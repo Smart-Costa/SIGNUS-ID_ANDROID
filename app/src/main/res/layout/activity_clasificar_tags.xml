@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/ClasificarTags"
+        android:layout_width="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:text="█ ■ █ ■ █"
+            />
+
+        <LinearLayout
+            android:layout_height = "wrap_content"
+            android:layout_width  = "match_parent"
+            android:orientation   = "vertical"
+            android:layout_marginLeft="15dp"
+            android:gravity="center"
+            android:layout_marginRight="15dp"
+            >
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="27dp"
+                android:layout_weight="1"
+                android:text="Seleccione Una Categoría"
+                android:layout_centerInParent="true"
+                android:textAlignment="center"
+                android:textSize="17dp"
+                android:textStyle="bold"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal"
+                >
+
+                <Spinner
+                    android:id="@+id/cmbTagCategoria"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:ems="10"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_height = "15dp"
+            android:layout_width  = "match_parent"
+            android:text          = "█ ■ █ ■ █"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"/>
+        <LinearLayout
+            android:layout_height = "wrap_content"
+            android:layout_width  = "match_parent"
+            android:orientation   = "vertical"
+            android:layout_marginLeft="15dp"
+            android:gravity="center"
+            android:layout_marginRight="15dp"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal"
+                > <Button
+                android:id="@+id/btn_VerResultados"
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="5dp"
+                android:background="@color/colorPrimary"
+                android:text="Ver Resultado"
+                android:textColor="@android:color/background_light"
+                android:textStyle="bold"></Button>
+
+
+            </LinearLayout>
+        </LinearLayout>
+        <RelativeLayout
+            android:layout_height = "8dp"
+            android:layout_width  = "match_parent"
+            android:text          = "█ ■ █ ■ █"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"/>
+
+        <LinearLayout
+            android:layout_height = "wrap_content"
+            android:layout_width  = "match_parent"
+            android:orientation   = "vertical"
+            android:layout_marginLeft="15dp"
+            android:gravity="center"
+            android:layout_marginRight="15dp"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal"
+                >
+                <CheckBox
+                    android:id="@+id/ckReclasifica"
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:text="Reclasificar"
+                    android:layout_weight="1" />
+                <Button
+                    android:id="@+id/btn_Clasificar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:layout_centerInParent="true"
+                    android:background="@color/colorPrimary"
+                    android:text="Clasificar Tags"
+                    android:textColor="@android:color/background_light"
+                    android:textStyle="bold"
+                    ></Button>
+            </LinearLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_height = "15dp"
+            android:layout_width  = "match_parent"
+            android:text          = "█ ■ █ ■ █"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listTags"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:text="█ ■ █ ■ █"
+            />
+
+    </LinearLayout>
+
+
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--Array con los valores de la cabecera de la tabla -->
+    <string-array name="header_table">
+        <item>Sector</item>
+        <item>Edificio</item>
+        <item>País</item>
+        <item>Razón Social</item>
+        <item>Tag</item>
+    </string-array>
+
+    <string-array name="opc_sincronizacion">
+        <item>--Seleccionar--</item>
+        <item>Todo</item>
+        <item>Activos</item>
+        <item>Usuarios</item>
+        <item>Sectores</item>
+        <item>Inventarios</item>
+    </string-array>
+
+</resources>

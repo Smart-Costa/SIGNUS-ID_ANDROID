@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView android:layout_height = "wrap_content"
+    android:layout_width = "wrap_content"
+    tools:context = "com.example.diverscan.activeid.Inventory.Cargar_Toma_Fisica"
+    xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:tools = "http://schemas.android.com/tools" >
+
+    <LinearLayout
+        android:background = "@color/colorPrimary"
+        android:gravity = "center_horizontal"
+        android:layout_height = "wrap_content"
+        android:layout_gravity = "center_horizontal"
+        android:layout_width = "wrap_content"
+        android:orientation = "vertical"
+        android:padding = "10px" >
+
+        <!--■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■-->
+
+        <TextView
+            android:layout_width="106dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="left"
+            android:text=" Fecha"
+            android:textColor="@color/blanco"
+            android:textSize="10pt" />
+
+        <DatePicker
+            android:background = "@color/blanco"
+            android:calendarViewShown = "false"
+            android:datePickerMode = "spinner"
+            android:layout_height = "wrap_content"
+            android:layout_marginLeft = "10dp"
+            android:layout_marginRight = "10dp"
+            android:layout_width = "wrap_content" />
+
+        <RelativeLayout android:layout_height = "5dp"
+            android:layout_width = "match_parent"
+            android:text = "█ ■ █ ■ █" />
+
+        <Button
+            android:background = "@color/blanco"
+            android:id = "@+id/per_dat_des_btn_ace"
+            android:layout_height = "wrap_content"
+            android:layout_width = "wrap_content"
+            android:padding = "10dp"
+            android:text = "Aceptar"
+            android:textAllCaps = "false"
+            android:textColor = "@color/colorPrimary"
+            android:textSize = "8pt" />
+
+        <RelativeLayout android:layout_height = "5dp"
+            android:layout_width = "match_parent"
+            android:text = "█ ■ █ ■ █" />
+
+        <!--■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■-->
+
+    </LinearLayout>
+
+</ScrollView>

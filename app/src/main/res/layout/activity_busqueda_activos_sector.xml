@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/elegirubicacion"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <!-- Ver -->
+            <TextView
+                android:id="@+id/lblTipoUbicacion"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAlignment="center"
+                android:text="Seleccione el tipo de ubicación"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                />
+            <RadioGroup
+                android:id="@+id/opciones_inventario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="40dp"
+                android:layout_marginLeft="10dp"
+                android:checkedButton="@id/rbt_ubicManual"
+                android:orientation="horizontal"
+                >
+
+                <RadioButton
+                    android:id="@+id/rbt_ubicManual"
+                    android:layout_width="3dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.8"
+                    android:text="Ubicación Manual"
+                    android:onClick="onRadioButtonClicked"/>
+
+                <RadioButton
+                    android:id="@+id/rbt_ubicPorEpc"
+                    android:layout_width="5dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.8"
+                    android:text="Ubicación por EPC"
+                    android:onClick="onRadioButtonClicked"/>
+            </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/PanelEpc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <EditText
+                    android:id="@+id/txt_epcInventario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:hint="Lea un Tag"
+                    android:maxLength="24"
+                    android:enabled="false"
+                    android:textSize="18px"/>
+
+                <LinearLayout
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_ver"
+                    android:layout_width="68dp"
+                    android:layout_height="27dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimary"
+                    android:text="@string/ver"
+                    android:textColor="@android:color/background_light"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+
+
+            <!-- cuadro de texto-->
+
+
+            <LinearLayout
+                android:id="@+id/Espacio1"
+                android:layout_width="match_parent"
+                android:layout_height="21dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/Espacio2"
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/panelVista"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                >
+                <EditText
+                    android:id="@+id/SectorTexto"
+                    android:layout_width="match_parent"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:hint="Sector de toma"
+                    android:enabled="false"
+                    android:singleLine="true"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/Espacio3"
+                android:layout_width="match_parent"
+                android:layout_height="21dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+
+            <!--tipo inventario-->
+
+
+            <!-- compania -->
+            <LinearLayout
+                android:id="@+id/Espacio4"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/PanelTituloRazon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/lbl_compania"
+                    android:layout_width="92dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/compañia_actualiza" />
+
+                <LinearLayout
+                    android:layout_width="14dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+
+            <!-- compania -->
+            <LinearLayout
+                android:id="@+id/Espacio5"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/PanelRazonSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <Spinner
+                    android:id="@+id/compania_toma"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:ems="10"/>
+
+                <LinearLayout
+                    android:layout_width="14dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+
+            <!-- Edificio -->
+            <LinearLayout
+                android:id="@+id/Espacio6"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/PanelTituloEdificio"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/lbl_edificio"
+                    android:layout_width="92dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/edificio_actualiza" />
+
+                <LinearLayout
+                    android:layout_width="14dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/Espacio7"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/PanelEdificioSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <Spinner
+                    android:id="@+id/edificio_toma"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:ems="10"/>
+
+                <LinearLayout
+                    android:layout_width="14dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+
+            <!-- Piso -->
+            <LinearLayout
+                android:id="@+id/Espacio8"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/PanelTituloPiso"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/lbl_piso"
+                    android:layout_width="92dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/piso_actualiza" />
+
+                <LinearLayout
+                    android:layout_width="14dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/Espacio9"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/PanelPisoSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <Spinner
+                    android:id="@+id/piso_toma"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:ems="10"/>
+
+                <LinearLayout
+                    android:layout_width="14dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+
+            <!-- Sector -->
+            <LinearLayout
+                android:id="@+id/Espacio10"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/PanelTituloSector"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/lbl_oficina"
+                    android:layout_width="89dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/oficina_actualiza" />
+                <EditText
+                    android:id="@+id/txtSectorBusqueda"
+                    android:layout_width="190dp"
+                    android:layout_height="wrap_content"></EditText>
+                <LinearLayout
+                    android:layout_width="14dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/Espacio11"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:orientation="vertical"
+                android:visibility="gone"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/PanelSectorSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="25dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                >
+
+                <LinearLayout
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <Spinner
+                    android:id="@+id/oficina_toma"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:ems="10"/>
+
+                <LinearLayout
+                    android:layout_width="14dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+
+
+
+            <!-- Boton Continuar -->
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                >
+
+                <LinearLayout
+                    android:layout_width="53dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_continua"
+                    android:layout_width="184dp"
+                    android:layout_height="27dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimary"
+                    android:text="@string/conti"
+                    android:textColor="@android:color/background_light"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="55dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+            <!-- fin continuar-->
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:orientation="vertical"></LinearLayout>
+
+
+            <!-- Boton elegir ubicacion manualmente  -->
+            <!-- fin elegir ubicacion manualmente-->
+
+
+
+
+        </LinearLayout>
+    </ScrollView>
+</android.support.constraint.ConstraintLayout>

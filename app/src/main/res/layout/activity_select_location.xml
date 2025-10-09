@@ -1,0 +1,87 @@
+<!-- Archivo: res/layout/activity_select_location.xml -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seleccione una compañía"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/compania_crea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/compañia_crea" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seleccione un edificio"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/edificio_crea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/edificio_crea" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seleccione un piso"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/piso_crea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/piso_crea" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seleccione una oficina"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/oficina_crea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/oficina_crea" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
+
+        <Button
+            android:id="@+id/btn_siguiente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Siguiente"
+            android:background="@color/colorPrimary"
+            android:textColor="@android:color/background_light"
+            android:textStyle="bold" />
+    </LinearLayout>
+</ScrollView>

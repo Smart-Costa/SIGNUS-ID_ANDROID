@@ -1,0 +1,71 @@
+<!-- Archivo: res/layout/activity_register_asset_secondary.xml -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/txt_marca"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Marca"/>
+
+        <EditText
+            android:id="@+id/txt_modelo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Modelo" />
+
+        <EditText
+            android:id="@+id/txt_anno"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Año de fabricación"/>
+
+        <EditText
+            android:id="@+id/txt_capacidad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Capacidad"/>
+        <EditText
+            android:id="@+id/txt_detalle_estado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Detalle del estado"/>
+        <TextView android:text="Estado del activo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Spinner
+            android:id="@+id/sp_estado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
+        <TextView android:text="Estado de conservación"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Spinner
+            android:id="@+id/sp_estado_conservacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
+
+        <Button
+            android:id="@+id/btn_crear_activo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Crear Activo"
+            android:background="@color/colorPrimary"
+            android:textColor="@android:color/background_light"
+            android:textStyle="bold"  />
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/sincronizar_view"
+    tools:context=".Sincronizar.sincronizar_base">
+
+
+    <ScrollView
+        android:id="@+id/SincronizarForm"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="45dp"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:orientation="vertical"></LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginBottom="25dp">
+
+                <LinearLayout
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    ></LinearLayout>
+
+                <TextView
+                    android:id="@+id/lblSpinnerDescripciones"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sincronizar:" />
+
+                <Spinner
+                    android:id="@+id/SpinnerSincronizacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:ems="10"
+                    android:spinnerMode="dropdown"
+                    android:padding="2dp"
+                    android:textSize="6dp" />
+
+                <LinearLayout
+                    android:layout_width="14dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_enviar"
+                    android:layout_width="68dp"
+                    android:layout_height="27dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimary"
+                    android:text="@string/enviar"
+                    android:textColor="@android:color/background_light"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:orientation="vertical"></LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"></LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_obtener"
+                    android:layout_width="60dp"
+                    android:layout_height="27dp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="40dp"
+                    android:background="@color/colorPrimary"
+                    android:text="@string/obtenerI"
+                    android:textColor="@android:color/background_light"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="15dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/mensaje"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="" />
+            </LinearLayout>
+
+           <!-- <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="122dp"
+                android:orientation="vertical"></LinearLayout>-->
+
+            <RadioGroup
+                android:id="@+id/opciones_sync"
+                android:layout_width="match_parent"
+                android:layout_height="138dp"
+                android:gravity="center|start"
+                android:orientation="vertical"
+                android:layout_marginLeft="40dp"
+                android:visibility="gone">
+
+
+                <RadioButton
+                    android:id="@+id/radio_Actualiza"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/radioButton"
+                    android:layout_centerHorizontal="true"
+                    android:checked="true"
+                    android:text="Actualizar todo" />
+
+                <RadioButton
+                    android:id="@+id/radio_tagSync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/radioButton"
+                    android:layout_centerHorizontal="true"
+                    android:checked="false"
+                    android:text="Sincronizar tag sectores"
+                    />
+
+               <!-- <RadioButton
+                    android:id="@+id/radio_Ingresa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/radioButton"
+                    android:layout_centerHorizontal="true"
+                    android:checked="false"
+                    android:text="Actualizar activos nuevos" />-->
+
+
+
+
+            </RadioGroup>
+        </LinearLayout>
+    </ScrollView>
+
+
+</android.support.constraint.ConstraintLayout>

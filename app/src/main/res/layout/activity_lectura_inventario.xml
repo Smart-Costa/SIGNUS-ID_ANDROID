@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/clLecturaInventario"
+    tools:context="Inventory.Lectura_Inventario">
+
+    <ScrollView
+        android:id="@+id/LecturaInventario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:gravity="center">
+                    <Switch
+                        android:id="@+id/swRfid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="15dp"
+                        android:checked="true"
+                        android:showText="true"
+                        android:switchMinWidth="56dp"
+                        android:switchTextAppearance="@style/AppTheme"
+                        android:text="RFID"
+                        android:textOff="Off"
+                        android:textOn="On"
+                        android:theme="@style/AppTheme" />
+
+                    <EditText
+                        android:id="@+id/txt_barcode"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:configChanges="screenSize|orientation"
+                        android:ems="10"
+                        android:inputType="textPersonName"
+                        android:text=""
+                        android:textSize="20px"
+                        android:windowSoftInputMode="stateHidden" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <Button
+                    android:id="@+id/btn_GuardarToma"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@color/colorPrimary"
+                    android:elevation="50dp"
+                    android:text="Guardar Resultado"
+                    android:textColor="@android:color/background_light"
+                    android:textSize="10dp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/EncabezadoEncontrados"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/verde"
+                    android:text="Encontrado"
+                    android:textAlignment="center"
+                    android:textColor="@color/blanco"
+                    android:textSize="12dp" />
+
+                <EditText
+                    android:id="@+id/txtEncontrados"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:enabled="false"
+                    android:inputType="number"
+                    android:text=""
+                    android:textSize="20px"
+                    android:windowSoftInputMode="stateHidden" />
+
+                <TextView
+                    android:id="@+id/Faltantes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/rojo"
+                    android:text="Faltante"
+                    android:textAlignment="center"
+                    android:textColor="@color/blanco"
+                    android:textSize="12dp" />
+
+
+                <EditText
+                    android:id="@+id/txtFaltantes"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:enabled="false"
+                    android:inputType="number"
+                    android:text=""
+                    android:textSize="20px"
+                    android:windowSoftInputMode="stateHidden" />
+
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimary"
+                    android:text="No Pertenece"
+                    android:textAlignment="center"
+                    android:textColor="@color/blanco"
+                    android:textSize="12dp" />
+
+                <EditText
+                    android:id="@+id/txtSobrantes"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:enabled="false"
+                    android:inputType="number"
+                    android:text=""
+                    android:textSize="20px" />
+
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/txtLeidos"
+                android:layout_width="5dp"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:configChanges="screenSize|orientation"
+                android:enabled="false"
+                android:inputType="number"
+                android:text=""
+                android:textSize="22px"
+                android:visibility="gone"
+                android:windowSoftInputMode="stateHidden" />
+
+            <EditText
+                android:id="@+id/txtUbicacion"
+                android:layout_width="5dp"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:configChanges="screenSize|orientation"
+                android:enabled="false"
+                android:inputType="number"
+                android:text=""
+                android:textSize="22px"
+                android:visibility="gone"
+                android:windowSoftInputMode="stateHidden" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/listView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:scrollbars="vertical"
+                        tools:listitem="@layout/campos_lectura_inventario" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:text="█ ■ █ ■ █" />
+
+        </LinearLayout>
+    </ScrollView>
+</android.support.constraint.ConstraintLayout>

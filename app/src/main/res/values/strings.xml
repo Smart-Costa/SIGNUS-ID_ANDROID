@@ -1,0 +1,174 @@
+<resources>
+
+    <!-- Strings de Login-->
+    <string name="prompt_email">Email</string>
+    <string name="app_name">Active ID</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="usuario">Usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="Ingresar_login">Ingresar</string>
+    <string name="error_invalid_email">Este Usuario no es válido </string>
+    <string name="error_invalid_password">La contraseña es un campo requerido </string>
+    <string name="error_incorrect_password">Esta contraseña es incorrecta</string>
+    <string name="error_field_required">El usuario es un campo requerido</string>
+    <string name="permission_rationale">"Pemitir acceso a los contactos y al almacenamiento interno."</string>
+
+    <!-- Strings de Principal-->
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="principal">Principal</string>
+    <string name="opciones">Cerrar Sesión</string>
+    <string name="miperfil">Mi Perfil</string>
+    <string name="header_title">Bienvenido</string>
+    <string name="header_subtitle">Usuario</string>
+
+
+    <!--String Cabeceras de activities-->
+    <string name="title_activity_main">Active ID</string>
+    <string name="crear">Crear Activo</string>
+    <string name="Actualizar">Buscar y Actualizar</string>
+    <string name="Sincronizar">Sincronizar Activos</string>
+    <string name="Sector">Asignar Tag A Sector</string>
+    <string name="SectorInventarios">Hacer Inventarios</string>
+    <string name="Ubicaciones">Ajustar Ubicación</string>
+    <string name="ActivosXSector">Activos Por Sector</string>
+    <string name="SubActivos">SubActivos</string>
+    <string name="FotosActivo">Fotos Del Activo</string>
+    <string name="Configuraciones">Configuraciones</string>
+    <string name="Tags">Clasificar Tags</string>
+    <string name="Inicio">Inicio</string>
+    <string name="UbicacionNuevoActivo">Seleccione la ubicación</string>
+    <string name="DatosNuevoActivoObligatorios">Datos del Activo</string>
+    <string name="DatosNuevoActivoSecundarios">Datos del Activo</string>
+
+
+    <!--String Asignar Tag Activo-->
+    <string name="ver">Ver</string>
+    <string name="continuar">+</string>
+    <string name="conti">Continuar</string>
+    <string name="numero">N°:</string>
+    <string name="placa">Placa:</string>
+    <string name="descripcion">Descripción:</string>
+    <string name="compañia">Región:</string>
+    <string name="edificio">Edificio:</string>
+    <string name="piso">Piso:</string>
+    <string name="oficina">Oficina:</string>
+    <string name="encargado">Responsable:</string>
+    <string name="epc">EPC:</string>
+    <string name="titulo">Actualizar Activo</string>
+    <string name="epc_nuevo">EPC Nuevo:</string>
+    <string name="obtener">Obtener</string>
+    <string name="grabar">Grabar</string>
+    <string name="guardar">Guardar</string>
+    <string name="barcode_required">Debe ingresar el código de barras del activo</string>
+
+    <!--String Asignar Tag Sector-->
+
+    <string name="titulo2">Asignar tag a sector</string>
+    <string name="RowOffice">Oficina</string>
+    <string name="Rowfloor">Piso</string>
+    <string name="Rowbuild">Edificio</string>
+    <string name="RowCompanie">Región</string>
+    <string name="RowTag">Tag</string>
+    <string name="RowSectores">Sectores</string>
+    <string name="sector_required">Debe ingresar el nombre del sector</string>
+    <string name="OfficeS">Oficina:</string>
+    <string name="floorS">Piso:</string>
+    <string name="buildS">Edificio:</string>
+    <string name="tagS">EPC:</string>
+    <string name="statusS">Estado:</string>
+    <string name="behind">Atrás</string>
+
+    <!--String Localizar activos-->
+    <string name="titulo3">Localizar Activo</string>
+    <string name="rownum">Número activo</string>
+    <string name="rowdescription">Descripción</string>
+    <string name="num_required">Debe ingresar el número del activo</string>
+    <string name="iniciar">Iniciar</string>
+    <string name="detener">Detener</string>
+
+
+    <!-- String Hacer Inventario -->
+    <string name="Buscar">Buscar</string>
+    <string name="Name">Nombre</string>
+    <string name="Descrip">Descripción</string>
+    <string name="fecha">Fecha inicial</string>
+    <string name="fechaFinal">Fecha final</string>  <!-- prueba estado -->
+    <string name="estadoToma">Estado</string>  <!-- prueba estado -->
+    <string name="Tipo_inventario">Tipo de Inventario:</string>
+    <string name="Elegir_ubicacion_manual">Elegir ubicación manualmente</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="cancelar">Cancelar</string>
+
+
+    <!-- String Sincronizar base y web service  -->
+    <string name="enviar">Enviar</string>
+    <string name="obtenerI">Obtener</string>
+
+    <!--String Actualizar Activo-->
+
+    <string name="buscar">Buscar</string>
+    <string name="guardar_actualiza">Actualizar</string>
+    <string name="reescribirEPC">Reescribir EPC</string>
+    <string name="encenderAntena">Activar Antena</string>
+
+    <string name="numero_actualiza">N°:</string>
+    <string name="placa_actualiza">Etiqueta Nueva:</string>
+    <string name="descripcion_actualiza">Descripción corta y tipo:</string>
+    <string name="categoria_actualiza">Categoría:</string>
+    <string name="compañia_actualiza">Región:</string>
+    <string name="edificio_actualiza">Edficio:</string>
+    <string name="piso_actualiza">Piso:</string>
+    <string name="tipo_inventario">Tipo Inventario:</string>
+    <string name="oficina_actualiza">Oficina:</string>
+    <string name="encargado_actualiza">Responsable:</string>
+    <string name="marca_actualiza">Marca / Material:</string>
+    <string name="modelo_actualiza">Modelo / Color:</string>
+    <string name="serie_actualiza">Serie:</string>
+    <string name="epc_actualiza">EPC:</string>
+    <string name="estadoConser_actualiza">Estado Conservacion</string>
+    <string name="estado_actualiza">Condición De Uso</string>
+    <string name="titulo_actualiza">Actualizar Activo</string>
+    <string name="activo_required">Debe ingresar un número valido</string>
+
+
+    <!--String Nuevo Activo-->
+
+
+    <string name="IngresaActivo">Crear Activo</string>
+    <string name="IngresaSubActivo">Crear Sub Activo</string>
+    <string name="numero_crea">N° Activo</string>
+    <string name="placa_crea">Etiqueta Nueva</string>
+    <string name="descripcion_crea">Descripción corta y tipo</string>
+    <string name="compañia_crea">Seleccione la región</string>
+    <string name="edificio_crea">Seleccione el edificio</string>
+    <string name="piso_crea">Seleccione el piso</string>
+    <string name="oficina_crea">Seleccione la Oficina</string>
+    <string name="encargado_crea">Responsable</string>
+    <string name="marca_crea">Marca / Material</string>
+    <string name="modelo_crea">Modelo / Color</string>
+    <string name="serie_crea">Serie</string>
+    <string name="epc_crea">EPC</string>
+    <string name="estadoConser_crea">Estado Conservacion</string>
+    <string name="estado_crea">Condición De Uso</string>
+    <string name="titulo4">Ingresar Activo</string>
+    <string name="TituloSubActivo">Ingresar Sub Activo</string>
+    <string name="titulo_Crear">Ingresar Activo</string>
+
+    <!--String Carrusel Foto -->
+    <string name="tituloReescribir">Reescribir Foto</string>
+    <string name="mensajeReescribir">Ya existe una foto. ¿Desea sobreescribir la foto?</string>
+    <string name="title_datepicker_year">Seleccione un año</string>
+
+    <!--String permisos del bluetooth -->
+    <string name="permission_rationale_bluetooth">Este permiso es necesario para acceder a Bluetooth.</string>
+    <string name="permission_denied_bluetooth">Los permisos de Bluetooth son necesarios para esta funcionalidad.</string>
+
+</resources>

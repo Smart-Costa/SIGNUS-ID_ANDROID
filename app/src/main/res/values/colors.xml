@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#EBB71E</color>
+    <color name="colorPrimaryDark">#CE9D0C</color>
+    <color name="colorAccent">#555555</color>
+    <color name="color1">#f6dba8</color>
+    <color name="color2">#d8d8d6</color>
+    <color name="color3">#343434</color>
+    <color name="color4">#1c1c1c</color>
+    <color name="blanco">#FFFFFF</color>
+    <color name="rojo">#E51A1A</color>
+    <color name="verde">#00C264</color>
+    <color name="AlertaVerde">#00C264</color>
+    <color name="SeleccionAjuste">#FC7676</color>
+    <color name="colorError">#D81622</color>
+    <color name="layout_correcto">#0C9E0C</color>
+    <color name="col_gris_claro">#AAAAAA</color>
+    <color name="button_container">#ebb71e</color>
+    <color name="AlertColor">#CC2C1F</color>
+    <color name="AcceptColor">#04A54D</color>
+    <color name="notificationTitle">#E1E6F0</color>
+</resources>
