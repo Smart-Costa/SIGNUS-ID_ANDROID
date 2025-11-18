@@ -8,7 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet;
 import com.example.diverscan.activeid.R;
-import com.example.diverscan.activeid.login.LoginActivity;
+import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.zebra.rfid.api3.TagData;
 
 import java.util.List;

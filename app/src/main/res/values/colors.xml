@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#EBB71E</color>
-    <color name="colorPrimaryDark">#CE9D0C</color>
+    <color name="colorPrimary">#FF5100</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
     <color name="colorAccent">#555555</color>
     <color name="color1">#f6dba8</color>
     <color name="color2">#d8d8d6</color>
@@ -19,4 +19,11 @@
     <color name="AlertColor">#CC2C1F</color>
     <color name="AcceptColor">#04A54D</color>
     <color name="notificationTitle">#E1E6F0</color>
+
+    <!-- Fondo del drawer -->
+    <color name="nav_drawer_bg">#FFFFFF</color>
+    <color name="nav_item_text_tint">#222222</color>
+    <color name="nav_item_icon_tint">#4A4A4A</color>
+    <color name="nav_item_bg_tint">#E3F2FD</color>
+    <color name="nav_item_ripple">#1A2196F3</color>
 </resources>

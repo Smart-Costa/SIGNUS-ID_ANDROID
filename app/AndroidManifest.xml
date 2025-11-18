@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Main.MainActivity"
+            android:name=".UI.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"/>
         <activity android:name=".Assign_tag_Assets.Asignar_tag_activo" />
@@ -57,75 +57,75 @@
         <activity
             android:name=".Assign_tag_Offices.Asignar_tag_sector"
             android:label="@string/Sector"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".Assign_tag_Offices.Grabar_Tag_Sector"
             android:label="@string/Sector"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".Activo.activoPorDescripcion" />
         <activity android:name=".Locate_Assets.Localizar_activo" />
         <activity
             android:name=".Activo.createAssets"
             android:label="@string/crear"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".Locate_Assets.AsignarUbicacion"
             android:label="@string/Ubicaciones"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".Tags.ClasificacionTags"
             android:label="@string/Tags"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".Locate_Assets.AsignarUbicacionTodo"
             android:label="@string/Ubicaciones"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".Locate_Assets.Actualizar_activo"
             android:label="@string/Actualizar"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".Locate_Assets.Localizacion_activo" />
         <activity
             android:name=".Inventory.Cargar_Toma_Fisica"
             android:label="@string/SectorInventarios"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".Inventory.ElegirUbicacion_TomaFisica"
             android:label="@string/SectorInventarios"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".Inventory.Lectura_Inventario"
             android:label="@string/SectorInventarios"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".Sincronizar.sincronizar_base"
             android:label="@string/Sincronizar"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".GeneralTag.ConfiguracionAntena"
             android:label="@string/Configuraciones"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".Oficina.ActivosPorSector"
             android:label="@string/ActivosXSector"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".Oficina.MostrarActivosSector"
             android:label="@string/ActivosXSector"
-            android:parentActivityName=".Main.MainActivity"
+            android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".SubActivos.SubActivoActivity"

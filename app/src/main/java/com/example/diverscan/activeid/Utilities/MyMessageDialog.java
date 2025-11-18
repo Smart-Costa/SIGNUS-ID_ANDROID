@@ -2,7 +2,7 @@ package com.example.diverscan.activeid.Utilities;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -25,7 +25,7 @@ public class MyMessageDialog {
         TextView txvMessage = view.findViewById(R.id.txvMessageDialog);
         txvTitulo.setText(title);
         txvMessage.setText(message);
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
         builder.setView(view);
         builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
@@ -52,7 +52,7 @@ public class MyMessageDialog {
         TextView txvMessage = view.findViewById(R.id.txvMessageDialog);
         txvTitulo.setText(title);
         txvMessage.setText(message);
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
         builder.setView(view);
         builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
@@ -75,7 +75,7 @@ public class MyMessageDialog {
         TextView txvMessage = view.findViewById(R.id.txvMessageDialog);
         txvTitulo.setText(title);
         txvMessage.setText(message);
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
         builder.setView(view);
         builder.setPositiveButton(_boton, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {

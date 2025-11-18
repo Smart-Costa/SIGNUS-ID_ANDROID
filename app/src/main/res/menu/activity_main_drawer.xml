@@ -5,128 +5,94 @@
 
     <group android:checkableBehavior="single">
 
-        <!--<item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+        <!-- 🔄 Sincronización -->
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
-
-         Item para opciones de menu-->
-        <item
-            android:id="@+id/SincronizacionMenu"
+            android:id="@+id/menu_sincronizacion"
             android:title="Sincronización">
             <menu>
                 <item
-                    android:id="@+id/sub_Sincronizar"
+                    android:id="@+id/sub_sincronizar"
                     android:icon="@drawable/sincronizar"
                     android:title="Sincronizar"
                     android:visible="false" />
             </menu>
         </item>
 
-
+        <!-- 🏷️ Activos -->
         <item
-            android:id="@+id/ActivosMenu"
+            android:id="@+id/menu_activos"
             android:title="Activos">
             <menu>
-             <!--  <item
-                        android:id="@+id/sub_AsignarEPC"
-                    android:icon="@drawable/iconosepc"
-                    android:title="Asignar EPC al Activo"/>
--->
                 <item
-                    android:id="@+id/sub_CrearActivo"
+                    android:id="@+id/sub_crear_activo"
                     android:icon="@drawable/iconoscrear"
                     android:title="Crear Activo"
                     android:visible="false" />
 
-
-                <!--Actualizar activo, creado por Alejandra-->
-
-
-
-                <!--  <Actualizar activo, creado por Alejandra-->
-
                 <item
-                    android:id="@+id/sub_ActualizarActivo"
+                    android:id="@+id/sub_actualizar_activo"
                     android:icon="@drawable/iconosactualizar"
                     android:title="Búsqueda y Actualización de Activos"
                     android:visible="false" />
-              <!--  <item
-                    android:id="@+id/sub_LocalizarActivo"
-                    android:icon="@drawable/localizaractivo"
-                    android:title="Localizar Activo"
-                    android:visible="false" />-->
+
                 <item
-                    android:id="@+id/sub_HacerInventario"
+                    android:id="@+id/sub_hacer_inventario"
                     android:icon="@drawable/hacerinventario"
                     android:title="Hacer Inventarios"
                     android:visible="false" />
+
                 <item
-                    android:id="@+id/sub_AjusteUbicacion"
+                    android:id="@+id/sub_ajuste_ubicacion"
                     android:icon="@drawable/ajusteubicacion"
                     android:title="Ajuste de Ubicación"
                     android:visible="false" />
-
             </menu>
-
         </item>
+
+        <!-- 🧭 Tags -->
         <item
-            android:id="@+id/subClasificarTag"
-            android:title="Tags"
-            >
+            android:id="@+id/menu_tags"
+            android:title="Tags">
             <menu>
                 <item
-                    android:id="@+id/sub_Clasificar"
+                    android:id="@+id/sub_clasificar_tag"
                     android:icon="@drawable/configuracion"
-                    android:title="Clasificar tags"
-                    android:visible="false"/>
+                    android:title="Clasificar Tags"
+                    android:visible="false" />
             </menu>
         </item>
 
+        <!-- 🏢 Sectores -->
         <item
-            android:id="@+id/SectoresMenu"
-            android:title="Sectores"
-            >
+            android:id="@+id/menu_sectores"
+            android:title="Sectores">
             <menu>
                 <item
-                    android:id="@+id/sub_AsignarTagSector"
+                    android:id="@+id/sub_asignar_tag_sector"
                     android:icon="@drawable/asignartagsector"
                     android:title="Asignar Tag a Sector"
-                    android:visible="false"/>
-                <item
-                    android:id="@+id/sub_ActivosXSector"
-                    android:icon="@drawable/sector"
-                    android:title="Activos Por Sector"
-                    android:visible="false"/>
-            </menu>
+                    android:visible="false" />
 
+                <item
+                    android:id="@+id/sub_activos_sector"
+                    android:icon="@drawable/sector"
+                    android:title="Activos por Sector"
+                    android:visible="false" />
+            </menu>
         </item>
 
+        <!-- ⚙️ Configuración -->
         <item
-            android:id="@+id/ConfiguracionMenu"
-            android:title="Configuración"
-            >
+            android:id="@+id/menu_configuracion"
+            android:title="Configuración">
             <menu>
                 <item
-                    android:id="@+id/sub_ConfigurarAntena"
+                    android:id="@+id/sub_configurar_antena"
                     android:icon="@drawable/configuracion"
                     android:title="Configurar Antena"
-                    android:visible="false"/>
+                    android:visible="false" />
             </menu>
         </item>
 
     </group>
-
 </menu>

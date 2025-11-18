@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Opción Mi Perfil -->
+    <item
+        android:id="@+id/mi_perfil"
+        android:orderInCategory="100"
+        android:title="@string/miperfil"
+        app:showAsAction="never"
+        android:visible="false" />
+
+    <!-- Opción Configuración -->
+    <!--<item
+        android:id="@+id/action_settings"
+        android:checkable="false"
+        android:orderInCategory="200"
+        android:title="@string/opciones"
+        app:showAsAction="never" />-->
+
+    <!-- Opción Cerrar sesión -->
+    <item
+        android:id="@+id/action_logout"
+        android:title="@string/cerrar_sesion"
+        android:orderInCategory="300"
+        app:showAsAction="never" />
+
+</menu>

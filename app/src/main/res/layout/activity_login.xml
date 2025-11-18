@@ -2,101 +2,141 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:id="@+id/login_activity"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".login.LoginActivity">
+    android:padding="@dimen/activity_horizontal_margin"
+    tools:context=".UI.login.LoginActivity">
 
-    <!-- Login progress -->
-    <ProgressBar
-        android:id="@+id/login_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:src="@drawable/logo2"
-            app:srcCompat="@color/colorAccent" />
-    </LinearLayout>
+        android:adjustViewBounds="true"
+        android:layout_marginTop="40dp"
+        android:padding="16dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/logo2" />
 
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="40dp"
+        android:fillViewport="true">
 
         <LinearLayout
             android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <android.support.design.widget.TextInputLayout
+            <!-- Usuario -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="@font/public_sans"
+                android:text="@string/usuario"
+                android:textColor="#606060"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:boxBackgroundMode="outline"
+                app:hintEnabled="false">
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/user"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/usuario"
                     android:imeOptions="actionNext"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1"
-                    android:singleLine="true" />
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:padding="12dp"
+                    android:textSize="14sp"
+                    android:textColor="#606060"
+                    android:textColorHint="#898989"
+                    android:backgroundTint="#FFF"
+                    android:hint="Administrador"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            </android.support.design.widget.TextInputLayout>
+            <!-- Contraseña -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="@font/public_sans"
+                android:text="@string/password"
+                android:textColor="#606060"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:boxBackgroundMode="outline"
+                app:endIconMode="password_toggle"
+                app:hintEnabled="false" >
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/password"
-                    android:imeActionId="6"
-                    android:imeActionLabel="@string/Ingresar_login"
                     android:imeOptions="actionGo"
                     android:inputType="textPassword"
-                    android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:padding="12dp"
+                    android:textSize="14sp"
+                    android:textColor="#606060"
+                    android:textColorHint="#898989"
+                    android:backgroundTint="#FFF"
+                    android:hint="************" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            </android.support.design.widget.TextInputLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="31dp"
-                android:orientation="horizontal"></LinearLayout>
-
-            <Button
-                android:id="@+id/btn_login"
-                style="?android:textAppearanceSmall"
+            <!-- Recordarme -->
+            <CheckBox
+                android:id="@+id/remember_me"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:background="@color/colorPrimary"
-                android:text="@string/Ingresar_login"
-                android:textColor="@android:color/background_light"
+                android:fontFamily="@font/public_sans"
+                android:padding="8dp"
+                android:text="@string/recordarme"
+                android:textColor="#606060"
+                android:textSize="14sp"
                 android:textStyle="bold" />
+
+            <!-- Botón Ingresar -->
+            <Button
+                android:id="@+id/btn_login"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/btn_primary"
+                android:text="@string/Ingresar_login"
+                android:textColor="@color/blanco"
+                android:textStyle="bold"
+                android:textAllCaps="false"/>
+
+            <!-- Botón Sincronizar -->
+            <Button
+                android:id="@+id/btn_sync"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/btn_primary"
+                android:padding="10dp"
+                android:text="Sincronizar"
+                android:textColor="@color/blanco"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
     </ScrollView>

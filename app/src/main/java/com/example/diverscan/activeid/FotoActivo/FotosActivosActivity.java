@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -17,7 +17,7 @@ import android.widget.TextView;
 import com.example.diverscan.activeid.CarruselCompleto.CarruselFotosActivo;
 import com.example.diverscan.activeid.CarruselCompleto.Step;
 import com.example.diverscan.activeid.R;
-import com.example.diverscan.activeid.login.LoginActivity;
+import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.FotoDBHelper;
 
 import java.io.BufferedReader;

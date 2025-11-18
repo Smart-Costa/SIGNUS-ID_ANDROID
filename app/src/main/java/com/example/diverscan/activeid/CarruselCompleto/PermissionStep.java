@@ -2,7 +2,7 @@ package com.example.diverscan.activeid.CarruselCompleto;
 
 import android.os.Build;
 import android.os.Parcelable;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class PermissionStep extends Step implements Parcelable {

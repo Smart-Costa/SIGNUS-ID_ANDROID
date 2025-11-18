@@ -9,6 +9,7 @@
     <string name="usuario">Usuario</string>
     <string name="password">Contraseña</string>
     <string name="Ingresar_login">Ingresar</string>
+    <string name="recordarme">Recordarme</string>
     <string name="error_invalid_email">Este Usuario no es válido </string>
     <string name="error_invalid_password">La contraseña es un campo requerido </string>
     <string name="error_incorrect_password">Esta contraseña es incorrecta</string>
@@ -26,6 +27,7 @@
     <string name="principal">Principal</string>
     <string name="opciones">Cerrar Sesión</string>
     <string name="miperfil">Mi Perfil</string>
+    <string name="cerrar_sesion">Cerrar sesión</string>
     <string name="header_title">Bienvenido</string>
     <string name="header_subtitle">Usuario</string>
 

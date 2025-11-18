@@ -1,6 +1,6 @@
 package com.example.diverscan.activeid.Inventory;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class EntidadTiposInventarios {
 

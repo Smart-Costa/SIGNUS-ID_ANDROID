@@ -1,6 +1,6 @@
 package com.example.diverscan.activeid.SubActivos;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 public interface CallBackAssetTouch {
     void itemTouchOnMode(int oldPosition, int newPosition);

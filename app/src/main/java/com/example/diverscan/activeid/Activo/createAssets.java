@@ -9,7 +9,7 @@ import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -41,7 +41,7 @@ import com.example.diverscan.activeid.Piso.PisoNuevo;
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.RazonSocial.RazonNuevo;
 import com.example.diverscan.activeid.RazonSocial.RazonSocialDBHelper;
-import com.example.diverscan.activeid.login.LoginActivity;
+import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.newAssets;
 
 import java.text.SimpleDateFormat;

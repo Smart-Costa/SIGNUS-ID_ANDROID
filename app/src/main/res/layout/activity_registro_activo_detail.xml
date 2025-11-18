@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/blanco"
+    tools:context=".UI.activo.RegistroActivoDetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Título -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/publicsansbold"
+            android:text="Detalles del Activo"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#606060"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <!-- Numero de Activo -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingEnd="4dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Número de Activo"
+                    android:fontFamily="@font/publicsansbold"
+                    android:textColor="#606060"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundMode="outline"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/txtNumeroActivo"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:inputType="text"
+                        android:textColor="#606060"
+                        android:backgroundTint="#FFF"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <!-- Numero de Etiqueta -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="4dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Número de Etiqueta"
+                    android:fontFamily="@font/publicsansbold"
+                    android:textColor="#606060"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundMode="outline"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/txtNumeroEtiqueta"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:inputType="text"
+                        android:paddingHorizontal="10dp"
+                        android:textColor="#000000"
+                        android:backgroundTint="#FFF"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Campo 3 - Descripción corta -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Descripción corta"
+            android:fontFamily="@font/publicsansbold"
+            android:textColor="#606060"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/txtDescripcionCorta"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:inputType="textMultiLine"
+                android:gravity="top|start"
+                android:padding="10dp"
+                android:textColor="#000000"
+                android:backgroundTint="#FFF" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Campo 4 - Categoría -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Categoría"
+            android:fontFamily="@font/publicsansbold"
+            android:textColor="#606060"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="false">
+
+            <AutoCompleteTextView
+                android:id="@+id/spCategoria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:dropDownHeight="wrap_content"
+                android:dropDownHorizontalOffset="0dp"
+                android:dropDownVerticalOffset="8dp"
+                android:gravity="center_vertical"
+                android:fontFamily="@font/publicsansbold"
+                android:inputType="none"
+                android:paddingHorizontal="8dp"
+                android:padding="12dp"
+                android:singleLine="true"
+                android:textColor="#606060"
+                android:textColorHint="#898989"
+                android:background="#DDD"
+                android:hint="Seleccione un elemento" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Campo 5 - Estado -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estado"
+            android:fontFamily="@font/publicsansbold"
+            android:textColor="#606060"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="false">
+
+            <AutoCompleteTextView
+                android:id="@+id/spEstado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:dropDownHeight="wrap_content"
+                android:dropDownHorizontalOffset="0dp"
+                android:dropDownVerticalOffset="8dp"
+                android:gravity="center_vertical"
+                android:fontFamily="@font/publicsansbold"
+                android:inputType="none"
+                android:paddingHorizontal="8dp"
+                android:padding="12dp"
+                android:singleLine="true"
+                android:textColor="#606060"
+                android:textColorHint="#898989"
+                android:background="#DDD"
+                android:hint="Seleccione un elemento" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Campo 6 - Empresa -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Empresa"
+            android:fontFamily="@font/publicsansbold"
+            android:textColor="#606060"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="false">
+
+            <AutoCompleteTextView
+                android:id="@+id/spEmpresa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:dropDownHeight="wrap_content"
+                android:dropDownHorizontalOffset="0dp"
+                android:dropDownVerticalOffset="8dp"
+                android:gravity="center_vertical"
+                android:fontFamily="@font/publicsansbold"
+                android:inputType="none"
+                android:paddingHorizontal="8dp"
+                android:padding="12dp"
+                android:singleLine="true"
+                android:textColor="#606060"
+                android:textColorHint="#898989"
+                android:background="#DDD"
+                android:hint="Seleccione un elemento" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Campo 7 - Marca -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Marca"
+            android:fontFamily="@font/publicsansbold"
+            android:textColor="#606060"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="false">
+
+            <AutoCompleteTextView
+                android:id="@+id/spMarca"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:dropDownHeight="wrap_content"
+                android:dropDownHorizontalOffset="0dp"
+                android:dropDownVerticalOffset="8dp"
+                android:gravity="center_vertical"
+                android:fontFamily="@font/publicsansbold"
+                android:inputType="none"
+                android:paddingHorizontal="8dp"
+                android:padding="12dp"
+                android:singleLine="true"
+                android:textColor="#606060"
+                android:textColorHint="#898989"
+                android:background="#DDD"
+                android:hint="Seleccione un elemento" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Campo 8 - Modelo -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Modelo"
+            android:fontFamily="@font/publicsansbold"
+            android:textColor="#606060"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="false">
+
+            <AutoCompleteTextView
+                android:id="@+id/spModelo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:dropDownHeight="wrap_content"
+                android:dropDownHorizontalOffset="0dp"
+                android:dropDownVerticalOffset="8dp"
+                android:gravity="center_vertical"
+                android:fontFamily="@font/publicsansbold"
+                android:inputType="none"
+                android:paddingHorizontal="8dp"
+                android:padding="12dp"
+                android:singleLine="true"
+                android:textColor="#606060"
+                android:textColorHint="#898989"
+                android:background="#DDD"
+                android:hint="Seleccione un elemento" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Botón Guardar -->
+        <Button
+            android:id="@+id/btnGuardarParte2"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/btn_primary"
+            android:text="Continuar"
+            android:textColor="@android:color/background_light"
+            android:textStyle="bold"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+</ScrollView>

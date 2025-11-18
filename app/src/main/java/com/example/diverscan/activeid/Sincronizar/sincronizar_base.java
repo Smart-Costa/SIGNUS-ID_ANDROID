@@ -1,6 +1,7 @@
 package com.example.diverscan.activeid.Sincronizar;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.VoiceInteractor;
 import android.content.BroadcastReceiver;
@@ -12,6 +13,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -19,11 +23,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.example.diverscan.activeid.data.local.dao.ActivoDao;
+import com.example.diverscan.activeid.data.local.dao.UserDao;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
@@ -31,6 +38,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -101,27 +109,17 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 import static com.example.diverscan.activeid.Utilities.Fechas.parserJSONDate;
 
 //Librerias de consumir el web services
-public class sincronizar_base extends AppCompatActivity
-{
+public class sincronizar_base extends AppCompatActivity {
 
+    private UserDao userDao;
+    private ActivoDao activoDao;
+    private SincronizarDBHelper SincronizarDBHelper;
+    private String IP = "www.google.com";
     public final ArrayList<Entidad_TomaFisica>        listTomaUpdate        = new ArrayList<>();
     public final ArrayList<Entidad_TomaDetalle>       listTomaDetalle       = new ArrayList<>();
-
     public final ArrayList<EntidadTomasInventario>    listTomasInventario   = new ArrayList<>();
     public final ArrayList<EntidadInventario>         listInventario        = new ArrayList<>();
     public final ArrayList<EntidadDetalleInventario>  listDetalleInventario = new ArrayList<>();
-
-    private View mSincronizarView;
-    Button btn_enviar;
-    Button btn_obtener;
-    RadioButton radio_enviar;
-    RadioButton radio_sincro;
-    RadioButton radio_Tags;
-    TextView Mensaje;
-    private boolean obtenerActivo = true;
-    private boolean enviarActivo = true;
-    ConstraintLayout rlsnackbar;
-    Snackbar _snackbar;
     ArrayList<EntidadRazonSocial> Razon;
     ArrayList<EntidadEdificios> Edificio;
     ArrayList<EntidadPisos> Piso;
@@ -134,89 +132,90 @@ public class sincronizar_base extends AppCompatActivity
     ArrayList<EntidadTags> Tags;
     ArrayList<EntidadTiposTags> tipoTags;
     ArrayList<EntidadCategoriaActivos> categoriaActivos;
-    private Map<Integer, ActivoRecord> _mapActivos = new HashMap<Integer, ActivoRecord>();
-    private ProgressDialog dialog;
-    private ProgressDialog dialogEnvio;
-    private ProgressDialog dialog2;
-    int Exitos=0;
-    int exitosEnviados = 0;
-    int exitosRecibidos = 0;
-    int enviadosSinExito =0;
-    int noHay = 0;
-    //private String IP = "196.40.23.183";
-    private String IP = "www.google.com";
-    SincronizarDBHelper SincronizarDBHelper;
-    private Context _context;
+
+    private ConstraintLayout rlsnackbar;
+    private Snackbar _snackbar;
+    private View mSincronizarView;
+    private Button btn_enviar, btn_obtener;
     private Spinner PreOpcionesSincr;
-    private String[] strOpcionesSincr;
-    private List<String> listaOpcionesSincr;
-    private ArrayAdapter<String> adapterOpcionesSincr;
-    private String preOpcionesSincr;
-    private Activity _activity;
+    private RadioButton radio_sincro, radio_Tags;
+    private TextView Mensaje;
+    private LinearLayout progressSegmented;
+    private View[] pasos;
+    private ProgressDialog dialogEnvio;
+    private Context _context;
     private ArrayList<String> enviados = new ArrayList<String>();
     private ArrayList<String> Noenviados = new ArrayList<String>();
-    private Boolean _isConnected = true;
-    ProgressDialog progressDialog;
+    private Activity _activity;
+    private boolean _isConnected = true;
     android.app.AlertDialog alertDialog;
-    private BroadcastReceiver receiver;
-
-    // === Helpers de formato ===
-    private static String toIso8601(String raw) {
-        if (raw == null || raw.trim().isEmpty()) return raw;
-        // Ajusta el formato de ENTRADA si tu SQLite guarda otro (p.ej. "yyyy-MM-dd HH:mm:ss")
-        try {
-            java.text.SimpleDateFormat in = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US);
-            in.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-            java.util.Date d = in.parse(raw);
-            java.text.SimpleDateFormat out = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US);
-            out.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-            return out.format(d);
-        } catch (Exception e) {
-            // si ya venía en ISO u otro formato, devuélvelo tal cual
-            return raw;
-        }
-    }
-
-    private static int toIntOrZero(String s) {
-        if (s == null) return 0;
-        try { return Integer.parseInt(s.trim()); } catch (Exception ignore) { return 0; }
-    }
-
+    private int exitosEnviados = 0, exitosRecibidos = 0;
+    private static final int TOTAL_SEGMENTOS = 5;
+    int Exitos=0;
+    int enviadosSinExito =0;
+    int noHay = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sincronizar_base_webservice);
-        _activity = this;
+
         _context = this;
+        _activity = this;
         controles();
         eventos();
         CargarOpciones();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
-        isAvailable.execute();
+
+        userDao = new UserDao(this);
+        activoDao = new ActivoDao(this);
+
+        // Configuración visual
+        pasos = new View[]{
+                findViewById(R.id.step1),
+                findViewById(R.id.step2),
+                findViewById(R.id.step3),
+                findViewById(R.id.step4),
+                findViewById(R.id.step5)
+        };
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        IntentFilter intentFilter = new IntentFilter(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+        registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
-    private void CargarOpciones()
-    {
-        listaOpcionesSincr = new ArrayList<>();
-        strOpcionesSincr = new String[]{"Seleccionar","Todo","Activos","Usuarios", "Sectores", "Inventarios"};
- 
-        fillSpinnerOpciones(strOpcionesSincr);
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(networkStateReceiver);
     }
 
-    private void fillSpinnerOpciones(String[] descripciones)
-    {
+    public void controles() {
+        mSincronizarView = findViewById(R.id.SincronizarForm);
+        SincronizarDBHelper = new SincronizarDBHelper(mSincronizarView.getContext());
+        btn_enviar = findViewById(R.id.btn_enviar);
+        btn_obtener = findViewById(R.id.btn_obtener);
         PreOpcionesSincr = findViewById(R.id.SpinnerSincronizacion);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.opc_sincronizacion, R.layout.spinner_item);
+        Mensaje = findViewById(R.id.mensaje);
+        rlsnackbar = findViewById(R.id.sincronizar_view);
+        progressSegmented = findViewById(R.id.progress_segmented);
+    }
+
+    public void eventos() {
+        btn_enviar.setOnClickListener(OnClickListenerEnviar);
+        btn_obtener.setOnClickListener(OnClickListenerObtener);
+    }
+
+    private void CargarOpciones() {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this, R.array.opc_sincronizacion, R.layout.spinner_item);
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         PreOpcionesSincr.setAdapter(adapter);
     }
 
-    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver()
-    {
+    private final BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -226,200 +225,113 @@ public class sincronizar_base extends AppCompatActivity
         }
     };
 
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
-    }
-
-    @Override
-    public void onPause()
-    {
-        unregisterReceiver(networkStateReceiver);
-        super.onPause();
-    }
-
-    private void onNetworkChange(NetworkInfo networkInfo)
-    {
-        if (networkInfo != null && networkInfo.isAvailable()&& networkInfo.isConnected())
-        {
-            if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI)
-            {
-                _snackbar = Snackbar.make(rlsnackbar, "Conexión a internet activa!" +
-                        "\n Nombre red Wi-Fi: " + networkInfo.getExtraInfo(), 3000);
-                _snackbar.setActionTextColor(Color.rgb(179,179,179));
-                View snackBarView = _snackbar.getView();
-                snackBarView.setBackgroundColor(Color.rgb(4,165,77));
-                _snackbar.show();
-            }
-        }
-        else
-        {
-            dialog.dismiss();
-            _snackbar = Snackbar.make(rlsnackbar, "Se ha perdido la conexión a internet.", 3000);
-            _snackbar.setActionTextColor(Color.rgb(179,179,179));
-            View snackBarView = _snackbar.getView();
-            snackBarView.setBackgroundColor(Color.rgb(242,59,59));
-            _snackbar.show();
-        }
-    }
-
-    NetworkConnection isAvailable = new NetworkConnection(this, new NetworkConnection.EntoncesHacer() {
-        @Override
-        public void cuandoHayInternet()
-        {
-            _snackbar = Snackbar.make(rlsnackbar, "Se ha conectado con el servidor.", 3000);
-            _snackbar.setActionTextColor(Color.rgb(179,179,179));
-            View snackBarView = _snackbar.getView();
-            snackBarView.setBackgroundColor(Color.rgb(4,165,77));
-            _snackbar.show();
+    private void onNetworkChange(NetworkInfo networkInfo) {
+        if (networkInfo != null && networkInfo.isConnected()) {
+            //mostrarSnack("Conexión activa: " + networkInfo.getExtraInfo(), Color.rgb(4, 165, 77));
             _isConnected = true;
-        }
-
-        @Override
-        public void cuandoNOHayInternet()
-        {
-            _snackbar = Snackbar.make(rlsnackbar, "No hay conexión con el servidor.", 3000);
-            _snackbar.setActionTextColor(Color.rgb(179,179,179));
-            View snackBarView = _snackbar.getView();
-            snackBarView.setBackgroundColor(Color.rgb(242,59,59));
-            _snackbar.show();
-            dialog.dismiss();
-            dialogEnvio.dismiss();
-            btn_obtener.setEnabled(true);
-            btn_enviar.setEnabled(true);
-            Alerta("Atención", "Se ha perdido la conexión, intente sincronizar nuevamente");
+        } else {
+            mostrarSnack("Sin conexión a Internet.", Color.rgb(242, 59, 59));
             _isConnected = false;
         }
-    });
-
-    public boolean isOnline()
-    {
-        Runtime runtime = Runtime.getRuntime();
-        try
-        {
-            dialog2 = new ProgressDialog(_context);
-            dialog2.setMessage("Verificando conexión con el servidor");
-            dialog2.setCancelable(false);
-            dialog2.show();
-            Process ipProcess = runtime.exec("ping -c 2 -w 4 www.google.com");
-            int     exitValue = ipProcess.waitFor();
-            dialog2.dismiss();
-            return (exitValue == 0);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    //endregion
-
-    //region Controles y Eventos
-    public void controles(){
-        dialog = new ProgressDialog(_context);
-        dialogEnvio = new ProgressDialog(_context);
-        mSincronizarView = findViewById(R.id.SincronizarForm);
-        SincronizarDBHelper = new SincronizarDBHelper(mSincronizarView.getContext());
-        btn_enviar = (Button) findViewById(R.id.btn_enviar);
-        btn_obtener = (Button) findViewById(R.id.btn_obtener);
-        PreOpcionesSincr = findViewById(R.id.SpinnerSincronizacion);
-        //radio_enviar = (RadioButton) findViewById(R.id.radio_Ingresa);
-        radio_sincro = (RadioButton) findViewById(R.id.radio_Actualiza);
-        radio_Tags = (RadioButton) findViewById(R.id.radio_tagSync);
-        Mensaje = findViewById(R.id.mensaje);
-        rlsnackbar = findViewById(R.id.sincronizar_view);
     }
 
-    public void eventos()
-    {
-        btn_enviar.setOnClickListener(OnClickListenerenviar);
-        btn_obtener.setOnClickListener(OnClickListenerObtener);
-        receiver = new BroadcastReceiver()
-        {
+    private void mostrarSnack(String mensaje, int color) {
+        Snackbar snackbar = Snackbar.make(rlsnackbar, mensaje, Snackbar.LENGTH_LONG);
+        View sbView = snackbar.getView();
+        sbView.setBackgroundColor(color);
+        snackbar.show();
+    }
+
+    private void actualizarBarraSegmentada(int progreso) {
+        int segmentoActual = (int) ((progreso / 100.0) * TOTAL_SEGMENTOS);
+        for (int i = 0; i < TOTAL_SEGMENTOS; i++) {
+            int color = (i < segmentoActual) ? Color.parseColor("#FF5100") : Color.parseColor("#CCCCCC");
+            cambiarColorSuave(pasos[i], color);
+        }
+    }
+
+    private void resetBarraSegmentada() {
+        for (View paso : pasos) {
+            cambiarColorSuave(paso, Color.parseColor("#CCCCCC"));
+        }
+    }
+
+    private void cambiarColorSuave(View view, int nuevoColor) {
+        Drawable background = view.getBackground();
+
+        if (background instanceof GradientDrawable) {
+            ((GradientDrawable) background).setColor(nuevoColor);
+        } else if (background instanceof ColorDrawable) {
+            ((ColorDrawable) background).setColor(nuevoColor);
+        } else {
+            view.setBackgroundColor(nuevoColor);
+        }
+    }
+
+    public final View.OnClickListener OnClickListenerObtener = v -> {
+        btn_obtener.setEnabled(false);
+
+        if (!_isConnected) {
+            btn_enviar.setEnabled(true);
+            return;
+        }
+
+        resetBarraSegmentada();
+        btn_enviar.setEnabled(false);
+
+        userDao.fetchAndSyncFromApi();
+        activoDao.fetchAndSyncFromApi();
+
+        iniciarProgressThread(5);
+    };
+
+    public final View.OnClickListener OnClickListenerEnviar = v -> {
+        btn_enviar.setEnabled(false);
+
+        if (!_isConnected) {
+            btn_enviar.setEnabled(true);
+            return;
+        }
+
+        activoDao.pushLocalChangesToApi();
+        userDao.pushLocalChangesToApi();
+
+        iniciarProgressThread(5);
+    };
+
+    private void iniciarProgressThread(final int totalProcesos) {
+        Handler handler = new Handler() {
             @Override
-            public void onReceive(Context context, Intent intent) {
-
+            public void handleMessage(Message msg) {
+                int progresoActual = msg.arg1;
+                actualizarBarraSegmentada(progresoActual);
             }
         };
-    }
-    //endregion
 
-    //region Roles Y Usuarios
-    //Consumir web service Usuarios
-    public void getUsuarios()
-    {
-        ACTIVEID_API activeid_api = new ACTIVEID_API();
+        new Thread(() -> {
+            try {
+                int progreso = 0;
+                int incremento = 100 / totalProcesos;
 
-        try
-        {
-            JSONObject jsonObject = new JSONObject();
-            //  jsonObject.put("idperfilusuario", "");
-            StringEntity entity = new StringEntity(jsonObject.toString());
-            activeid_api.post(mSincronizarView.getContext(), "/ObtenerUsuario",entity,new AsyncHttpResponseHandler(){
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {deserializeUsuarios(new String(responseBody));}
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                    Toast.makeText(mSincronizarView.getContext(), "Error al sincronizar" +
-                            error.getMessage(), Toast.LENGTH_LONG).show();
+                while (progreso <= 100) {
+                    Thread.sleep(300);
+                    progreso += incremento;
+                    Message msg = handler.obtainMessage();
+                    msg.arg1 = progreso;
+                    handler.sendMessage(msg);
                 }
-            });
-        } catch (UnsupportedEncodingException  e) {
-            e.printStackTrace();
-        }
+
+                runOnUiThread(() -> {
+                    resetBarraSegmentada();
+                    btn_enviar.setEnabled(true);
+                    btn_obtener.setEnabled(true);
+                    mostrarSnack("Sincronización completada con éxito.", Color.rgb(4, 165, 77));
+                });
+            } catch (Exception ignored) {}
+        }).start();
     }
 
-    //Obtener respuesta Web service Usuarios
-    public void deserializeUsuarios(String response) {
-        try
-        {
-            Usuario = new ArrayList<>();
-            JSONObject jsonObject = new JSONObject(response);
-            JSONArray jsonArray=jsonObject.getJSONArray("ObtenerUsuariosResult");
-            //esto solo funciona si el web services devuelve una lista
-
-            for(int i = 0; i < jsonArray.length(); i++)
-            {
-                JSONObject UsuariosEncontrados = jsonArray.getJSONObject(i);
-                Usuario.add(
-                    new EntidadUsuarios(
-                        UsuariosEncontrados.getString("IdUsuario"),
-                        UsuariosEncontrados.getString("NombreUsuario"),
-                        UsuariosEncontrados.getString("email"),
-                        UsuariosEncontrados.getString("pass"),
-                        UsuariosEncontrados.getString("bloqueado"),
-                        UsuariosEncontrados.getString("aprobado"),
-                        UsuariosEncontrados.getString("sesionActiva"),
-                        UsuariosEncontrados.getString("contrasenaFallida"),
-                        UsuariosEncontrados.getString("UltimaActividad"),
-                        UsuariosEncontrados.getString("UltimoInicio"),
-                        UsuariosEncontrados.getString("FechaBloqueo")
-                    ));
-            }
-
-            Exitos++;
-            exitosRecibidos++;
-            InsertOrReplaceUsuarios(Usuario);
-
-            boolean estado=ObtenerEstadoUbicaciones();
-
-            if(estado)
-            {
-                Toast.makeText(mSincronizarView.getContext(), "La sincronización de usuarios " + "ha sido exitosa.", Toast.LENGTH_LONG).show();
-            }
-        }
-        catch (JSONException e)
-        {
-            Log.w("myApp", "Error 21 " +e.toString()+ " "+e.getStackTrace());
-        }
-    }
+    // BEGIN OLD
 
     //consumir web service de Roles Hand
     public void  getRolHH()
@@ -829,7 +741,7 @@ public class sincronizar_base extends AppCompatActivity
                                 tipoTagsEncontrados.getString("name"),
                                 tipoTagsEncontrados.getString("description"),
                                 tipoTagsEncontrados.getString("category")
-                                ));
+                        ));
             }
 
             Exitos++;
@@ -894,7 +806,7 @@ public class sincronizar_base extends AppCompatActivity
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject RazonEncontrados = jsonArray.getJSONObject(i);
                 Razon.add(
-                          new EntidadRazonSocial(RazonEncontrados.getString("IdRazon"),
+                        new EntidadRazonSocial(RazonEncontrados.getString("IdRazon"),
                                 RazonEncontrados.getString("NombreRazon")));
             }
 
@@ -1093,10 +1005,10 @@ public class sincronizar_base extends AppCompatActivity
                 JSONObject OficinasEncontrados = jsonArray.getJSONObject(i);
                 Oficina.add(
                         new EntidadOficina2(OficinasEncontrados.getString("IdOficina"),
-                                            OficinasEncontrados.getString("NombreOficina"),
-                                            OficinasEncontrados.getString("IdPiso"),
-                                            OficinasEncontrados.getString("Piso"),
-                                            OficinasEncontrados.getString("IdTag")));
+                                OficinasEncontrados.getString("NombreOficina"),
+                                OficinasEncontrados.getString("IdPiso"),
+                                OficinasEncontrados.getString("Piso"),
+                                OficinasEncontrados.getString("IdTag")));
             }
 
             Exitos++;
@@ -1285,54 +1197,54 @@ public class sincronizar_base extends AppCompatActivity
             }
             else
             {
-            JSONArray listToUpdate = new JSONArray();
-            JSONObject activos = new JSONObject();
-            for(int i = 0; i < listActivos.size(); i++){
-                JSONObject asset = new JSONObject();
+                JSONArray listToUpdate = new JSONArray();
+                JSONObject activos = new JSONObject();
+                for(int i = 0; i < listActivos.size(); i++){
+                    JSONObject asset = new JSONObject();
 
-                asset.put("Alias", listActivos.get(i).getAlias());
-                asset.put("longDescription", listActivos.get(i).getDescripcion());
-                asset.put("tagId", listActivos.get(i).getTag());
-                asset.put("assetSysId", listActivos.get(i).getIdActivo());
-                asset.put("officeSysId", listActivos.get(i).getIdOficina());
-                asset.put("floorSysId", listActivos.get(i).getIdPiso());
-                asset.put("buildingSysId", listActivos.get(i).getIdEdificio());
-                asset.put("companySysId", listActivos.get(i).getIdCompania());
-                asset.put("brand", listActivos.get(i).getMarca());
-                asset.put("modelNo", listActivos.get(i).getModelo());
-                asset.put("serialNo", listActivos.get(i).getSerial());
-                asset.put("Barcode", listActivos.get(i).getCodeBar());
-                asset.put("updateUser", listActivos.get(i).get_UpdateUser());
-                asset.put("parentAssetSysId", listActivos.get(i).get_ParentAssetSysId());
-                asset.put("employeeRelated", listActivos.get(i).getEmployeeRelatedSysId());
-                asset.put("assetStatusSysId", listActivos.get(i).getAssetStatusSysId());
-                asset.put("AnnoFabricacion", listActivos.get(i).getAnoFabricacion());
-                asset.put("Capacidad", listActivos.get(i).getCapacidad());
-                asset.put("estadoDescripcion", listActivos.get(i).get_EstadoDescripcion());
-                asset.put("estadoConservacion", listActivos.get(i).get_EstadoConservacion());
-                //poner todos
-                //al final de todos
-                listToUpdate.put(asset);
-            }
-
-            activos.put("assets", listToUpdate);
-            StringEntity entity = new StringEntity(activos.toString(), "UTF-8");
-
-            activeid_api.post(mSincronizarView.getContext().getApplicationContext(), "/ActualizarActivo",entity, new AsyncHttpResponseHandler(){
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    AssetsDBHelper assetsDBHelper = new AssetsDBHelper(mSincronizarView.getContext());
-                    assetsDBHelper.ActualizarSync(listActivos);
-                    exitosEnviados++;
-                    enviados.add("Activos Actualizados");
+                    asset.put("Alias", listActivos.get(i).getAlias());
+                    asset.put("longDescription", listActivos.get(i).getDescripcion());
+                    asset.put("tagId", listActivos.get(i).getTag());
+                    asset.put("assetSysId", listActivos.get(i).getIdActivo());
+                    asset.put("officeSysId", listActivos.get(i).getIdOficina());
+                    asset.put("floorSysId", listActivos.get(i).getIdPiso());
+                    asset.put("buildingSysId", listActivos.get(i).getIdEdificio());
+                    asset.put("companySysId", listActivos.get(i).getIdCompania());
+                    asset.put("brand", listActivos.get(i).getMarca());
+                    asset.put("modelNo", listActivos.get(i).getModelo());
+                    asset.put("serialNo", listActivos.get(i).getSerial());
+                    asset.put("Barcode", listActivos.get(i).getCodeBar());
+                    asset.put("updateUser", listActivos.get(i).get_UpdateUser());
+                    asset.put("parentAssetSysId", listActivos.get(i).get_ParentAssetSysId());
+                    asset.put("employeeRelated", listActivos.get(i).getEmployeeRelatedSysId());
+                    asset.put("assetStatusSysId", listActivos.get(i).getAssetStatusSysId());
+                    asset.put("AnnoFabricacion", listActivos.get(i).getAnoFabricacion());
+                    asset.put("Capacidad", listActivos.get(i).getCapacidad());
+                    asset.put("estadoDescripcion", listActivos.get(i).get_EstadoDescripcion());
+                    asset.put("estadoConservacion", listActivos.get(i).get_EstadoConservacion());
+                    //poner todos
+                    //al final de todos
+                    listToUpdate.put(asset);
                 }
-                @Override
-                public void onFailure(int statusCode, Header[] headers, byte[] responseBody,
-                                      Throwable error) {
-                    enviadosSinExito++;
-                    Noenviados.add("Activos Actualizados");
-                }
-            });
+
+                activos.put("assets", listToUpdate);
+                StringEntity entity = new StringEntity(activos.toString(), "UTF-8");
+
+                activeid_api.post(mSincronizarView.getContext().getApplicationContext(), "/ActualizarActivo",entity, new AsyncHttpResponseHandler(){
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                        AssetsDBHelper assetsDBHelper = new AssetsDBHelper(mSincronizarView.getContext());
+                        assetsDBHelper.ActualizarSync(listActivos);
+                        exitosEnviados++;
+                        enviados.add("Activos Actualizados");
+                    }
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody,
+                                          Throwable error) {
+                        enviadosSinExito++;
+                        Noenviados.add("Activos Actualizados");
+                    }
+                });
 
             }
         }
@@ -2044,54 +1956,54 @@ public class sincronizar_base extends AppCompatActivity
         TagsDBHelper tagClasificado = new TagsDBHelper(mSincronizarView.getContext());
         final ArrayList<EntidadTags> listTags = tagClasificado.ObtenerTagsClasificadosSync();
         ACTIVEID_API activeid_api = new ACTIVEID_API();
-            try
-            {
-                if(listTags.size() <= 0){
-                    exitosEnviados++;
-                    noHay++;
-                    Noenviados.add("No hay tags para sincronizar");
+        try
+        {
+            if(listTags.size() <= 0){
+                exitosEnviados++;
+                noHay++;
+                Noenviados.add("No hay tags para sincronizar");
+            }
+            else{
+                JSONArray listToUpdate = new JSONArray();
+                JSONObject activos = new JSONObject();
+                for(int i = 0; i < listTags.size(); i++){
+                    JSONObject asset = new JSONObject();
+
+                    asset.put("tagSysId", listTags.get(i).getTagSysId());
+                    asset.put("tagID", listTags.get(i).getTagID());
+                    asset.put("tagTypeSysId", listTags.get(i).getTagTypeSysId());
+
+                    //poner todos
+                    //al final de todos
+                    listToUpdate.put(asset);
                 }
-                else{
-                    JSONArray listToUpdate = new JSONArray();
-                    JSONObject activos = new JSONObject();
-                    for(int i = 0; i < listTags.size(); i++){
-                        JSONObject asset = new JSONObject();
 
-                        asset.put("tagSysId", listTags.get(i).getTagSysId());
-                        asset.put("tagID", listTags.get(i).getTagID());
-                        asset.put("tagTypeSysId", listTags.get(i).getTagTypeSysId());
+                activos.put("tagsClasificados", listToUpdate);
 
-                        //poner todos
-                        //al final de todos
-                        listToUpdate.put(asset);
+                StringEntity entity = new StringEntity(activos.toString(), "UTF-8");
+
+                activeid_api.post(mSincronizarView.getContext().getApplicationContext(), "/tagsClasificados",entity, new AsyncHttpResponseHandler(){
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                        TagsDBHelper tagsDBHelper = new TagsDBHelper(mSincronizarView.getContext());
+                        tagsDBHelper.tagSync(listTags);
+                        exitosEnviados++;
+                        enviados.add("Tags");
                     }
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody,
+                                          Throwable error) {
 
-                    activos.put("tagsClasificados", listToUpdate);
-
-                    StringEntity entity = new StringEntity(activos.toString(), "UTF-8");
-
-                    activeid_api.post(mSincronizarView.getContext().getApplicationContext(), "/tagsClasificados",entity, new AsyncHttpResponseHandler(){
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                            TagsDBHelper tagsDBHelper = new TagsDBHelper(mSincronizarView.getContext());
-                            tagsDBHelper.tagSync(listTags);
-                            exitosEnviados++;
-                            enviados.add("Tags");
-                        }
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody,
-                                              Throwable error) {
-
-                            enviadosSinExito++;
-                            Noenviados.add("Tags");
-                        }
-                    });
-                }
+                        enviadosSinExito++;
+                        Noenviados.add("Tags");
+                    }
+                });
             }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
     //endregion
 
@@ -2232,385 +2144,7 @@ public class sincronizar_base extends AppCompatActivity
         }
     }
 
-    //region Botones
-    private Button.OnClickListener OnClickListenerenviar = new View.OnClickListener()
-    {
-        Handler handleEnvid = new Handler() {
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                dialogEnvio.incrementProgressBy(5); // Incremented By Value 2
-            }
-        };
-        @Override
-        public void onClick(View v) {
-        try {
-            btn_enviar.setEnabled(false);
-            dialogEnvio.setMax(100);
-            dialogEnvio.setTitle("Almacenando Resultado");
-            dialogEnvio.setMessage("Espere un momento...");
-            dialogEnvio.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            dialogEnvio.setCancelable(false);
-            dialogEnvio.show();
-            long id = PreOpcionesSincr.getSelectedItemId();
-
-                if(_isConnected)
-                {
-                    if (id == 0) { //No seleccionado
-                        dialogEnvio.dismiss();
-                        Alerta("ATENCIÓN", "Debe seleccionar una opción para sincronizar");
-                        btn_enviar.setEnabled(true);
-                    }else if(id == 1) { //Todos
-                        SincronizarTags();
-                        ActualizarToma();
-                        SincronizarInventario();
-                        InsertarActivos();
-                        ActualizarActivos();
-                        //SincronizarTagsClasificados();    //No se va a utilizar
-                        // EnviarFotos();                   //No se va a utilizar
-
-                        new Thread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                try
-                                {
-                                    while (exitosEnviados <= 5 && dialogEnvio.getProgress() <= dialogEnvio.getMax()) //5 porque se utilizan 5 métodos
-                                    {
-                                        Thread.sleep(300);
-                                        handleEnvid.sendMessage(handleEnvid.obtainMessage());
-                                        if ( dialogEnvio.getProgress() == dialogEnvio.getMax())
-                                        {
-                                            exitosEnviados = 0;
-                                            dialogEnvio.setProgress(0);
-                                            String mensaje ="Sincronización Exitosa";
-                                            Mensaje.setText(mensaje);
-                                            dialogEnvio.dismiss();
-                                            //btn_enviar.setEnabled(true);
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    btn_enviar.setEnabled(true);  //Se establece aquí para poder editar la interfaz que pertenece al hilo original
-                                                }
-                                            });
-
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    ex.printStackTrace();
-                                }
-                            }
-                        }).start();
-
-
-                    }
-                    else if(id == 2){ //Activos
-                        //SincronizarTags();
-                        //ActualizarToma();
-                        //SincronizarInventario();
-                        InsertarActivos();
-                        ActualizarActivos();
-
-                        //EnvioFotoVolley();
-                        /*String activosHH = Noenviados.get(0);
-                        String ActivosNuevos = Noenviados.get(1);
-                        Alerta("ATENCION", "No se pudo sincronizar lo siguiente: " + "\n" +  "- " + activosHH + "\n" + "- " + ActivosNuevos);
-                        Noenviados.clear();*/
-
-                          new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try{
-                                        while (exitosEnviados <= 2 && dialogEnvio.getProgress() <= dialogEnvio.getMax()) { //2 porque se utilizan 2 métodos
-                                            Thread.sleep(200);
-                                            handleEnvid.sendMessage(handleEnvid.obtainMessage());
-                                            if (dialogEnvio.getProgress() == dialogEnvio.getMax())
-                                            {
-                                                exitosEnviados = 0;
-                                                dialogEnvio.setProgress(0);
-                                                String mensaje ="Sincronización Exitosa";
-                                                Mensaje.setText(mensaje);
-                                                dialogEnvio.dismiss();
-                                                //btn_enviar.setEnabled(true);
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        btn_enviar.setEnabled(true);
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        ex.printStackTrace();
-                                    }
-                                }
-                            }).start();
-
-
-                    }
-                    else if(id == 3){ //Usuarios
-                        /*  No hay una acción en específica por lo cual se actualizará todas*/
-                        SincronizarTags();
-                        ActualizarToma();
-                        SincronizarInventario();
-                        InsertarActivos();
-                        ActualizarActivos();
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try{
-                                    while (exitosEnviados <= 5 && dialogEnvio.getProgress() <= dialogEnvio.getMax()) {  //5 porque se utilizan 5 métodos
-                                        handleEnvid.sendMessage(handleEnvid.obtainMessage());
-                                        Thread.sleep(200);
-
-                                        if(dialogEnvio.getProgress() == dialogEnvio.getMax()) {
-                                            exitosEnviados = 0;
-                                            dialogEnvio.setProgress(0);
-                                            String mensaje ="Sincronización Exitosa";
-                                            Mensaje.setText(mensaje);
-                                            dialogEnvio.dismiss();
-                                            //btn_enviar.setEnabled(true);
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    btn_enviar.setEnabled(true);
-                                                }
-                                            });
-                                        }
-                                    }
-                                }catch (Exception ex){
-                                    ex.printStackTrace();
-                                }
-                            }
-                        }).start();
-
-                    }
-                    else if (id == 4){ //Sectores
-                        SincronizarTags();
-                        //ActualizarToma();
-                        //SincronizarInventario();
-                        //InsertarActivos();
-                        //ActualizarActivos();
-
-                        /*String mensaje = Noenviados.get(0);
-                        if(Alerta("Atención", mensaje)){  Noenviados.clear();  dialogEnvio.show();  }*/
-
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try{
-                                        while (exitosEnviados <= 1 && dialogEnvio.getProgress() <= dialogEnvio.getMax()) { //1 porque se utiliza 1 método
-                                            handleEnvid.sendMessage(handleEnvid.obtainMessage());
-                                            Thread.sleep(200);
-
-                                            if(dialogEnvio.getProgress() == dialogEnvio.getMax()) {
-                                                exitosEnviados = 0;
-                                                dialogEnvio.setProgress(0);
-                                                String mensaje ="Sincronización Exitosa";
-                                                Mensaje.setText(mensaje);
-                                                dialogEnvio.dismiss();
-                                                //btn_enviar.setEnabled(true);
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        btn_enviar.setEnabled(true);
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }catch (Exception ex){
-                                        ex.printStackTrace();
-                                    }
-                                }
-                            }).start();
-
-                    }
-                    else if(id == 5) { //Inventario
-                        //SincronizarTags();
-                        ActualizarToma();
-                        SincronizarInventario();
-                        //InsertarActivos();
-                        //ActualizarActivos();
-
-                            /* String toma = Noenviados.get(0);
-                            String detalle = Noenviados.get(1);
-                            Alerta("ATENCION", "No se pudo sincronizar lo siguiente: " + "\n" + "- " + toma + "\n" + "- " + detalle);
-                            Noenviados.clear(); */
-                            new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    while (exitosEnviados <= 2 && dialogEnvio.getProgress() <= dialogEnvio.getMax()) {  //2 porque se utilizan 2 métodos
-                                        Thread.sleep(200);
-                                        handleEnvid.sendMessage(handleEnvid.obtainMessage());
-                                        if (dialogEnvio.getProgress() == dialogEnvio.getMax()) {
-                                            exitosEnviados = 0;
-                                            dialogEnvio.setProgress(0);
-                                            String mensaje = "Sincronización Exitosa";
-                                            Mensaje.setText(mensaje);
-                                            dialogEnvio.dismiss();
-                                            //btn_enviar.setEnabled(true);
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    btn_enviar.setEnabled(true);  //
-                                                }
-                                            });
-                                        }
-                                    }
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                        }).start();
-
-
-                    }
-                }
-                else
-                {
-                    dialogEnvio.dismiss();
-                    btn_enviar.setEnabled(true);
-                    _snackbar = Snackbar.make(rlsnackbar, "No hay conexión con el servidor, " +
-                            "verifique su conexión.", 5000);
-                    _snackbar.setActionTextColor(Color.rgb(179,179,179));
-                    View snackBarView = _snackbar.getView();
-                    snackBarView.setBackgroundColor(Color.rgb(242,59,59));
-                    _snackbar.show();
-                }
-             /* NetworkUsages activeid_api = new NetworkUsages();*/
-                 /*if(isOnline()) {
-                     if(radio_sincro.isChecked()){
-                         ActualizarActivos();
-                         SincronizarTags();
-                         ActualizarToma();
-                         SincronizarInventario();
-                         Toast.makeText(getApplicationContext(), "Se ha completado la sincronización", Toast.LENGTH_LONG).show();
-                         InsertarActivos();
-                     }else if(radio_Tags.isChecked()){
-                         SincronizarTags();
-
-                         Toast.makeText(getApplicationContext(), "Se ha completado la sincronización", Toast.LENGTH_LONG).show();
-                     }else {
-                         Toast.makeText(getApplicationContext(), "Debe seleccionar una opción", Toast.LENGTH_LONG).show();
-                     }*/
-
-        }catch(Exception e){
-            dialogEnvio.dismiss();
-            btn_enviar.setEnabled(true);
-            e.printStackTrace();
-        }
-    }};
-
-    public Button.OnClickListener OnClickListenerObtener = new View.OnClickListener()
-    {
-        Handler handleRecibido = new Handler() {
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-               // dialog.incrementProgressBy(2); // Incremented By Value 2
-            }
-        };
-        @Override
-        public void onClick(View v)
-        {
-            btn_obtener.setEnabled(false);
-
-            long id = PreOpcionesSincr.getSelectedItemId();
-
-            if(_isConnected)
-            {
-                if (id == 0) //No seleccionado
-                {
-                   // dialog.dismiss();
-                    Alerta("ATENCIÓN", "Debe seleccionar una opción para sincronizar");
-                    btn_obtener.setEnabled(true);
-                }
-                else if(id == 1) //Todos
-                {
-                    getUsuarios();
-                    getRolHH();
-                    getRazones();
-                    getEdificios();
-                    getPisos();
-                    getOficinas();
-                    getTomaFisica();
-                    getTipoInventario();
-                    getTomaDetalle();
-                    getTags();
-                    getTagsType();
-                    getAssetStatus();
-                    getcategoriaActivos();
-
-                    getActivosBySegmentsV3(0, 10000, 150000, 10000);
-                    getActivosBySegmentsV3(150000, 160000, 250000, 10000);
-                    getActivosBySegmentsV3(250000, 260000, 400000, 10000);
-
-                    getActivosBySegmentsV3(400000, 450000, 500000, 10000);
-                    getActivosBySegmentsV3(600000, 650000, 700000, 10000);
-                    getActivosBySegmentsV3(700000, 750000, 800000, 10000);
-                    getActivosBySegmentsV3(800000, 850000, 900000, 10000);
-                    getActivosBySegmentsV3(900000, 950000, 1000000, 10000);
-                    getActivosBySegmentsV3(1000000, 1010000, 1100000, 10000);
-                    getActivosBySegmentsV3(1100000, 1150000, 1200000, 10000);
-                    getActivosBySegmentsV3(1200000, 1250000, 1300000, 10000);
-
-                    getEmployees(0, 10000, 40000, 10000);
-                }
-                else if(id == 2) //Activos
-                {
-                    getAssetStatus();
-                    getcategoriaActivos();
-
-                    getActivosBySegmentsV3(0, 10000, 150000, 10000);
-                    getActivosBySegmentsV3(150000, 160000, 250000, 10000);
-                    getActivosBySegmentsV3(250000, 260000, 400000, 10000);
-
-                    getActivosBySegmentsV3(400000, 450000, 500000, 10000);
-                    getActivosBySegmentsV3(600000, 650000, 700000, 10000);
-                    getActivosBySegmentsV3(700000, 750000, 800000, 10000);
-                    getActivosBySegmentsV3(800000, 850000, 900000, 10000);
-                    getActivosBySegmentsV3(900000, 950000, 1000000, 10000);
-                    getActivosBySegmentsV3(1000000, 1010000, 1100000, 10000);
-                    getActivosBySegmentsV3(1100000, 1150000, 1200000, 10000);
-                    getActivosBySegmentsV3(1200000, 1250000, 1300000, 10000);
-
-                    getEmployees(0, 10000, 40000, 10000);
-                }
-                else if(id == 3) //Usuarios
-                {
-                    getUsuarios();
-                    getRolHH();
-                }
-                else if (id == 4) //Sectores
-                {
-                    getRazones();
-                    getEdificios();
-                    getPisos();
-                    getOficinas();
-                }
-                else if(id == 5) //Inventarios
-                {
-                    getTomaFisica();
-                    getTipoInventario();
-                    getTomaDetalle();
-                }
-            }
-            else
-            {
-                btn_obtener.setEnabled(true);
-                _snackbar = Snackbar.make(rlsnackbar, "No hay conexión con el servidor, " +
-                        "verifique su conexión.", 5000);
-                _snackbar.setActionTextColor(Color.rgb(179,179,179));
-                View snackBarView = _snackbar.getView();
-                snackBarView.setBackgroundColor(Color.rgb(242,59,59));
-                _snackbar.show();
-            }
-    }};
+    // END OLD
 
     public boolean Alerta(String titulo, String Mensaje)
     {
@@ -2651,9 +2185,9 @@ public class sincronizar_base extends AppCompatActivity
     {
         return SincronizarDBHelper.InsertOrReplaceTipoTags(tipoTags);
     }
-     public boolean InsertOrReplaceTags(ArrayList<EntidadTags>  tags){
-         return SincronizarDBHelper.InsertOrReplaceTags(tags);
-     }
+    public boolean InsertOrReplaceTags(ArrayList<EntidadTags>  tags){
+        return SincronizarDBHelper.InsertOrReplaceTags(tags);
+    }
 
     public boolean InsertOrReplaceTomaFisica(ArrayList<Entidad_TomaFisica> tomafisica){
 
@@ -2697,10 +2231,10 @@ public class sincronizar_base extends AppCompatActivity
         return  SincronizarDBHelper.InsertOrReplaceOficinas(oficina);
     }
 
-    public boolean InsertOrReplaceUsuarios (ArrayList<EntidadUsuarios> usuario){
+    /*public boolean InsertOrReplaceUsuarios (ArrayList<EntidadUsuarios> usuario){
 
         return  SincronizarDBHelper.InsertOrReplaceUsuarios(usuario);
-    }
+    }*/
 
     public boolean InsertOrReplaceActivos (ArrayList<EntidadActivos> activo){
 
@@ -2721,7 +2255,5 @@ public class sincronizar_base extends AppCompatActivity
 
         return  SincronizarDBHelper.InsertOrReplaceEmployees(employeesList);
     }
-    //endregion
-
-    }
+}
 

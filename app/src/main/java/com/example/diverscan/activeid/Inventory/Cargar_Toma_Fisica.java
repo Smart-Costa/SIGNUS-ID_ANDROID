@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.Utilities.Fechas;
-import com.example.diverscan.activeid.login.LoginActivity;
+import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.InventoryDBHelper;
 
 import java.text.DateFormat;
