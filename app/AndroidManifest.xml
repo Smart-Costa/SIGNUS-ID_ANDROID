@@ -64,10 +64,10 @@
             android:label="@string/Sector"
             android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".Activo.activoPorDescripcion" />
+        <activity android:name=".TomasFisicas.activoPorDescripcion" />
         <activity android:name=".Locate_Assets.Localizar_activo" />
         <activity
-            android:name=".Activo.createAssets"
+            android:name=".TomasFisicas.createAssets"
             android:label="@string/crear"
             android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"/>

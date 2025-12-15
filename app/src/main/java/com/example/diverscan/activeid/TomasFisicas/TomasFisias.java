@@ -1,16 +1,26 @@
-package com.example.diverscan.activeid.Activo;
+package com.example.diverscan.activeid.TomasFisicas;
 
-public class EntidadActivosInventarios {
-    String Numero;
-    String Descripcion;
-    String EPC;
-    String AssetSysId;
-    String Oficina;
-    String IdOficina;
+import java.io.Serializable;
 
-    public EntidadActivosInventarios(String numero, String descripcion, String EPC, String assetSysId, String oficina, String idOficina) {
+public class TomasFisias implements Serializable
+{
+
+    public String Numero;
+    public String Descripcion;
+    public String Status;
+    public String EPC;
+    public String AssetSysId;
+    public String Oficina;
+    public String IdOficina;
+
+    public TomasFisias()
+    {
+    }
+    public TomasFisias(String numero, String descripcion, String status, String EPC, String assetSysId, String oficina, String idOficina)
+    {
         this.Numero = numero;
         this.Descripcion = descripcion;
+        this.Status = status;
         this.EPC = EPC;
         this.AssetSysId = assetSysId;
         this.Oficina = oficina;
@@ -31,6 +41,14 @@ public class EntidadActivosInventarios {
 
     public void setDescripcion(String descripcion) {
         Descripcion = descripcion;
+    }
+
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
     }
 
     public String getEPC() {

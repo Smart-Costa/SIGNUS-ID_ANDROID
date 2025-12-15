@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.diverscan.activeid.Activo.AjustarActivoUbicacion;
+import com.example.diverscan.activeid.TomasFisicas.AjustarActivoUbicacion;
 import com.example.diverscan.activeid.Inventory.InventarioVisual;
 import com.example.diverscan.activeid.R;
 

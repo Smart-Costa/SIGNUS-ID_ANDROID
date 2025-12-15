@@ -39,31 +39,31 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:fontFamily="@font/public_sans"
                 android:text="@string/usuario"
                 android:textColor="#606060"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/RoundedTextInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 app:boxBackgroundMode="outline"
                 app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/user"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="#FFF"
+                    android:hint="Administrador"
                     android:imeOptions="actionNext"
                     android:inputType="text"
+                    android:padding="8dp"
                     android:singleLine="true"
-                    android:padding="12dp"
-                    android:textSize="14sp"
                     android:textColor="#606060"
                     android:textColorHint="#898989"
-                    android:backgroundTint="#FFF"
-                    android:hint="Administrador"/>
+                    android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Contraseña -->
@@ -72,15 +72,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="4dp"
-                android:fontFamily="@font/public_sans"
                 android:text="@string/password"
                 android:textColor="#606060"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/RoundedTextInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 app:boxBackgroundMode="outline"
                 app:endIconMode="password_toggle"
                 app:hintEnabled="false" >
@@ -88,25 +88,24 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="#FFF"
+                    android:hint="************"
                     android:imeOptions="actionGo"
                     android:inputType="textPassword"
+                    android:padding="8dp"
                     android:singleLine="true"
-                    android:padding="12dp"
-                    android:textSize="14sp"
                     android:textColor="#606060"
                     android:textColorHint="#898989"
-                    android:backgroundTint="#FFF"
-                    android:hint="************" />
+                    android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Recordarme -->
             <CheckBox
                 android:id="@+id/remember_me"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_marginTop="16dp"
-                android:fontFamily="@font/public_sans"
                 android:padding="8dp"
                 android:text="@string/recordarme"
                 android:textColor="#606060"
@@ -123,7 +122,7 @@
                 android:text="@string/Ingresar_login"
                 android:textColor="@color/blanco"
                 android:textStyle="bold"
-                android:textAllCaps="false"/>
+                android:textAllCaps="false" />
 
             <!-- Botón Sincronizar -->
             <Button

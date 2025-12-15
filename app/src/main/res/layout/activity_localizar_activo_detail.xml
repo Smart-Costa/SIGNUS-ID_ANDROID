@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/blanco"
+    tools:context=".UI.activo.LocalizarActivoDetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <CheckBox
+                android:id="@+id/opcRFID"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="RFID" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <!-- Numero de Activo -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingEnd="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="Número de Activo"
+                    android:textColor="#606060"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/RoundedTextInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    app:boxBackgroundMode="outline"
+                    app:hintEnabled="false" >
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/txtNumeroActivo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="#FFF"
+                        android:hint="13"
+                        android:imeOptions="actionNext"
+                        android:inputType="text"
+                        android:padding="8dp"
+                        android:singleLine="true"
+                        android:textColor="#606060"
+                        android:textColorHint="#898989"
+                        android:textSize="14sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+            <!-- Numero de Etiqueta -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="Número de Placa"
+                    android:textColor="#606060"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/RoundedTextInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    app:boxBackgroundMode="outline"
+                    app:hintEnabled="false" >
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/txtNumeroEtiqueta"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="#FFF"
+                        android:hint=""
+                        android:imeOptions="actionNext"
+                        android:inputType="text"
+                        android:padding="8dp"
+                        android:singleLine="true"
+                        android:textColor="#606060"
+                        android:textColorHint="#898989"
+                        android:textSize="14sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:paddingTop="8dp"
+            android:text="Descripción Corta"
+            android:textColor="#606060"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/RoundedTextInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/txtDescripcionCorta"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:inputType="textMultiLine"
+                android:gravity="top|start"
+                android:padding="8dp"
+                android:textColor="#606060"
+                android:textColorHint="#898989"
+                android:textSize="14sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Botón Guardar -->
+        <Button
+            android:id="@+id/btnGuardar"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/btn_primary"
+            android:text="Buscar"
+            android:textColor="@color/blanco"
+            android:textStyle="bold"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btnSimular"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/btn_primary"
+            android:text="Simular RFID"
+            android:textColor="@color/blanco"
+            android:textStyle="bold"
+            android:textAllCaps="false"/>
+
+    </LinearLayout>
+</ScrollView>

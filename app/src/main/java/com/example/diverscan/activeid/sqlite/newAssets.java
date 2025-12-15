@@ -7,7 +7,7 @@ package com.example.diverscan.activeid.sqlite;
     import android.database.sqlite.SQLiteOpenHelper;
     import android.util.Log;
 
-    import com.example.diverscan.activeid.Activo.NuevoActivo;
+    import com.example.diverscan.activeid.TomasFisicas.NuevoActivo;
     import com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet;
 
     import java.util.ArrayList;

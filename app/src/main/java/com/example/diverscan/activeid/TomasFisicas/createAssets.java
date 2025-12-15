@@ -1,9 +1,8 @@
-package com.example.diverscan.activeid.Activo;
+package com.example.diverscan.activeid.TomasFisicas;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
@@ -41,7 +40,6 @@ import com.example.diverscan.activeid.Piso.PisoNuevo;
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.RazonSocial.RazonNuevo;
 import com.example.diverscan.activeid.RazonSocial.RazonSocialDBHelper;
-import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.newAssets;
 
 import java.text.SimpleDateFormat;
@@ -52,7 +50,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.example.diverscan.activeid.R.id.lbl_numero_activo_crea;
-import static com.example.diverscan.activeid.R.id.txt_cap;
 
 public class createAssets extends AppCompatActivity
 {

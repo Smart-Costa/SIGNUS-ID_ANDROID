@@ -87,8 +87,8 @@
             android:exported="false"/>
 
         <!-- 🗂️ Creación y actualización de activos -->
-        <activity android:name=".Activo.activoPorDescripcion" android:exported="false"/>
-        <activity android:name=".Activo.createAssets"
+        <activity android:name=".TomasFisicas.activoPorDescripcion" android:exported="false"/>
+        <activity android:name=".TomasFisicas.createAssets"
             android:label="@string/crear"
             android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"
@@ -128,6 +128,28 @@
         <activity android:name=".UI.activo.RegistroActivoFotoTagActivity"
             android:parentActivityName=".UI.activo.RegistroActivoDetailActivity"
             android:label="Registro de Activo"
+            android:exported="false" />
+
+        <!-- 🏗️ Flujo de Tomas Fisicas -->
+        <activity android:name=".UI.tomasfisicas.RegistroTomaFisicaActivity"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:label="Hacer Inventarios"
+            android:exported="false" />
+        <activity android:name=".UI.tomasfisicas.RegistroInventarioElectronicosActivity"
+            android:parentActivityName=".UI.tomasfisicas.RegistroTomaFisicaActivity"
+            android:label="Hacer Inventarios"
+            android:exported="false" />
+
+        <!-- 🏗️ Flujo de DarBaja de activos -->
+        <activity android:name=".UI.activo.DarBajaActivoDetailActivity"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:label="Dar baja de Activo"
+            android:exported="false" />
+
+        <!-- 🏗️ Flujo de Localizar activos -->
+        <activity android:name=".UI.activo.LocalizarActivoDetailActivity"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:label="Localizar Activo"
             android:exported="false" />
 
         <!--<activity android:name=".CreateAsset.SelectLocationActivity"

@@ -17,66 +17,14 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActivoDao extends SQLiteOpenHelper {
-
-    private static final String DB_NAME = "dbSignusId.db";
-    private static final int DB_VERSION = 7;
-    private static final String TAG = "ACTIVO_DAO";
+public class ActivoDao {
+    private static final String TAG = "DB_DAO_ACTIVO";
+    private final AppDatabaseHelper dbHelper;
     private final Context context;
 
     public ActivoDao(Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
         this.context = context.getApplicationContext();
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE Activos (" +
-                "ID_ACTIVO TEXT, " +
-                "NUMERO_ACTIVO INTEGER, " +
-                "NUMERO_ETIQUETA TEXT, " +
-                "DESCRIPCION_CORTA TEXT, " +
-                "DESCRIPCION_LARGA TEXT, " +
-                "CATEGORIA TEXT, " +
-                "ESTADO TEXT, " +
-                "EMPRESA TEXT, " +
-                "MARCA TEXT, " +
-                "MODELO TEXT, " +
-                "NUMERO_SERIE TEXT, " +
-                "COSTO REAL, " +
-                "NUMERO_FACTURA TEXT, " +
-                "FECHA_COMPRA TEXT, " +
-                "FECHA_CAPITALIZACION TEXT, " +
-                "VALOR_RESIDUAL REAL, " +
-                "DOCUMENTO TEXT, " +
-                "FOTOS TEXT, " +
-                "NUMERO_PARTE_FABRICANTE TEXT, " +
-                "DEPRECIADO TEXT, " +
-                "DESCRIPCION_DEPRECIADO TEXT, " +
-                "ANOS_VIDA_UTIL INTEGER, " +
-                "CUENTA_CONTABLE_DEPRESIACION TEXT, " +
-                "CENTRO_COSTOS TEXT, " +
-                "DESCRIPCION_ESTADO_ULTIMO_INVENTARIO TEXT, " +
-                "TAG_EPC TEXT, " +
-                "EMPLEADO TEXT, " +
-                "UBICACION_A TEXT, " +
-                "UBICACION_B TEXT, " +
-                "UBICACION_C TEXT, " +
-                "UBICACION_D TEXT, " +
-                "UBICACION_SECUNDARIA TEXT, " +
-                "FECHA_GARANTIA TEXT, " +
-                "COLOR TEXT, " +
-                "TAMANIO_MEDIDA TEXT, " +
-                "OBSERVACIONES TEXT, " +
-                "ESTADO_ACTIVO INTEGER, " +
-                "FECHA_CREACION_ACTIVO TEXT" +
-                ")");
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS activos");
-        onCreate(db);
+        this.dbHelper = new AppDatabaseHelper(context);
     }
 
     private ContentValues entityToContentValues(ActivoEntity a) {
@@ -124,9 +72,17 @@ public class ActivoDao extends SQLiteOpenHelper {
         return v;
     }
 
+    public long insertActivo(ActivoEntity activo) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = entityToContentValues(activo);
+
+        long result = db.insert("Activos", null, values);
+        db.close();
+        return result;
+    }
 
     public void syncActivos(List<ActivoEntity> activos) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             for (ActivoEntity a : activos) {
@@ -144,8 +100,7 @@ public class ActivoDao extends SQLiteOpenHelper {
 
     public List<ActivoEntity> getAllLocalActivos() {
         List<ActivoEntity> list = new ArrayList<>();
-
-        SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         try (Cursor c = db.rawQuery("SELECT * FROM Activos", null)) {
             if (c.moveToFirst()) {
                 do {
@@ -179,6 +134,83 @@ public class ActivoDao extends SQLiteOpenHelper {
         return list;
     }
 
+    public ActivoEntity getActivoByEpc(String epc) {
+        ActivoEntity activo = null;
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        try (Cursor c = db.rawQuery(
+                "SELECT * FROM Activos WHERE TAG_EPC = ? LIMIT 1",
+                new String[]{epc}
+        )) {
+            if (c.moveToFirst()) {
+                activo = new ActivoEntity();
+
+                activo.setIdActivo(c.getString(c.getColumnIndexOrThrow("ID_ACTIVO")));
+                activo.setNumeroActivo(c.getString(c.getColumnIndexOrThrow("NUMERO_ACTIVO")));
+                activo.setNumeroEtiqueta(c.getString(c.getColumnIndexOrThrow("NUMERO_ETIQUETA")));
+                activo.setDescripcionCorta(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")));
+                activo.setDescripcionLarga(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_LARGA")));
+                activo.setCategoria(c.getString(c.getColumnIndexOrThrow("CATEGORIA")));
+                activo.setEstado(c.getString(c.getColumnIndexOrThrow("ESTADO")));
+                activo.setEmpresa(c.getString(c.getColumnIndexOrThrow("EMPRESA")));
+                activo.setMarca(c.getString(c.getColumnIndexOrThrow("MARCA")));
+                activo.setModelo(c.getString(c.getColumnIndexOrThrow("MODELO")));
+                activo.setNumeroSerie(c.getString(c.getColumnIndexOrThrow("NUMERO_SERIE")));
+                activo.setCosto(c.getDouble(c.getColumnIndexOrThrow("COSTO")));
+                activo.setNumeroFactura(c.getString(c.getColumnIndexOrThrow("NUMERO_FACTURA")));
+                activo.setValorResidual(c.getDouble(c.getColumnIndexOrThrow("VALOR_RESIDUAL")));
+                activo.setTagEpc(c.getString(c.getColumnIndexOrThrow("TAG_EPC")));
+                activo.setColor(c.getString(c.getColumnIndexOrThrow("COLOR")));
+                activo.setObservaciones(c.getString(c.getColumnIndexOrThrow("OBSERVACIONES")));
+            }
+        } catch (Exception e) {
+            Log.e("TAG", "Error consultando por EPC", e);
+        } finally {
+            db.close();
+        }
+
+        return activo;
+    }
+
+    public ActivoEntity getActivoById(String id) {
+        ActivoEntity activo = null;
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        try (Cursor c = db.rawQuery(
+                "SELECT * FROM Activos WHERE NUMERO_ACTIVO = ? LIMIT 1",
+                new String[]{id}
+        )) {
+            if (c.moveToFirst()) {
+                activo = new ActivoEntity();
+
+                activo.setNumeroActivo(c.getString(c.getColumnIndexOrThrow("NUMERO_ACTIVO")));
+                activo.setNumeroEtiqueta(c.getString(c.getColumnIndexOrThrow("NUMERO_ETIQUETA")));
+                activo.setDescripcionCorta(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")));
+                activo.setTagEpc(c.getString(c.getColumnIndexOrThrow("TAG_EPC")));
+                activo.setObservaciones(c.getString(c.getColumnIndexOrThrow("OBSERVACIONES")));
+            }
+        } catch (Exception e) {
+            Log.e("TAG", "Error consultando por EPC", e);
+        } finally {
+            db.close();
+        }
+
+        return activo;
+    }
+
+    public void updateEstadoActivo(ActivoEntity activo) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("estado_activo", activo.getEstadoActivo());
+
+        db.update("Activo",
+                values,
+                "NUMERO_ACTIVO = ?",
+                new String[]{ String.valueOf(activo.getIdActivo()) }
+        );
+    }
+
     public void fetchAndSyncFromApi() {
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<List<ActivoEntity>>() {}.getType();
@@ -199,20 +231,23 @@ public class ActivoDao extends SQLiteOpenHelper {
     public void pushLocalChangesToApi() {
         List<ActivoEntity> localActivos = getAllLocalActivos();
         if (localActivos.isEmpty()) {
-            Log.d(TAG, "No hay activos locales para sincronizar con el servidor");
+            Log.d(TAG, "No hay activos locales para sincronizar");
             return;
         }
 
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<ApiResponse<Void>>() {}.getType();
 
-        api.<ApiResponse<Void>>post("Activos", localActivos, type, new ApiCallback<ApiResponse<Void>>() {
+        api.<ApiResponse<Void>>post("Activos/SyncBatch", localActivos, type, new ApiCallback<ApiResponse<Void>>() {
             @Override
             public void onComplete(ApiResponse<ApiResponse<Void>> response) {
                 if (response.success) {
-                    Log.d(TAG, "Activos locales enviados exitosamente al servidor");
+                    Log.d(TAG, "Activos locales sincronizados correctamente");
+
+                    // OPCIONAL: limpiar activos locales después de subirlos.
+                    // deleteAllLocalActivos();
                 } else {
-                    Log.e(TAG, "Error enviando activos al servidor: " + response.errorMessage);
+                    Log.e(TAG, "Error al sincronizar: " + response.errorMessage);
                 }
             }
         });

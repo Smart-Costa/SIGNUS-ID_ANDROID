@@ -2,8 +2,8 @@ package com.example.diverscan.activeid.Locate_Assets;
 
 import android.content.Context;
 
-import com.example.diverscan.activeid.Activo.ActivoInventario;
-import com.example.diverscan.activeid.Activo.EntidadActivosInventarios;
+import com.example.diverscan.activeid.TomasFisicas.TomasFisias;
+import com.example.diverscan.activeid.TomasFisicas.EntidadActivosInventarios;
 import com.example.diverscan.activeid.Inventory.InventarioVisual;
 import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
 
@@ -18,7 +18,7 @@ public class ChequearUbicacion {
     ArrayList<InventarioVisual> _activoSinTag = new ArrayList<InventarioVisual>();
     Context _context;
 
-    public ChequearUbicacion(ArrayList<ActivoInventario> activos,  Context context){
+    public ChequearUbicacion(ArrayList<TomasFisias> activos, Context context){
         if(activos.size() <= 0)
 
             throw new NullPointerException();
@@ -26,8 +26,8 @@ public class ChequearUbicacion {
         _context= context;
     }
 
-    private void ListToDictionary(ArrayList<ActivoInventario> activos){
-        for (ActivoInventario activo : activos){
+    private void ListToDictionary(ArrayList<TomasFisias> activos){
+        for (TomasFisias activo : activos){
 
             if(activo.getEPC().equals("Sin Asignar")){
                 _activoSinTag.add(new InventarioVisual(

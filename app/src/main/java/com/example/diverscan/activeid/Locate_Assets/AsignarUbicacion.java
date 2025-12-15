@@ -5,14 +5,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import android.text.Editable;
+
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,7 +22,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.diverscan.activeid.Activo.ActivoInventario;
+import com.example.diverscan.activeid.TomasFisicas.TomasFisias;
 import com.example.diverscan.activeid.Edificio.EdificioDBHelper;
 import com.example.diverscan.activeid.Edificio.EdificioNuevo;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
@@ -56,7 +54,7 @@ public class AsignarUbicacion extends AppCompatActivity implements ResponseHandl
     com.example.diverscan.activeid.sqlite.InventoryDBHelper InventoryDBHelper;
     com.example.diverscan.activeid.sqlite.OfficesDBHelper OfficesDBHelper;
     ChequearUbicacion Inventario;
-    ArrayList<ActivoInventario> inventarioVisual;
+    ArrayList<TomasFisias> inventarioVisual;
     List<String> listSpinner;
     ArrayList<com.example.diverscan.activeid.Inventory.Inventories> Inventories;
     ArrayList<Entidad_TomaDetalle> _entidadTomaDetalle;
@@ -584,8 +582,8 @@ public class AsignarUbicacion extends AppCompatActivity implements ResponseHandl
                                 .setNegativeButton("Sí", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        ActivoInventario inventarioVisualq = new ActivoInventario("0000", "No existe","EPC", "Sin Asignar", "00000000-0000-0000-0000-000000000000", "Sin Asignar", "00000000-0000-0000-0000-000000000000" );
-                                        ArrayList<ActivoInventario> visuals = new ArrayList<ActivoInventario>();
+                                        TomasFisias inventarioVisualq = new TomasFisias("0000", "No existe","EPC", "Sin Asignar", "00000000-0000-0000-0000-000000000000", "Sin Asignar", "00000000-0000-0000-0000-000000000000" );
+                                        ArrayList<TomasFisias> visuals = new ArrayList<TomasFisias>();
                                         visuals.add(inventarioVisualq);
                                         Inventario = new ChequearUbicacion(visuals, AsignarUbicacion.this);
 
@@ -647,8 +645,8 @@ public class AsignarUbicacion extends AppCompatActivity implements ResponseHandl
                                 .setNegativeButton("Sí", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        ActivoInventario inventarioVisualq = new ActivoInventario("0000", "No existe","EPC", "Sin Asignar", "00000000-0000-0000-0000-000000000000", "Sin Asignar", "00000000-0000-0000-0000-000000000000" );
-                                        ArrayList<ActivoInventario> visuals = new ArrayList<ActivoInventario>();
+                                        TomasFisias inventarioVisualq = new TomasFisias("0000", "No existe","EPC", "Sin Asignar", "00000000-0000-0000-0000-000000000000", "Sin Asignar", "00000000-0000-0000-0000-000000000000" );
+                                        ArrayList<TomasFisias> visuals = new ArrayList<TomasFisias>();
                                         visuals.add(inventarioVisualq);
                                         Inventario = new ChequearUbicacion(visuals, AsignarUbicacion.this);
 

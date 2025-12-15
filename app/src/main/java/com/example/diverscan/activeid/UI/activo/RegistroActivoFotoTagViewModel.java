@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.diverscan.activeid.data.local.dao.ActivoDao;
+import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import com.example.diverscan.activeid.data.local.entity.ActivoFotoEntity;
 import com.example.diverscan.activeid.data.repository.ActivoRepository;
 
@@ -48,5 +50,16 @@ public class RegistroActivoFotoTagViewModel extends AndroidViewModel {
 
         // Guardar tag RFID y ubicación (puedes hacerlo con otro DAO o repositorio)
         Log.d("ViewModel", "Guardando tag y fotos para activo " + idActivo);
+    }
+
+    public void guardarActivoFinal(Context context, ActivoEntity activo) {
+        ActivoDao dao = new ActivoDao(context);
+        long res = dao.insertActivo(activo);
+
+        if (res == -1) {
+            Log.e("DAO", "Error al insertar activo");
+        } else {
+            Log.i("DAO", "Activo guardado con ID fila: " + res);
+        }
     }
 }

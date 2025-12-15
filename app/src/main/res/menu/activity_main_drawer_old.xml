@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+
+        <!-- 🔄 Sincronización -->
+        <item
+            android:id="@+id/menu_sincronizacion"
+            android:title="Sincronización">
+            <menu>
+                <item
+                    android:id="@+id/sub_sincronizar"
+                    android:icon="@drawable/sincronizar"
+                    android:title="Sincronizar"
+                    android:visible="true" />
+            </menu>
+        </item>
+
+        <!-- 🏷️ Activos -->
+        <item
+            android:id="@+id/menu_activos"
+            android:title="Activos">
+            <menu>
+                <item
+                    android:id="@+id/sub_crear_activo"
+                    android:icon="@drawable/iconoscrear"
+                    android:title="Crear Activo"
+                    android:visible="true" />
+
+                <item
+                    android:id="@+id/sub_actualizar_activo"
+                    android:icon="@drawable/iconosactualizar"
+                    android:title="Búsqueda y Actualización de Activos"
+                    android:visible="true" />
+
+                <item
+                    android:id="@+id/sub_hacer_inventario"
+                    android:icon="@drawable/hacerinventario"
+                    android:title="Hacer Inventarios"
+                    android:visible="true" />
+
+                <item
+                    android:id="@+id/sub_ajuste_ubicacion"
+                    android:icon="@drawable/ajusteubicacion"
+                    android:title="Ajuste de Ubicación"
+                    android:visible="true" />
+            </menu>
+        </item>
+
+        <!-- 🧭 Tags -->
+        <item
+            android:id="@+id/menu_tags"
+            android:title="Tags">
+            <menu>
+                <item
+                    android:id="@+id/sub_clasificar_tag"
+                    android:icon="@drawable/configuracion"
+                    android:title="Clasificar Tags"
+                    android:visible="true" />
+            </menu>
+        </item>
+
+        <!-- 🏢 Sectores -->
+        <item
+            android:id="@+id/menu_sectores"
+            android:title="Sectores">
+            <menu>
+                <item
+                    android:id="@+id/sub_asignar_tag_sector"
+                    android:icon="@drawable/asignartagsector"
+                    android:title="Asignar Tag a Sector"
+                    android:visible="true" />
+
+                <item
+                    android:id="@+id/sub_activos_sector"
+                    android:icon="@drawable/sector"
+                    android:title="Activos por Sector"
+                    android:visible="true" />
+            </menu>
+        </item>
+
+        <!-- ⚙️ Configuración -->
+        <item
+            android:id="@+id/menu_configuracion"
+            android:title="Configuración">
+            <menu>
+                <item
+                    android:id="@+id/sub_configurar_antena"
+                    android:icon="@drawable/configuracion"
+                    android:title="Configurar Antena"
+                    android:visible="true" />
+            </menu>
+        </item>
+
+    </group>
+</menu>

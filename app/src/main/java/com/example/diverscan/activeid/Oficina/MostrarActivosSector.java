@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.diverscan.activeid.Activo.ActivoInventario;
+import com.example.diverscan.activeid.TomasFisicas.TomasFisias;
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
@@ -24,7 +24,7 @@ public class MostrarActivosSector extends AppCompatActivity {
     private View UbicacionFinalView;
 
     private RecyclerView ListaLectura;
-    private ArrayList<ActivoInventario> activoInventarios = new ArrayList<ActivoInventario>();
+    private ArrayList<TomasFisias> activoInventarios = new ArrayList<TomasFisias>();
 
 
     com.example.diverscan.activeid.sqlite.OfficesDBHelper OfficesDBHelper;
@@ -83,7 +83,7 @@ public class MostrarActivosSector extends AppCompatActivity {
 
     public void RecibirTakesInfo() {
 
-        activoInventarios = (ArrayList<ActivoInventario>) getIntent().getSerializableExtra("inventarioVisual");
+        activoInventarios = (ArrayList<TomasFisias>) getIntent().getSerializableExtra("inventarioVisual");
 
         fillRecyclerView(activoInventarios);
 
@@ -112,7 +112,7 @@ public class MostrarActivosSector extends AppCompatActivity {
     //endregion
     //region Fill Adapter
 
-    public void fillRecyclerView (ArrayList<ActivoInventario> response) {
+    public void fillRecyclerView (ArrayList<TomasFisias> response) {
 
         try{
 

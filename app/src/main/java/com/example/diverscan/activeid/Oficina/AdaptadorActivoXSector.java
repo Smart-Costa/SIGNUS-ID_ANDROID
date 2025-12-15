@@ -8,20 +8,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.diverscan.activeid.Activo.ActivoInventario;
+import com.example.diverscan.activeid.TomasFisicas.TomasFisias;
 import com.example.diverscan.activeid.R;
 
 import java.util.List;
 
 public class AdaptadorActivoXSector extends RecyclerView.Adapter<AdaptadorActivoXSector.ViewHolder> {
-    private List<ActivoInventario> _activoInventarios;
+    private List<TomasFisias> _activoInventarios;
 
-    public AdaptadorActivoXSector(List<ActivoInventario> assetList) {
+    public AdaptadorActivoXSector(List<TomasFisias> assetList) {
         this._activoInventarios = assetList;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private ActivoInventario activo;
+        private TomasFisias activo;
         private TextView txtnumActivo,txtdescripcion,txtstatus, txtePC,txtsector;
         private CardView Tarjeta;
 
@@ -34,11 +34,11 @@ public class AdaptadorActivoXSector extends RecyclerView.Adapter<AdaptadorActivo
             txtsector=itemView.findViewById(R.id.txtSector);
             Tarjeta = itemView.findViewById(R.id.tarjeta);
         }
-        public ActivoInventario getActivo() {
+        public TomasFisias getActivo() {
             return activo;
         }
 
-        public void setActivo(ActivoInventario product) {
+        public void setActivo(TomasFisias product) {
             this.activo = product;
         }
     }

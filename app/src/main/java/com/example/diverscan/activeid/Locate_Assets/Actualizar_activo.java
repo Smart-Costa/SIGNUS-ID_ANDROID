@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.app.AlertDialog;
@@ -37,10 +36,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.diverscan.activeid.Activo.EntidadActivos;
-import com.example.diverscan.activeid.Activo.EntidadCategoriaActivos;
-import com.example.diverscan.activeid.Activo.EntidadSubActivo;
-import com.example.diverscan.activeid.Activo.UpdateAssetAdapter;
+import com.example.diverscan.activeid.TomasFisicas.EntidadActivos;
+import com.example.diverscan.activeid.TomasFisicas.EntidadCategoriaActivos;
+import com.example.diverscan.activeid.TomasFisicas.EntidadSubActivo;
+import com.example.diverscan.activeid.TomasFisicas.UpdateAssetAdapter;
 import com.example.diverscan.activeid.AssetStatus.AssetStatusDBHerlper;
 import com.example.diverscan.activeid.AssetStatus.EntidadAssetStatus;
 import com.example.diverscan.activeid.Edificio.EdificioDBHelper;
@@ -57,10 +56,7 @@ import com.example.diverscan.activeid.Piso.PisoRecord;
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.RazonSocial.RazonSocialDBHelper;
 import com.example.diverscan.activeid.RazonSocial.RazonSocialRecord;
-import com.example.diverscan.activeid.SubActivos.SubActivoActivity;
 import com.example.diverscan.activeid.Tags.EntidadTiposTags;
-import com.example.diverscan.activeid.Utilities.Fechas;
-import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
 import com.example.diverscan.activeid.sqlite.TagsDBHelper;
 import com.zebra.rfid.api3.TagData;
@@ -68,14 +64,12 @@ import com.zebra.rfid.api3.TagData;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
 public class Actualizar_activo extends AppCompatActivity implements ResponseHandlerInterface {
 

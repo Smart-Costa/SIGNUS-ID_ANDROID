@@ -5,10 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.media.effect.EffectUpdateListener;
 import android.util.Log;
 
-import com.example.diverscan.activeid.Activo.NuevoActivo;
 import com.example.diverscan.activeid.FotoActivo.EFotoActivo;
 
 import java.util.ArrayList;

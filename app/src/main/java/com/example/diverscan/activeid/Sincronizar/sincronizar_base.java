@@ -3,7 +3,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.app.VoiceInteractor;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -27,6 +25,11 @@ import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
+import com.example.diverscan.activeid.data.local.dao.RolDao;
+import com.example.diverscan.activeid.data.local.dao.TomaFisicaDao;
+import com.example.diverscan.activeid.data.local.dao.TomaFisicaDetallesDao;
+import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
+import com.example.diverscan.activeid.data.local.dao.UbicacionDao;
 import com.example.diverscan.activeid.data.local.dao.UserDao;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -51,14 +54,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.diverscan.activeid.Activo.ActivoRecord;
-import com.example.diverscan.activeid.Activo.EntidadActivos;
-import com.example.diverscan.activeid.Activo.EntidadCategoriaActivos;
-import com.example.diverscan.activeid.Activo.NuevoActivo;
+import com.example.diverscan.activeid.TomasFisicas.ActivoRecord;
+import com.example.diverscan.activeid.TomasFisicas.EntidadActivos;
+import com.example.diverscan.activeid.TomasFisicas.EntidadCategoriaActivos;
+import com.example.diverscan.activeid.TomasFisicas.NuevoActivo;
 import com.example.diverscan.activeid.AssetStatus.EntidadAssetStatus;
 import com.example.diverscan.activeid.Assign_tag_Offices.sincronizarTag;
 import com.example.diverscan.activeid.Conexion.ACTIVEID_API;
-import com.example.diverscan.activeid.Conexion.NetworkConnection;
 import com.example.diverscan.activeid.Employees.EntidadEmployees;
 import com.example.diverscan.activeid.FotoActivo.EFotoActivo;
 import com.example.diverscan.activeid.Inventory.EntidadDetalleInventario;
@@ -88,19 +90,13 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
@@ -113,6 +109,11 @@ public class sincronizar_base extends AppCompatActivity {
 
     private UserDao userDao;
     private ActivoDao activoDao;
+    private RolDao rolDao;
+    private UbicacionDao ubicacionDao;
+    private TomaFisicaDao tomafisicaDao;
+    private TomaFisicaTomasDao tomafisicatomasDao;
+    private TomaFisicaDetallesDao tomafisicadetallesDao;
     private SincronizarDBHelper SincronizarDBHelper;
     private String IP = "www.google.com";
     public final ArrayList<Entidad_TomaFisica>        listTomaUpdate        = new ArrayList<>();
@@ -168,6 +169,12 @@ public class sincronizar_base extends AppCompatActivity {
 
         userDao = new UserDao(this);
         activoDao = new ActivoDao(this);
+        rolDao = new RolDao(this);
+        ubicacionDao = new UbicacionDao(this);
+        tomafisicaDao = new TomaFisicaDao(this);
+        tomafisicatomasDao = new TomaFisicaTomasDao(this);
+        tomafisicadetallesDao = new TomaFisicaDetallesDao(this);
+
 
         // Configuración visual
         pasos = new View[]{
@@ -281,6 +288,11 @@ public class sincronizar_base extends AppCompatActivity {
 
         userDao.fetchAndSyncFromApi();
         activoDao.fetchAndSyncFromApi();
+        rolDao.fetchAndSyncFromApi();
+        ubicacionDao.fetchAndSyncFromApi();
+        tomafisicaDao.fetchAndSyncFromApi();
+        tomafisicatomasDao.fetchAndSyncFromApi();
+        tomafisicadetallesDao.fetchAndSyncFromApi();
 
         iniciarProgressThread(5);
     };
@@ -293,8 +305,7 @@ public class sincronizar_base extends AppCompatActivity {
             return;
         }
 
-        activoDao.pushLocalChangesToApi();
-        userDao.pushLocalChangesToApi();
+        //activoDao.pushLocalChangesToApi();
 
         iniciarProgressThread(5);
     };

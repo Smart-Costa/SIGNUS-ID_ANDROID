@@ -18,7 +18,7 @@ public class RegistroActivoUbicacionViewModel extends AndroidViewModel {
 
     public RegistroActivoUbicacionViewModel(@NonNull Application application) {
         super(application);
-        repository = new UbicacionRepository();
+        repository = new UbicacionRepository(application.getApplicationContext());
     }
 
     public LiveData<List<UbicacionEntity>> getUbicaciones() {
@@ -26,6 +26,7 @@ public class RegistroActivoUbicacionViewModel extends AndroidViewModel {
     }
 
     public void cargarUbicaciones() {
-        repository.getUbicaciones(getApplication(), ubicaciones);
+        List<UbicacionEntity> lista = repository.getUbicaciones();
+        ubicaciones.setValue(lista);
     }
 }

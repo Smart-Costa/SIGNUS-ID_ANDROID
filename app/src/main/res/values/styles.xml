@@ -13,11 +13,19 @@
 
         <!-- Opcional: Ripple para botones -->
         <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button</item>
+
+        <!-- Opcional: FontFamily Global-->
+        <item name="android:fontFamily">@font/public_sans</item>
+        <item name="fontFamily">@font/public_sans</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+
+        <!-- Opcional: FontFamily Global-->
+        <item name="android:fontFamily">@font/public_sans</item>
+        <item name="fontFamily">@font/public_sans</item>
     </style>
 
     <!-- Tema SplashScreen -->
@@ -35,7 +43,12 @@
     <!-- 🟠 Forma redondeada para ítems -->
     <style name="NavDrawerItemShape">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">16dp</item>
+        <item name="cornerSize">6dp</item>
+    </style>
+
+    <style name="RoundedTextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">6dp</item>
     </style>
 
 </resources>

@@ -5,8 +5,8 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 import android.util.Log;
 
-import com.example.diverscan.activeid.Activo.ActivoInventario;
-import com.example.diverscan.activeid.Activo.EntidadActivosInventarios;
+import com.example.diverscan.activeid.TomasFisicas.TomasFisias;
+import com.example.diverscan.activeid.TomasFisicas.EntidadActivosInventarios;
 import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
 import com.example.diverscan.activeid.sqlite.InventoryDBHelper;
 import com.zebra.rfid.api3.TagData;
@@ -34,8 +34,8 @@ public class ChequearInventario {
     Context _context;
 
 
-    public ChequearInventario(ArrayList<ActivoInventario> activos, String idTomaFisica,
-                                Context context, IChequearInventario iChequearInventario){
+    public ChequearInventario(ArrayList<TomasFisias> activos, String idTomaFisica,
+                              Context context, IChequearInventario iChequearInventario){
         if (activos == null) {
             activos = new ArrayList<>();
         }
@@ -45,8 +45,8 @@ public class ChequearInventario {
         _context= context;
     }
 
-    private void ListToDictionary(ArrayList<ActivoInventario> activos, IChequearInventario iChequearInventario){
-        for (ActivoInventario activo : activos){
+    private void ListToDictionary(ArrayList<TomasFisias> activos, IChequearInventario iChequearInventario){
+        for (TomasFisias activo : activos){
             InventarioVisual inventarioVisual = new InventarioVisual(
                     activo.getNumero(),
                     activo.getDescripcion(),

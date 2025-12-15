@@ -17,49 +17,21 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-public class UserDao extends SQLiteOpenHelper {
-
-    private static final String DB_NAME = "dbSignusId.db";
-    private static final int DB_VERSION = 8;
-    private static final String TAG = "USER_DAO";
-
+public class UserDao {
+    private static final String TAG = "DB_DAO_USER";
+    private final AppDatabaseHelper dbHelper;
     private final Context context;
 
     public UserDao(Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
         this.context = context.getApplicationContext();
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE users (" +
-                "userSysId TEXT, " +
-                "username TEXT, " +
-                "email TEXT, " +
-                "password TEXT, " +
-                "isApproved INTEGER, " +
-                "isOnLine INTEGER, " +
-                "isLockedOut INTEGER, " +
-                "Idrol TEXT" +
-                ")");
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS users");
-        onCreate(db);
-    }
-
-    @Override
-    public void onOpen(SQLiteDatabase db) {
-        super.onOpen(db);
+        this.dbHelper = new AppDatabaseHelper(context);
     }
 
     public boolean validateUser(String user, String pass) {
-        SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         String encryptedInput = EncryptUtil.encrypting(pass, true);
         Cursor cursor = db.rawQuery(
-                "SELECT * FROM users WHERE username=? AND password=?",
+                "SELECT * FROM Users WHERE username=? AND password=?",
                 new String[]{user, encryptedInput}
         );
 
@@ -80,7 +52,7 @@ public class UserDao extends SQLiteOpenHelper {
     }
 
     public void saveUser(LoginEntity u) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("userSysId", u.userSysId);
         values.put("username", u.username);
@@ -91,17 +63,17 @@ public class UserDao extends SQLiteOpenHelper {
         values.put("isLockedOut", u.isLockedOut ? 1 : 0);
         values.put("Idrol", u.Idrol);
 
-        db.insertWithOnConflict("users", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        db.insertWithOnConflict("Users", null, values, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
     }
 
     public void syncUsers(List<LoginEntity> users) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             for (LoginEntity u : users) {
                 ContentValues values = entityToContentValues(u);
-                db.insertWithOnConflict("users", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                db.insertWithOnConflict("Users", null, values, SQLiteDatabase.CONFLICT_REPLACE);
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -168,8 +140,8 @@ public class UserDao extends SQLiteOpenHelper {
 
     public List<LoginEntity> getAllLocalUsers() {
         List<LoginEntity> users = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM users", null);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM Users", null);
 
         if (cursor.moveToFirst()) {
             do {

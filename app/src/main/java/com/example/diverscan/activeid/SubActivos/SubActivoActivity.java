@@ -33,7 +33,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.diverscan.activeid.Activo.EntidadSubActivo;
+import com.example.diverscan.activeid.TomasFisicas.EntidadSubActivo;
 import com.example.diverscan.activeid.AssetStatus.AssetStatusDBHerlper;
 import com.example.diverscan.activeid.AssetStatus.EntidadAssetStatus;
 import com.example.diverscan.activeid.Edificio.EdificioDBHelper;

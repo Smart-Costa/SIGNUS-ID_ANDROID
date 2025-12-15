@@ -52,7 +52,7 @@ public class RFIDHandler implements Readers.RFIDReaderEventHandler  {
     String readername = "RFD8500123";
     private static final String _PASSWORD = "00";
 
-    void onCreate(ResponseHandlerInterface activity) {
+    public void onCreate(ResponseHandlerInterface activity) {
 
         responseHandlerInterface = activity;
 
@@ -494,8 +494,4 @@ public class RFIDHandler implements Readers.RFIDReaderEventHandler  {
             return null;
         }
     }
-
-
-
-
 }

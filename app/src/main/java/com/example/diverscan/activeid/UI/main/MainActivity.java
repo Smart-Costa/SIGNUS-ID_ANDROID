@@ -4,10 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,9 +36,13 @@ import com.example.diverscan.activeid.Locate_Assets.AsignarUbicacion;
 import com.example.diverscan.activeid.Oficina.ActivosPorSector;
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.Sincronizar.sincronizar_base;
+import com.example.diverscan.activeid.UI.activo.DarBajaActivoDetailActivity;
+import com.example.diverscan.activeid.UI.activo.LocalizarActivoDetailActivity;
 import com.example.diverscan.activeid.UI.activo.RegistroActivoUbicacionActivity;
 import com.example.diverscan.activeid.UI.login.LoginActivity;
+import com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity;
 import com.example.diverscan.activeid.Utilities.SessionManager;
+import com.example.diverscan.activeid.data.local.dao.RolDao;
 import com.example.diverscan.activeid.data.remote.api.ApiClient;
 import com.example.diverscan.activeid.databinding.ActivityMainBinding;
 import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
@@ -50,8 +58,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ResponseHandlerInterface {
     private ActivityMainBinding binding;
-
-    private HHRolHelper rolHelper;
+    private RolDao rolDao;
     private AssetsDBHelper assetsDB;
     private TagsDBHelper tagsDB;
     private SessionManager sessionManager;
@@ -75,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
         setContentView(binding.getRoot());
 
         sessionManager = new SessionManager(this);
-        //rolHelper = new HHRolHelper(this);
+        rolDao = new RolDao(this);
         //assetsDB = new AssetsDBHelper(this);
         //tagsDB = new TagsDBHelper(this);
 
@@ -85,24 +92,14 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
         validateSession();
 
         setupToolbarAndDrawer();
+        setupExpandableMenus();
         setupFab();
 
         username = sessionManager.getUsername();
         userId = sessionManager.getUserId();
-        setUserInfo(username);
 
-        List<String> roles = Arrays.asList(
-                "28 - HH Creación de Activo",
-                "29 - HH Creación de Inventario",
-                "30 - HH Actualización de Activo",
-                "31 - HH Asignación de tag a sector",
-                "32 - HH Sincronizador",
-                "34 - HH Ajustar Ubicación",
-                "35 - HH Configuración de antenas",
-                "37 - HH Activos Por Sector"
-        );
-        binding.navView.post(() -> showHideItemMenu(roles));
-        //showHideItemMenu(roles);
+        List<String> roles = rolDao.getRolesForUser(userId);
+        binding.navView.post(() -> applyUserPermissions(roles));
     }
 
     /* Session Validation */
@@ -159,53 +156,46 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
     }
 
     /* User Menu and Roles */
-    private void setUserInfo(String username) {
-        View headerView = binding.navView.getHeaderView(0);
-        TextView profileName = headerView.findViewById(R.id.txtUserMain);
-        profileName.setText(username != null ? username : "Usuario");
-    }
+    private void applyUserPermissions(List<String> permisosHH) {
+        Menu menu = binding.navView.getMenu();
+        initMenuCollapseState(menu);
 
-    private void showHideItemMenu(List<String> permisosHH) {
-        try {
-            Menu drawerMenu = binding.navView.getMenu();
+        for (String permiso : permisosHH) {
+            switch (permiso) {
 
-            for (String permiso : permisosHH) {
-                switch (permiso) {
-                    case "28 - HH Creación de Activo":
-                        drawerMenu.findItem(R.id.sub_crear_activo).setVisible(true);
-                        break;
+                case "28 - HH Creación de Activo":
+                    menu.findItem(R.id.menu_activos).setVisible(true);
+                    break;
 
-                    case "29 - HH Creación de Inventario":
-                        drawerMenu.findItem(R.id.sub_hacer_inventario).setVisible(true);
-                        break;
+                case "29 - HH Creación de Inventario":
+                    menu.findItem(R.id.menu_inventarios).setVisible(true);
+                    menu.findItem(R.id.menu_tomasfisicas).setVisible(true);
+                    break;
 
-                    case "30 - HH Actualización de Activo":
-                        drawerMenu.findItem(R.id.sub_actualizar_activo).setVisible(true);
-                        break;
+                case "30 - HH Actualización de Activo":
+                    menu.findItem(R.id.menu_busqueda_actualizacion).setVisible(true);
+                    break;
 
-                    case "31 - HH Asignación de tag a sector":
-                        drawerMenu.findItem(R.id.sub_asignar_tag_sector).setVisible(true);
-                        break;
+                case "31 - HH Asignación de tag a sector":
+                    menu.findItem(R.id.menu_sectores).setVisible(true);
+                    break;
 
-                    case "32 - HH Sincronizador":
-                        drawerMenu.findItem(R.id.sub_sincronizar).setVisible(true);
-                        break;
+                case "32 - HH Sincronizador":
+                    menu.findItem(R.id.sub_sincronizar).setVisible(true);
+                    break;
 
-                    case "34 - HH Ajustar Ubicación":
-                        drawerMenu.findItem(R.id.sub_ajuste_ubicacion).setVisible(true);
-                        break;
+                case "34 - HH Ajustar Ubicación":
+                    menu.findItem(R.id.menu_ajuste_ubicacion).setVisible(true);
+                    break;
 
-                    case "35 - HH Configuración de antenas":
-                        drawerMenu.findItem(R.id.sub_configurar_antena).setVisible(true);
-                        break;
+                case "35 - HH Configuración de antenas":
+                    menu.findItem(R.id.menu_configuracion).setVisible(true);
+                    break;
 
-                    case "37 - HH Activos Por Sector":
-                        drawerMenu.findItem(R.id.sub_activos_sector).setVisible(true);
-                        break;
-                }
+                case "37 - HH Activos Por Sector":
+                    menu.findItem(R.id.menu_sectores).setVisible(true);
+                    break;
             }
-        } catch (Exception ex) {
-            Log.e("LOGIN_MENU", "Error al mostrar permisos: " + ex.getMessage());
         }
     }
 
@@ -214,10 +204,15 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
         Intent intent = null;
 
         if (id == R.id.sub_crear_activo) {
-            //intent = new Intent(this, SelectLocationActivity.class);
             intent = new Intent(this, RegistroActivoUbicacionActivity.class);
+        } else if (id == R.id.sub_baja_activos) {
+            intent = new Intent(this, DarBajaActivoDetailActivity.class);
+        } else if (id == R.id.sub_localizar_activos) {
+            intent = new Intent(this, LocalizarActivoDetailActivity.class);
         } else if (id == R.id.sub_hacer_inventario) {
             intent = new Intent(this, Cargar_Toma_Fisica.class);
+        } else if (id == R.id.sub_tomasfisicas) {
+            intent = new Intent(this, RegistroTomaFisicaActivity.class);
         } else if (id == R.id.sub_actualizar_activo) {
             intent = new Intent(this, Actualizar_activo.class);
         } else if (id == R.id.sub_ajuste_ubicacion) {
@@ -240,18 +235,73 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
         return true;
     }
 
-    private void debugMenuIds() {
-        Menu menu = binding.navView.getMenu();
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            Log.d("LOGIN_MENU", "Item: " + item.getTitle() + " ID: " + item.getItemId());
-            if (item.hasSubMenu()) {
-                SubMenu sub = item.getSubMenu();
-                for (int j = 0; j < sub.size(); j++) {
-                    MenuItem subItem = sub.getItem(j);
-                    Log.d("LOGIN_MENU", "   SubItem: " + subItem.getTitle() + " ID: " + subItem.getItemId());
-                }
+    /* Spandible Menus */
+    private void initMenuCollapseState(Menu menu) {
+        menu.findItem(R.id.sub_crear_activo).setVisible(false);
+        menu.findItem(R.id.sub_baja_activos).setVisible(false);
+        menu.findItem(R.id.sub_localizar_activos).setVisible(false);
+        menu.findItem(R.id.sub_busqueda_actualizacion).setVisible(false);
+        menu.findItem(R.id.sub_inventarios).setVisible(false);
+        menu.findItem(R.id.sub_tomasfisicas).setVisible(true);
+        menu.findItem(R.id.sub_ajuste_ubicacion).setVisible(false);
+        menu.findItem(R.id.sub_registro_activos_sector).setVisible(false);
+        menu.findItem(R.id.sub_asignar_tag_sector).setVisible(false);
+        menu.findItem(R.id.sub_activos_sector).setVisible(false);
+        menu.findItem(R.id.sub_configurar_antena).setVisible(false);
+    }
+
+    private void setupExpandableMenus() {
+        binding.navView.setNavigationItemSelectedListener(item -> {
+            Menu menu = binding.navView.getMenu();
+            int id = item.getItemId();
+
+            switch (id) {
+
+                case R.id.menu_activos:
+                    toggleGroup(menu,
+                            R.id.sub_crear_activo,
+                            R.id.sub_baja_activos,
+                            R.id.sub_localizar_activos
+                    );
+                    return true;
+
+                case R.id.menu_busqueda_actualizacion:
+                    toggleGroup(menu, R.id.sub_busqueda_actualizacion);
+                    return true;
+
+                case R.id.menu_inventarios:
+                    toggleGroup(menu, R.id.sub_inventarios);
+                    return true;
+
+                case R.id.menu_tomasfisicas:
+                    toggleGroup(menu, R.id.sub_tomasfisicas);
+                    return true;
+
+                case R.id.menu_ajuste_ubicacion:
+                    toggleGroup(menu, R.id.sub_ajuste_ubicacion);
+                    return true;
+
+                case R.id.menu_sectores:
+                    toggleGroup(menu,
+                            R.id.sub_registro_activos_sector,
+                            R.id.sub_asignar_tag_sector,
+                            R.id.sub_activos_sector
+                    );
+                    return true;
+
+                case R.id.menu_configuracion:
+                    toggleGroup(menu, R.id.sub_configurar_antena);
+                    return true;
             }
+
+            return onNavigationItemSelected(item);
+        });
+    }
+
+    private void toggleGroup(Menu menu, int... ids) {
+        boolean shouldShow = !menu.findItem(ids[0]).isVisible();
+        for (int id : ids) {
+            menu.findItem(id).setVisible(shouldShow);
         }
     }
 

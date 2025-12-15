@@ -19,7 +19,7 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class ApiClient {
     private static final String TAG = "LOGIN_APICLIENT";
-    private static final String BASE_URL = "https://lung-run-send-jamie.trycloudflare.com/Api";
+    private static final String BASE_URL = "http://192.168.2.36:5200/Api";
     private static ApiClient instance;
     private final AsyncHttpClient client;
     private final Context context;
@@ -64,7 +64,7 @@ public class ApiClient {
 
     /* GET Factory */
     public <T> void get(String endpoint, final Type typeOfT, final ApiCallback<T> callback) {
-        if (!NetworkUtils.isOnline(context)) { // NetworkUtils es tu clase para chequear conectividad
+        if (!NetworkUtils.isOnline(context)) {
             callback.onComplete(ApiResponse.failure("No network connection", -1));
             return;
         }
@@ -110,8 +110,9 @@ public class ApiClient {
         String url = buildUrl(endpoint);
         try {
             String json = gson.toJson(bodyObject);
-            StringEntity entity = new StringEntity(json, StandardCharsets.UTF_8);
-            entity.setContentType("application/json");
+            //StringEntity entity = new StringEntity(json, StandardCharsets.UTF_8);
+            //entity.setContentType("application/json");
+            StringEntity entity = new StringEntity(json, "application/json", "UTF-8");
 
             Log.d(TAG, "POST " + url + " -> " + json);
 

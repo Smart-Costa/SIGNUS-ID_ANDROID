@@ -9,10 +9,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import androidx.annotation.RequiresApi;
+
 import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,17 +26,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.diverscan.activeid.Activo.ActivoInventario;
-import com.example.diverscan.activeid.Activo.AjustarActivoUbicacion;
-import com.example.diverscan.activeid.Activo.EntidadActivos;
+import com.example.diverscan.activeid.TomasFisicas.TomasFisias;
+import com.example.diverscan.activeid.TomasFisicas.EntidadActivos;
 import com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
@@ -48,14 +44,7 @@ import com.example.diverscan.activeid.sqlite.InventoryDBHelper;
 import com.example.diverscan.activeid.sqlite.OfficesDBHelper;
 import com.zebra.rfid.api3.TagData;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 public class Lectura_Inventario extends AppCompatActivity implements ResponseHandlerInterface, IChequearInventario {
@@ -74,7 +63,7 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
     private ArrayList<String> _activosEncontrados, _activosFaltantes, _activosActivoNoPertenece = new ArrayList<String>();
     private ArrayList<EntidadDetalleInventario> _detalleInventario = new ArrayList<EntidadDetalleInventario>();
     private ArrayList<EntidadInventario> _inventario = new ArrayList<EntidadInventario>();
-    private ArrayList<ActivoInventario> activoInventarios = new ArrayList<ActivoInventario>();
+    private ArrayList<TomasFisias> activoInventarios = new ArrayList<TomasFisias>();
     ArrayList<InventarioVisual> inventarioVisuals = new ArrayList<InventarioVisual>();
 
     private ArrayList<String> _activosSobrantes = new ArrayList<String>();

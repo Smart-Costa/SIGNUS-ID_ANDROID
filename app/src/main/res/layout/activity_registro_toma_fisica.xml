@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/blanco"
+    tools:context=".UI.tomasfisicas.RegistroTomaFisicaActivity">
+
+    <!-- Container Superior -->
+    <LinearLayout
+        android:id="@+id/contenedorSuperior"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/txtTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tomas Físicas"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#606060"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Buscador -->
+        <LinearLayout
+            android:id="@+id/lyBuscador"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Búsqueda por Nombre"
+                android:textColor="#606060"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/RoundedTextInput"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                app:boxBackgroundMode="outline"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txtBusquedaNombre"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="#FFF"
+                    android:hint="Introduzca un nombre"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:padding="8dp"
+                    android:singleLine="true"
+                    android:textColor="#606060"
+                    android:textColorHint="#898989"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Botón Buscar -->
+            <Button
+                android:id="@+id/btnBuscarNombre"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/btn_primary"
+                android:text="Buscar"
+                android:textColor="@color/blanco"
+                android:textStyle="bold"
+                android:textAllCaps="false" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Bloque Tabla + Paginador -->
+    <LinearLayout
+        android:id="@+id/bloqueTabla"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="@drawable/bg_bloque_tabla"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/contenedorSuperior"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Cabecera Tabla -->
+        <LinearLayout
+            android:id="@+id/lyCabecera"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.2"
+                android:text="NOMBRE"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="F. INICIAL"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="F. FINAL"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerTomas"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Paginador -->
+        <LinearLayout
+            android:id="@+id/lyPaginador"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+
+            <Button
+                android:id="@+id/btnRetrocesoRapido"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_paginador"
+                android:text="≪"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnRetroceso"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/btn_paginador"
+                android:text="‹"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/txtPagina"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="1"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/btn_paginador_seleccionado"
+                android:textColor="@color/blanco" />
+
+            <Button
+                android:id="@+id/btnAvance"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/btn_paginador"
+                android:text="›"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnAvanceRapido"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/btn_paginador"
+                android:text="≫"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

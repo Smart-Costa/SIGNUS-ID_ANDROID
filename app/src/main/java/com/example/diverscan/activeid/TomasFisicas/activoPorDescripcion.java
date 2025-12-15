@@ -1,4 +1,4 @@
-package com.example.diverscan.activeid.Activo;
+package com.example.diverscan.activeid.TomasFisicas;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;

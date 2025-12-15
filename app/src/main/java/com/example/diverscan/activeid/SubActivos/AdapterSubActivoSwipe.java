@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.diverscan.activeid.Activo.EntidadSubActivo;
+import com.example.diverscan.activeid.TomasFisicas.EntidadSubActivo;
 import com.example.diverscan.activeid.R;
 
 import java.util.ArrayList;

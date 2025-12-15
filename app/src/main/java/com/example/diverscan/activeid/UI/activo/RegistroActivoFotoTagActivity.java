@@ -2,6 +2,7 @@ package com.example.diverscan.activeid.UI.activo;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,14 +21,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.diverscan.activeid.R;
+import com.example.diverscan.activeid.RFID.RfidListener;
+import com.example.diverscan.activeid.RFID.RfidManager;
+import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import com.example.diverscan.activeid.data.local.entity.ActivoFotoEntity;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RegistroActivoFotoTagActivity extends AppCompatActivity {
+public class RegistroActivoFotoTagActivity extends AppCompatActivity implements RfidListener {
 
+    private RfidManager rfidManager;
     private ImageView imgFoto1, imgFoto2, imgFoto3, imgFoto4, imgFoto5;
     private AutoCompleteTextView spUbicacionSecundaria;
     private EditText etRfidTag;
@@ -59,6 +64,10 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registro_activo_foto_tag);
 
         inicializarVistas();
+
+        rfidManager = new RfidManager(this, this);
+
+        rfidManager.connect();
 
         viewModel = new ViewModelProvider(this).get(RegistroActivoFotoTagViewModel.class);
 
@@ -99,6 +108,35 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity {
         btnGuardar = findViewById(R.id.btnGuardar);
     }
 
+    @Override
+    public void onConnected() {
+        runOnUiThread(() ->
+                Toast.makeText(this, "Lector conectado", Toast.LENGTH_SHORT).show()
+        );
+    }
+
+    @Override
+    public void onTagRead(String epc) {
+        runOnUiThread(() -> {
+            etRfidTag.setText(epc);
+            Toast.makeText(this, "TAG leído: " + epc, Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    @Override
+    public void onError(String message) {
+        runOnUiThread(() ->
+                Toast.makeText(this, "Error lector: " + message, Toast.LENGTH_LONG).show()
+        );
+    }
+
+    @Override
+    public void onReaderDisconnected() {
+        runOnUiThread(() ->
+                Toast.makeText(this, "Lector desconectado", Toast.LENGTH_LONG).show()
+        );
+    }
+
     private void configurarClickImagenes() {
         imgFoto1.setOnClickListener(v -> abrirGaleria(1));
         imgFoto2.setOnClickListener(v -> abrirGaleria(2));
@@ -132,25 +170,30 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity {
             return;
         }
 
-        String idActivo = getSharedPreferences("RegistroActivo", MODE_PRIVATE).getString("idActivo", "");
+        SharedPreferences prefs = getSharedPreferences("RegistroActivo", MODE_PRIVATE);
+        String idActivo = prefs.getString("idActivo", "");
 
-        List<ActivoFotoEntity> fotos = new ArrayList<>();
-        for (int i = 0; i < fotosSeleccionadas.size(); i++) {
-            ActivoFotoEntity foto = new ActivoFotoEntity();
-            foto.setIdActivo(idActivo);
-            foto.setNumeroFoto(i + 1);
-            foto.setRutaLocal("foto_" + (i + 1));
-            fotos.add(foto);
-        }
+        // --- Construimos el Activo COMPLETO ---
+        ActivoEntity activo = new ActivoEntity();
+        activo.setIdActivo(idActivo);
 
-        viewModel.guardarTagYFotos(this, idActivo, ubicacionSec, rfid, fotos);
+        activo.setNumeroActivo(prefs.getString("NumeroActivo", ""));
+        activo.setNumeroEtiqueta(prefs.getString("NumeroEtiqueta", ""));
+        activo.setDescripcionCorta(prefs.getString("Descripcion", ""));
+
+        activo.setUbicacionA(prefs.getString("UbicacionA", ""));
+        activo.setUbicacionB(prefs.getString("UbicacionB", ""));
+        activo.setUbicacionC(prefs.getString("UbicacionC", ""));
+        activo.setUbicacionD(prefs.getString("UbicacionD", ""));
+        activo.setUbicacionSecundaria(ubicacionSec);
+
+        activo.setTagEpc(rfid);
+
+        viewModel.guardarActivoFinal(this, activo);
 
         Toast.makeText(this, "Activo registrado correctamente", Toast.LENGTH_LONG).show();
 
-        // Opcional: limpiar el flujo o volver al inicio
-        getSharedPreferences("RegistroActivo", MODE_PRIVATE).edit().clear().apply();
-
-        // Ir al home o listado
+        prefs.edit().clear().apply();
         finish();
     }
 }

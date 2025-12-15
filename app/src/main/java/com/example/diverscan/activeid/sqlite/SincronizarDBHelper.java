@@ -6,8 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.example.diverscan.activeid.Activo.EntidadActivos;
-import com.example.diverscan.activeid.Activo.EntidadCategoriaActivos;
+import com.example.diverscan.activeid.TomasFisicas.EntidadActivos;
+import com.example.diverscan.activeid.TomasFisicas.EntidadCategoriaActivos;
 import com.example.diverscan.activeid.AssetStatus.EntidadAssetStatus;
 import com.example.diverscan.activeid.Employees.EntidadEmployees;
 import com.example.diverscan.activeid.Inventory.EntidadEdificios;
@@ -23,7 +23,6 @@ import com.example.diverscan.activeid.Tags.EntidadTags;
 import com.example.diverscan.activeid.Tags.EntidadTiposTags;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SincronizarDBHelper  extends SQLiteOpenHelper {
 

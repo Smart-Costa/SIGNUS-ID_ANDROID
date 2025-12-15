@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.example.diverscan.activeid.Activo.ActivoInventario;
+import com.example.diverscan.activeid.TomasFisicas.TomasFisias;
 import com.example.diverscan.activeid.Assign_tag_Offices.sincronizarTag;
 import com.example.diverscan.activeid.Inventory.EUbicacionActivo;
 import com.example.diverscan.activeid.Inventory.EntidadTomaFisicaEPC;
@@ -166,7 +166,7 @@ public class OfficesDBHelper extends SQLiteOpenHelper {
         }
         return mapOficinas;
     }
-    public ArrayList<ActivoInventario> ActivosUbicacion(String Sector){
+    public ArrayList<TomasFisias> ActivosUbicacion(String Sector){
         String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag from Oficina o " +
                 " Inner Join Activos a ON a.IdOficina = o._id " +
                 " where o._id = '"+ Sector + "'";
@@ -174,7 +174,7 @@ public class OfficesDBHelper extends SQLiteOpenHelper {
 
     }
 
-    public ArrayList<ActivoInventario> ActivosUbicacionEPC(String Sector, String EPC){
+    public ArrayList<TomasFisias> ActivosUbicacionEPC(String Sector, String EPC){
         String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag from Oficina o " +
                 " Inner Join Activos a ON a.IdOficina = o._id " +
                 " inner join Tags t ON o.Tag = t._id  " +
@@ -225,22 +225,22 @@ public class OfficesDBHelper extends SQLiteOpenHelper {
         return actualizarUbicacionActivo;
     }
 
-    public ArrayList<ActivoInventario> ActivosUbicacionID(String Sector){
+    public ArrayList<TomasFisias> ActivosUbicacionID(String Sector){
         String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag from Oficina o " +
                 " Inner Join Activos a ON a.IdOficina = o._id " +
                 " where a.IdOficina like '%"+ Sector + "%'";
         return CargarActivosSector(query);
     }
 
-    public ArrayList<ActivoInventario> CargarActivosSector(String query){
-        ArrayList<ActivoInventario> listaInventario = new ArrayList<>();
+    public ArrayList<TomasFisias> CargarActivosSector(String query){
+        ArrayList<TomasFisias> listaInventario = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         int cantidadInventario = cursor.getCount();
         cursor.moveToFirst();
         for(int i = 0; i < cantidadInventario; i++){
 
-            ActivoInventario inventarioVisual = getInventarioVisual(cursor);
+            TomasFisias inventarioVisual = getInventarioVisual(cursor);
             listaInventario.add(inventarioVisual);
             cursor.moveToNext();
 
@@ -248,7 +248,7 @@ public class OfficesDBHelper extends SQLiteOpenHelper {
         return listaInventario;
     }
 
-    private ActivoInventario getInventarioVisual (Cursor cursor){
+    private TomasFisias getInventarioVisual (Cursor cursor){
 
         String AssetSysId= cursor.getString(cursor.getColumnIndex("_id"));
         String Numero = cursor.getString(cursor.getColumnIndex("CodeBar"));
@@ -257,7 +257,7 @@ public class OfficesDBHelper extends SQLiteOpenHelper {
         String Oficina = cursor.getString(cursor.getColumnIndex("Nombre"));
         String EPC = cursor.getString(cursor.getColumnIndex("Tag"));
 
-        ActivoInventario inventarioVisual = new ActivoInventario(Numero, Descripcion,"",  EPC, AssetSysId,Oficina, IdOficina );
+        TomasFisias inventarioVisual = new TomasFisias(Numero, Descripcion,"",  EPC, AssetSysId,Oficina, IdOficina );
         return inventarioVisual;
     }
 

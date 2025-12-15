@@ -2,47 +2,125 @@ package com.example.diverscan.activeid.data.local.entity;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.UUID;
 
 public class ActivoEntity {
+
+    @SerializedName("ID_ACTIVO")
     @NonNull
     private String idActivo = UUID.randomUUID().toString();
+
+    @SerializedName("NUMERO_ACTIVO")
     private String numeroActivo;
+
+    @SerializedName("NUMERO_ETIQUETA")
     private String numeroEtiqueta;
+
+    @SerializedName("DESCRIPCION_CORTA")
     private String descripcionCorta;
+
+    @SerializedName("DESCRIPCION_LARGA")
     private String descripcionLarga;
+
+    @SerializedName("CATEGORIA")
     private String categoria;
+
+    @SerializedName("ESTADO")
     private String estado;
+
+    @SerializedName("EMPRESA")
     private String empresa;
+
+    @SerializedName("MARCA")
     private String marca;
+
+    @SerializedName("MODELO")
     private String modelo;
+
+    @SerializedName("NUMERO_SERIE")
     private String numeroSerie;
+
+    @SerializedName("COSTO")
     private Double costo;
+
+    @SerializedName("NUMERO_FACTURA")
     private String numeroFactura;
+
+    @SerializedName("FECHA_COMPRA")
     private String fechaCompra;
+
+    @SerializedName("FECHA_CAPITALIZACION")
     private String fechaCapitalizacion;
+
+    @SerializedName("VALOR_RESIDUAL")
     private Double valorResidual;
+
+    @SerializedName("DOCUMENTO")
     private String documento;
+
+    @SerializedName("FOTOS")
     private String fotos;
+
+    @SerializedName("NUMERO_PARTE_FABRICANTE")
     private String numeroParteFabricante;
+
+    @SerializedName("DEPRECIADO")
     private String depreciado;
+
+    @SerializedName("DESCRIPCION_DEPRECIADO")
     private String descripcionDepreciado;
+
+    @SerializedName("ANOS_VIDA_UTIL")
     private Integer anosVidaUtil;
+
+    @SerializedName("CUENTA_CONTABLE_DEPRESIACION")
     private String cuentaContableDepresiacion;
+
+    @SerializedName("CENTRO_COSTOS")
     private String centroCostos;
+
+    @SerializedName("DESCRIPCION_ESTADO_ULTIMO_INVENTARIO")
     private String descripcionEstadoUltimoInventario;
+
+    @SerializedName("TAG_EPC")
     private String tagEpc;
+
+    @SerializedName("EMPLEADO")
     private String empleado;
+
+    @SerializedName("UBICACION_A")
     private String ubicacionA;
+
+    @SerializedName("UBICACION_B")
     private String ubicacionB;
+
+    @SerializedName("UBICACION_C")
     private String ubicacionC;
+
+    @SerializedName("UBICACION_D")
     private String ubicacionD;
+
+    @SerializedName("UBICACION_SECUNDARIA")
     private String ubicacionSecundaria;
+
+    @SerializedName("FECHA_GARANTIA")
     private String fechaGarantia;
+
+    @SerializedName("COLOR")
     private String color;
+
+    @SerializedName("TAMANIO_MEDIDA")
     private String tamanioMedida;
+
+    @SerializedName("OBSERVACIONES")
     private String observaciones;
+
+    @SerializedName("ESTADO_ACTIVO")
     private Boolean estadoActivo;
+
+    @SerializedName("FECHA_CREACION_ACTIVO")
     private String fechaCreacionActivo;
 
     // --- Getters y Setters ---

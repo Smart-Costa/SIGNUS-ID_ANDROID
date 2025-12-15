@@ -14,12 +14,18 @@ import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.data.local.entity.UbicacionEntity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RegistroActivoUbicacionActivity extends AppCompatActivity {
 
     AutoCompleteTextView spUbicacionA, spUbicacionB, spUbicacionC, spUbicacionD;
     Button btnGuardarUbicacion;
+    private ComboItem itemSeleccionA;
+    private ComboItem itemSeleccionB;
+    private ComboItem itemSeleccionC;
+    private ComboItem itemSeleccionD;
 
     RegistroActivoUbicacionViewModel viewModel;
     List<UbicacionEntity> listaUbicaciones = new ArrayList<>();
@@ -41,7 +47,6 @@ public class RegistroActivoUbicacionActivity extends AppCompatActivity {
             if (ubicaciones != null && !ubicaciones.isEmpty()) {
                 listaUbicaciones = ubicaciones;
                 cargarUbicacionesA(ubicaciones);
-                Toast.makeText(this, "Ubicaciones cargadas: " + ubicaciones.size(), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "No se encontraron ubicaciones", Toast.LENGTH_SHORT).show();
             }
@@ -50,42 +55,59 @@ public class RegistroActivoUbicacionActivity extends AppCompatActivity {
         viewModel.cargarUbicaciones();
 
         spUbicacionA.setOnItemClickListener((adapterView, view, i, l) -> {
-            String seleccionA = spUbicacionA.getText().toString();
-            cargarUbicacionesB(seleccionA);
+            itemSeleccionA = (ComboItem) spUbicacionA.getAdapter().getItem(i);
+
+            cargarUbicacionesB(itemSeleccionA.getId());
+
+            itemSeleccionB = null;
+            itemSeleccionC = null;
+            itemSeleccionD = null;
+
+            spUbicacionB.setText("");
+            spUbicacionC.setText("");
+            spUbicacionD.setText("");
         });
 
         spUbicacionB.setOnItemClickListener((adapterView, view, i, l) -> {
-            String seleccionB = spUbicacionB.getText().toString();
-            cargarUbicacionesC(seleccionB);
+            itemSeleccionB = (ComboItem) spUbicacionB.getAdapter().getItem(i);
+
+            cargarUbicacionesC(itemSeleccionB.getId());
+
+            itemSeleccionC = null;
+            itemSeleccionD = null;
+
+            spUbicacionC.setText("");
+            spUbicacionD.setText("");
         });
 
         spUbicacionC.setOnItemClickListener((adapterView, view, i, l) -> {
-            String seleccionC = spUbicacionC.getText().toString();
-            cargarUbicacionesD(seleccionC);
+            itemSeleccionC = (ComboItem) spUbicacionC.getAdapter().getItem(i);
+
+            cargarUbicacionesD(itemSeleccionC.getId());
+
+            itemSeleccionD = null;
+            spUbicacionD.setText("");
+        });
+
+        spUbicacionD.setOnItemClickListener((adapterView, view, i, l) -> {
+            itemSeleccionD = (ComboItem) spUbicacionD.getAdapter().getItem(i);
         });
 
         btnGuardarUbicacion.setOnClickListener(v -> {
-            String ubicacionA = spUbicacionA.getText().toString();
-            String ubicacionB = spUbicacionB.getText().toString();
-            String ubicacionC = spUbicacionC.getText().toString();
-            String ubicacionD = spUbicacionD.getText().toString();
-
-            if (ubicacionA.isEmpty() || ubicacionB.isEmpty()) {
+            if (itemSeleccionA == null || itemSeleccionB == null) {
                 Toast.makeText(this, "Por favor completa las ubicaciones A y B obligatorias", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             String idActivo = java.util.UUID.randomUUID().toString();
 
             getSharedPreferences("RegistroActivo", MODE_PRIVATE)
                     .edit()
                     .putString("idActivo", idActivo)
-                    .putString("UbicacionA", ubicacionA)
-                    .putString("UbicacionB", ubicacionB)
-                    .putString("UbicacionC", ubicacionC)
-                    .putString("UbicacionD", ubicacionD)
+                    .putString("UbicacionA_ID", itemSeleccionA.getId())
+                    .putString("UbicacionB_ID", itemSeleccionB.getId())
+                    .putString("UbicacionC_ID", itemSeleccionC != null ? itemSeleccionC.getId() : null)
+                    .putString("UbicacionD_ID", itemSeleccionD != null ? itemSeleccionD.getId() : null)
                     .apply();
-
             Intent intent = new Intent(this, RegistroActivoDetailActivity.class);
             startActivity(intent);
             finish();
@@ -93,53 +115,75 @@ public class RegistroActivoUbicacionActivity extends AppCompatActivity {
     }
 
     /** -------------------- MÉTODOS DE CARGA -------------------- **/
+    public class ComboItem {
+        private final String id;
+        private final String nombre;
+
+        public ComboItem(String id, String nombre) {
+            this.id = id;
+            this.nombre = nombre;
+        }
+
+        public String getId() { return id; }
+        public String getNombre() { return nombre; }
+
+        @Override
+        public String toString() {
+            return nombre;
+        }
+    }
+
     private void cargarUbicacionesA(List<UbicacionEntity> ubicaciones) {
-        List<String> listaA = new ArrayList<>();
+        List<ComboItem> listaA = new ArrayList<>();
+        Set<String> repetidos = new HashSet<>();
         for (UbicacionEntity item : ubicaciones) {
-            if (item.getUbicacionA() != null && !listaA.contains(item.getUbicacionA())) {
-                listaA.add(item.getUbicacionA());
+            if (item.getUbicacionA() != null && repetidos.add(item.getUbicacionA())) {
+                listaA.add(new ComboItem(item.getASysId(), item.getUbicacionA()));
             }
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, listaA);
-        spUbicacionA.setAdapter(adapter);
+        spUbicacionA.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, listaA));
     }
 
-    private void cargarUbicacionesB(String ubicacionA) {
-        List<String> listaB = new ArrayList<>();
+    private void cargarUbicacionesB(String idA) {
+        List<ComboItem> listaB = new ArrayList<>();
+        Set<String> repetidos = new HashSet<>();
         for (UbicacionEntity item : listaUbicaciones) {
-            if (item.getUbicacionA() != null && item.getUbicacionA().equals(ubicacionA)) {
-                if (item.getUbicacionB() != null && !listaB.contains(item.getUbicacionB())) {
-                    listaB.add(item.getUbicacionB());
+            if (item.getASysId() != null && item.getASysId().equals(idA)) {
+                if (item.getBSysId() != null && repetidos.add(item.getBSysId())) {
+                    listaB.add(new ComboItem(item.getBSysId(), item.getUbicacionB()));
                 }
             }
         }
-        ArrayAdapter<String> adapterB = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, listaB);
-        spUbicacionB.setAdapter(adapterB);
+        spUbicacionB.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, listaB));
     }
 
-    private void cargarUbicacionesC(String ubicacionB) {
-        List<String> listaC = new ArrayList<>();
+    private void cargarUbicacionesC(String idB) {
+        List<ComboItem> listaC = new ArrayList<>();
+        Set<String> repetidos = new HashSet<>();
         for (UbicacionEntity item : listaUbicaciones) {
-            if (item.getUbicacionB() != null && item.getUbicacionB().equals(ubicacionB)) {
-                if (item.getUbicacionC() != null && !listaC.contains(item.getUbicacionC())) {
-                    listaC.add(item.getUbicacionC());
+            if (item.getBSysId() != null && item.getBSysId().equals(idB)) {
+                if (item.getCSysId() != null && repetidos.add(item.getCSysId())) {
+                    listaC.add(new ComboItem(item.getCSysId(), item.getUbicacionC()));
                 }
             }
         }
-        ArrayAdapter<String> adapterC = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, listaC);
-        spUbicacionC.setAdapter(adapterC);
+        spUbicacionC.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, listaC));
     }
 
-    private void cargarUbicacionesD(String ubicacionC) {
-        List<String> listaD = new ArrayList<>();
+    private void cargarUbicacionesD(String idC) {
+        List<ComboItem> listaD = new ArrayList<>();
+        Set<String> repetidos = new HashSet<>();
         for (UbicacionEntity item : listaUbicaciones) {
-            if (item.getUbicacionC() != null && item.getUbicacionC().equals(ubicacionC)) {
-                if (item.getUbicacionD() != null && !listaD.contains(item.getUbicacionD())) {
-                    listaD.add(item.getUbicacionD());
+            if (item.getCSysId() != null && item.getCSysId().equals(idC)) {
+                if (item.getDSysId() != null && repetidos.add(item.getDSysId())) {
+                    listaD.add(new ComboItem(item.getDSysId(), item.getUbicacionD()));
                 }
             }
         }
-        ArrayAdapter<String> adapterD = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, listaD);
-        spUbicacionD.setAdapter(adapterD);
+        spUbicacionD.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, listaD));
     }
 }

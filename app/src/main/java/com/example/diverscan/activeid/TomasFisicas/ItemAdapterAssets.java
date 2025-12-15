@@ -1,4 +1,4 @@
-package com.example.diverscan.activeid.Activo;
+package com.example.diverscan.activeid.TomasFisicas;
 
 import android.content.Context;
 import android.view.LayoutInflater;

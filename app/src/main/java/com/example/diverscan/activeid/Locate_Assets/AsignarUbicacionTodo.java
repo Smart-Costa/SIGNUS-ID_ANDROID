@@ -32,10 +32,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.diverscan.activeid.Activo.ActivoInventario;
-import com.example.diverscan.activeid.Activo.AjustarActivoUbicacion;
-import com.example.diverscan.activeid.Activo.EntidadActivos;
-import com.example.diverscan.activeid.Activo.entidadaAjustarUbicacion;
+import com.example.diverscan.activeid.TomasFisicas.TomasFisias;
+import com.example.diverscan.activeid.TomasFisicas.AjustarActivoUbicacion;
+import com.example.diverscan.activeid.TomasFisicas.EntidadActivos;
+import com.example.diverscan.activeid.TomasFisicas.entidadaAjustarUbicacion;
 import com.example.diverscan.activeid.AssetStatus.AssetStatusDBHerlper;
 import com.example.diverscan.activeid.AssetStatus.EntidadAssetStatus;
 import com.example.diverscan.activeid.Employees.EmployeesDBHelper;
@@ -68,7 +68,7 @@ public class AsignarUbicacionTodo extends AppCompatActivity implements ResponseH
 
     private RecyclerView ListaLectura;
     private RecyclerView.Adapter recycle;
-    private ArrayList<ActivoInventario> activoInventarios = new ArrayList<ActivoInventario>();
+    private ArrayList<TomasFisias> activoInventarios = new ArrayList<TomasFisias>();
 
     ArrayList<InventarioVisual> inventarioVisuals = new ArrayList<InventarioVisual>();
     ArrayList<InventarioVisual> tagSinPertenencia = new ArrayList<InventarioVisual>();
@@ -171,7 +171,7 @@ public class AsignarUbicacionTodo extends AppCompatActivity implements ResponseH
 
     public void RecibirTakesInfo() {
 
-        activoInventarios = (ArrayList<ActivoInventario>) getIntent().getSerializableExtra("inventarioVisual");
+        activoInventarios = (ArrayList<TomasFisias>) getIntent().getSerializableExtra("inventarioVisual");
         idOficina = getIntent().getExtras().getString("idOficina");
 
         try {

@@ -6,12 +6,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.example.diverscan.activeid.Activo.ActivoRecord;
-import com.example.diverscan.activeid.Activo.AjustarActivoUbicacion;
-import com.example.diverscan.activeid.Activo.EntidadActivos;
-import com.example.diverscan.activeid.Activo.EntidadActivosInventarios;
-import com.example.diverscan.activeid.Activo.EntidadCategoriaActivos;
-import com.example.diverscan.activeid.Activo.entidadaAjustarUbicacion;
+import com.example.diverscan.activeid.TomasFisicas.ActivoRecord;
+import com.example.diverscan.activeid.TomasFisicas.AjustarActivoUbicacion;
+import com.example.diverscan.activeid.TomasFisicas.EntidadActivos;
+import com.example.diverscan.activeid.TomasFisicas.EntidadActivosInventarios;
+import com.example.diverscan.activeid.TomasFisicas.EntidadCategoriaActivos;
+import com.example.diverscan.activeid.TomasFisicas.entidadaAjustarUbicacion;
 import com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet;
 import com.example.diverscan.activeid.Tags.EntidadTiposTags;
 

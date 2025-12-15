@@ -1,0 +1,45 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/itemNombre"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.5"
+        android:textColor="#333"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/itemFechaInicial"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textColor="#333"
+        android:textSize="14sp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/itemFechaFinal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textColor="#333"
+        android:textSize="14sp"
+        android:gravity="center"/>
+
+    <ImageView
+        android:id="@+id/btnLupa"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="8dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_lupa"
+        android:contentDescription="Ver detalles"
+        android:background="@drawable/circle_white"/>
+
+</LinearLayout>
