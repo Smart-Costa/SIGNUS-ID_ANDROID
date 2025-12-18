@@ -38,31 +38,31 @@
             android:visible="false"
             android:background="@color/blanco" />
 
-        <!-- 🔍 BÚSQUEDA (PADRE) -->
+        <!-- 🔍 BÚSQUEDA (PADRE)
         <item
             android:id="@+id/menu_busqueda_actualizacion"
             android:icon="@drawable/iconosactualizar"
-            android:title="Búsqueda y Actualización" />
+            android:title="Búsqueda y Actualización" /> -->
 
-        <!-- SUBMENÚ BÚSQUEDA -->
+        <!-- SUBMENÚ BÚSQUEDA
         <item
             android:id="@+id/sub_busqueda_actualizacion"
             android:title=" o Buscar y Actualizar Activos"
             android:visible="false"
-            android:background="@color/blanco" />
+            android:background="@color/blanco" /> -->
 
-        <!-- 📦 INVENTARIOS (PADRE) -->
+        <!-- 📦 INVENTARIOS (PADRE)
         <item
             android:id="@+id/menu_inventarios"
             android:icon="@drawable/hacerinventario"
-            android:title="Hacer Inventarios" />
+            android:title="Hacer Inventarios" /> -->
 
-        <!-- SUBMENÚ INVENTARIOS -->
+        <!-- SUBMENÚ INVENTARIOS
         <item
             android:id="@+id/sub_inventarios"
             android:title=" o Realizar Inventario"
             android:visible="false"
-            android:background="@color/blanco" />
+            android:background="@color/blanco" /> -->
 
         <!-- 📦 TOMAS FISICAS (PADRE) -->
         <item
@@ -77,26 +77,26 @@
             android:visible="false"
             android:background="@color/blanco" />
 
-        <!-- 📍 AJUSTE DE UBICACIÓN (PADRE) -->
+        <!-- 📍 AJUSTE DE UBICACIÓN (PADRE)
         <item
             android:id="@+id/menu_ajuste_ubicacion"
             android:icon="@drawable/ajusteubicacion"
-            android:title="Ajuste de Ubicación" />
+            android:title="Ajuste de Ubicación" /> -->
 
-        <!-- SUBMENÚ AJUSTE -->
+        <!-- SUBMENÚ AJUSTE
         <item
             android:id="@+id/sub_ajuste_ubicacion"
             android:title=" o Ajuste de Ubicación"
             android:visible="false"
-            android:background="@color/blanco" />
+            android:background="@color/blanco" /> -->
 
-        <!-- 🏢 SECTORES (PADRE) -->
+        <!-- 🏢 SECTORES (PADRE)
         <item
             android:id="@+id/menu_sectores"
             android:icon="@drawable/sector"
-            android:title="Sectores" />
+            android:title="Sectores" /> -->
 
-        <!-- SUBMENÚ SECTORES -->
+        <!-- SUBMENÚ SECTORES
         <item
             android:id="@+id/sub_registro_activos_sector"
             android:title=" o Registro de Activos"
@@ -113,7 +113,7 @@
             android:id="@+id/sub_activos_sector"
             android:title=" o Activos por Sector"
             android:visible="false"
-            android:background="@color/blanco" />
+            android:background="@color/blanco" /> -->
 
         <!-- ⚙ CONFIGURACIÓN (PADRE) -->
         <item

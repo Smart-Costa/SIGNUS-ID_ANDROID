@@ -165,9 +165,15 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         String ubicacionSec = spUbicacionSecundaria.getText().toString();
         String rfid = etRfidTag.getText().toString();
 
-        if (ubicacionSec.isEmpty() || rfid.isEmpty()) {
-            Toast.makeText(this, "Completa los campos requeridos", Toast.LENGTH_SHORT).show();
+        if (rfid.isEmpty()) {
+            Toast.makeText(this, "Debe escanear o ingresar un TAG RFID", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        // Validación de formato básico de EPC (opcional, ejemplo 24 caracteres hex)
+        if (!rfid.matches("^[A-Fa-f0-9]+$")) {
+             Toast.makeText(this, "El TAG debe contener solo caracteres hexadecimales", Toast.LENGTH_SHORT).show();
+             return;
         }
 
         SharedPreferences prefs = getSharedPreferences("RegistroActivo", MODE_PRIVATE);

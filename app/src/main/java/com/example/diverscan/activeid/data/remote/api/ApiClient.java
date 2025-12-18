@@ -3,6 +3,7 @@ package com.example.diverscan.activeid.data.remote.api;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.diverscan.activeid.BuildConfig;
 import com.example.diverscan.activeid.Utilities.NetworkUtils;
 import com.example.diverscan.activeid.Utilities.SessionManager;
 import com.example.diverscan.activeid.data.remote.response.ApiCallback;
@@ -19,7 +20,7 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class ApiClient {
     private static final String TAG = "LOGIN_APICLIENT";
-    private static final String BASE_URL = "http://192.168.2.36:5200/Api";
+    private static final String BASE_URL = BuildConfig.BASE_URL;
     private static ApiClient instance;
     private final AsyncHttpClient client;
     private final Context context;

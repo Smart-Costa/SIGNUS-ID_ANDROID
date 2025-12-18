@@ -36,7 +36,12 @@ public class TomaFisicaTomasDao {
         return v;
     }
 
-    public void syncResumen(List<TomaFisicaTomasEntity> list) {
+    public long insert(TomaFisicaTomasEntity entity) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        return db.insert("TomasFisicasResumen", null, entityToValues(entity));
+    }
+
+    public void syncResumen(List<TomaFisicaTomasEntity> data) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         try {
@@ -103,6 +108,49 @@ public class TomaFisicaTomasDao {
             db.close();
         }
 
+        return list;
+    }
+
+    public List<TomaFisicaTomasEntity> getByTomaFisicaId(String tomaFisicaId) {
+        List<TomaFisicaTomasEntity> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String sql = "SELECT * FROM TomasFisicasResumen WHERE tomaFisicaId = ?";
+        String[] args = { tomaFisicaId };
+
+        try (Cursor c = db.rawQuery(sql, args)) {
+            while (c.moveToNext()) {
+                TomaFisicaTomasEntity r = new TomaFisicaTomasEntity();
+                r.setTomaFisicaId(c.getString(c.getColumnIndexOrThrow("tomaFisicaId")));
+                r.setNumeroToma(c.getString(c.getColumnIndexOrThrow("numeroToma")));
+                r.setIdToma(c.getString(c.getColumnIndexOrThrow("idToma")));
+                r.setTotalLecturas(c.getString(c.getColumnIndexOrThrow("totalLecturas")));
+                list.add(r);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching summaries by ID", e);
+        }
+        return list;
+    }
+
+    public List<TomaFisicaTomasEntity> getAll() {
+        List<TomaFisicaTomasEntity> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String sql = "SELECT * FROM TomasFisicasResumen";
+
+        try (Cursor c = db.rawQuery(sql, null)) {
+            while (c.moveToNext()) {
+                TomaFisicaTomasEntity r = new TomaFisicaTomasEntity();
+                r.setTomaFisicaId(c.getString(c.getColumnIndexOrThrow("tomaFisicaId")));
+                r.setNumeroToma(c.getString(c.getColumnIndexOrThrow("numeroToma")));
+                r.setIdToma(c.getString(c.getColumnIndexOrThrow("idToma")));
+                r.setTotalLecturas(c.getString(c.getColumnIndexOrThrow("totalLecturas")));
+                list.add(r);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching all summaries", e);
+        }
         return list;
     }
 }

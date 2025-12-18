@@ -20,6 +20,9 @@ android {
         versionCode 1
         versionName "1.0.14"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        // URL Base por defecto (Desarrollo / Emulador)
+        buildConfigField "String", "BASE_URL", "\"http://10.0.2.2:5200/Api\""
     }
     buildTypes {
         release {
@@ -27,6 +30,12 @@ android {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // URL Base para Producción (CAMBIAR ESTO)
+            buildConfigField "String", "BASE_URL", "\"https://api.produccion.com/Api\""
+        }
+        debug {
+            // URL Base para Debug
+            buildConfigField "String", "BASE_URL", "\"http://10.0.2.2:5200/Api\""
         }
     }
     compileOptions {

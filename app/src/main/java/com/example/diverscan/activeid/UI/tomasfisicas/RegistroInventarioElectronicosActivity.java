@@ -1,5 +1,6 @@
 package com.example.diverscan.activeid.UI.tomasfisicas;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -26,11 +27,16 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
 
     TomaFisicaTomasRepository repository;
     TomaFisicaTomasAdapter adapter;
+    String tomaFisicaId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro_inventario_electronicos);
+
+        if (getIntent().hasExtra("tomaFisicaId")) {
+            tomaFisicaId = getIntent().getStringExtra("tomaFisicaId");
+        }
 
         repository = new TomaFisicaTomasRepository(this);
 
@@ -53,6 +59,12 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
         cargarTomas();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cargarTomas();
+    }
+
     private void cargarListeners() {
 
         btnTomas.setOnClickListener(v -> {
@@ -67,11 +79,16 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
             cargarTomasCompletas();
         });
 
-        btnNuevaToma.setOnCheckedChangeListener((buttonView, checked) -> {
-            if (checked) {
-                //startActivity(new Intent(this, CrearTomaFisicaActivity.class));
-            }
+        btnNuevaToma.setOnClickListener(v -> {
+            Intent intent = new Intent(this, NuevaTomaActivity.class);
+            intent.putExtra("tomaFisicaId", tomaFisicaId);
+            startActivity(intent);
         });
+    }
+
+    private void cargarTomasCompletas() {
+        List<TomaFisicaTomasEntity> lista = repository.getCompletas();
+        adapter.actualizar(lista);
     }
 
     private void cargarKpi() {
@@ -87,7 +104,7 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
     }
 
     private void cargarTomas() {
-        List<TomaFisicaTomasEntity> lista = repository.getPendientes();
+        List<TomaFisicaTomasEntity> lista = repository.getPendientes(tomaFisicaId);
         adapter.actualizar(lista);
     }
 

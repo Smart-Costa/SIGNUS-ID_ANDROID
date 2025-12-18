@@ -15,4 +15,20 @@ public class TomaFisicaTomasRepository {
     public void sync(List<TomaFisicaTomasEntity> data) {
         dao.syncResumen(data);
     }
+
+    public List<TomaFisicaTomasEntity> getPendientes(String tomaFisicaId) {
+        if (tomaFisicaId == null || tomaFisicaId.isEmpty()) {
+            return dao.getAll();
+        }
+        return dao.getByTomaFisicaId(tomaFisicaId);
+    }
+
+    public List<TomaFisicaTomasEntity> getPendientes() {
+        return dao.getAll();
+    }
+
+    public List<TomaFisicaTomasEntity> getCompletas() {
+        // TODO: Implement logic to filter completed items if applicable
+        return new java.util.ArrayList<>();
+    }
 }

@@ -139,6 +139,10 @@
             android:parentActivityName=".UI.tomasfisicas.RegistroTomaFisicaActivity"
             android:label="Hacer Inventarios"
             android:exported="false" />
+        <activity android:name=".UI.tomasfisicas.NuevaTomaActivity"
+            android:parentActivityName=".UI.tomasfisicas.RegistroInventarioElectronicosActivity"
+            android:label="Nueva Toma Física"
+            android:exported="false" />
 
         <!-- 🏗️ Flujo de DarBaja de activos -->
         <activity android:name=".UI.activo.DarBajaActivoDetailActivity"

@@ -18,4 +18,8 @@ public class UbicacionRepository {
     public List<UbicacionEntity> getUbicaciones() {
         return dao.getAllUbicaciones();
     }
+
+    public void syncUbicaciones(Runnable onComplete) {
+        dao.fetchAndSyncFromApi(onComplete);
+    }
 }

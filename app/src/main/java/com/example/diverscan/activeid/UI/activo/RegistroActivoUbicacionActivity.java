@@ -94,8 +94,8 @@ public class RegistroActivoUbicacionActivity extends AppCompatActivity {
         });
 
         btnGuardarUbicacion.setOnClickListener(v -> {
-            if (itemSeleccionA == null || itemSeleccionB == null) {
-                Toast.makeText(this, "Por favor completa las ubicaciones A y B obligatorias", Toast.LENGTH_SHORT).show();
+            if (itemSeleccionA == null) {
+                Toast.makeText(this, "La Ubicación A es obligatoria", Toast.LENGTH_SHORT).show();
                 return;
             }
             String idActivo = java.util.UUID.randomUUID().toString();
@@ -104,7 +104,7 @@ public class RegistroActivoUbicacionActivity extends AppCompatActivity {
                     .edit()
                     .putString("idActivo", idActivo)
                     .putString("UbicacionA_ID", itemSeleccionA.getId())
-                    .putString("UbicacionB_ID", itemSeleccionB.getId())
+                    .putString("UbicacionB_ID", itemSeleccionB != null ? itemSeleccionB.getId() : null)
                     .putString("UbicacionC_ID", itemSeleccionC != null ? itemSeleccionC.getId() : null)
                     .putString("UbicacionD_ID", itemSeleccionD != null ? itemSeleccionD.getId() : null)
                     .apply();

@@ -27,6 +27,13 @@ public class RegistroActivoUbicacionViewModel extends AndroidViewModel {
 
     public void cargarUbicaciones() {
         List<UbicacionEntity> lista = repository.getUbicaciones();
-        ubicaciones.setValue(lista);
+        if (lista.isEmpty()) {
+            repository.syncUbicaciones(() -> {
+                List<UbicacionEntity> nuevaLista = repository.getUbicaciones();
+                ubicaciones.postValue(nuevaLista);
+            });
+        } else {
+            ubicaciones.setValue(lista);
+        }
     }
 }

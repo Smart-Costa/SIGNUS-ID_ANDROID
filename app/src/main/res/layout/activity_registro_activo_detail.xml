@@ -54,7 +54,8 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txtNumeroActivo"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="56dp"
                         android:inputType="text"
                         android:textColor="#606060"
                         android:backgroundTint="#FFF"
@@ -88,7 +89,8 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txtNumeroEtiqueta"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="56dp"
                         android:inputType="text"
                         android:paddingHorizontal="10dp"
                         android:textColor="#000000"

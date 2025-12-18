@@ -167,34 +167,34 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
                     menu.findItem(R.id.menu_activos).setVisible(true);
                     break;
 
-                case "29 - HH Creación de Inventario":
-                    menu.findItem(R.id.menu_inventarios).setVisible(true);
-                    menu.findItem(R.id.menu_tomasfisicas).setVisible(true);
-                    break;
-
-                case "30 - HH Actualización de Activo":
-                    menu.findItem(R.id.menu_busqueda_actualizacion).setVisible(true);
-                    break;
-
-                case "31 - HH Asignación de tag a sector":
-                    menu.findItem(R.id.menu_sectores).setVisible(true);
-                    break;
+//                case "29 - HH Creación de Inventario":
+//                    menu.findItem(R.id.menu_inventarios).setVisible(true);
+//                    menu.findItem(R.id.menu_tomasfisicas).setVisible(true);
+//                    break;
+//
+//                case "30 - HH Actualización de Activo":
+//                    menu.findItem(R.id.menu_busqueda_actualizacion).setVisible(true);
+//                    break;
+//
+//                case "31 - HH Asignación de tag a sector":
+//                    menu.findItem(R.id.menu_sectores).setVisible(true);
+//                    break;
 
                 case "32 - HH Sincronizador":
                     menu.findItem(R.id.sub_sincronizar).setVisible(true);
                     break;
 
-                case "34 - HH Ajustar Ubicación":
-                    menu.findItem(R.id.menu_ajuste_ubicacion).setVisible(true);
-                    break;
+//                case "34 - HH Ajustar Ubicación":
+//                    menu.findItem(R.id.menu_ajuste_ubicacion).setVisible(true);
+//                    break;
 
                 case "35 - HH Configuración de antenas":
                     menu.findItem(R.id.menu_configuracion).setVisible(true);
                     break;
 
-                case "37 - HH Activos Por Sector":
-                    menu.findItem(R.id.menu_sectores).setVisible(true);
-                    break;
+//                case "37 - HH Activos Por Sector":
+//                    menu.findItem(R.id.menu_sectores).setVisible(true);
+//                    break;
             }
         }
     }
@@ -209,22 +209,22 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
             intent = new Intent(this, DarBajaActivoDetailActivity.class);
         } else if (id == R.id.sub_localizar_activos) {
             intent = new Intent(this, LocalizarActivoDetailActivity.class);
-        } else if (id == R.id.sub_hacer_inventario) {
-            intent = new Intent(this, Cargar_Toma_Fisica.class);
+//        } else if (id == R.id.sub_hacer_inventario) {
+//            intent = new Intent(this, Cargar_Toma_Fisica.class);
         } else if (id == R.id.sub_tomasfisicas) {
             intent = new Intent(this, RegistroTomaFisicaActivity.class);
-        } else if (id == R.id.sub_actualizar_activo) {
-            intent = new Intent(this, Actualizar_activo.class);
-        } else if (id == R.id.sub_ajuste_ubicacion) {
-            intent = new Intent(this, AsignarUbicacion.class);
-        } else if (id == R.id.sub_asignar_tag_sector) {
-            intent = new Intent(this, Asignar_tag_sector.class);
+//        } else if (id == R.id.sub_actualizar_activo) {
+//            intent = new Intent(this, Actualizar_activo.class);
+//        } else if (id == R.id.sub_ajuste_ubicacion) {
+//            intent = new Intent(this, AsignarUbicacion.class);
+//        } else if (id == R.id.sub_asignar_tag_sector) {
+//            intent = new Intent(this, Asignar_tag_sector.class);
         } else if (id == R.id.sub_configurar_antena) {
             intent = new Intent(this, ConfiguracionAntena.class);
         } else if (id == R.id.sub_sincronizar) {
             intent = new Intent(this, sincronizar_base.class);
-        } else if (id == R.id.sub_activos_sector) {
-            intent = new Intent(this, ActivosPorSector.class);
+//        } else if (id == R.id.sub_activos_sector) {
+//            intent = new Intent(this, ActivosPorSector.class);
         }
 
         if (intent != null) {
@@ -240,13 +240,13 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
         menu.findItem(R.id.sub_crear_activo).setVisible(false);
         menu.findItem(R.id.sub_baja_activos).setVisible(false);
         menu.findItem(R.id.sub_localizar_activos).setVisible(false);
-        menu.findItem(R.id.sub_busqueda_actualizacion).setVisible(false);
-        menu.findItem(R.id.sub_inventarios).setVisible(false);
+//        menu.findItem(R.id.sub_busqueda_actualizacion).setVisible(false);
+//        menu.findItem(R.id.sub_inventarios).setVisible(false);
         menu.findItem(R.id.sub_tomasfisicas).setVisible(true);
-        menu.findItem(R.id.sub_ajuste_ubicacion).setVisible(false);
-        menu.findItem(R.id.sub_registro_activos_sector).setVisible(false);
-        menu.findItem(R.id.sub_asignar_tag_sector).setVisible(false);
-        menu.findItem(R.id.sub_activos_sector).setVisible(false);
+//        menu.findItem(R.id.sub_ajuste_ubicacion).setVisible(false);
+//        menu.findItem(R.id.sub_registro_activos_sector).setVisible(false);
+//        menu.findItem(R.id.sub_asignar_tag_sector).setVisible(false);
+//        menu.findItem(R.id.sub_activos_sector).setVisible(false);
         menu.findItem(R.id.sub_configurar_antena).setVisible(false);
     }
 
@@ -265,29 +265,29 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
                     );
                     return true;
 
-                case R.id.menu_busqueda_actualizacion:
-                    toggleGroup(menu, R.id.sub_busqueda_actualizacion);
-                    return true;
-
-                case R.id.menu_inventarios:
-                    toggleGroup(menu, R.id.sub_inventarios);
-                    return true;
+//                case R.id.menu_busqueda_actualizacion:
+//                    toggleGroup(menu, R.id.sub_busqueda_actualizacion);
+//                    return true;
+//
+//                case R.id.menu_inventarios:
+//                    toggleGroup(menu, R.id.sub_inventarios);
+//                    return true;
 
                 case R.id.menu_tomasfisicas:
                     toggleGroup(menu, R.id.sub_tomasfisicas);
                     return true;
 
-                case R.id.menu_ajuste_ubicacion:
-                    toggleGroup(menu, R.id.sub_ajuste_ubicacion);
-                    return true;
-
-                case R.id.menu_sectores:
-                    toggleGroup(menu,
-                            R.id.sub_registro_activos_sector,
-                            R.id.sub_asignar_tag_sector,
-                            R.id.sub_activos_sector
-                    );
-                    return true;
+//                case R.id.menu_ajuste_ubicacion:
+//                    toggleGroup(menu, R.id.sub_ajuste_ubicacion);
+//                    return true;
+//
+//                case R.id.menu_sectores:
+//                    toggleGroup(menu,
+//                            R.id.sub_registro_activos_sector,
+//                            R.id.sub_asignar_tag_sector,
+//                            R.id.sub_activos_sector
+//                    );
+//                    return true;
 
                 case R.id.menu_configuracion:
                     toggleGroup(menu, R.id.sub_configurar_antena);

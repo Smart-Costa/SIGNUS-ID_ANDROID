@@ -13,3 +13,6 @@
 # Project exclude paths
 /BarcodeScannerLibrary/build/
 /RFIDAPI3Library/build/
+
+# IDE files
+/.idea/

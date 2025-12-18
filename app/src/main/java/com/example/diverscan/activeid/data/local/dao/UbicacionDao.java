@@ -127,6 +127,10 @@ public class UbicacionDao {
     }
 
     public void fetchAndSyncFromApi() {
+        fetchAndSyncFromApi(null);
+    }
+
+    public void fetchAndSyncFromApi(final Runnable onSynced) {
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<List<UbicacionEntity>>() {}.getType();
 
@@ -135,6 +139,7 @@ public class UbicacionDao {
             public void onComplete(ApiResponse<List<UbicacionEntity>> response) {
                 if (response.success && response.data != null) {
                     syncUbicaciones(response.data);
+                    if (onSynced != null) onSynced.run();
                 } else {
                     Log.e(TAG, "Error al sincronizar ubicaciones: " + response.errorMessage);
                 }
