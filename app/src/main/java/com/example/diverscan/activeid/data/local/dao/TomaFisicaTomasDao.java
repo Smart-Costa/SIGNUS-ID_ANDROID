@@ -45,7 +45,7 @@ public class TomaFisicaTomasDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         try {
-            for (TomaFisicaTomasEntity a : list) {
+            for (TomaFisicaTomasEntity a : data) {
                 ContentValues values = entityToValues(a);
                 Log.d(TAG, "VALUES → " + values.toString());
                 db.insertWithOnConflict("TomasFisicasResumen", null, entityToValues(a),
