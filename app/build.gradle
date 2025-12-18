@@ -34,8 +34,8 @@ android {
             buildConfigField "String", "BASE_URL", "\"https://api.produccion.com/Api\""
         }
         debug {
-            // URL Base para Debug
-            buildConfigField "String", "BASE_URL", "\"http://10.0.2.2:5200/Api\""
+            // URL Base para Debug (IP de LAN para acceso externo)
+            buildConfigField "String", "BASE_URL", "\"http://192.168.1.13:5200/Api\""
         }
     }
     compileOptions {
