@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.SpannableString;
@@ -221,6 +222,8 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 //            intent = new Intent(this, Asignar_tag_sector.class);
         } else if (id == R.id.sub_configurar_antena) {
             intent = new Intent(this, ConfiguracionAntena.class);
+        } else if (id == R.id.sub_validar_conexion) {
+            intent = new Intent(this, ConnectionValidationActivity.class);
         } else if (id == R.id.sub_sincronizar) {
             intent = new Intent(this, sincronizar_base.class);
 //        } else if (id == R.id.sub_activos_sector) {

@@ -76,7 +76,18 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
         responseHandlerInterface = activity;
         context = activity.GetContext();
         Power = SharedPreferencesGetSet.leer_local("potenciaAntena", context);
-        MAX_POWER = Integer.parseInt(Power);
+        try {
+            if (Power != null && !Power.isEmpty()) {
+                MAX_POWER = Integer.parseInt(Power);
+            } else {
+                MAX_POWER = 270; // Valor por defecto seguro
+                Power = "270";
+            }
+        } catch (NumberFormatException e) {
+            MAX_POWER = 270;
+            Power = "270";
+            Log.e(TAG, "Error parsing power preference", e);
+        }
         InitSDK();
         initialized = true;
     }
@@ -91,6 +102,35 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
 
     public String Test2() {
         return "Session set to S2";
+    }
+
+    //*******************************************************************************************
+
+    // Added for Connection Validation
+    public boolean isConnected() {
+        return reader != null && reader.isConnected();
+    }
+
+    public String getReaderName() {
+        if (reader != null && reader.isConnected()) {
+             try {
+                 return reader.getHostName();
+             } catch (Exception e) {
+                 return "Error";
+             }
+        }
+        return "Desconectado";
+    }
+
+    public String getReaderModel() {
+        if (reader != null && reader.isConnected()) {
+             try {
+                 return reader.ReaderCapabilities.getModelName();
+             } catch (Exception e) {
+                 return "Desconocido";
+             }
+        }
+        return "--";
     }
 
     //*******************************************************************************************
@@ -317,8 +357,6 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
         return connect();
     }
 
-    //Adm*******************************************************************************************
-
     public void onPause() {
         disconnect();
     }
@@ -344,11 +382,15 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
                 }
             } catch (InvalidUsageException e) {
                 e.printStackTrace();
+                if(responseHandlerInterface != null)
+                    responseHandlerInterface.SetMessage("Error InvalidUsage: " + e.getVendorMessage());
             } catch (OperationFailureException e) {
                 e.printStackTrace();
 
                 Log.d(TAG, "OperationFailureException " + e.getVendorMessage());
                 String des = e.getResults().toString();
+                if(responseHandlerInterface != null)
+                    responseHandlerInterface.SetMessage("Fallo Operación: " + e.getVendorMessage() + " " + des);
                 return "Connection failed" + e.getVendorMessage() + " " + des;
             }
         }
@@ -397,6 +439,9 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     public void InitSDK()
     {
         Log.d(TAG, "InitSDK");
+        if(responseHandlerInterface != null)
+            responseHandlerInterface.SetMessage("Iniciando búsqueda de lectores...");
+
         if(readers == null){
             new CreateInstanceTask().execute();
         }else
@@ -418,8 +463,10 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
                 invalidUsageException = e;
             }
             if (invalidUsageException != null){
-                readers.Dispose();
-                readers = null;
+                if (readers != null) {
+                    readers.Dispose();
+                    readers = null;
+                }
                 if (readers == null){
                     readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
                 }
@@ -448,7 +495,12 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
         }
 
         @Override
-        protected void onPostExecute(String result){super.onPostExecute(result);
+        protected void onPostExecute(String result){
+            super.onPostExecute(result);
+            if (result != null && !result.isEmpty() && !result.equals("Conectado")) {
+                if(responseHandlerInterface != null)
+                    responseHandlerInterface.SetMessage("Estado Conexión: " + result);
+            }
         }
     }
 

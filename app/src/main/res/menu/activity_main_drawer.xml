@@ -127,5 +127,12 @@
             android:title=" o Configurar Antena"
             android:visible="false"
             android:background="@color/blanco" />
+
+        <!-- 📡 VALIDACIÓN CONEXIÓN -->
+        <item
+            android:id="@+id/sub_validar_conexion"
+            android:icon="@drawable/configuracion"
+            android:title="Validar Conexión RFID" />
+
     </group>
 </menu>

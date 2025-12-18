@@ -86,6 +86,14 @@
             android:screenOrientation="portrait"
             android:exported="false"/>
 
+        <!-- 📡 Validación de Conexión -->
+        <activity
+            android:name=".UI.validation.ConnectionValidationActivity"
+            android:label="Validación Conexión"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false"/>
+
         <!-- 🗂️ Creación y actualización de activos -->
         <activity android:name=".TomasFisicas.activoPorDescripcion" android:exported="false"/>
         <activity android:name=".TomasFisicas.createAssets"
