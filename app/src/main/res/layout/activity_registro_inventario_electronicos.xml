@@ -40,19 +40,28 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
+                android:layout_marginEnd="4dp"
                 android:background="@drawable/btn_primary"
                 android:text="Tomas"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeMaxTextSize="14sp"
+                android:lines="1" />
 
             <Button
                 android:id="@+id/btnTomasCompletas"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="4dp"
                 android:background="@drawable/btn_secondary_gray"
                 android:text="Tomas Completas"
-                android:textColor="@color/blanco" />
+                android:textColor="@color/blanco"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeMaxTextSize="14sp"
+                android:lines="1" />
         </LinearLayout>
 
         <!-- 📌 Cabecera -->
@@ -95,45 +104,47 @@
         android:id="@+id/recyclerTomas"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintTop_toBottomOf="@id/contenedorSuperior"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/kpiContainer" />
 
-    <!-- 📌 KPI → AHORA ESTÁ DEBAJO DEL RECYCLER Y ANTES DEL PAGINADOR -->
+    <!-- 📌 KPI Gauge -->
     <FrameLayout
         android:id="@+id/kpiContainer"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
-        android:layout_marginTop="250dp"
-        app:layout_constraintTop_toBottomOf="@id/recyclerTomas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnNuevaToma">
 
-        <ProgressBar
+        <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/kpiProgress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:indicatorSize="140dp"
+            app:trackThickness="12dp"
+            app:trackColor="#E0E0E0"
+            app:indicatorColor="@color/colorPrimary"
             android:max="100"
-            android:indeterminate="false"
-            android:progress="60"
-            android:rotation="-90"
-            android:progressDrawable="@drawable/kpi_progressbar" />
+            android:progress="60" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:gravity="center"
-            android:orientation="vertical"
-            android:padding="8dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/kpiValor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:textSize="40sp"
+                android:textSize="32sp"
                 android:textStyle="bold"
                 android:textColor="#333" />
 
@@ -142,29 +153,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="de 5"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textColor="#666" />
         </LinearLayout>
     </FrameLayout>
 
-    <!-- 📌 Paginador -->
-    <LinearLayout
-        android:id="@+id/lyPaginador"
-        android:layout_width="match_parent"
+    <!-- 📌 Botón Nueva Toma (FAB) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnNuevaToma"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingTop="12dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <ToggleButton
-            android:id="@+id/btnNuevaToma"
-            android:layout_width="160dp"
-            android:layout_height="48dp"
-            android:textOn="Crear Toma"
-            android:textOff="Nueva Toma"
-            android:background="@drawable/btn_toggle"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"/>
-    </LinearLayout>
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:backgroundTint="@color/colorPrimary"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:tint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="Nueva Toma" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,4 +20,8 @@ public class TomaFisicaRepository {
     public List<TomaFisicaEntity> getTomaFisicaByName(String nombre) {
         return dao.getTomaFisicaByName(nombre);
     }
+
+    public void sync(Runnable onSuccess) {
+        dao.fetchAndSyncFromApi(onSuccess);
+    }
 }

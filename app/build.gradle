@@ -22,7 +22,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         
         // URL Base por defecto (Desarrollo / Emulador)
-        buildConfigField "String", "BASE_URL", "\"http://3.85.211.90:70/ApiHH/Api\""
+        buildConfigField "String", "BASE_URL", "\"http://10.0.2.2:5200/api\""
     }
     buildTypes {
         release {

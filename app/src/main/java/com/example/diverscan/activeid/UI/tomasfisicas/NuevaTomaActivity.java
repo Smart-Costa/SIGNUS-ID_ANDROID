@@ -1,6 +1,5 @@
 package com.example.diverscan.activeid.UI.tomasfisicas;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,7 +7,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +24,9 @@ import com.example.diverscan.activeid.data.local.dao.TomaFisicaDetallesDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaDetallesEntity;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaTomasEntity;
+import com.example.diverscan.activeid.data.remote.response.ApiCallback;
+import com.example.diverscan.activeid.data.remote.response.ApiResponse;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.zebra.rfid.api3.TagData;
 
 import java.text.SimpleDateFormat;
@@ -38,10 +44,23 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private String tomaFisicaId;
     private String idToma;
     private String numeroToma;
+    private int currentTomaIndex = 1;
 
-    private TextView txtStatus, txtCount;
-    private Button btnToggleScan, btnSave;
+    // UI Components
+    private TextView lblConteos;
+    private HorizontalScrollView scrollTomas;
+    private LinearLayout containerTomasTabs;
+    private Button tabResumen, tabActivos;
+    private RelativeLayout viewResumen;
+    private LinearLayout viewActivos;
+    private CircularProgressIndicator gaugeResumen;
+    private TextView txtGaugeCount;
     private ListView listScannedTags;
+    private LinearLayout btnPotencia, btnIniciar, btnSubir;
+    private TextView txtIniciar;
+    private ImageView iconIniciar;
+    private ImageView btnBack;
+
     private ArrayAdapter<String> adapter;
     private ArrayList<String> scannedTagsList;
     private Set<String> uniqueTags;
@@ -69,29 +88,110 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         tomasDao = new TomaFisicaTomasDao(this);
         detallesDao = new TomaFisicaDetallesDao(this);
 
+        // Calculate next Toma Number
+        int existingCount = tomasDao.getPendientesCount(tomaFisicaId);
+        currentTomaIndex = existingCount + 1;
+        
         // Generate new ID for this Take
         idToma = UUID.randomUUID().toString();
-        // Generate a simple number (in real app this might need to be queried)
-        numeroToma = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
+        // numeroToma for DB (string) vs display (int)
+        // Usually numeroToma is just "1", "2", etc. or a timestamp. 
+        // Based on the user wanting "Toma 1..5", let's use the index as the number for now, or timestamp if preferred.
+        // I'll use the index for consistency with the UI.
+        numeroToma = String.valueOf(currentTomaIndex);
 
         initUI();
         initRFID();
     }
 
     private void initUI() {
-        txtStatus = findViewById(R.id.txtStatus);
-        txtCount = findViewById(R.id.txtCount);
-        btnToggleScan = findViewById(R.id.btnToggleScan);
-        btnSave = findViewById(R.id.btnSave);
+        // Bind Views
+        lblConteos = findViewById(R.id.lblConteos);
+        scrollTomas = findViewById(R.id.scrollTomas);
+        containerTomasTabs = findViewById(R.id.containerTomasTabs);
+        
+        tabResumen = findViewById(R.id.tabResumen);
+        tabActivos = findViewById(R.id.tabActivos);
+        
+        viewResumen = findViewById(R.id.viewResumen);
+        viewActivos = findViewById(R.id.viewActivos);
+        
+        gaugeResumen = findViewById(R.id.gaugeResumen);
+        txtGaugeCount = findViewById(R.id.txtGaugeCount);
+        
         listScannedTags = findViewById(R.id.listScannedTags);
+        
+        btnPotencia = findViewById(R.id.btnPotencia);
+        btnIniciar = findViewById(R.id.btnIniciar);
+        btnSubir = findViewById(R.id.btnSubir);
+        
+        txtIniciar = findViewById(R.id.txtIniciar);
+        iconIniciar = findViewById(R.id.iconIniciar);
+        btnBack = findViewById(R.id.btnBack);
 
+        // Setup List Adapter
         scannedTagsList = new ArrayList<>();
         uniqueTags = new HashSet<>();
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, scannedTagsList);
         listScannedTags.setAdapter(adapter);
 
-        btnToggleScan.setOnClickListener(v -> toggleScan());
-        btnSave.setOnClickListener(v -> saveTake());
+        // Update Tabs (Tomas 1..5)
+        updateTomasTabs();
+
+        // Listeners
+        tabResumen.setOnClickListener(v -> switchTab(true));
+        tabActivos.setOnClickListener(v -> switchTab(false));
+
+        btnIniciar.setOnClickListener(v -> toggleScan());
+        btnSubir.setOnClickListener(v -> uploadTake());
+        btnBack.setOnClickListener(v -> finish());
+        
+        btnPotencia.setOnClickListener(v -> Toast.makeText(this, "Configuración de potencia no disponible", Toast.LENGTH_SHORT).show());
+    }
+    
+    private void updateTomasTabs() {
+        containerTomasTabs.removeAllViews();
+        // Show at least the current one, maybe previous ones too if we could load them.
+        // For "Nueva Toma", we are creating "currentTomaIndex".
+        // Let's show "Toma X" as selected.
+        
+        TextView tab = new TextView(this);
+        tab.setText("Toma " + currentTomaIndex);
+        tab.setTextColor(getResources().getColor(android.R.color.white));
+        tab.setBackgroundResource(R.drawable.tab_selected_bg); // Assume this drawable exists or use btn_primary
+        tab.setPadding(48, 16, 48, 16);
+        containerTomasTabs.addView(tab);
+        
+        // Add a placeholder for next if < 5
+        if (currentTomaIndex < 5) {
+             TextView nextTab = new TextView(this);
+            nextTab.setText("Toma " + (currentTomaIndex + 1));
+            nextTab.setTextColor(getResources().getColor(R.color.colorAccent));
+            nextTab.setBackgroundResource(R.drawable.tab_unselected_bg); // Assume exists
+            nextTab.setPadding(48, 16, 48, 16);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(16, 0, 0, 0);
+            nextTab.setLayoutParams(params);
+            containerTomasTabs.addView(nextTab);
+        }
+    }
+
+    private void switchTab(boolean isResumen) {
+        if (isResumen) {
+            viewResumen.setVisibility(View.VISIBLE);
+            viewActivos.setVisibility(View.GONE);
+            tabResumen.setBackgroundResource(R.drawable.btn_primary);
+            tabResumen.setTextColor(getResources().getColor(android.R.color.white));
+            tabActivos.setBackgroundResource(R.drawable.btn_secondary_gray);
+            tabActivos.setTextColor(getResources().getColor(android.R.color.darker_gray)); // Or generic gray
+        } else {
+            viewResumen.setVisibility(View.GONE);
+            viewActivos.setVisibility(View.VISIBLE);
+            tabResumen.setBackgroundResource(R.drawable.btn_secondary_gray);
+            tabResumen.setTextColor(getResources().getColor(android.R.color.darker_gray));
+            tabActivos.setBackgroundResource(R.drawable.btn_primary);
+            tabActivos.setTextColor(getResources().getColor(android.R.color.white));
+        }
     }
 
     private void initRFID() {
@@ -145,30 +245,32 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private void updateUIState() {
         runOnUiThread(() -> {
             if (isScanning) {
-                btnToggleScan.setText("Detener Escaneo");
-                txtStatus.setText("Estado: Escaneando...");
-                btnSave.setEnabled(false);
+                txtIniciar.setText("Detener");
+                iconIniciar.setImageResource(android.R.drawable.ic_media_pause); // Or custom stop icon
+                btnSubir.setEnabled(false);
+                btnSubir.setAlpha(0.5f);
             } else {
-                btnToggleScan.setText("Iniciar Escaneo");
-                txtStatus.setText("Estado: Detenido");
-                btnSave.setEnabled(!uniqueTags.isEmpty());
+                txtIniciar.setText("Iniciar");
+                iconIniciar.setImageResource(R.drawable.ic_nfc);
+                btnSubir.setEnabled(true);
+                btnSubir.setAlpha(1.0f);
             }
         });
     }
 
-    private void saveTake() {
-        // Save header
+    private void uploadTake() {
+        if (uniqueTags.isEmpty()) {
+            Toast.makeText(this, "No hay lecturas para guardar", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 1. Prepare Data
         TomaFisicaTomasEntity header = new TomaFisicaTomasEntity();
         header.setTomaFisicaId(tomaFisicaId);
         header.setIdToma(idToma);
         header.setNumeroToma(numeroToma);
         header.setTotalLecturas(String.valueOf(uniqueTags.size()));
         
-        // I added insert method to DAO previously? No, I need to check if I did.
-        // I planned to add it. Let's check TomaFisicaTomasDao again.
-        // If not, I will add it here (or rather, assume I added it or use a raw query if needed, but better to add it to DAO).
-        
-        // Save details
         List<TomaFisicaDetallesEntity> detalles = new ArrayList<>();
         String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
@@ -179,33 +281,40 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             detail.setNumeroToma(numeroToma);
             detail.setEpc(epc);
             detail.setDateRead(now);
-            // Other fields can be null or empty for now
+            // FK fields need to be set if required by API/DB
+            // detail.setFKTomaFisica(tomaFisicaId); // Field not present in entity
             detalles.add(detail);
         }
 
-        new SaveTask(header, detalles).execute();
+        // 2. Save Local & Push
+        new SaveAndPushTask(header, detalles).execute();
     }
 
-    private class SaveTask extends AsyncTask<Void, Void, Boolean> {
+    private class SaveAndPushTask extends AsyncTask<Void, Void, Boolean> {
         private TomaFisicaTomasEntity header;
         private List<TomaFisicaDetallesEntity> detalles;
 
-        public SaveTask(TomaFisicaTomasEntity header, List<TomaFisicaDetallesEntity> detalles) {
+        public SaveAndPushTask(TomaFisicaTomasEntity header, List<TomaFisicaDetallesEntity> detalles) {
             this.header = header;
             this.detalles = detalles;
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(NuevaTomaActivity.this, "Guardando y subiendo...", Toast.LENGTH_SHORT).show();
+            btnSubir.setEnabled(false);
+        }
+
+        @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                // I need to ensure insert exists. 
-                // Since I cannot edit the DAO from inside here, I will assume I edit the DAO file next.
-                // For now I will call a method I will create in DAO.
+                // Save Local
                 tomasDao.insert(header);
-                detallesDao.syncDetalle(detalles); // syncDetalle uses insertWithOnConflict, so it works for new items too
+                detallesDao.syncDetalle(detalles);
                 return true;
             } catch (Exception e) {
-                Log.e(TAG, "Error saving take", e);
+                Log.e(TAG, "Error saving take locally", e);
                 return false;
             }
         }
@@ -213,12 +322,62 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
-                Toast.makeText(NuevaTomaActivity.this, "Toma guardada exitosamente", Toast.LENGTH_SHORT).show();
-                finish();
+                // Now Push to API
+                pushToApi(header, detalles);
             } else {
-                Toast.makeText(NuevaTomaActivity.this, "Error al guardar la toma", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NuevaTomaActivity.this, "Error al guardar localmente", Toast.LENGTH_SHORT).show();
+                btnSubir.setEnabled(true);
             }
         }
+    }
+
+    private void pushToApi(TomaFisicaTomasEntity header, List<TomaFisicaDetallesEntity> detalles) {
+        // 1. Push Header
+        tomasDao.pushSubtoma(header, new ApiCallback<ApiResponse<Void>>() {
+            @Override
+            public void onComplete(ApiResponse<ApiResponse<Void>> response) {
+                // Check HTTP success AND API logical success
+                boolean apiSuccess = response.success && (response.data == null || response.data.success);
+                
+                if (apiSuccess) {
+                    // 2. Push Details
+                    pushDetailsToApi(detalles);
+                } else {
+                    String errorMsg = response.errorMessage;
+                    if (response.data != null && response.data.errorMessage != null) {
+                        errorMsg = response.data.errorMessage;
+                    }
+                    final String finalError = errorMsg;
+                    runOnUiThread(() -> {
+                        Toast.makeText(NuevaTomaActivity.this, "Error subiendo cabecera: " + finalError, Toast.LENGTH_LONG).show();
+                        btnSubir.setEnabled(true);
+                    });
+                }
+            }
+        });
+    }
+
+    private void pushDetailsToApi(List<TomaFisicaDetallesEntity> detalles) {
+        detallesDao.pushDetalle(detalles, new ApiCallback<ApiResponse<Void>>() {
+            @Override
+            public void onComplete(ApiResponse<ApiResponse<Void>> response) {
+                runOnUiThread(() -> {
+                    boolean apiSuccess = response.success && (response.data == null || response.data.success);
+
+                    if (apiSuccess) {
+                        Toast.makeText(NuevaTomaActivity.this, "Subtoma subida exitosamente", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        String errorMsg = response.errorMessage;
+                        if (response.data != null && response.data.errorMessage != null) {
+                            errorMsg = response.data.errorMessage;
+                        }
+                        Toast.makeText(NuevaTomaActivity.this, "Error subiendo detalles: " + errorMsg, Toast.LENGTH_LONG).show();
+                        btnSubir.setEnabled(true);
+                    }
+                });
+            }
+        });
     }
 
     // ResponseHandlerInterface methods
@@ -240,7 +399,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         if (newTagsFound) {
             runOnUiThread(() -> {
                 adapter.notifyDataSetChanged();
-                txtCount.setText("Leídos: " + uniqueTags.size());
+                int count = uniqueTags.size();
+                txtGaugeCount.setText(String.valueOf(count));
+                gaugeResumen.setProgress(count); // Max default is 100, might need adjustment
             });
         }
     }

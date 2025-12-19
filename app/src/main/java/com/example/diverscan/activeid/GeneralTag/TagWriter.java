@@ -74,7 +74,9 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     public void onCreate(ResponseHandlerInterface activity)
     {
         responseHandlerInterface = activity;
-        context = activity.GetContext();
+        // Use ApplicationContext to prevent memory leaks and crashes on Activity destruction
+        context = activity.GetContext().getApplicationContext();
+        
         Power = SharedPreferencesGetSet.leer_local("potenciaAntena", context);
         try {
             if (Power != null && !Power.isEmpty()) {
@@ -131,6 +133,16 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
              }
         }
         return "--";
+    }
+
+    public ArrayList<String> getFoundDevices() {
+        ArrayList<String> devices = new ArrayList<>();
+        if (availableRFIDReaderList != null) {
+            for (ReaderDevice device : availableRFIDReaderList) {
+                devices.add(device.getName() + " (" + device.getAddress() + ")");
+            }
+        }
+        return devices;
     }
 
     //*******************************************************************************************
@@ -373,6 +385,11 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
         if (reader != null) {
             Log.d(TAG, "conectar " + reader.getHostName());
             try {
+                if (reader.isConnected()) {
+                    responseHandlerInterface.SetMessage("Ya conectado a " + reader.getHostName());
+                    return "Conectado";
+                }
+                
                 if (!reader.isConnected()) {
                     // Establish connection to the RFID Reader
                     reader.connect();
@@ -442,6 +459,17 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
         if(responseHandlerInterface != null)
             responseHandlerInterface.SetMessage("Iniciando búsqueda de lectores...");
 
+        // Si la lista de lectores está vacía, forzamos la recreación de la instancia Readers
+        // para asegurar que probamos todos los transportes (Bluetooth, etc.)
+        if (readers != null && (availableRFIDReaderList == null || availableRFIDReaderList.isEmpty())) {
+            try {
+                readers.Dispose();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            readers = null;
+        }
+
         if(readers == null){
             new CreateInstanceTask().execute();
         }else
@@ -453,22 +481,34 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     private class CreateInstanceTask extends AsyncTask<Void, Void, Void>{
         @Override
         protected Void doInBackground(Void... voids){
-            Log.d(TAG, "CraeteInstanceTask");
+            Log.d(TAG, "CreateInstanceTask");
             InvalidUsageException invalidUsageException = null;
-            try{
-                readers = new Readers(context, ENUM_TRANSPORT.SERVICE_SERIAL);  //ENUM_TRANSPORT.BLUETOOTH
+
+            // Intentar BLUETOOTH primero (Prioridad para RFD4031/Handhelds modernos)
+            try {
+                readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
                 availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-            }catch (InvalidUsageException e){
+            } catch (InvalidUsageException e) {
                 e.printStackTrace();
                 invalidUsageException = e;
             }
-            if (invalidUsageException != null){
+
+            // Si Bluetooth falla o no encuentra lectores, intentar SERVICE_SERIAL
+            if (invalidUsageException != null || availableRFIDReaderList == null || availableRFIDReaderList.isEmpty()) {
                 if (readers != null) {
-                    readers.Dispose();
+                    try {
+                        readers.Dispose();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     readers = null;
                 }
-                if (readers == null){
-                    readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
+
+                try {
+                    readers = new Readers(context, ENUM_TRANSPORT.SERVICE_SERIAL);
+                    availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
+                } catch (InvalidUsageException e) {
+                    e.printStackTrace();
                 }
             }
             return null;
@@ -516,20 +556,25 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
                     availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
                     if (availableRFIDReaderList.size() != 0) {
                         // if single reader is available then connect it
-                        // get first reader from list
-                        //readerDevice = availableRFIDReaderList.get(0);
-                        //reader = readerDevice.getRFIDReader();
                         if (availableRFIDReaderList.size() == 1) {
                             readerDevice = availableRFIDReaderList.get(0);
                             reader = readerDevice.getRFIDReader();
                         } else {
                             // search reader specified by name
+                            boolean found = false;
                             for (ReaderDevice device : availableRFIDReaderList) {
                                 if (device.getName().equals(readername))
                                 {
                                     readerDevice = device;
                                     reader = readerDevice.getRFIDReader();
+                                    found = true;
+                                    break;
                                 }
+                            }
+                            // Fallback: if not found, use the first one
+                            if (!found) {
+                                readerDevice = availableRFIDReaderList.get(0);
+                                reader = readerDevice.getRFIDReader();
                             }
                         }
                     }
@@ -555,7 +600,7 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     @Override
     public void RFIDReaderDisappeared(ReaderDevice readerDevice) {
         Log.d(TAG, "RFIDReaderDisappeared " + readerDevice.getName());
-        if (readerDevice.getName().equals(reader.getHostName()))
+        if (reader != null && reader.getHostName() != null && readerDevice.getName().equals(reader.getHostName()))
             disconnect();
     }
 
@@ -660,7 +705,8 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
                     new AsyncTask<Void, Void, Void>() {
                         @Override
                         protected Void doInBackground(Void... voids) {
-                            responseHandlerInterface.handleTriggerPress(true);
+                            if (responseHandlerInterface != null)
+                                responseHandlerInterface.handleTriggerPress(true);
                             return null;
                         }
                     }.execute();
@@ -669,7 +715,8 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
                     new AsyncTask<Void, Void, Void>() {
                         @Override
                         protected Void doInBackground(Void... voids) {
-                            responseHandlerInterface.handleTriggerPress(false);
+                            if (responseHandlerInterface != null)
+                                responseHandlerInterface.handleTriggerPress(false);
                             return null;
                         }
                     }.execute();
@@ -683,7 +730,8 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     private class AsyncDataUpdate extends AsyncTask<TagData[], Void, Void> {
         @Override
         protected Void doInBackground(TagData[]... params) {
-            responseHandlerInterface.handleTagdata(params[0]);
+            if (responseHandlerInterface != null)
+                responseHandlerInterface.handleTagdata(params[0]);
             return null;
         }
     }

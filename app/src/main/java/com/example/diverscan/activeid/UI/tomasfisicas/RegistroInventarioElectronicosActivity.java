@@ -3,17 +3,15 @@ package com.example.diverscan.activeid.UI.tomasfisicas;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.ToggleButton;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaTomasEntity;
 import com.example.diverscan.activeid.data.repository.TomaFisicaTomasRepository;
-
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +19,9 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     Button btnTomas, btnTomasCompletas;
-    ToggleButton btnNuevaToma;
+    FloatingActionButton btnNuevaToma;
     TextView kpiValor, kpiTotal;
-    ProgressBar kpiProgress;
+    CircularProgressIndicator kpiProgress;
 
     TomaFisicaTomasRepository repository;
     TomaFisicaTomasAdapter adapter;
@@ -92,7 +90,10 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
     }
 
     private void cargarKpi() {
-        int completadas = repository.getCompletas().size();
+        // Corrección: El límite de 5 aplica al total de subtomas creadas para esta Toma Física.
+        // Usamos getPendientes(tomaFisicaId) que retorna todas las subtomas asociadas.
+        List<TomaFisicaTomasEntity> todasLasTomas = repository.getPendientes(tomaFisicaId);
+        int completadas = todasLasTomas != null ? todasLasTomas.size() : 0;
         int total = 5;
 
         float progreso = (completadas * 100f) / total;
@@ -101,6 +102,14 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
         kpiTotal.setText("de " + total);
 
         kpiProgress.setProgress((int) progreso);
+
+        if (completadas >= total) {
+            btnNuevaToma.setEnabled(false);
+            btnNuevaToma.setAlpha(0.5f);
+        } else {
+            btnNuevaToma.setEnabled(true);
+            btnNuevaToma.setAlpha(1.0f);
+        }
     }
 
     private void cargarTomas() {

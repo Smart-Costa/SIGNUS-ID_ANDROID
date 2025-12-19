@@ -17,10 +17,21 @@ import java.util.Date;
 import java.util.Locale;
 import android.text.method.ScrollingMovementMethod;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.widget.Toast;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ConnectionValidationActivity extends AppCompatActivity implements ResponseHandlerInterface {
 
+    private static final int PERMISSION_REQUEST_CODE = 100;
     private TextView tvStatus;
     private TextView tvDevice;
+    private TextView tvFoundDevices;
     private TextView tvLog;
     private Button btnReconnect;
     private TagWriter rfidHandler;
@@ -32,8 +43,11 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection_validation);
 
+        checkAndRequestPermissions();
+
         tvStatus = findViewById(R.id.tv_connection_status);
         tvDevice = findViewById(R.id.tv_device_info);
+        tvFoundDevices = findViewById(R.id.tv_found_devices);
         tvLog = findViewById(R.id.tv_log);
         tvLog.setMovementMethod(new ScrollingMovementMethod()); // Habilitar scroll
 
@@ -58,8 +72,18 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     @Override
     protected void onResume() {
         super.onResume();
-        rfidHandler.setResponseHandler(this);
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(this);
+        }
         updateUI();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Don't nullify handler here if we want background updates, 
+        // but for safety in this app structure:
+        // if (rfidHandler != null) rfidHandler.setResponseHandler(null);
     }
 
     private void updateUI() {
@@ -74,16 +98,34 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
         } else {
             tvDevice.setText("Dispositivo: --");
         }
+        updateDeviceList();
+    }
+
+    private void updateDeviceList() {
+        if (rfidHandler != null) {
+            List<String> devices = rfidHandler.getFoundDevices();
+            if (devices != null && !devices.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for (String d : devices) {
+                    sb.append("• ").append(d).append("\n");
+                }
+                tvFoundDevices.setText(sb.toString());
+            } else {
+                tvFoundDevices.setText("Buscando... (0 encontrados)");
+            }
+        }
     }
 
     private void log(String msg) {
+        if (isFinishing() || isDestroyed()) return;
         String timestamp = timeFormat.format(new Date());
         runOnUiThread(() -> {
             tvLog.append("\n[" + timestamp + "] " + msg);
-            // Auto-scroll al final
-            final int scrollAmount = tvLog.getLayout().getLineTop(tvLog.getLineCount()) - tvLog.getHeight();
-            if (scrollAmount > 0)
-                tvLog.scrollTo(0, scrollAmount);
+            if (tvLog.getLayout() != null) {
+                final int scrollAmount = tvLog.getLayout().getLineTop(tvLog.getLineCount()) - tvLog.getHeight();
+                if (scrollAmount > 0)
+                    tvLog.scrollTo(0, scrollAmount);
+            }
         });
     }
 
@@ -105,6 +147,62 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
 
     @Override
     public void SetMessage(String Text) {
-        log(Text);
+        if (!isFinishing() && !isDestroyed()) {
+            log(Text);
+            runOnUiThread(this::updateDeviceList);
+        }
+    }
+
+    private void checkAndRequestPermissions() {
+        String[] permissions;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissions = new String[]{
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            };
+        } else {
+            permissions = new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            };
+        }
+
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String p : permissions) {
+            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p);
+            }
+        }
+
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            // Simple check
+            boolean allGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+            if (!allGranted) {
+                log("Advertencia: Permisos no concedidos. La conexión podría fallar.");
+                Toast.makeText(this, "Permisos necesarios no concedidos", Toast.LENGTH_LONG).show();
+            } else {
+                log("Permisos concedidos. Intentando conectar...");
+                if (!rfidHandler.isInitialized()) {
+                    rfidHandler.onCreate(this);
+                } else {
+                    rfidHandler.InitSDK();
+                }
+            }
+        }
     }
 }

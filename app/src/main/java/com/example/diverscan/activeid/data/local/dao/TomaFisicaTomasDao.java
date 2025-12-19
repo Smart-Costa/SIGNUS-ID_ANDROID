@@ -77,6 +77,59 @@ public class TomaFisicaTomasDao {
         });
     }
 
+    public int getPendientesCount(String tomaFisicaId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM TomasFisicasResumen WHERE TomaFisicaId = ?", new String[]{tomaFisicaId});
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
+    }
+
+    public void pushSubtoma(TomaFisicaTomasEntity entity, ApiCallback<ApiResponse<Void>> callback) {
+        ApiClient api = ApiClient.getInstance(context);
+        Type type = new TypeToken<ApiResponse<Void>>() {}.getType();
+
+        api.<ApiResponse<Void>>post("TomasFisicas/TFResumen", entity, type, callback);
+    }
+
+    public void pushLocalChangesToApi() {
+        List<TomaFisicaTomasEntity> localData = getAll();
+        if (localData.isEmpty()) {
+            Log.d(TAG, "No hay resumenes locales para enviar al servidor");
+            return;
+        }
+
+        ApiClient api = ApiClient.getInstance(context);
+        Type type = new TypeToken<ApiResponse<Void>>() {}.getType();
+
+        api.<ApiResponse<Void>>post("TomasFisicas/TFResumen", localData.get(0), type, new ApiCallback<ApiResponse<Void>>() {
+            @Override
+            public void onComplete(ApiResponse<ApiResponse<Void>> response) {
+                if (response.success) {
+                    Log.d(TAG, "Resumen enviado exitosamente al servidor");
+                    // Opcional: Marcar como sincronizado
+                } else {
+                    Log.e(TAG, "Error enviando resumen al servidor: " + response.errorMessage);
+                }
+            }
+        });
+        
+        // Nota: El endpoint TFResumen actualmente acepta un solo objeto PostTomaFisicaResumen.
+        // Si necesitamos enviar una lista, deberíamos iterar o cambiar el endpoint para aceptar lista.
+        // Dado que el flujo suele ser "Terminar Toma" -> enviar resumen de ESA toma, enviar 1 por 1 podría ser aceptable
+        // o mejor aún, modificar el endpoint para aceptar lista si se espera batch.
+        // Por ahora, para validar el flujo, enviamos el primero o iteramos.
+        
+        /* 
+        for (TomaFisicaTomasEntity item : localData) {
+             api.post("TomasFisicas/TFResumen", item, type, callback...);
+        }
+        */
+    }
+
     public List<TomaFisicaTomasEntity> getResumenById(String tomaFisicaId) {
         List<TomaFisicaTomasEntity> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();

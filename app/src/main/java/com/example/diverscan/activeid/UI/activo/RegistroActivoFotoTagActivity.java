@@ -14,6 +14,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.io.IOException;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
@@ -21,18 +25,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.diverscan.activeid.R;
-import com.example.diverscan.activeid.RFID.RfidListener;
-import com.example.diverscan.activeid.RFID.RfidManager;
+import android.content.Context;
+import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
+import com.example.diverscan.activeid.GeneralTag.TagWriter;
+import com.zebra.rfid.api3.TagData;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
-import com.example.diverscan.activeid.data.local.entity.ActivoFotoEntity;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+public class RegistroActivoFotoTagActivity extends AppCompatActivity implements ResponseHandlerInterface {
 
-public class RegistroActivoFotoTagActivity extends AppCompatActivity implements RfidListener {
-
-    private RfidManager rfidManager;
+    private static final int PERMISSION_REQUEST_CODE = 101;
+    private TagWriter rfidHandler;
     private ImageView imgFoto1, imgFoto2, imgFoto3, imgFoto4, imgFoto5;
     private AutoCompleteTextView spUbicacionSecundaria;
     private EditText etRfidTag;
@@ -65,9 +67,10 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
 
         inicializarVistas();
 
-        rfidManager = new RfidManager(this, this);
+        // Inicializar Singleton de TagWriter
+        rfidHandler = TagWriter.getInstance();
 
-        rfidManager.connect();
+        checkAndRequestPermissions();
 
         viewModel = new ViewModelProvider(this).get(RegistroActivoFotoTagViewModel.class);
 
@@ -108,34 +111,116 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         btnGuardar = findViewById(R.id.btnGuardar);
     }
 
+    private void checkAndRequestPermissions() {
+        String[] permissions;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            permissions = new String[]{
+                    android.Manifest.permission.BLUETOOTH_SCAN,
+                    android.Manifest.permission.BLUETOOTH_CONNECT,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+            };
+        } else {
+            permissions = new String[]{
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+            };
+        }
+
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String p : permissions) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, p) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p);
+            }
+        }
+
+        if (!listPermissionsNeeded.isEmpty()) {
+            androidx.core.app.ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+        }
+    }
+
     @Override
-    public void onConnected() {
+    public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions, @androidx.annotation.NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            boolean allGranted = true;
+            for (int result : grantResults) {
+                if (result != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+            if (!allGranted) {
+                Toast.makeText(this, "Permisos necesarios no concedidos. El lector RFID podría no funcionar.", Toast.LENGTH_LONG).show();
+            } else {
+                if (rfidHandler != null && !rfidHandler.isInitialized()) {
+                    rfidHandler.onCreate(this);
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(this);
+            if (!rfidHandler.isInitialized()) {
+                 rfidHandler.onCreate(this);
+            } else {
+                 // Verificar conexión
+                 if (!rfidHandler.isConnected()) {
+                     rfidHandler.InitSDK();
+                 }
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // rfidHandler.setResponseHandler(null); // Opcional
+    }
+
+    // --- Implementación de ResponseHandlerInterface ---
+
+    @Override
+    public void handleTagdata(TagData[] tagData) {
+        if (tagData != null && tagData.length > 0) {
+            String epc = tagData[0].getTagID();
+            runOnUiThread(() -> {
+                etRfidTag.setText(epc);
+                Toast.makeText(this, "TAG leído: " + epc, Toast.LENGTH_SHORT).show();
+            });
+        }
+    }
+
+    @Override
+    public void handleTriggerPress(boolean pressed) {
+        if (pressed) {
+             runOnUiThread(() -> Toast.makeText(this, "Gatillo presionado - Leyendo...", Toast.LENGTH_SHORT).show());
+             if (rfidHandler != null) {
+                 rfidHandler.performInventory();
+             }
+        } else {
+             if (rfidHandler != null) {
+                 rfidHandler.stopInventory();
+             }
+        }
+    }
+
+    @Override
+    public void SetMessage(String msg) {
         runOnUiThread(() ->
-                Toast.makeText(this, "Lector conectado", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Reader: " + msg, Toast.LENGTH_SHORT).show()
         );
     }
 
     @Override
-    public void onTagRead(String epc) {
-        runOnUiThread(() -> {
-            etRfidTag.setText(epc);
-            Toast.makeText(this, "TAG leído: " + epc, Toast.LENGTH_SHORT).show();
-        });
+    public Context GetContext() {
+        return this;
     }
 
-    @Override
-    public void onError(String message) {
-        runOnUiThread(() ->
-                Toast.makeText(this, "Error lector: " + message, Toast.LENGTH_LONG).show()
-        );
-    }
-
-    @Override
-    public void onReaderDisconnected() {
-        runOnUiThread(() ->
-                Toast.makeText(this, "Lector desconectado", Toast.LENGTH_LONG).show()
-        );
-    }
+    // ------------------------------------------------
 
     private void configurarClickImagenes() {
         imgFoto1.setOnClickListener(v -> abrirGaleria(1));

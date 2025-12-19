@@ -6,8 +6,9 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class ACTIVEID_API {
-    private static final String BASE_URL = "http://3.85.211.90:70/ApiHH/Api";
-    //private static final String BASE_URL = "http://3.85.211.90:70/WCF-IMAS/Service1.svc";
+    private static final String BASE_URL = "http://srvapppro/ApiHH/api";
+    //private static final String BASE_URL = "http://3.85.211.90:70/ApiHH/Api";
+    //private static final String BASE_URL = "http://10.0.2.2:5200/api";
     //private static final String BASE_URL = "http://10.211.136.196/WCFActivos_EMERSON/Service1.svc";
     //private static final String BASE_URL = "http://172.16.1.198/WCFActiveIntegration/Service1.svc";
 

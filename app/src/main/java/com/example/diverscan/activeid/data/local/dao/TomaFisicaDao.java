@@ -123,7 +123,7 @@ public class TomaFisicaDao {
         }
     }
 
-    public void fetchAndSyncFromApi() {
+    public void fetchAndSyncFromApi(final Runnable onSuccess) {
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<List<TomaFisicaEntity>>() {}.getType();
 
@@ -133,10 +133,17 @@ public class TomaFisicaDao {
                 if (response.success && response.data != null) {
                     syncTomasFisicas(response.data);
                     Log.d(TAG, "Tomas Fisicas sincronizadas desde API: " + response.data.size());
+                    if (onSuccess != null) {
+                        onSuccess.run();
+                    }
                 } else {
                     Log.e(TAG, "Error al sincronizar tomas fisicas desde API: " + response.errorMessage);
                 }
             }
         });
+    }
+
+    public void fetchAndSyncFromApi() {
+        fetchAndSyncFromApi(null);
     }
 }

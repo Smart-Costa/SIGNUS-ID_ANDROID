@@ -27,7 +27,14 @@ public class RegistroTomaFisicaViewModel extends AndroidViewModel {
     }
 
     public void cargarTomasFisicas() {
+        // Primero cargamos lo local
         tomasfisicas.setValue(repository.getTomaFisica());
+        
+        // Intentamos sincronizar
+        repository.sync(() -> {
+            // Si hay éxito, recargamos
+            tomasfisicas.postValue(repository.getTomaFisica());
+        });
     }
 
     public void buscarTomasFisicasPorNombre(String nombre) {
