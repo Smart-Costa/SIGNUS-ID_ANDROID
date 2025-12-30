@@ -20,17 +20,75 @@ import java.util.Map;
 public class InventoryDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "Test_ActiveId_v1";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 8;
 
     public InventoryDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) {}
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE if not exists TipoTomaInventario (_id Text PRIMARY KEY, " +
+                "Nombre Text, Descripcion Text, fechaInicio Text, fechaFinal Text, estado Text)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicasResumen (" +
+                "IdToma TEXT PRIMARY KEY, " +
+                "TomaFisicaId TEXT, " +
+                "NumeroToma TEXT, " +
+                "TotalLecturas TEXT, " +
+                "FechaCreacion TEXT, " +
+                "ActivosLeidos TEXT, " +
+                "Sobrantes TEXT, " +
+                "Faltantes TEXT, " +
+                "TotalActivos TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicas (" +
+                "tomaFisicaId TEXT PRIMARY KEY, " +
+                "nombre TEXT, " +
+                "fechaInicial TEXT, " +
+                "fechaFinal TEXT, " +
+                "categoria TEXT, " +
+                "usuarioAsignado TEXT, " +
+                "unidadOrganizativa TEXT, " +
+                "estadoActivo TEXT, " +
+                "ubicacionA TEXT, " +
+                "ubicacionB TEXT, " +
+                "ubicacionC TEXT, " +
+                "ubicacionD TEXT ) ");
+    }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int i, int i2) {}
+    public void onUpgrade(SQLiteDatabase db, int i, int i2) {
+        if (i2 > i) {
+             db.execSQL("CREATE TABLE if not exists TipoTomaInventario (_id Text PRIMARY KEY, " +
+                "Nombre Text, Descripcion Text, fechaInicio Text, fechaFinal Text, estado Text)");
+             
+             db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicasResumen (" +
+                "IdToma TEXT PRIMARY KEY, " +
+                "TomaFisicaId TEXT, " +
+                "NumeroToma TEXT, " +
+                "TotalLecturas TEXT, " +
+                "FechaCreacion TEXT, " +
+                "ActivosLeidos TEXT, " +
+                "Sobrantes TEXT, " +
+                "Faltantes TEXT, " +
+                "TotalActivos TEXT)");
+
+             db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicas (" +
+                "tomaFisicaId TEXT PRIMARY KEY, " +
+                "nombre TEXT, " +
+                "fechaInicial TEXT, " +
+                "fechaFinal TEXT, " +
+                "categoria TEXT, " +
+                "usuarioAsignado TEXT, " +
+                "unidadOrganizativa TEXT, " +
+                "estadoActivo TEXT, " +
+                "ubicacionA TEXT, " +
+                "ubicacionB TEXT, " +
+                "ubicacionC TEXT, " +
+                "ubicacionD TEXT ) ");
+        }
+    }
 
     public Cursor ObtenerTomasDelInventario(){
         try
@@ -244,8 +302,9 @@ public class InventoryDBHelper extends SQLiteOpenHelper {
     public Cursor VerTomasFisicas (){
         try {
             SQLiteDatabase db = this.getReadableDatabase();
-            String query ="Select _id, Nombre, Descripcion, fechaInicio, estado, fechaFinal from TipoTomaInventario WHERE estado = 1 OR estado = 3 " +
-                    "ORDER BY fechaInicio ASC";
+            // Modified to read from the new TomasFisicas table populated by Sync
+            // Mapping columns to match what Cargar_Toma_Fisica expects
+            String query ="Select tomaFisicaId as _id, nombre as Nombre, '' as Descripcion, fechaInicial as fechaInicio, '1' as estado, fechaFinal as fechaFinal from TomasFisicas ORDER BY fechaInicial ASC";
 
              return db.rawQuery(query, null);
          }

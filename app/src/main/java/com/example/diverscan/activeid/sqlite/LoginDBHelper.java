@@ -16,7 +16,7 @@ public class LoginDBHelper extends SQLiteOpenHelper
 {
 
     public static final String DATABASE_NAME = "Test_ActiveId_v1";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 8;
     int i = 1;
     public LoginDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -82,7 +82,32 @@ public class LoginDBHelper extends SQLiteOpenHelper
             db.execSQL("CREATE UNIQUE INDEX idx_Tomas_id ON Tomas (_id)");
 
             db.execSQL("CREATE TABLE if not exists TipoTomaInventario (_id Text PRIMARY KEY, " +
-                    "Nombre Text, Descripcion Text)");
+                    "Nombre Text, Descripcion Text, fechaInicio Text, fechaFinal Text, estado Text)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicas (" +
+                    "tomaFisicaId TEXT PRIMARY KEY, " +
+                    "nombre TEXT, " +
+                    "fechaInicial TEXT, " +
+                    "fechaFinal TEXT, " +
+                    "categoria TEXT, " +
+                    "usuarioAsignado TEXT, " +
+                    "unidadOrganizativa TEXT, " +
+                    "estadoActivo TEXT, " +
+                    "ubicacionA TEXT, " +
+                    "ubicacionB TEXT, " +
+                    "ubicacionC TEXT, " +
+                    "ubicacionD TEXT ) ");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicasResumen (" +
+                    "IdToma TEXT PRIMARY KEY, " +
+                    "TomaFisicaId TEXT, " +
+                    "NumeroToma TEXT, " +
+                    "TotalLecturas TEXT, " +
+                    "FechaCreacion TEXT, " +
+                    "ActivosLeidos TEXT, " +
+                    "Sobrantes TEXT, " +
+                    "Faltantes TEXT, " +
+                    "TotalActivos TEXT)");
 
 
             db.execSQL("CREATE TABLE if not exists TomaFisicaDetalle (idTakeDetail Text Primary Key, FK_TomaFisica Text, EPC Text, " +
@@ -124,44 +149,29 @@ public class LoginDBHelper extends SQLiteOpenHelper
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i2) {
         db.execSQL("DROP TABLE IF EXISTS Users");
-        onCreate(db);
-
         db.execSQL("DROP TABLE IF EXISTS Oficina");
-        onCreate(db);
-
         db.execSQL("DROP TABLE IF EXISTS Pisos");
-        onCreate(db);
-
         db.execSQL("DROP TABLE IF EXISTS Edificios");
-        onCreate(db);
-
         db.execSQL("DROP TABLE IF EXISTS RazonSocial");
-        onCreate(db);
-
         db.execSQL("DROP TABLE IF EXISTS OfficesXTags");
-        onCreate(db);
-
         db.execSQL("DROP TABLE IF EXISTS Tags");
-        onCreate(db);
-
-        db.execSQL("DROP TABLE IF EXISTS Activos");
-        onCreate(db);
-
-        db.execSQL("DROP TABLE IF EXISTS TipoTomaInventario");
-        onCreate(db);
-
+        db.execSQL("DROP TABLE IF EXISTS tipoTags");
+        db.execSQL("DROP TABLE IF EXISTS categoriaActivos");
         db.execSQL("DROP TABLE IF EXISTS Inventario");
-        onCreate(db);
-
+        db.execSQL("DROP TABLE IF EXISTS TomasDelInventario");
         db.execSQL("DROP TABLE IF EXISTS DetalleInventario");
-        onCreate(db);
-
+        db.execSQL("DROP TABLE IF EXISTS Tomas");
+        db.execSQL("DROP TABLE IF EXISTS TipoTomaInventario");
+        db.execSQL("DROP TABLE IF EXISTS TomasFisicas");
+        db.execSQL("DROP TABLE IF EXISTS TomasFisicasResumen");
+        db.execSQL("DROP TABLE IF EXISTS TomaFisicaDetalle");
+        db.execSQL("DROP TABLE IF EXISTS Activos");
         db.execSQL("DROP TABLE IF EXISTS RolHH");
-        onCreate(db);
-
+        db.execSQL("DROP TABLE IF EXISTS NewAssets");
         db.execSQL("DROP TABLE IF EXISTS AssetStatus");
-        onCreate(db);
         db.execSQL("DROP TABLE IF EXISTS Employees");
+        db.execSQL("DROP TABLE IF EXISTS FotoActivo");
+        
         onCreate(db);
     }
 

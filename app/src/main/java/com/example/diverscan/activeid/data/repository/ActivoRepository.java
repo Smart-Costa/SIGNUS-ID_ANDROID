@@ -80,6 +80,11 @@ public class ActivoRepository {
         });
     }
 
+    public void obtenerUbicacionesSecundarias(Context context, ApiCallback<List<UbicacionSecundariaEntity>> callback) {
+        Type ubiSType = new TypeToken<List<UbicacionSecundariaEntity>>() {}.getType();
+        ApiClient.getInstance(context).get("ActivosDetail/UbicacionesS", ubiSType, callback);
+    }
+
     // ✅ Guardar el activo en backend o local
     public void guardarActivo(Context context, ActivoEntity activo) {
     }

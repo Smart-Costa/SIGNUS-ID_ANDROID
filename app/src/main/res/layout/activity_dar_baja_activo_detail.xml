@@ -200,16 +200,5 @@
             android:textStyle="bold"
             android:textAllCaps="false" />
 
-        <Button
-            android:id="@+id/btnSimular"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/btn_primary"
-            android:text="Simular RFID"
-            android:textColor="@color/blanco"
-            android:textStyle="bold"
-            android:textAllCaps="false"/>
-
     </LinearLayout>
 </ScrollView>

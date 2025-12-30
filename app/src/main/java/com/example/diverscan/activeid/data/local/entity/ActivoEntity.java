@@ -4,123 +4,124 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class ActivoEntity {
 
-    @SerializedName("ID_ACTIVO")
+    @SerializedName(value = "ID_ACTIVO", alternate = {"IdActivo", "idActivo"})
     @NonNull
     private String idActivo = UUID.randomUUID().toString();
 
-    @SerializedName("NUMERO_ACTIVO")
-    private String numeroActivo;
+    @SerializedName(value = "NUMERO_ACTIVO", alternate = {"NumeroActivo", "numeroActivo", "Placa", "placa"})
+    private Object numeroActivo;
 
-    @SerializedName("NUMERO_ETIQUETA")
+    @SerializedName(value = "NUMERO_ETIQUETA", alternate = {"NumeroEtiqueta", "numeroEtiqueta", "Etiqueta", "etiqueta", "NoActivo", "noActivo"})
     private String numeroEtiqueta;
 
-    @SerializedName("DESCRIPCION_CORTA")
+    @SerializedName(value = "DESCRIPCION_CORTA", alternate = {"DescripcionCorta", "descripcionCorta", "Nombre", "nombre", "Descripcion", "descripcion"})
     private String descripcionCorta;
 
-    @SerializedName("DESCRIPCION_LARGA")
+    @SerializedName(value = "DESCRIPCION_LARGA", alternate = {"DescripcionLarga", "descripcionLarga"})
     private String descripcionLarga;
 
-    @SerializedName("CATEGORIA")
+    @SerializedName(value = "CATEGORIA", alternate = {"Categoria", "categoria"})
     private String categoria;
 
-    @SerializedName("ESTADO")
+    @SerializedName(value = "ESTADO", alternate = {"Estado", "estado"})
     private String estado;
 
-    @SerializedName("EMPRESA")
+    @SerializedName(value = "EMPRESA", alternate = {"Empresa", "empresa"})
     private String empresa;
 
-    @SerializedName("MARCA")
+    @SerializedName(value = "MARCA", alternate = {"Marca", "marca"})
     private String marca;
 
-    @SerializedName("MODELO")
+    @SerializedName(value = "MODELO", alternate = {"Modelo", "modelo"})
     private String modelo;
 
-    @SerializedName("NUMERO_SERIE")
+    @SerializedName(value = "NUMERO_SERIE", alternate = {"NumeroSerie", "numeroSerie", "Serie", "serie"})
     private String numeroSerie;
 
-    @SerializedName("COSTO")
+    @SerializedName(value = "COSTO", alternate = {"Costo", "costo"})
     private Double costo;
 
-    @SerializedName("NUMERO_FACTURA")
+    @SerializedName(value = "NUMERO_FACTURA", alternate = {"NumeroFactura", "numeroFactura", "Factura", "factura"})
     private String numeroFactura;
 
-    @SerializedName("FECHA_COMPRA")
+    @SerializedName(value = "FECHA_COMPRA", alternate = {"FechaCompra", "fechaCompra"})
     private String fechaCompra;
 
-    @SerializedName("FECHA_CAPITALIZACION")
+    @SerializedName(value = "FECHA_CAPITALIZACION", alternate = {"FechaCapitalizacion", "fechaCapitalizacion"})
     private String fechaCapitalizacion;
 
-    @SerializedName("VALOR_RESIDUAL")
+    @SerializedName(value = "VALOR_RESIDUAL", alternate = {"ValorResidual", "valorResidual"})
     private Double valorResidual;
 
-    @SerializedName("DOCUMENTO")
+    @SerializedName(value = "DOCUMENTO", alternate = {"Documento", "documento"})
     private String documento;
 
-    @SerializedName("FOTOS")
+    @SerializedName(value = "FOTOS", alternate = {"Fotos", "fotos", "Foto", "foto"})
     private String fotos;
 
-    @SerializedName("NUMERO_PARTE_FABRICANTE")
+    @SerializedName(value = "NUMERO_PARTE_FABRICANTE", alternate = {"NumeroParteFabricante", "numeroParteFabricante"})
     private String numeroParteFabricante;
 
-    @SerializedName("DEPRECIADO")
+    @SerializedName(value = "DEPRECIADO", alternate = {"Depreciado", "depreciado"})
     private String depreciado;
 
-    @SerializedName("DESCRIPCION_DEPRECIADO")
+    @SerializedName(value = "DESCRIPCION_DEPRECIADO", alternate = {"DescripcionDepreciado", "descripcionDepreciado"})
     private String descripcionDepreciado;
 
-    @SerializedName("ANOS_VIDA_UTIL")
+    @SerializedName(value = "ANOS_VIDA_UTIL", alternate = {"AnosVidaUtil", "anosVidaUtil"})
     private Integer anosVidaUtil;
 
-    @SerializedName("CUENTA_CONTABLE_DEPRESIACION")
+    @SerializedName(value = "CUENTA_CONTABLE_DEPRESIACION", alternate = {"CuentaContableDepresiacion", "cuentaContableDepresiacion"})
     private String cuentaContableDepresiacion;
 
-    @SerializedName("CENTRO_COSTOS")
+    @SerializedName(value = "CENTRO_COSTOS", alternate = {"CentroCostos", "centroCostos"})
     private String centroCostos;
 
-    @SerializedName("DESCRIPCION_ESTADO_ULTIMO_INVENTARIO")
+    @SerializedName(value = "DESCRIPCION_ESTADO_ULTIMO_INVENTARIO", alternate = {"DescripcionEstadoUltimoInventario", "descripcionEstadoUltimoInventario"})
     private String descripcionEstadoUltimoInventario;
 
-    @SerializedName("TAG_EPC")
+    @SerializedName(value = "TAG_EPC", alternate = {"TagEpc", "tagEpc", "EPC", "epc"})
     private String tagEpc;
 
-    @SerializedName("EMPLEADO")
+    @SerializedName(value = "EMPLEADO", alternate = {"Empleado", "empleado"})
     private String empleado;
 
-    @SerializedName("UBICACION_A")
+    @SerializedName(value = "UBICACION_A", alternate = {"UbicacionA", "ubicacionA"})
     private String ubicacionA;
 
-    @SerializedName("UBICACION_B")
+    @SerializedName(value = "UBICACION_B", alternate = {"UbicacionB", "ubicacionB"})
     private String ubicacionB;
 
-    @SerializedName("UBICACION_C")
+    @SerializedName(value = "UBICACION_C", alternate = {"UbicacionC", "ubicacionC"})
     private String ubicacionC;
 
-    @SerializedName("UBICACION_D")
+    @SerializedName(value = "UBICACION_D", alternate = {"UbicacionD", "ubicacionD"})
     private String ubicacionD;
 
-    @SerializedName("UBICACION_SECUNDARIA")
+    @SerializedName(value = "UBICACION_SECUNDARIA", alternate = {"UbicacionSecundaria", "ubicacionSecundaria"})
     private String ubicacionSecundaria;
 
-    @SerializedName("FECHA_GARANTIA")
+    @SerializedName(value = "FECHA_GARANTIA", alternate = {"FechaGarantia", "fechaGarantia"})
     private String fechaGarantia;
 
-    @SerializedName("COLOR")
+    @SerializedName(value = "COLOR", alternate = {"Color", "color"})
     private String color;
 
-    @SerializedName("TAMANIO_MEDIDA")
+    @SerializedName(value = "TAMANIO_MEDIDA", alternate = {"TamanioMedida", "tamanioMedida"})
     private String tamanioMedida;
 
-    @SerializedName("OBSERVACIONES")
+    @SerializedName(value = "OBSERVACIONES", alternate = {"Observaciones", "observaciones"})
     private String observaciones;
 
-    @SerializedName("ESTADO_ACTIVO")
+    @SerializedName(value = "ESTADO_ACTIVO", alternate = {"EstadoActivo", "estadoActivo"})
     private Boolean estadoActivo;
 
-    @SerializedName("FECHA_CREACION_ACTIVO")
+    @SerializedName(value = "FECHA_CREACION_ACTIVO", alternate = {"FechaCreacionActivo", "fechaCreacionActivo"})
     private String fechaCreacionActivo;
 
     // --- Getters y Setters ---
@@ -129,7 +130,22 @@ public class ActivoEntity {
     public String getIdActivo() { return idActivo; }
     public void setIdActivo(@NonNull String idActivo) { this.idActivo = idActivo; }
 
-    public String getNumeroActivo() { return numeroActivo; }
+    public String getNumeroActivo() {
+        if (numeroActivo == null) return null;
+        if (numeroActivo instanceof String) {
+            return (String) numeroActivo;
+        }
+        if (numeroActivo instanceof Number) {
+            try {
+                BigDecimal bd = new BigDecimal(numeroActivo.toString());
+                bd = bd.stripTrailingZeros();
+                return bd.toPlainString();
+            } catch (Exception e) {
+                return String.valueOf(numeroActivo);
+            }
+        }
+        return String.valueOf(numeroActivo);
+    }
     public void setNumeroActivo(String numeroActivo) { this.numeroActivo = numeroActivo; }
 
     public String getNumeroEtiqueta() { return numeroEtiqueta; }

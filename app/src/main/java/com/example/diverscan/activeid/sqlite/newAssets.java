@@ -14,7 +14,7 @@ package com.example.diverscan.activeid.sqlite;
 
 public class newAssets extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "Test_ActiveId_v1";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 8;
     Context _context;
     public newAssets(Context context){
 

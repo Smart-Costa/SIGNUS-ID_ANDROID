@@ -11,6 +11,7 @@ import com.example.diverscan.activeid.data.local.entity.RolEntity;
 import com.example.diverscan.activeid.data.remote.api.ApiClient;
 import com.example.diverscan.activeid.data.remote.response.ApiCallback;
 import com.example.diverscan.activeid.data.remote.response.ApiResponse;
+import com.example.diverscan.activeid.sqlite.LoginDBHelper;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -19,12 +20,12 @@ import java.util.List;
 
 public class RolDao {
     private static final String TAG = "DB_DAO_ROL";
-    private final AppDatabaseHelper dbHelper;
+    private final LoginDBHelper dbHelper;
     private final Context context;
 
     public RolDao(Context context) {
         this.context = context.getApplicationContext();
-        this.dbHelper = new AppDatabaseHelper(context);
+        this.dbHelper = new LoginDBHelper(context);
     }
 
     public void syncRoles(List<RolEntity> roles) {
@@ -115,6 +116,10 @@ public class RolDao {
     }
 
     public void fetchAndSyncFromApi() {
+        fetchAndSyncFromApi(null);
+    }
+
+    public void fetchAndSyncFromApi(final Runnable onComplete) {
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<List<RolEntity>>() {}.getType();
 
@@ -126,6 +131,7 @@ public class RolDao {
                 } else {
                     Log.e(TAG, "Error al sincronizar roles desde API: " + response.errorMessage);
                 }
+                if (onComplete != null) onComplete.run();
             }
         });
     }

@@ -20,9 +20,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
 import com.example.diverscan.activeid.R;
+import com.example.diverscan.activeid.data.local.dao.ActivoDao;
+import com.example.diverscan.activeid.data.local.dao.TomaFisicaDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaDetallesDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
+import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaDetallesEntity;
+import com.example.diverscan.activeid.data.local.entity.TomaFisicaEntity;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaTomasEntity;
 import com.example.diverscan.activeid.data.remote.response.ApiCallback;
 import com.example.diverscan.activeid.data.remote.response.ApiResponse;
@@ -31,12 +35,14 @@ import com.zebra.rfid.api3.TagData;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import android.content.Intent;
 
 public class NuevaTomaActivity extends AppCompatActivity implements ResponseHandlerInterface {
 
@@ -70,6 +76,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     private TomaFisicaTomasDao tomasDao;
     private TomaFisicaDetallesDao detallesDao;
+    private TomaFisicaDao tomaFisicaDao;
+    private ActivoDao activoDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +95,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         // Initialize DAO
         tomasDao = new TomaFisicaTomasDao(this);
         detallesDao = new TomaFisicaDetallesDao(this);
+        tomaFisicaDao = new TomaFisicaDao(this);
+        activoDao = new ActivoDao(this);
 
         // Calculate next Toma Number
         int existingCount = tomasDao.getPendientesCount(tomaFisicaId);
@@ -178,12 +188,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     private void switchTab(boolean isResumen) {
         if (isResumen) {
-            viewResumen.setVisibility(View.VISIBLE);
-            viewActivos.setVisibility(View.GONE);
-            tabResumen.setBackgroundResource(R.drawable.btn_primary);
-            tabResumen.setTextColor(getResources().getColor(android.R.color.white));
-            tabActivos.setBackgroundResource(R.drawable.btn_secondary_gray);
-            tabActivos.setTextColor(getResources().getColor(android.R.color.darker_gray)); // Or generic gray
+            new SaveLocalTask().execute();
         } else {
             viewResumen.setVisibility(View.GONE);
             viewActivos.setVisibility(View.VISIBLE);
@@ -191,6 +196,120 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             tabResumen.setTextColor(getResources().getColor(android.R.color.darker_gray));
             tabActivos.setBackgroundResource(R.drawable.btn_primary);
             tabActivos.setTextColor(getResources().getColor(android.R.color.white));
+        }
+    }
+
+    private TomaFisicaTomasEntity calculateSummary() {
+        TomaFisicaTomasEntity header = new TomaFisicaTomasEntity();
+        header.setTomaFisicaId(tomaFisicaId);
+        header.setIdToma(idToma);
+        header.setNumeroToma(numeroToma);
+        header.setTotalLecturas(String.valueOf(uniqueTags.size()));
+        header.setFechaCreacion(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+
+        TomaFisicaEntity tomaFisica = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
+        if (tomaFisica != null) {
+            // Asumimos que la ubicación para validar activos es UbicacionD, ajustar según lógica de negocio
+            String ubicacionD = tomaFisica.getUbicacionD();
+            List<ActivoEntity> expected = new ArrayList<>();
+            if (ubicacionD != null) {
+                expected = activoDao.getActivosByUbicacion(ubicacionD);
+            }
+
+            int totalActivos = expected.size();
+            int encontrados = 0;
+            int sobrantes = 0;
+
+            Set<String> expectedEpcs = new HashSet<>();
+            for (ActivoEntity a : expected) {
+                if (a.getTagEpc() != null) expectedEpcs.add(a.getTagEpc());
+            }
+
+            for (String scanned : uniqueTags) {
+                if (expectedEpcs.contains(scanned)) {
+                    encontrados++;
+                } else {
+                    sobrantes++;
+                }
+            }
+
+            int faltantes = totalActivos - encontrados;
+            if (faltantes < 0) faltantes = 0;
+
+            header.setTotalActivos(String.valueOf(totalActivos));
+            header.setActivosLeidos(String.valueOf(uniqueTags.size()));
+            header.setFaltantes(String.valueOf(faltantes));
+            header.setSobrantes(String.valueOf(sobrantes));
+        } else {
+            header.setTotalActivos("0");
+            header.setActivosLeidos(String.valueOf(uniqueTags.size()));
+            header.setFaltantes("0");
+            header.setSobrantes(String.valueOf(uniqueTags.size()));
+        }
+        return header;
+    }
+
+    private class SaveLocalTask extends AsyncTask<Void, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(NuevaTomaActivity.this, "Calculando resumen...", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                TomaFisicaTomasEntity header = calculateSummary();
+                List<TomaFisicaDetallesEntity> detalles = new ArrayList<>();
+                String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+
+                // Obtener detalles existentes para evitar duplicados si es posible
+                List<TomaFisicaDetallesEntity> existing = detallesDao.getByIdToma(idToma);
+                Set<String> existingEpcs = new HashSet<>();
+                if (existing != null) {
+                    for (TomaFisicaDetallesEntity d : existing) existingEpcs.add(d.getEpc());
+                }
+
+                for (String epc : uniqueTags) {
+                    if (!existingEpcs.contains(epc)) {
+                        TomaFisicaDetallesEntity detail = new TomaFisicaDetallesEntity();
+                        detail.setIdTakeDetail(UUID.randomUUID().toString());
+                        detail.setIdToma(idToma);
+                        detail.setNumeroToma(numeroToma);
+                        detail.setEpc(epc);
+                        detail.setDateRead(now);
+                        detalles.add(detail);
+                    }
+                }
+
+                // Guardar Header (Upsert)
+                List<TomaFisicaTomasEntity> headers = new ArrayList<>();
+                headers.add(header);
+                tomasDao.syncResumen(headers);
+
+                // Guardar Detalles
+                if (!detalles.isEmpty()) {
+                    detallesDao.syncDetalle(detalles);
+                }
+
+                return true;
+            } catch (Exception e) {
+                Log.e(TAG, "Error saving local", e);
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                Intent intent = new Intent(NuevaTomaActivity.this, RegistroConteosActivity.class);
+                intent.putExtra("tomaFisicaId", tomaFisicaId);
+                intent.putExtra("idToma", idToma);
+                intent.putExtra("numeroToma", numeroToma);
+                startActivity(intent);
+            } else {
+                Toast.makeText(NuevaTomaActivity.this, "Error al guardar datos", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

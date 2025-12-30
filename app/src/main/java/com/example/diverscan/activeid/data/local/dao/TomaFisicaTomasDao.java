@@ -13,6 +13,8 @@ import com.example.diverscan.activeid.data.remote.response.ApiCallback;
 import com.example.diverscan.activeid.data.remote.response.ApiResponse;
 import com.google.gson.reflect.TypeToken;
 
+import android.net.Uri;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,11 @@ public class TomaFisicaTomasDao {
         v.put("NumeroToma", a.getNumeroToma());
         v.put("IdToma", a.getIdToma());
         v.put("TotalLecturas", a.getTotalLecturas());
+        v.put("FechaCreacion", a.getFechaCreacion());
+        v.put("ActivosLeidos", a.getActivosLeidos());
+        v.put("Sobrantes", a.getSobrantes());
+        v.put("Faltantes", a.getFaltantes());
+        v.put("TotalActivos", a.getTotalActivos());
         return v;
     }
 
@@ -60,11 +67,20 @@ public class TomaFisicaTomasDao {
         }
     }
 
-    public void fetchAndSyncFromApi() {
+    public void fetchAndSyncFromApi(final Runnable onComplete) {
+        fetchAndSyncFromApi(null, onComplete);
+    }
+
+    public void fetchAndSyncFromApi(String tomaFisicaId, final Runnable onComplete) {
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<List<TomaFisicaTomasEntity>>() {}.getType();
 
-        api.<List<TomaFisicaTomasEntity>>get("TomasFisicas/TFResumen", type, new ApiCallback<List<TomaFisicaTomasEntity>>() {
+        String endpoint = "TomasFisicas/TFResumen";
+        if (tomaFisicaId != null && !tomaFisicaId.trim().isEmpty()) {
+            endpoint += "?tomaFisicaId=" + Uri.encode(tomaFisicaId.trim());
+        }
+
+        api.<List<TomaFisicaTomasEntity>>get(endpoint, type, new ApiCallback<List<TomaFisicaTomasEntity>>() {
             @Override
             public void onComplete(ApiResponse<List<TomaFisicaTomasEntity>> response) {
                 if (response.success && response.data != null) {
@@ -73,13 +89,71 @@ public class TomaFisicaTomasDao {
                 } else {
                     Log.e(TAG, "Error al sincronizar tomas fisicas desde API: " + response.errorMessage);
                 }
+                if (onComplete != null) {
+                    onComplete.run();
+                }
             }
         });
     }
 
+    public void fetchAndSyncFromApi() {
+        fetchAndSyncFromApi(null);
+    }
+
+    public List<TomaFisicaTomasEntity> getByTomaFisicaId(String tomaFisicaId) {
+        List<TomaFisicaTomasEntity> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        // Usar LOWER para comparar GUIDs sin importar mayúsculas/minúsculas
+        Cursor cursor = db.rawQuery("SELECT * FROM TomasFisicasResumen WHERE LOWER(TomaFisicaId) = LOWER(?)", new String[]{tomaFisicaId});
+        if (cursor.moveToFirst()) {
+            do {
+                TomaFisicaTomasEntity entity = new TomaFisicaTomasEntity();
+                entity.setTomaFisicaId(cursor.getString(cursor.getColumnIndexOrThrow("TomaFisicaId")));
+                entity.setNumeroToma(cursor.getString(cursor.getColumnIndexOrThrow("NumeroToma")));
+                entity.setIdToma(cursor.getString(cursor.getColumnIndexOrThrow("IdToma")));
+                entity.setTotalLecturas(cursor.getString(cursor.getColumnIndexOrThrow("TotalLecturas")));
+                entity.setFechaCreacion(cursor.getString(cursor.getColumnIndexOrThrow("FechaCreacion")));
+                entity.setActivosLeidos(cursor.getString(cursor.getColumnIndexOrThrow("ActivosLeidos")));
+                entity.setSobrantes(cursor.getString(cursor.getColumnIndexOrThrow("Sobrantes")));
+                entity.setFaltantes(cursor.getString(cursor.getColumnIndexOrThrow("Faltantes")));
+                entity.setTotalActivos(cursor.getString(cursor.getColumnIndexOrThrow("TotalActivos")));
+                list.add(entity);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return list;
+    }
+
+    public TomaFisicaTomasEntity getByIdToma(String idToma) {
+        if (idToma == null || idToma.trim().isEmpty()) return null;
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sql = "SELECT * FROM TomasFisicasResumen WHERE LOWER(IdToma) = LOWER(?) LIMIT 1";
+
+        try (Cursor c = db.rawQuery(sql, new String[]{idToma.trim()})) {
+            if (!c.moveToFirst()) return null;
+
+            TomaFisicaTomasEntity r = new TomaFisicaTomasEntity();
+            r.setTomaFisicaId(c.getString(c.getColumnIndexOrThrow("TomaFisicaId")));
+            r.setNumeroToma(c.getString(c.getColumnIndexOrThrow("NumeroToma")));
+            r.setIdToma(c.getString(c.getColumnIndexOrThrow("IdToma")));
+            r.setTotalLecturas(c.getString(c.getColumnIndexOrThrow("TotalLecturas")));
+            r.setFechaCreacion(c.getString(c.getColumnIndexOrThrow("FechaCreacion")));
+            r.setActivosLeidos(c.getString(c.getColumnIndexOrThrow("ActivosLeidos")));
+            r.setSobrantes(c.getString(c.getColumnIndexOrThrow("Sobrantes")));
+            r.setFaltantes(c.getString(c.getColumnIndexOrThrow("Faltantes")));
+            r.setTotalActivos(c.getString(c.getColumnIndexOrThrow("TotalActivos")));
+            return r;
+        } catch (Exception e) {
+            Log.e(TAG, "Error obteniendo TomasFisicasResumen por idToma", e);
+            return null;
+        } finally {
+            db.close();
+        }
+    }
+
     public int getPendientesCount(String tomaFisicaId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM TomasFisicasResumen WHERE TomaFisicaId = ?", new String[]{tomaFisicaId});
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM TomasFisicasResumen WHERE LOWER(TomaFisicaId) = LOWER(?)", new String[]{tomaFisicaId});
         int count = 0;
         if (cursor.moveToFirst()) {
             count = cursor.getInt(0);
@@ -95,62 +169,60 @@ public class TomaFisicaTomasDao {
         api.<ApiResponse<Void>>post("TomasFisicas/TFResumen", entity, type, callback);
     }
 
-    public void pushLocalChangesToApi() {
+    public void pushLocalChangesToApi(final Runnable onAllFinished) {
         List<TomaFisicaTomasEntity> localData = getAll();
         if (localData.isEmpty()) {
             Log.d(TAG, "No hay resumenes locales para enviar al servidor");
+            if (onAllFinished != null) onAllFinished.run();
             return;
         }
 
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<ApiResponse<Void>>() {}.getType();
 
-        api.<ApiResponse<Void>>post("TomasFisicas/TFResumen", localData.get(0), type, new ApiCallback<ApiResponse<Void>>() {
-            @Override
-            public void onComplete(ApiResponse<ApiResponse<Void>> response) {
-                if (response.success) {
-                    Log.d(TAG, "Resumen enviado exitosamente al servidor");
-                    // Opcional: Marcar como sincronizado
-                } else {
-                    Log.e(TAG, "Error enviando resumen al servidor: " + response.errorMessage);
-                }
-            }
-        });
-        
-        // Nota: El endpoint TFResumen actualmente acepta un solo objeto PostTomaFisicaResumen.
-        // Si necesitamos enviar una lista, deberíamos iterar o cambiar el endpoint para aceptar lista.
-        // Dado que el flujo suele ser "Terminar Toma" -> enviar resumen de ESA toma, enviar 1 por 1 podría ser aceptable
-        // o mejor aún, modificar el endpoint para aceptar lista si se espera batch.
-        // Por ahora, para validar el flujo, enviamos el primero o iteramos.
-        
-        /* 
+        final int total = localData.size();
+        final int[] completed = {0};
+
+        // Enviar todos los resumenes pendientes uno por uno
         for (TomaFisicaTomasEntity item : localData) {
-             api.post("TomasFisicas/TFResumen", item, type, callback...);
+            api.<ApiResponse<Void>>post("TomasFisicas/TFResumen", item, type, new ApiCallback<ApiResponse<Void>>() {
+                @Override
+                public void onComplete(ApiResponse<ApiResponse<Void>> response) {
+                    if (response.success) {
+                        Log.d(TAG, "Resumen enviado exitosamente: " + item.getIdToma());
+                    } else {
+                        Log.e(TAG, "Error enviando resumen " + item.getIdToma() + ": " + response.errorMessage);
+                    }
+                    
+                    completed[0]++;
+                    if (completed[0] == total && onAllFinished != null) {
+                        onAllFinished.run();
+                    }
+                }
+            });
         }
-        */
     }
 
     public List<TomaFisicaTomasEntity> getResumenById(String tomaFisicaId) {
         List<TomaFisicaTomasEntity> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String sql = "SELECT " +
-                "tomaFisicaId, " +
-                "numeroToma, " +
-                "idToma, " +
-                "totalLecturas " +
-                "FROM TomasFisicasResumen " +
-                "WHERE tomaFisicaId = ?";
+        String sql = "SELECT * FROM TomasFisicasResumen WHERE LOWER(TomaFisicaId) = LOWER(?)";
 
         try (Cursor c = db.rawQuery(sql, new String[]{tomaFisicaId})) {
 
             while (c.moveToNext()) {
                 TomaFisicaTomasEntity r = new TomaFisicaTomasEntity();
 
-                r.setTomaFisicaId(c.getString(c.getColumnIndexOrThrow("tomaFisicaId")));
-                r.setNumeroToma(c.getString(c.getColumnIndexOrThrow("numeroToma")));
-                r.setIdToma(c.getString(c.getColumnIndexOrThrow("idToma")));
-                r.setTotalLecturas(c.getString(c.getColumnIndexOrThrow("totalLecturas")));
+                r.setTomaFisicaId(c.getString(c.getColumnIndexOrThrow("TomaFisicaId")));
+                r.setNumeroToma(c.getString(c.getColumnIndexOrThrow("NumeroToma")));
+                r.setIdToma(c.getString(c.getColumnIndexOrThrow("IdToma")));
+                r.setTotalLecturas(c.getString(c.getColumnIndexOrThrow("TotalLecturas")));
+                r.setFechaCreacion(c.getString(c.getColumnIndexOrThrow("FechaCreacion")));
+                r.setActivosLeidos(c.getString(c.getColumnIndexOrThrow("ActivosLeidos")));
+                r.setSobrantes(c.getString(c.getColumnIndexOrThrow("Sobrantes")));
+                r.setFaltantes(c.getString(c.getColumnIndexOrThrow("Faltantes")));
+                r.setTotalActivos(c.getString(c.getColumnIndexOrThrow("TotalActivos")));
 
                 list.add(r);
             }
@@ -164,28 +236,6 @@ public class TomaFisicaTomasDao {
         return list;
     }
 
-    public List<TomaFisicaTomasEntity> getByTomaFisicaId(String tomaFisicaId) {
-        List<TomaFisicaTomasEntity> list = new ArrayList<>();
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        String sql = "SELECT * FROM TomasFisicasResumen WHERE tomaFisicaId = ?";
-        String[] args = { tomaFisicaId };
-
-        try (Cursor c = db.rawQuery(sql, args)) {
-            while (c.moveToNext()) {
-                TomaFisicaTomasEntity r = new TomaFisicaTomasEntity();
-                r.setTomaFisicaId(c.getString(c.getColumnIndexOrThrow("tomaFisicaId")));
-                r.setNumeroToma(c.getString(c.getColumnIndexOrThrow("numeroToma")));
-                r.setIdToma(c.getString(c.getColumnIndexOrThrow("idToma")));
-                r.setTotalLecturas(c.getString(c.getColumnIndexOrThrow("totalLecturas")));
-                list.add(r);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error fetching summaries by ID", e);
-        }
-        return list;
-    }
-
     public List<TomaFisicaTomasEntity> getAll() {
         List<TomaFisicaTomasEntity> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -195,10 +245,15 @@ public class TomaFisicaTomasDao {
         try (Cursor c = db.rawQuery(sql, null)) {
             while (c.moveToNext()) {
                 TomaFisicaTomasEntity r = new TomaFisicaTomasEntity();
-                r.setTomaFisicaId(c.getString(c.getColumnIndexOrThrow("tomaFisicaId")));
-                r.setNumeroToma(c.getString(c.getColumnIndexOrThrow("numeroToma")));
-                r.setIdToma(c.getString(c.getColumnIndexOrThrow("idToma")));
-                r.setTotalLecturas(c.getString(c.getColumnIndexOrThrow("totalLecturas")));
+                r.setTomaFisicaId(c.getString(c.getColumnIndexOrThrow("TomaFisicaId")));
+                r.setNumeroToma(c.getString(c.getColumnIndexOrThrow("NumeroToma")));
+                r.setIdToma(c.getString(c.getColumnIndexOrThrow("IdToma")));
+                r.setTotalLecturas(c.getString(c.getColumnIndexOrThrow("TotalLecturas")));
+                r.setFechaCreacion(c.getString(c.getColumnIndexOrThrow("FechaCreacion")));
+                r.setActivosLeidos(c.getString(c.getColumnIndexOrThrow("ActivosLeidos")));
+                r.setSobrantes(c.getString(c.getColumnIndexOrThrow("Sobrantes")));
+                r.setFaltantes(c.getString(c.getColumnIndexOrThrow("Faltantes")));
+                r.setTotalActivos(c.getString(c.getColumnIndexOrThrow("TotalActivos")));
                 list.add(r);
             }
         } catch (Exception e) {

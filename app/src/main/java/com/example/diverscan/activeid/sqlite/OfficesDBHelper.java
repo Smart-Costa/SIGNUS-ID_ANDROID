@@ -21,7 +21,7 @@ import java.util.Map;
 public class OfficesDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "Test_ActiveId_v1";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 8;
 
     public OfficesDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -167,17 +167,27 @@ public class OfficesDBHelper extends SQLiteOpenHelper {
         return mapOficinas;
     }
     public ArrayList<TomasFisias> ActivosUbicacion(String Sector){
-        String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag from Oficina o " +
+        String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag, " +
+                "p._id as IdPiso, e._id as IdEdificio, r._id as IdCompania " +
+                "from Oficina o " +
                 " Inner Join Activos a ON a.IdOficina = o._id " +
+                " Left Join Pisos p ON o.idPiso = p._id " +
+                " Left Join Edificios e ON p.idEdificio = e._id " +
+                " Left Join RazonSocial r ON e.idRazonSocial = r._id " +
                 " where o._id = '"+ Sector + "'";
         return CargarActivosSector(query);
 
     }
 
     public ArrayList<TomasFisias> ActivosUbicacionEPC(String Sector, String EPC){
-        String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag from Oficina o " +
+        String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag, " +
+                "p._id as IdPiso, e._id as IdEdificio, r._id as IdCompania " +
+                "from Oficina o " +
                 " Inner Join Activos a ON a.IdOficina = o._id " +
                 " inner join Tags t ON o.Tag = t._id  " +
+                " Left Join Pisos p ON o.idPiso = p._id " +
+                " Left Join Edificios e ON p.idEdificio = e._id " +
+                " Left Join RazonSocial r ON e.idRazonSocial = r._id " +
                 " where o._id = '"+ Sector + "' AND t.EPC = '"+EPC+"' OR o.EPC = '"+EPC+"'";
         return CargarActivosSector(query);
     }
@@ -226,8 +236,13 @@ public class OfficesDBHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<TomasFisias> ActivosUbicacionID(String Sector){
-        String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag from Oficina o " +
+        String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag, " +
+                "p._id as IdPiso, e._id as IdEdificio, r._id as IdCompania " +
+                "from Oficina o " +
                 " Inner Join Activos a ON a.IdOficina = o._id " +
+                " Left Join Pisos p ON o.idPiso = p._id " +
+                " Left Join Edificios e ON p.idEdificio = e._id " +
+                " Left Join RazonSocial r ON e.idRazonSocial = r._id " +
                 " where a.IdOficina like '%"+ Sector + "%'";
         return CargarActivosSector(query);
     }
@@ -257,7 +272,12 @@ public class OfficesDBHelper extends SQLiteOpenHelper {
         String Oficina = cursor.getString(cursor.getColumnIndex("Nombre"));
         String EPC = cursor.getString(cursor.getColumnIndex("Tag"));
 
-        TomasFisias inventarioVisual = new TomasFisias(Numero, Descripcion,"",  EPC, AssetSysId,Oficina, IdOficina );
+        // Nuevos campos
+        String IdPiso = cursor.getColumnIndex("IdPiso") != -1 ? cursor.getString(cursor.getColumnIndex("IdPiso")) : "";
+        String IdEdificio = cursor.getColumnIndex("IdEdificio") != -1 ? cursor.getString(cursor.getColumnIndex("IdEdificio")) : "";
+        String IdCompania = cursor.getColumnIndex("IdCompania") != -1 ? cursor.getString(cursor.getColumnIndex("IdCompania")) : "";
+
+        TomasFisias inventarioVisual = new TomasFisias(Numero, Descripcion,"",  EPC, AssetSysId,Oficina, IdOficina, IdPiso, IdEdificio, IdCompania );
         return inventarioVisual;
     }
 

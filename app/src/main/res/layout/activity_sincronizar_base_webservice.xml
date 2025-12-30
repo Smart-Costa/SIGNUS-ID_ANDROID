@@ -100,6 +100,69 @@
                     android:textSize="14sp" />
             </androidx.cardview.widget.CardView>
 
+            <!-- DEBUG CONTAINER -->
+            <LinearLayout
+                android:id="@+id/debug_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:background="#EEEEEE"
+                android:visibility="gone"
+                android:layout_marginTop="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="RESUMEN DE DATOS RECIBIDOS (SQLITE)"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginBottom="10dp"/>
+
+                <TextView
+                    android:id="@+id/tv_debug_usuarios"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Usuarios: 0" />
+
+                <TextView
+                    android:id="@+id/tv_debug_roles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Roles: 0" />
+
+                <TextView
+                    android:id="@+id/tv_debug_ubicaciones"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ubicaciones: 0" />
+
+                <TextView
+                    android:id="@+id/tv_debug_activos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Activos: 0" />
+
+                <TextView
+                    android:id="@+id/tv_debug_tomas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tomas Físicas: 0" />
+
+                <TextView
+                    android:id="@+id/tv_debug_tomas_resumen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tomas Resumen: 0" />
+
+                <TextView
+                    android:id="@+id/tv_debug_tomas_detalle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tomas Detalle: 0" />
+
+            </LinearLayout>
+
             <!-- Mensaje -->
             <TextView
                 android:id="@+id/mensaje"

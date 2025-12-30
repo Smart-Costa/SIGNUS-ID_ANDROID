@@ -12,11 +12,25 @@ public class TomasFisias implements Serializable
     public String AssetSysId;
     public String Oficina;
     public String IdOficina;
+    public String IdPiso;
+    public String IdEdificio;
+    public String IdCompania;
+    public String UbicacionSecundaria;
 
     public TomasFisias()
     {
     }
+
     public TomasFisias(String numero, String descripcion, String status, String EPC, String assetSysId, String oficina, String idOficina)
+    {
+        this(numero, descripcion, status, EPC, assetSysId, oficina, idOficina, null, null, null, null);
+    }
+
+    public TomasFisias(String numero, String descripcion, String status, String EPC, String assetSysId, String oficina, String idOficina, String idPiso, String idEdificio, String idCompania) {
+        this(numero, descripcion, status, EPC, assetSysId, oficina, idOficina, idPiso, idEdificio, idCompania, null);
+    }
+
+    public TomasFisias(String numero, String descripcion, String status, String EPC, String assetSysId, String oficina, String idOficina, String idPiso, String idEdificio, String idCompania, String ubicacionSecundaria)
     {
         this.Numero = numero;
         this.Descripcion = descripcion;
@@ -25,6 +39,10 @@ public class TomasFisias implements Serializable
         this.AssetSysId = assetSysId;
         this.Oficina = oficina;
         this.IdOficina = idOficina;
+        this.IdPiso = idPiso;
+        this.IdEdificio = idEdificio;
+        this.IdCompania = idCompania;
+        this.UbicacionSecundaria = ubicacionSecundaria;
     }
 
     public String getNumero() {
@@ -82,4 +100,16 @@ public class TomasFisias implements Serializable
     public void setIdOficina(String idOficina) {
         IdOficina = idOficina;
     }
+
+    public String getIdPiso() { return IdPiso; }
+    public void setIdPiso(String idPiso) { IdPiso = idPiso; }
+
+    public String getIdEdificio() { return IdEdificio; }
+    public void setIdEdificio(String idEdificio) { IdEdificio = idEdificio; }
+
+    public String getIdCompania() { return IdCompania; }
+    public void setIdCompania(String idCompania) { IdCompania = idCompania; }
+
+    public String getUbicacionSecundaria() { return UbicacionSecundaria; }
+    public void setUbicacionSecundaria(String ubicacionSecundaria) { UbicacionSecundaria = ubicacionSecundaria; }
 }

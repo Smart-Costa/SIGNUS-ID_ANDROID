@@ -151,6 +151,10 @@
             android:parentActivityName=".UI.tomasfisicas.RegistroInventarioElectronicosActivity"
             android:label="Nueva Toma Física"
             android:exported="false" />
+        <activity android:name=".UI.tomasfisicas.RegistroConteosActivity"
+            android:parentActivityName=".UI.tomasfisicas.RegistroInventarioElectronicosActivity"
+            android:label="Resumen de conteos"
+            android:exported="false" />
 
         <!-- 🏗️ Flujo de DarBaja de activos -->
         <activity android:name=".UI.activo.DarBajaActivoDetailActivity"
@@ -194,7 +198,7 @@
             android:label="@string/SectorInventarios"
             android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"
-            android:exported="false"/>
+            android:exported="true"/>
         <activity android:name=".Inventory.Lectura_Inventario"
             android:label="@string/SectorInventarios"
             android:parentActivityName=".UI.main.MainActivity"

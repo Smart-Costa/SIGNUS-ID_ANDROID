@@ -11,7 +11,10 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import com.example.diverscan.activeid.data.local.entity.ActivoFotoEntity;
+import com.example.diverscan.activeid.data.local.entity.UbicacionSecundariaEntity;
 import com.example.diverscan.activeid.data.repository.ActivoRepository;
+import com.example.diverscan.activeid.data.remote.response.ApiCallback;
+import com.example.diverscan.activeid.data.remote.response.ApiResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +34,28 @@ public class RegistroActivoFotoTagViewModel extends AndroidViewModel {
     }
 
     public void cargarUbicacionesSecundarias(Context context) {
-        // Simulación temporal: esto luego vendrá del backend
-        List<String> lista = new ArrayList<>();
-        lista.add("Bodega Principal");
-        lista.add("Taller Mantenimiento");
-        lista.add("Zona Norte");
-        lista.add("Zona Sur");
-        ubicacionesSecundarias.postValue(lista);
+        repository.obtenerUbicacionesSecundarias(context, new ApiCallback<List<UbicacionSecundariaEntity>>() {
+            @Override
+            public void onComplete(ApiResponse<List<UbicacionSecundariaEntity>> response) {
+                if (response.success && response.data != null) {
+                    ubicacionesSecundarias.postValue(mapearUbicacionesSec(response.data));
+                } else {
+                    ubicacionesSecundarias.postValue(null);
+                }
+            }
+        });
+    }
+
+    private List<String> mapearUbicacionesSec(List<UbicacionSecundariaEntity> lista) {
+        List<String> nombres = new ArrayList<>();
+        if (lista != null) {
+            for (UbicacionSecundariaEntity item : lista) {
+                if (item != null && item.getUbicacionS() != null) {
+                    nombres.add(item.getUbicacionS());
+                }
+            }
+        }
+        return nombres;
     }
 
     public void guardarTagYFotos(Context context, String idActivo, String ubicacionSec, String rfid, List<ActivoFotoEntity> fotos) {

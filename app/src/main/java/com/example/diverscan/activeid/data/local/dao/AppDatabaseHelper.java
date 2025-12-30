@@ -6,8 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class AppDatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DB_DAO";
-    private static final String DB_NAME = "dbTest";
-    private static final int DB_VERSION = 1;
+    private static final String DB_NAME = "Test_ActiveId_v1";
+    private static final int DB_VERSION = 8;
     private final Context context;
 
     public AppDatabaseHelper(Context context) {
@@ -17,35 +17,9 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE Users (" +
-                "userSysId TEXT, " +
-                "username TEXT, " +
-                "email TEXT, " +
-                "password TEXT, " +
-                "isApproved INTEGER, " +
-                "isOnLine INTEGER, " +
-                "isLockedOut INTEGER, " +
-                "Idrol TEXT )");
-
-        db.execSQL("CREATE TABLE RolHH (" +
-                "IdRol TEXT, " +
-                "Page TEXT, " +
-                "Description TEXT, " +
-                "Username TEXT, " +
-                "UserSysId TEXT, " +
-                "Esta_Bloqueado INTEGER )");
-
-        db.execSQL("CREATE TABLE UbicacionHH (" +
-                "ASysId TEXT, " +
-                "UbicacionA TEXT, " +
-                "BSysId TEXT, " +
-                "UbicacionB TEXT, " +
-                "CSysId TEXT, " +
-                "UbicacionC TEXT, " +
-                "DSysId TEXT, " +
-                "UbicacionD TEXT )");
-
-        db.execSQL("CREATE TABLE TomasFisicas (" +
+        // Solo creamos las tablas que son responsabilidad de este módulo y no existen en LoginDBHelper
+        
+        db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicas (" +
                 "tomaFisicaId TEXT PRIMARY KEY, " +
                 "nombre TEXT, " +
                 "fechaInicial TEXT, " +
@@ -59,13 +33,35 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "ubicacionC TEXT, " +
                 "ubicacionD TEXT ) ");
 
-        db.execSQL("CREATE TABLE TomasFisicasResumen (" +
-                "TomaFisicaId TEXT PRIMARY KEY, " +
+        db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicasResumen (" +
+                "IdToma TEXT PRIMARY KEY, " +
+                "TomaFisicaId TEXT, " +
                 "NumeroToma TEXT, " +
-                "IdToma TEXT, " +
-                "TotalLecturas TEXT)");
+                "TotalLecturas TEXT, " +
+                "FechaCreacion TEXT, " +
+                "ActivosLeidos TEXT, " +
+                "Sobrantes TEXT, " +
+                "Faltantes TEXT, " +
+                "TotalActivos TEXT)");
 
-        db.execSQL("CREATE TABLE TomasFisicasDetalle (" +
+        ensureTomasFisicasDetalleTable(db);
+        ensureActivosApiTable(db);
+        ensureUbicacionHHTable(db);
+
+        db.execSQL("CREATE TABLE if not exists TipoTomaInventario (_id Text PRIMARY KEY, " +
+                "Nombre Text, Descripcion Text, fechaInicio Text, fechaFinal Text, estado Text)");
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        ensureActivosApiTable(db);
+        ensureTomasFisicasDetalleTable(db);
+        ensureUbicacionHHTable(db);
+    }
+
+    private static void ensureTomasFisicasDetalleTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicasDetalle (" +
                 "IdTakeDetail TEXT PRIMARY KEY, " +
                 "IdToma TEXT, " +
                 "NumeroToma TEXT, " +
@@ -79,10 +75,12 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "UbicacionDetalleC TEXT, " +
                 "UbicacionDetalleD TEXT, " +
                 "Observaciones TEXT)");
+    }
 
-        db.execSQL("CREATE TABLE Activos (" +
+    private static void ensureActivosApiTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS ActivosApi (" +
                 "ID_ACTIVO TEXT PRIMARY KEY, " +
-                "NUMERO_ACTIVO INTEGER, " +
+                "NUMERO_ACTIVO TEXT, " +
                 "NUMERO_ETIQUETA TEXT, " +
                 "DESCRIPCION_CORTA TEXT, " +
                 "DESCRIPCION_LARGA TEXT, " +
@@ -118,19 +116,37 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "TAMANIO_MEDIDA TEXT, " +
                 "OBSERVACIONES TEXT, " +
                 "ESTADO_ACTIVO INTEGER, " +
-                "FECHA_CREACION_ACTIVO TEXT )");
+                "FECHA_CREACION_ACTIVO TEXT, " +
+                "SYNC_STATUS INTEGER DEFAULT 1" +
+                ")");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_ActivosApi_TAG_EPC ON ActivosApi (TAG_EPC)");
+        
+        // Ensure column exists for upgrades from older versions if table existed
+        try {
+            db.execSQL("ALTER TABLE ActivosApi ADD COLUMN SYNC_STATUS INTEGER DEFAULT 1");
+        } catch (Exception e) {
+            // Column likely exists
+        }
+    }
+
+    private static void ensureUbicacionHHTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS UbicacionHH (" +
+                "ASysId TEXT, " +
+                "UbicacionA TEXT, " +
+                "BSysId TEXT, " +
+                "UbicacionB TEXT, " +
+                "CSysId TEXT, " +
+                "UbicacionC TEXT, " +
+                "DSysId TEXT, " +
+                "UbicacionD TEXT" +
+                ")");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS Users");
-        db.execSQL("DROP TABLE IF EXISTS RolHH");
-        db.execSQL("DROP TABLE IF EXISTS UbicacionHH");
-        db.execSQL("DROP TABLE IF EXISTS TomasFisicas");
-        db.execSQL("DROP TABLE IF EXISTS TomasFisicasResumen");
-        db.execSQL("DROP TABLE IF EXISTS TomasFisicasDetalle");
-        db.execSQL("DROP TABLE IF EXISTS Activos");
-
-        onCreate(db);
+        if (newVersion > oldVersion) {
+            onCreate(db);
+            ensureActivosApiTable(db);
+        }
     }
 }

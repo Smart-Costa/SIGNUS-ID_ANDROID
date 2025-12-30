@@ -1,8 +1,6 @@
 package com.example.diverscan.activeid.UI.activo;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,12 +14,13 @@ import com.example.diverscan.activeid.RFID.RfidManager;
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import com.example.diverscan.activeid.databinding.ActivityLocalizarActivoDetailBinding;
-import com.zebra.rfid.api3.TagData;
 
 public class LocalizarActivoDetailActivity extends AppCompatActivity implements RfidListener {
     private ActivityLocalizarActivoDetailBinding binding;
     private RfidManager rfidManager;
     private ActivoDao activoDAO;
+    private ActivoEntity activoLeido;
+    private String epcLeido;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,16 +35,12 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         //binding.btnStart.setOnClickListener(v -> rfidManager.startReading());
         //binding.btnStop.setOnClickListener(v -> rfidManager.stopReading());
 
-        binding.btnSimular.setOnClickListener(v ->
-                procesarLecturaRFID("800474453240000000016145"));
-
         initEvents();
     }
 
     public void onConnected() {
-        runOnUiThread(() ->
-                Toast.makeText(this, "Lector conectado", Toast.LENGTH_SHORT).show()
-        );
+        runOnUiThread(() -> Toast.makeText(this, "Lector conectado", Toast.LENGTH_SHORT).show());
+        rfidManager.startReading();
     }
 
     @Override
@@ -68,12 +63,26 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
     }
 
     private void procesarLecturaRFID(String epc) {
+        if (epc == null || epc.trim().isEmpty()) {
+            return;
+        }
+        if (epcLeido != null) {
+            if (!epc.equals(epcLeido)) {
+                rfidManager.stopReading();
+                Toast.makeText(this, "Se detectaron múltiples TAGs. Acerque solo 1 y reintente.", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
         ActivoEntity activo = activoDAO.getActivoByEpc(epc);
 
         if (activo != null) {
+            activoLeido = activo;
+            epcLeido = epc;
             binding.txtNumeroActivo.setText(activo.getNumeroActivo());
             binding.txtNumeroEtiqueta.setText(activo.getNumeroEtiqueta());
             binding.txtDescripcionCorta.setText(activo.getDescripcionCorta());
+            rfidManager.stopReading();
         } else {
             Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
         }
@@ -108,20 +117,31 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
 
         binding.btnGuardar.setOnClickListener(view -> {
 
+            if (activoLeido != null) {
+                mostrarPopupActivo(activoLeido, epcLeido);
+                return;
+            }
+
             String id = binding.txtNumeroActivo.getText().toString();
 
             if (id.isEmpty()) {
-                Toast.makeText(this, "No hay EPC para buscar", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No hay activo para buscar", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             ActivoEntity activo = activoDAO.getActivoById(id);
 
             if (activo != null) {
-                mostrarPopupActivo(activo, id);
+                mostrarPopupActivo(activo, activo.getTagEpc());
             } else {
-                Toast.makeText(this, "EPC no encontrado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Activo no encontrado", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        rfidManager.stopReading();
     }
 }

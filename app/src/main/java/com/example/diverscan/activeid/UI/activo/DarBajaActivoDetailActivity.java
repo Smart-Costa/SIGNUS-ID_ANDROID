@@ -15,6 +15,7 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Rf
     private ActivityDarBajaActivoDetailBinding binding;
     private RfidManager rfidManager;
     private ActivoDao activoDAO;
+    private ActivoEntity activoLeido;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,16 +30,12 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Rf
         //binding.btnStart.setOnClickListener(v -> rfidManager.startReading());
         //binding.btnStop.setOnClickListener(v -> rfidManager.stopReading());
 
-        binding.btnSimular.setOnClickListener(v ->
-                procesarLecturaRFID("800474453240000000016145"));
-
         initEvents();
     }
 
     public void onConnected() {
-        runOnUiThread(() ->
-                Toast.makeText(this, "Lector conectado", Toast.LENGTH_SHORT).show()
-        );
+        runOnUiThread(() -> Toast.makeText(this, "Lector conectado", Toast.LENGTH_SHORT).show());
+        rfidManager.startReading();
     }
 
     @Override
@@ -61,12 +58,25 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Rf
     }
 
     private void procesarLecturaRFID(String epc) {
+        if (epc == null || epc.trim().isEmpty()) {
+            return;
+        }
+        if (activoLeido != null) {
+            if (activoLeido.getTagEpc() == null || !epc.equals(activoLeido.getTagEpc())) {
+                rfidManager.stopReading();
+                Toast.makeText(this, "Se detectaron múltiples TAGs. Acerque solo 1 y reintente.", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
         ActivoEntity activo = activoDAO.getActivoByEpc(epc);
         if (activo != null) {
+            activoLeido = activo;
             binding.txtNumeroActivo.setText(activo.getNumeroActivo());
             binding.txtNumeroEtiqueta.setText(activo.getNumeroEtiqueta());
             binding.txtDescripcionCorta.setText(activo.getDescripcionCorta());
             binding.txtDescripcionRazon.setText("Lectura RFID exitosa");
+            rfidManager.stopReading();
         } else {
             Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
         }
@@ -74,13 +84,30 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Rf
 
     private void initEvents() {
         binding.btnGuardar.setOnClickListener(view -> {
-            Toast.makeText(this, "Activo dado de baja", Toast.LENGTH_SHORT).show();
+            if (activoLeido == null || activoLeido.getIdActivo() == null || activoLeido.getIdActivo().trim().isEmpty()) {
+                Toast.makeText(this, "Primero lea un TAG RFID para buscar el activo", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            ActivoEntity activo = new ActivoEntity();
-            activo.setNumeroActivo(activo.getNumeroActivo());
-            activo.setEstadoActivo(Boolean.FALSE);
-
-            activoDAO.updateEstadoActivo(activo);
+            activoLeido.setEstadoActivo(Boolean.FALSE);
+            int updated = activoDAO.updateEstadoActivo(activoLeido);
+            if (updated > 0) {
+                Toast.makeText(this, "Activo dado de baja", Toast.LENGTH_SHORT).show();
+                activoLeido = null;
+                binding.txtNumeroActivo.setText("");
+                binding.txtNumeroEtiqueta.setText("");
+                binding.txtDescripcionCorta.setText("");
+                binding.txtDescripcionRazon.setText("");
+                rfidManager.startReading();
+            } else {
+                Toast.makeText(this, "No se pudo dar de baja el activo", Toast.LENGTH_SHORT).show();
+            }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        rfidManager.stopReading();
     }
 }

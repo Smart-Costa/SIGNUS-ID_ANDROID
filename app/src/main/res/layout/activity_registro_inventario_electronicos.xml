@@ -39,29 +39,47 @@
                 android:id="@+id/btnTomas"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:minHeight="48dp"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="4dp"
                 android:background="@drawable/btn_primary"
+                android:backgroundTint="@null"
+                app:backgroundTint="@null"
                 android:text="Tomas"
+                android:textAllCaps="true"
                 android:textColor="@android:color/white"
                 app:autoSizeTextType="uniform"
                 app:autoSizeMinTextSize="10sp"
                 app:autoSizeMaxTextSize="14sp"
-                android:lines="1" />
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <Button
                 android:id="@+id/btnTomasCompletas"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:minHeight="48dp"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
                 android:background="@drawable/btn_secondary_gray"
+                android:backgroundTint="@null"
+                app:backgroundTint="@null"
                 android:text="Tomas Completas"
-                android:textColor="@color/blanco"
+                android:textAllCaps="true"
+                android:textColor="@color/nav_item_text_tint"
                 app:autoSizeTextType="uniform"
                 app:autoSizeMinTextSize="10sp"
                 app:autoSizeMaxTextSize="14sp"
-                android:lines="1" />
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <!-- 📌 Cabecera -->

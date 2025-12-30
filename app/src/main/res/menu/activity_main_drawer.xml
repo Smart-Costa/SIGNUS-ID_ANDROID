@@ -128,11 +128,11 @@
             android:visible="false"
             android:background="@color/blanco" />
 
-        <!-- 📡 VALIDACIÓN CONEXIÓN -->
         <item
             android:id="@+id/sub_validar_conexion"
-            android:icon="@drawable/configuracion"
-            android:title="Validar Conexión RFID" />
+            android:title=" o Validar Conexión RFID"
+            android:visible="false"
+            android:background="@color/blanco" />
 
     </group>
 </menu>

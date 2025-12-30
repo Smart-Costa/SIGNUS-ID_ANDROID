@@ -34,21 +34,20 @@
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             app:boxBackgroundMode="outline"
             app:hintEnabled="false">
 
             <AutoCompleteTextView
                 android:id="@+id/spUbicacionA"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:dropDownHeight="wrap_content"
                 android:dropDownHorizontalOffset="0dp"
                 android:dropDownVerticalOffset="8dp"
                 android:gravity="center_vertical"
                 android:inputType="none"
-                android:paddingHorizontal="8dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:singleLine="true"
                 android:textColor="#606060"
                 android:textColorHint="#898989"
@@ -68,21 +67,20 @@
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             app:boxBackgroundMode="outline"
             app:hintEnabled="false">
 
             <AutoCompleteTextView
                 android:id="@+id/spUbicacionB"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:dropDownHeight="wrap_content"
                 android:dropDownHorizontalOffset="0dp"
                 android:dropDownVerticalOffset="8dp"
                 android:gravity="center_vertical"
                 android:inputType="none"
-                android:paddingHorizontal="8dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:singleLine="true"
                 android:textColor="#606060"
                 android:textColorHint="#898989"
@@ -102,21 +100,20 @@
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             app:boxBackgroundMode="outline"
             app:hintEnabled="false">
 
             <AutoCompleteTextView
                 android:id="@+id/spUbicacionC"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:dropDownHeight="wrap_content"
                 android:dropDownHorizontalOffset="0dp"
                 android:dropDownVerticalOffset="8dp"
                 android:gravity="center_vertical"
                 android:inputType="none"
-                android:paddingHorizontal="8dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:singleLine="true"
                 android:textColor="#606060"
                 android:textColorHint="#898989"
@@ -136,21 +133,20 @@
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             app:boxBackgroundMode="outline"
             app:hintEnabled="false">
 
             <AutoCompleteTextView
                 android:id="@+id/spUbicacionD"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:dropDownHeight="wrap_content"
                 android:dropDownHorizontalOffset="0dp"
                 android:dropDownVerticalOffset="8dp"
                 android:gravity="center_vertical"
                 android:inputType="none"
-                android:paddingHorizontal="8dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:singleLine="true"
                 android:textColor="#606060"
                 android:textColorHint="#898989"

@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.example.diverscan.activeid.TomasFisicas.TomasFisias;
 import com.example.diverscan.activeid.TomasFisicas.EntidadActivosInventarios;
+import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
 import com.example.diverscan.activeid.sqlite.InventoryDBHelper;
 import com.zebra.rfid.api3.TagData;
@@ -32,6 +33,7 @@ public class ChequearInventario {
     Map<String, String> _tags = new HashMap<String, String>();
     String _IdTomaFisica;
     Context _context;
+    ActivoDao activoDao;
 
 
     public ChequearInventario(ArrayList<TomasFisias> activos, String idTomaFisica,
@@ -43,6 +45,7 @@ public class ChequearInventario {
         ListToDictionary(activos, iChequearInventario);
         this._IdTomaFisica = idTomaFisica;
         _context= context;
+        this.activoDao = new ActivoDao(context);
     }
 
     private void ListToDictionary(ArrayList<TomasFisias> activos, IChequearInventario iChequearInventario){
@@ -54,7 +57,11 @@ public class ChequearInventario {
                     activo.getEPC(),
                     activo.getAssetSysId(),
                     activo.getOficina(),
-                    activo.getIdOficina()
+                    activo.getIdOficina(),
+                    activo.getIdPiso(),
+                    activo.getIdEdificio(),
+                    activo.getIdCompania(),
+                    activo.getUbicacionSecundaria()
             );
             if (activo.getEPC().equals("Sin Asignar")) {
                 _activoSinTag.add(inventarioVisual);
@@ -93,8 +100,12 @@ public class ChequearInventario {
     }
     public void AgregarActivos(String epc, IChequearInventario iChequearInventario) {
         try {
-            AssetsDBHelper assetsDBHelper = new AssetsDBHelper(_context);
-            EntidadActivosInventarios entidadActivos = assetsDBHelper.ActivosUbicacionInventario(epc);
+            EntidadActivosInventarios entidadActivos = activoDao.getActivoInventarioByEpc(epc);
+            
+            if (entidadActivos == null) {
+                AssetsDBHelper assetsDBHelper = new AssetsDBHelper(_context);
+                entidadActivos = assetsDBHelper.ActivosUbicacionInventario(epc);
+            }
 
             if (entidadActivos != null) {
                 InventarioVisual inventarioVisual = new InventarioVisual();
@@ -115,6 +126,10 @@ public class ChequearInventario {
                     inventarioVisual.setNumero(entidadActivos.getNumero());
                     inventarioVisual.setOficina(entidadActivos.getOficina());
                     inventarioVisual.setIdOficina(entidadActivos.getIdOficina());
+                    inventarioVisual.setIdPiso(entidadActivos.getIdPiso());
+                    inventarioVisual.setIdEdificio(entidadActivos.getIdEdificio());
+                    inventarioVisual.setIdCompania(entidadActivos.getIdCompania());
+                    inventarioVisual.setUbicacionSecundaria(entidadActivos.getUbicacionSecundaria());
                     inventarioVisual.setEPC(entidadActivos.getEPC());
                     inventarioVisual.setStatus("Encontrado");
                     _activosUbicacion.remove(entidadActivos.getAssetSysId());
@@ -127,6 +142,10 @@ public class ChequearInventario {
                     inventarioVisual.setNumero(entidadActivos.getNumero());
                     inventarioVisual.setOficina(entidadActivos.getOficina());
                     inventarioVisual.setIdOficina(entidadActivos.getIdOficina());
+                    inventarioVisual.setIdPiso(entidadActivos.getIdPiso());
+                    inventarioVisual.setIdEdificio(entidadActivos.getIdEdificio());
+                    inventarioVisual.setIdCompania(entidadActivos.getIdCompania());
+                    inventarioVisual.setUbicacionSecundaria(entidadActivos.getUbicacionSecundaria());
                     inventarioVisual.setEPC(entidadActivos.getEPC());
                     inventarioVisual.setStatus("No Pertenece");
                     _activosSobrantes.put(entidadActivos.getAssetSysId(), inventarioVisual);
@@ -146,8 +165,13 @@ public class ChequearInventario {
 
     public void AgregarActivosBarcode(String Placa, IChequearInventario iChequearInventario) {
         try {
-            AssetsDBHelper assetsDBHelper = new AssetsDBHelper(_context);
-            EntidadActivosInventarios entidadActivos = assetsDBHelper.ActivosUbicacionInventarioBarcode(Placa);
+            EntidadActivosInventarios entidadActivos = activoDao.getActivoInventarioByBarcode(Placa);
+            
+            if (entidadActivos == null) {
+                AssetsDBHelper assetsDBHelper = new AssetsDBHelper(_context);
+                entidadActivos = assetsDBHelper.ActivosUbicacionInventarioBarcode(Placa);
+            }
+            
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 if (!Objects.isNull(entidadActivos)) {
                     InventarioVisual inventarioVisual = new InventarioVisual();
@@ -166,9 +190,13 @@ public class ChequearInventario {
                         inventarioVisual.setDescripcion(entidadActivos.getDescripcion());
                         inventarioVisual.setNumero(entidadActivos.getNumero());
                         inventarioVisual.setOficina(entidadActivos.getOficina());
-                        inventarioVisual.setIdOficina(entidadActivos.getIdOficina());
-                        inventarioVisual.setEPC(entidadActivos.getEPC());
-                        inventarioVisual.setStatus("Encontrado");
+                    inventarioVisual.setIdOficina(entidadActivos.getIdOficina());
+                    inventarioVisual.setIdPiso(entidadActivos.getIdPiso());
+                    inventarioVisual.setIdEdificio(entidadActivos.getIdEdificio());
+                    inventarioVisual.setIdCompania(entidadActivos.getIdCompania());
+                    inventarioVisual.setUbicacionSecundaria(entidadActivos.getUbicacionSecundaria());
+                    inventarioVisual.setEPC(entidadActivos.getEPC());
+                    inventarioVisual.setStatus("Encontrado");
                         _activosBarcode.remove(entidadActivos.getAssetSysId());
                         this._activosEncontradosInsertar.add(entidadActivos.getAssetSysId());
                         //endregion
@@ -179,9 +207,13 @@ public class ChequearInventario {
                         inventarioVisual.setDescripcion(entidadActivos.getDescripcion());
                         inventarioVisual.setNumero(entidadActivos.getNumero());
                         inventarioVisual.setOficina(entidadActivos.getOficina());
-                        inventarioVisual.setIdOficina(entidadActivos.getIdOficina());
-                        inventarioVisual.setEPC(entidadActivos.getEPC());
-                        inventarioVisual.setStatus("Encontrado");
+                    inventarioVisual.setIdOficina(entidadActivos.getIdOficina());
+                    inventarioVisual.setIdPiso(entidadActivos.getIdPiso());
+                    inventarioVisual.setIdEdificio(entidadActivos.getIdEdificio());
+                    inventarioVisual.setIdCompania(entidadActivos.getIdCompania());
+                    inventarioVisual.setUbicacionSecundaria(entidadActivos.getUbicacionSecundaria());
+                    inventarioVisual.setEPC(entidadActivos.getEPC());
+                    inventarioVisual.setStatus("Encontrado");
                         _activosUbicacion.remove(entidadActivos.getAssetSysId());
                         this._activosEncontradosInsertar.add(entidadActivos.getAssetSysId());
                         //endregion
@@ -191,9 +223,13 @@ public class ChequearInventario {
                         inventarioVisual.setDescripcion(entidadActivos.getDescripcion());
                         inventarioVisual.setNumero(entidadActivos.getNumero());
                         inventarioVisual.setOficina(entidadActivos.getOficina());
-                        inventarioVisual.setIdOficina(entidadActivos.getIdOficina());
-                        inventarioVisual.setEPC(entidadActivos.getEPC());
-                        inventarioVisual.setStatus("No Pertenece");
+                    inventarioVisual.setIdOficina(entidadActivos.getIdOficina());
+                    inventarioVisual.setIdPiso(entidadActivos.getIdPiso());
+                    inventarioVisual.setIdEdificio(entidadActivos.getIdEdificio());
+                    inventarioVisual.setIdCompania(entidadActivos.getIdCompania());
+                    inventarioVisual.setUbicacionSecundaria(entidadActivos.getUbicacionSecundaria());
+                    inventarioVisual.setEPC(entidadActivos.getEPC());
+                    inventarioVisual.setStatus("No Pertenece");
                         _activosSobrantes.put(entidadActivos.getAssetSysId(), inventarioVisual);
                         //endregion
                     }

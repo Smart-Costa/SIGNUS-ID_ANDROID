@@ -2,94 +2,273 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:id="@+id/clLecturaInventario"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context="Inventory.Lectura_Inventario">
 
-    <ScrollView
+    <LinearLayout
         android:id="@+id/LecturaInventario"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:padding="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    <!-- Header -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Conteos"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Tabs for Sub-Tomas -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="16dp">
+        
+        <RadioGroup
+            android:id="@+id/tabGroupTomas"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
+            <!-- Dynamically populated RadioButtons -->
+        </RadioGroup>
+    </HorizontalScrollView>
 
+    <!-- Toggle Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+        
+        <Button
+            android:id="@+id/btnResumen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Resumen"
+            android:backgroundTint="#FF5722"
+            android:textColor="#FFFFFF"
+            android:layout_marginEnd="8dp"/>
+            
+        <Button
+            android:id="@+id/btnActivos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Activos"
+            android:backgroundTint="#E0E0E0"
+            android:textColor="#000000"/>
+    </LinearLayout>
+
+    <!-- Content Area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Resumen View -->
+        <ScrollView
+            android:id="@+id/viewResumen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible">
+            
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <!-- Gauge -->
+                <RelativeLayout
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_margin="24dp">
+                    
+                    <ProgressBar
+                        android:id="@+id/gaugeProgress"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:indeterminate="false"
+                        android:progressDrawable="@drawable/circular_progress_bar"
+                        android:progress="0"
+                        android:max="100"/>
+                        
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        
+                        <TextView
+                            android:id="@+id/txtGaugeCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="36sp"
+                            android:textStyle="bold"
+                            android:textColor="#000000"/>
+                            
+                        <TextView
+                            android:id="@+id/txtGaugeTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="De 5"
+                            android:textSize="18sp"
+                            android:textColor="#555555"/>
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <!-- Botón Simular Lectura -->
+                <Button
+                    android:id="@+id/btnAgregarManual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Simular Lectura (Test)"
+                    android:backgroundTint="#673AB7"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="24dp"
+                    android:layout_marginHorizontal="24dp"
+                    android:visibility="visible"/>
+
+                <!-- Status Navigation Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3"
+                    android:layout_marginBottom="16dp">
+
+                    <Button
+                        android:id="@+id/btnVerEncontrados"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Encontrados\n0"
+                        android:backgroundTint="#4CAF50"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:lines="2"
+                        android:layout_marginEnd="4dp"/>
+
+                    <Button
+                        android:id="@+id/btnVerFaltantes"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Faltantes\n0"
+                        android:backgroundTint="#F44336"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:lines="2"
+                        android:layout_marginEnd="4dp"/>
+
+                    <Button
+                        android:id="@+id/btnVerSobrantes"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sobrantes\n0"
+                        android:backgroundTint="#FFC107"
+                        android:textColor="#000000"
+                        android:textSize="12sp"
+                        android:lines="2"/>
+                </LinearLayout>
+
+                <!-- Separator -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#CCCCCC"
+                    android:layout_marginVertical="16dp"/>
+
+                <!-- Filters (Moved to Bottom) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+                    
+                    <TextView android:text="Ubicación A" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <Spinner android:id="@+id/spinnerUbicacionA" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"/>
+                    
+                    <TextView android:text="Ubicación B" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <Spinner android:id="@+id/spinnerUbicacionB" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"/>
+                    
+                    <TextView android:text="Ubicación C" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <Spinner android:id="@+id/spinnerUbicacionC" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"/>
+                    
+                    <TextView android:text="Ubicación D" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <Spinner android:id="@+id/spinnerUbicacionD" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"/>
+                    
+                    <TextView android:text="Ubicación Secundaria" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <Spinner android:id="@+id/spinnerUbicacionSecundaria" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Activos View (Previous Layout Content) -->
+        <LinearLayout
+            android:id="@+id/viewActivos"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+            
+            <!-- Existing RFID Controls -->
+             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
                     android:gravity="center">
                     <Switch
                         android:id="@+id/swRfid"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="15dp"
                         android:checked="true"
                         android:showText="true"
-                        android:switchMinWidth="56dp"
-                        android:switchTextAppearance="@style/AppTheme"
                         android:text="RFID"
                         android:textOff="Off"
-                        android:textOn="On"
-                        android:theme="@style/AppTheme" />
+                        android:textOn="On"/>
 
                     <EditText
                         android:id="@+id/txt_barcode"
                         android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:configChanges="screenSize|orientation"
-                        android:ems="10"
                         android:inputType="textPersonName"
-                        android:text=""
-                        android:textSize="20px"
                         android:windowSoftInputMode="stateHidden" />
-
                 </LinearLayout>
             </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_GuardarToma"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Guardar Resultado"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="#FFFFFF"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="5dp">
-
-                <Button
-                    android:id="@+id/btn_GuardarToma"
-                    android:layout_width="120dp"
-                    android:layout_height="30dp"
-                    android:background="@color/colorPrimary"
-                    android:elevation="50dp"
-                    android:text="Guardar Resultado"
-                    android:textColor="@android:color/background_light"
-                    android:textSize="10dp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_marginTop="8dp">
 
                 <TextView
                     android:id="@+id/EncabezadoEncontrados"
@@ -97,20 +276,15 @@
                     android:layout_height="wrap_content"
                     android:background="@color/verde"
                     android:text="Encontrado"
-                    android:textAlignment="center"
-                    android:textColor="@color/blanco"
-                    android:textSize="12dp" />
+                    android:textColor="#FFFFFF"
+                    android:padding="4dp"/>
 
                 <EditText
                     android:id="@+id/txtEncontrados"
-                    android:layout_width="30dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
                     android:enabled="false"
-                    android:inputType="number"
-                    android:text=""
-                    android:textSize="20px"
-                    android:windowSoftInputMode="stateHidden" />
+                    android:inputType="number"/>
 
                 <TextView
                     android:id="@+id/Faltantes"
@@ -118,22 +292,15 @@
                     android:layout_height="wrap_content"
                     android:background="@color/rojo"
                     android:text="Faltante"
-                    android:textAlignment="center"
-                    android:textColor="@color/blanco"
-                    android:textSize="12dp" />
-
+                    android:textColor="#FFFFFF"
+                    android:padding="4dp"/>
 
                 <EditText
                     android:id="@+id/txtFaltantes"
-                    android:layout_width="30dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
                     android:enabled="false"
-                    android:inputType="number"
-                    android:text=""
-                    android:textSize="20px"
-                    android:windowSoftInputMode="stateHidden" />
-
+                    android:inputType="number"/>
 
                 <TextView
                     android:id="@+id/textView2"
@@ -141,79 +308,28 @@
                     android:layout_height="wrap_content"
                     android:background="@color/colorPrimary"
                     android:text="No Pertenece"
-                    android:textAlignment="center"
-                    android:textColor="@color/blanco"
-                    android:textSize="12dp" />
+                    android:textColor="#FFFFFF"
+                    android:padding="4dp"/>
 
                 <EditText
                     android:id="@+id/txtSobrantes"
-                    android:layout_width="30dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
                     android:enabled="false"
-                    android:inputType="number"
-                    android:text=""
-                    android:textSize="20px" />
-
-
+                    android:inputType="number"/>
             </LinearLayout>
+            
+            <!-- Hidden inputs from original layout to prevent crash -->
+            <EditText android:id="@+id/txtLeidos" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+            <EditText android:id="@+id/txtUbicacion" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
 
-            <EditText
-                android:id="@+id/txtLeidos"
-                android:layout_width="5dp"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginRight="5dp"
-                android:layout_weight="1"
-                android:configChanges="screenSize|orientation"
-                android:enabled="false"
-                android:inputType="number"
-                android:text=""
-                android:textSize="22px"
-                android:visibility="gone"
-                android:windowSoftInputMode="stateHidden" />
-
-            <EditText
-                android:id="@+id/txtUbicacion"
-                android:layout_width="5dp"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginRight="5dp"
-                android:layout_weight="1"
-                android:configChanges="screenSize|orientation"
-                android:enabled="false"
-                android:inputType="number"
-                android:text=""
-                android:textSize="22px"
-                android:visibility="gone"
-                android:windowSoftInputMode="stateHidden" />
-
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/listView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/listView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:scrollbars="vertical"
-                        tools:listitem="@layout/campos_lectura_inventario" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="16dp"
-                android:text="█ ■ █ ■ █" />
-
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="8dp"/>
         </LinearLayout>
-    </ScrollView>
+    </FrameLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

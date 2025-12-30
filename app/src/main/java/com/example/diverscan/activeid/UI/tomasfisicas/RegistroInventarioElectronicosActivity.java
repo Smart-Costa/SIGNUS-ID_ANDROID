@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.diverscan.activeid.R;
@@ -20,17 +21,23 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     Button btnTomas, btnTomasCompletas;
     FloatingActionButton btnNuevaToma;
+    TextView txtTitulo;
     TextView kpiValor, kpiTotal;
     CircularProgressIndicator kpiProgress;
 
     TomaFisicaTomasRepository repository;
     TomaFisicaTomasAdapter adapter;
     String tomaFisicaId;
+    boolean mostrandoCompletas = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro_inventario_electronicos);
+
+        if (savedInstanceState != null) {
+            mostrandoCompletas = savedInstanceState.getBoolean("mostrandoCompletas", false);
+        }
 
         if (getIntent().hasExtra("tomaFisicaId")) {
             tomaFisicaId = getIntent().getStringExtra("tomaFisicaId");
@@ -38,10 +45,20 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
 
         repository = new TomaFisicaTomasRepository(this);
 
+        txtTitulo = findViewById(R.id.txtTitulo);
+        String nombre = getIntent().getStringExtra("nombre");
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            txtTitulo.setText(nombre.trim());
+        }
+
         recyclerView = findViewById(R.id.recyclerTomas);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new TomaFisicaTomasAdapter(new ArrayList<>());
+        adapter = new TomaFisicaTomasAdapter(
+                new ArrayList<>(),
+                this::abrirResumen,
+                this::abrirResumen
+        );
         recyclerView.setAdapter(adapter);
 
         btnTomas = findViewById(R.id.btnTomas);
@@ -54,27 +71,40 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
 
         cargarKpi();
         cargarListeners();
-        cargarTomas();
+        setToggleMostrandoCompletas(mostrandoCompletas);
+        repository.syncFromApi(tomaFisicaId, () -> runOnUiThread(() -> {
+            cargarKpi();
+            setToggleMostrandoCompletas(mostrandoCompletas);
+        }));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        cargarTomas();
+        repository.syncFromApi(tomaFisicaId, () -> runOnUiThread(() -> {
+            cargarKpi();
+            setToggleMostrandoCompletas(mostrandoCompletas);
+        }));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("mostrandoCompletas", mostrandoCompletas);
     }
 
     private void cargarListeners() {
 
         btnTomas.setOnClickListener(v -> {
-            btnTomas.setBackgroundResource(R.drawable.btn_primary);
-            btnTomasCompletas.setBackgroundResource(R.drawable.btn_secondary_gray);
-            cargarTomas();
+            if (mostrandoCompletas) {
+                setToggleMostrandoCompletas(false);
+            }
         });
 
         btnTomasCompletas.setOnClickListener(v -> {
-            btnTomasCompletas.setBackgroundResource(R.drawable.btn_primary);
-            btnTomas.setBackgroundResource(R.drawable.btn_secondary_gray);
-            cargarTomasCompletas();
+            if (!mostrandoCompletas) {
+                setToggleMostrandoCompletas(true);
+            }
         });
 
         btnNuevaToma.setOnClickListener(v -> {
@@ -87,6 +117,30 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
     private void cargarTomasCompletas() {
         List<TomaFisicaTomasEntity> lista = repository.getCompletas();
         adapter.actualizar(lista);
+    }
+
+    private void setToggleMostrandoCompletas(boolean completas) {
+        mostrandoCompletas = completas;
+        btnTomas.setSelected(!completas);
+        btnTomasCompletas.setSelected(completas);
+
+        if (completas) {
+            btnTomasCompletas.setBackgroundResource(R.drawable.btn_primary);
+            btnTomas.setBackgroundResource(R.drawable.btn_secondary_gray);
+
+            btnTomasCompletas.setTextColor(ContextCompat.getColor(this, R.color.blanco));
+            btnTomas.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint));
+
+            cargarTomasCompletas();
+        } else {
+            btnTomas.setBackgroundResource(R.drawable.btn_primary);
+            btnTomasCompletas.setBackgroundResource(R.drawable.btn_secondary_gray);
+
+            btnTomas.setTextColor(ContextCompat.getColor(this, R.color.blanco));
+            btnTomasCompletas.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint));
+
+            cargarTomas();
+        }
     }
 
     private void cargarKpi() {
@@ -117,6 +171,12 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
         adapter.actualizar(lista);
     }
 
+    private void abrirResumen(TomaFisicaTomasEntity item) {
+        Intent intent = new Intent(this, RegistroConteosActivity.class);
+        intent.putExtra("tomaFisicaId", tomaFisicaId);
+        intent.putExtra("idToma", item.getIdToma());
+        intent.putExtra("numeroToma", item.getNumeroToma());
+        startActivity(intent);
+    }
+
 }
-
-

@@ -116,9 +116,15 @@ public class RegistroActivoDetailActivity extends AppCompatActivity {
         viewModel.guardarActivo(this, activo);
 
         prefs.edit()
+                .putString("idActivo", idActivo)
                 .putString("NumeroActivo", numeroActivo)
                 .putString("NumeroEtiqueta", etiqueta)
                 .putString("Descripcion", descripcion)
+                .putString("Categoria", categoria)
+                .putString("Estado", estado)
+                .putString("Empresa", empresa)
+                .putString("Marca", marca)
+                .putString("Modelo", modelo)
                 .apply();
 
         Intent intent = new Intent(this, RegistroActivoFotoTagActivity.class);

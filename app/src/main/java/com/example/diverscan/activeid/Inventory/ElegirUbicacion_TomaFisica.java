@@ -2,6 +2,7 @@ package com.example.diverscan.activeid.Inventory;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -40,6 +41,14 @@ import com.example.diverscan.activeid.sqlite.InventoryDBHelper;
 import com.example.diverscan.activeid.sqlite.OfficesDBHelper;
 import com.zebra.rfid.api3.TagData;
 
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
+import com.example.diverscan.activeid.UI.tomasfisicas.TomaFisicaTomasAdapter;
+import com.example.diverscan.activeid.UI.tomasfisicas.RegistroConteosActivity;
+import com.example.diverscan.activeid.data.local.entity.TomaFisicaTomasEntity;
+import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +82,14 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
     private String _lastTag = "";
     private boolean triggerPressed = false;
 
+    private RecyclerView recyclerSubTomas;
+    private TomaFisicaTomasAdapter adapterSubTomas;
+    private TomaFisicaTomasDao subTomasDao;
+    private android.widget.TextView lblTituloDinamico;
+    private android.widget.TextView txtProgressCircle;
+
+    private static final String TAG = "ElegirUbicacion";
+
     public ElegirUbicacion_TomaFisica() {
     }
 
@@ -80,6 +97,15 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_elegir_ubicacion__toma_fisica);
+        
+        // Inicializar LoginDBHelper para asegurar creación de tablas
+        try {
+            com.example.diverscan.activeid.sqlite.LoginDBHelper loginDBHelper = new com.example.diverscan.activeid.sqlite.LoginDBHelper(this);
+            loginDBHelper.getWritableDatabase();
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing LoginDBHelper", e);
+        }
+
         _context = this;
         _activity = this;
         controles();
@@ -88,8 +114,16 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
         cargarRazonesSociales();
         cargarUbicaciones();
         RecibirTakesInfo();
-        rfidHandler = new TagWriter();
-        rfidHandler.onCreate(this);
+        configurarSubTomas();
+        
+        try {
+            rfidHandler = TagWriter.getInstance();
+            rfidHandler.onCreate(this);
+        } catch (SecurityException e) {
+            Log.e(TAG, "Error initializing RFID Handler: Permission missing", e);
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing RFID Handler", e);
+        }
     }
 
     public void controles() {
@@ -135,26 +169,149 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
     }
 
     private void cargarUbicaciones() {
-        RazonNuevo razonSocialRecord = (RazonNuevo) CompaniaView.getSelectedItem();
-        idCompania = razonSocialRecord.getIdRazon();
-        cargarEdificios(idCompania);
+        if (CompaniaView.getSelectedItem() != null) {
+            RazonNuevo razonSocialRecord = (RazonNuevo) CompaniaView.getSelectedItem();
+            idCompania = razonSocialRecord.getIdRazon();
+            cargarEdificios(idCompania);
 
-        EdificioNuevo edificioRecord = (EdificioNuevo) EdificioView.getSelectedItem();
-        idedificioActivo = edificioRecord.getIdEdificio();
-        cargarPisos(idedificioActivo);
+            if (EdificioView.getSelectedItem() != null) {
+                EdificioNuevo edificioRecord = (EdificioNuevo) EdificioView.getSelectedItem();
+                idedificioActivo = edificioRecord.getIdEdificio();
+                cargarPisos(idedificioActivo);
 
-        PisoNuevo pisoRecord = (PisoNuevo) PisoView.getSelectedItem();
-        idpisoActivo = pisoRecord.getIdPiso();
-        cargarOficinas(idpisoActivo);
+                if (PisoView.getSelectedItem() != null) {
+                    PisoNuevo pisoRecord = (PisoNuevo) PisoView.getSelectedItem();
+                    idpisoActivo = pisoRecord.getIdPiso();
+                    cargarOficinas(idpisoActivo);
+                }
+            }
+        }
     }
 
     public void RecibirTakesInfo() {
-        idTake = getIntent().getExtras().getString("Take_ID");
-        takeName = getIntent().getExtras().getString("Take_Name");
-        takeDescription = getIntent().getExtras().getString("Take_Description");
-        takeDate = getIntent().getExtras().getString("Take_Date");
+        if (getIntent().getExtras() != null) {
+            idTake = getIntent().getExtras().getString("Take_ID");
+            takeName = getIntent().getExtras().getString("Take_Name");
+            takeDescription = getIntent().getExtras().getString("Take_Description");
+            takeDate = getIntent().getExtras().getString("Take_Date");
+            Log.d(TAG, "RecibirTakesInfo: idTake=" + idTake + ", name=" + takeName);
+        } else {
+            Log.e(TAG, "RecibirTakesInfo: Extras is NULL");
+        }
     }
 
+    private void configurarSubTomas() {
+        // Inicializar vistas nuevas
+        lblTituloDinamico = findViewById(R.id.lbl_titulo_dinamico);
+        txtProgressCircle = findViewById(R.id.txtProgressCircle);
+
+        // Setear título dinámico
+        if (takeName != null && !takeName.isEmpty()) {
+            lblTituloDinamico.setText(takeName);
+        } else {
+            lblTituloDinamico.setText("Inventario Electrónico");
+        }
+
+        recyclerSubTomas = findViewById(R.id.recyclerSubTomas);
+            recyclerSubTomas.setLayoutManager(new LinearLayoutManager(this));
+            adapterSubTomas = new TomaFisicaTomasAdapter(
+                    new ArrayList<>(),
+                    new TomaFisicaTomasAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(TomaFisicaTomasEntity item) {
+                            Log.d(TAG, "onItemClick: Clicked on take " + item.getNumeroToma());
+
+                            try {
+                                if (OficinaView != null && OficinaView.getSelectedItem() != null) {
+                                    oficinaNuevo oficinaRecord = (oficinaNuevo) OficinaView.getSelectedItem();
+                                    if (oficinaRecord != null) {
+                                        idOficina = oficinaRecord.getIdOficina();
+                                    }
+                                }
+
+                                if (TipoInventarioView != null && TipoInventarioView.getSelectedItem() != null) {
+                                    EntidadTiposInventarios entidadTiposInventarios = (EntidadTiposInventarios) TipoInventarioView.getSelectedItem();
+                                    if (entidadTiposInventarios != null) {
+                                        idTipoInventario = entidadTiposInventarios.getidTipoToma();
+                                    }
+                                }
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error capturing spinner values (non-fatal)", e);
+                            }
+
+                            Intent intent = new Intent(ElegirUbicacion_TomaFisica.this, Lectura_Inventario.class);
+                            intent.putExtra("IdTake", idTake);
+                            intent.putExtra("takeName", takeName);
+                            intent.putExtra("takeDescription", takeDescription);
+                            intent.putExtra("takeDate", takeDate);
+                            intent.putExtra("idOficina", idOficina);
+                            intent.putExtra("tipoInventario", idTipoInventario);
+                            intent.putExtra("IdSubToma", item.getIdToma());
+                            intent.putExtra("NumeroToma", item.getNumeroToma());
+
+                            try {
+                                Log.d(TAG, "onItemClick: Attempting to start Lectura_Inventario");
+                                Toast.makeText(ElegirUbicacion_TomaFisica.this, "Abriendo conteo...", Toast.LENGTH_SHORT).show();
+                                startActivity(intent);
+                                Log.d(TAG, "onItemClick: Started Lectura_Inventario activity");
+                            } catch (Exception e) {
+                                Log.e(TAG, "onItemClick: Error starting activity", e);
+                                Toast.makeText(ElegirUbicacion_TomaFisica.this, "Error al abrir inventario: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    },
+                    new TomaFisicaTomasAdapter.OnGoToCountsClickListener() {
+                        @Override
+                        public void onGoToCountsClick(TomaFisicaTomasEntity item) {
+                            Intent intent = new Intent(ElegirUbicacion_TomaFisica.this, RegistroConteosActivity.class);
+                            intent.putExtra("tomaFisicaId", idTake);
+                            intent.putExtra("idToma", item.getIdToma());
+                            intent.putExtra("numeroToma", item.getNumeroToma());
+                            startActivity(intent);
+                        }
+                    }
+            );
+            recyclerSubTomas.setAdapter(adapterSubTomas);
+            subTomasDao = new TomaFisicaTomasDao(this);
+            cargarSubTomas();
+    }
+
+    private void cargarSubTomas() {
+        Log.d(TAG, "cargarSubTomas: Iniciando para idTake=" + idTake);
+        // Primero cargamos lo que tengamos localmente
+        if (idTake != null) {
+            List<TomaFisicaTomasEntity> localList = subTomasDao.getByTomaFisicaId(idTake);
+            Log.d(TAG, "cargarSubTomas: Encontrados localmente=" + localList.size());
+            if (!localList.isEmpty()) {
+                actualizarListaYProgreso(localList);
+            }
+        }
+
+        // Sincronizar con API
+        subTomasDao.fetchAndSyncFromApi(idTake, () -> {
+            runOnUiThread(() -> {
+                if (idTake != null) {
+                    List<TomaFisicaTomasEntity> updatedList = subTomasDao.getByTomaFisicaId(idTake);
+                    Log.d(TAG, "cargarSubTomas: Encontrados tras sync=" + updatedList.size());
+                    actualizarListaYProgreso(updatedList);
+                    
+                    if (updatedList.isEmpty()) {
+                         // Debug: Ver si hay ALGO en la tabla
+                         // (Esto es solo para depuración, se puede quitar después)
+                         // int totalCount = subTomasDao.getPendientesCount(idTake); // No sirve pq filtra por ID
+                         // Log.d(TAG, "Total en tabla para este ID: " + totalCount);
+                    }
+                }
+            });
+        });
+    }
+
+    private void actualizarListaYProgreso(List<TomaFisicaTomasEntity> lista) {
+        adapterSubTomas.actualizar(lista);
+        // Actualizar círculo de progreso (X/5)
+        int count = lista != null ? lista.size() : 0;
+        txtProgressCircle.setText(count + "/5");
+    }
 
     //region Se rellenan los spinners
 
@@ -174,10 +331,14 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
         fillSpinnerOficina(oficinas);
     }
     private void cargarTiposInventarios() {
-        InventoryDBHelper inventoryDBHelper = new InventoryDBHelper(ElegirUbicacionView.getContext());
-        _mapTipoInventarios = (Map<Integer, EntidadTiposInventarios>) inventoryDBHelper.ObtenerTiposInventario();
-        EntidadTiposInventarios[] tiposInventarios = _mapTipoInventarios.values().toArray(new EntidadTiposInventarios[0]);
-        fillTiposInventarios(tiposInventarios);
+        try {
+            InventoryDBHelper inventoryDBHelper = new InventoryDBHelper(ElegirUbicacionView.getContext());
+            _mapTipoInventarios = (Map<Integer, EntidadTiposInventarios>) inventoryDBHelper.ObtenerTiposInventario();
+            EntidadTiposInventarios[] tiposInventarios = _mapTipoInventarios.values().toArray(new EntidadTiposInventarios[0]);
+            fillTiposInventarios(tiposInventarios);
+        } catch (Exception e) {
+            Log.e(TAG, "Error cargando tipos de inventario", e);
+        }
     }
 
     private void cargarRazonesSociales() {
@@ -364,19 +525,21 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
     @Override
     protected void onPause() {
         super.onPause();
-        rfidHandler.onPause();
+        if (rfidHandler != null) {
+             try { rfidHandler.onPause(); } catch (Exception e) {}
+        }
     }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        rfidHandler.onResume();
+        if (rfidHandler != null) rfidHandler.onResume();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        rfidHandler.onDestroy();
+        if (rfidHandler != null) rfidHandler.onDestroy();
     }
 
     @Override
@@ -392,7 +555,24 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
     }
 
     @Override
+    public Context GetContext() {
+        return this;
+    }
+
+    @Override
+    public void SetMessage(String Text) {
+        final String text = Text;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(_context, text, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
     public void handleTriggerPress(boolean pressed) {
+        if (rfidHandler == null) return;
         triggerPressed = pressed;
         if (pressed) {
             rfidHandler.performInventory();
@@ -401,27 +581,41 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    cargarUbicacionPorEPC(_lastTag);
-                    Message();
+
                 }
             });
+            //ProbarEPCManual("800474453240000000031607");
         }
     }
 
-    @Override
-    public Context GetContext() {
-        return this;
-    }
-
-    @Override
-    public void SetMessage(String Text) {
-    }
     //endregion
 
+    //region Metodos de soporte
     private Button.OnClickListener OnClickListenerIrToma = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             LeerInventarioManual();
+        }
+    };
+
+    Runnable IrInventario = new Runnable() {
+        @Override
+        public void run() {
+            Intent intent = new Intent(ElegirUbicacion_TomaFisica.this, Lectura_Inventario.class);
+            intent.putExtra("IdTake", idTake);
+            intent.putExtra("takeName", takeName);
+            intent.putExtra("takeDescription", takeDescription);
+            intent.putExtra("takeDate", takeDate);
+            intent.putExtra("idOficina", idOficina);
+            intent.putExtra("tipoInventario", idTipoInventario);
+            startActivity(intent);
+
+        }
+    };
+
+    Runnable RespuestaNegativa = new Runnable() {
+        @Override
+        public void run() {
         }
     };
 
@@ -435,37 +629,9 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
             _snackbar = Snackbar.make(clsnackbar, mensaje, 4000);
             _snackbar.setActionTextColor(Color.rgb(179, 179, 179));
             View snackBarView = _snackbar.getView();
-            snackBarView.setBackgroundColor(Color.rgb(242, 59, 59));
+            snackBarView.setBackgroundColor(Color.rgb(170, 18, 18));
         }
         _snackbar.show();
     }
-
-    //region Respuestas Runnable
-    final Runnable RespuestaNegativa = new Runnable() {
-        @Override
-        public void run() {
-        }
-    };
-
-    final Runnable CerrarVentana = new Runnable() {
-        @Override
-        public void run() {
-            finish();
-        }
-    };
-
-    final Runnable IrInventario = new Runnable() {
-        @Override
-        public void run() {
-            Intent intent = new Intent(ElegirUbicacion_TomaFisica.this, Lectura_Inventario.class);
-            intent.putExtra("IdTake", idTake);
-            intent.putExtra("takeName", takeName);
-            intent.putExtra("takeDescription", takeDescription);
-            intent.putExtra("takeDate", takeDate);
-            intent.putExtra("idOficina", idOficina);
-            intent.putExtra("tipoInventario", idTipoInventario);
-            startActivity(intent);
-        }
-    };
     //endregion
 }

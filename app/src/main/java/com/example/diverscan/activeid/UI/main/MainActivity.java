@@ -251,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 //        menu.findItem(R.id.sub_asignar_tag_sector).setVisible(false);
 //        menu.findItem(R.id.sub_activos_sector).setVisible(false);
         menu.findItem(R.id.sub_configurar_antena).setVisible(false);
+        menu.findItem(R.id.sub_validar_conexion).setVisible(false);
     }
 
     private void setupExpandableMenus() {
@@ -293,7 +294,10 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 //                    return true;
 
                 case R.id.menu_configuracion:
-                    toggleGroup(menu, R.id.sub_configurar_antena);
+                    toggleGroup(menu,
+                            R.id.sub_configurar_antena,
+                            R.id.sub_validar_conexion
+                    );
                     return true;
             }
 

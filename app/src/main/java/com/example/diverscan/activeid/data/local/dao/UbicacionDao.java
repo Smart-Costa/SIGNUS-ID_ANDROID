@@ -66,9 +66,10 @@ public class UbicacionDao {
     public List<UbicacionEntity> getAllUbicaciones() {
         List<UbicacionEntity> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM UbicacionHH", null);
+        Cursor c = null;
 
         try {
+            c = db.rawQuery("SELECT * FROM UbicacionHH", null);
             if (c.moveToFirst()) {
                 do {
                     UbicacionEntity u = new UbicacionEntity();
@@ -87,7 +88,7 @@ public class UbicacionDao {
         } catch (Exception e) {
             Log.e(TAG, "Error leyendo ubicaciones", e);
         } finally {
-            c.close();
+            if (c != null) c.close();
             db.close();
         }
 
@@ -96,15 +97,15 @@ public class UbicacionDao {
 
     public UbicacionEntity getUbicacionByASysId(String aSysId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        Cursor c = db.rawQuery(
-                "SELECT * FROM UbicacionHH WHERE ASysId = ?",
-                new String[]{ aSysId }
-        );
-
+        Cursor c = null;
         UbicacionEntity u = null;
 
         try {
+            c = db.rawQuery(
+                    "SELECT * FROM UbicacionHH WHERE ASysId = ?",
+                    new String[]{ aSysId }
+            );
+
             if (c.moveToFirst()) {
                 u = new UbicacionEntity();
                 u.setASysId(c.getString(c.getColumnIndexOrThrow("ASysId")));
@@ -119,7 +120,7 @@ public class UbicacionDao {
         } catch (Exception e) {
             Log.e(TAG, "Error obteniendo ubicación por ASysId", e);
         } finally {
-            c.close();
+            if (c != null) c.close();
             db.close();
         }
 

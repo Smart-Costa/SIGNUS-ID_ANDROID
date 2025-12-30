@@ -12,6 +12,10 @@ public class TomaFisicaTomasRepository {
 
     public TomaFisicaTomasRepository(Context context) { this.dao = new TomaFisicaTomasDao(context); }
 
+    public void syncFromApi(String tomaFisicaId, Runnable onComplete) {
+        dao.fetchAndSyncFromApi(tomaFisicaId, onComplete);
+    }
+
     public void sync(List<TomaFisicaTomasEntity> data) {
         dao.syncResumen(data);
     }

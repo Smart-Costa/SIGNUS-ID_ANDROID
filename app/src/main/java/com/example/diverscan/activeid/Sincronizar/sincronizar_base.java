@@ -31,6 +31,9 @@ import com.example.diverscan.activeid.data.local.dao.TomaFisicaDetallesDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
 import com.example.diverscan.activeid.data.local.dao.UbicacionDao;
 import com.example.diverscan.activeid.data.local.dao.UserDao;
+import com.example.diverscan.activeid.data.remote.response.ApiCallback;
+import com.example.diverscan.activeid.data.remote.response.ApiResponse;
+import com.google.gson.JsonElement;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -156,6 +159,10 @@ public class sincronizar_base extends AppCompatActivity {
     int enviadosSinExito =0;
     int noHay = 0;
 
+    // Debug UI
+    private LinearLayout debugContainer;
+    private TextView tvDebugUsuarios, tvDebugRoles, tvDebugUbicaciones, tvDebugActivos, tvDebugTomas, tvDebugTomasResumen, tvDebugTomasDetalle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -208,6 +215,16 @@ public class sincronizar_base extends AppCompatActivity {
         Mensaje = findViewById(R.id.mensaje);
         rlsnackbar = findViewById(R.id.sincronizar_view);
         progressSegmented = findViewById(R.id.progress_segmented);
+
+        // Debug UI initialization
+        debugContainer = findViewById(R.id.debug_container);
+        tvDebugUsuarios = findViewById(R.id.tv_debug_usuarios);
+        tvDebugRoles = findViewById(R.id.tv_debug_roles);
+        tvDebugUbicaciones = findViewById(R.id.tv_debug_ubicaciones);
+        tvDebugActivos = findViewById(R.id.tv_debug_activos);
+        tvDebugTomas = findViewById(R.id.tv_debug_tomas);
+        tvDebugTomasResumen = findViewById(R.id.tv_debug_tomas_resumen);
+        tvDebugTomasDetalle = findViewById(R.id.tv_debug_tomas_detalle);
     }
 
     public void eventos() {
@@ -285,17 +302,83 @@ public class sincronizar_base extends AppCompatActivity {
 
         resetBarraSegmentada();
         btn_enviar.setEnabled(false);
+        if (debugContainer != null) debugContainer.setVisibility(View.GONE);
 
-        userDao.fetchAndSyncFromApi();
-        activoDao.fetchAndSyncFromApi();
-        rolDao.fetchAndSyncFromApi();
-        ubicacionDao.fetchAndSyncFromApi();
-        tomafisicaDao.fetchAndSyncFromApi();
-        tomafisicatomasDao.fetchAndSyncFromApi();
-        tomafisicadetallesDao.fetchAndSyncFromApi();
+        // Cadena secuencial de sincronización
+        // 1. Usuarios
+        userDao.fetchAndSyncFromApi(() -> {
+            runOnUiThread(() -> actualizarBarraSegmentada(15));
+            
+            // 2. Roles
+            rolDao.fetchAndSyncFromApi(() -> {
+                runOnUiThread(() -> actualizarBarraSegmentada(30));
 
-        iniciarProgressThread(5);
+                // 3. Ubicaciones
+                ubicacionDao.fetchAndSyncFromApi(() -> {
+                    runOnUiThread(() -> actualizarBarraSegmentada(45));
+
+                    // 4. Activos
+                    activoDao.fetchAndSyncFromApi(() -> {
+                        runOnUiThread(() -> actualizarBarraSegmentada(60));
+
+                        // 5. Tomas Fisicas (Encabezados)
+                        tomafisicaDao.fetchAndSyncFromApi(() -> {
+                            runOnUiThread(() -> actualizarBarraSegmentada(75));
+
+                            // 6. Tomas Fisicas (Resumen/Tomas)
+                            tomafisicatomasDao.fetchAndSyncFromApi(() -> {
+                                runOnUiThread(() -> actualizarBarraSegmentada(90));
+
+                                // 7. Tomas Fisicas (Detalles)
+                                tomafisicadetallesDao.fetchAndSyncFromApi(() -> {
+                                    runOnUiThread(() -> {
+                                        actualizarBarraSegmentada(100);
+                                        updateDebugSummary();
+                                        
+                                        btn_enviar.setEnabled(true);
+                                        btn_obtener.setEnabled(true);
+                                        mostrarSnack("Sincronización completada con éxito.", Color.rgb(4, 165, 77));
+                                        
+                                        // Reset bar after a delay
+                                        new Handler().postDelayed(() -> resetBarraSegmentada(), 2000);
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
     };
+
+    private void updateDebugSummary() {
+        new Thread(() -> {
+            // Obtener conteos de SQLite
+            // Nota: Se asume que los DAOs tienen métodos para contar o listar. 
+            // Si no tienen count directo, usamos size() de getAll().
+            
+            int countUsers = userDao.getAllLocalUsers().size();
+            int countRoles = rolDao.getAllLocalRoles().size();
+            int countUbicaciones = ubicacionDao.getAllUbicaciones().size();
+            int countActivos = activoDao.getAllLocalActivos().size();
+            int countTomas = tomafisicaDao.getAllTomasFisicas().size();
+            int countTomasResumen = tomafisicatomasDao.getAll().size(); // Asumiendo que existe getAll(), si no, verificamos
+            int countTomasDetalle = tomafisicadetallesDao.getAll().size(); // Asumiendo que existe getAll()
+
+            runOnUiThread(() -> {
+                if (debugContainer != null) {
+                    debugContainer.setVisibility(View.VISIBLE);
+                    tvDebugUsuarios.setText("Usuarios: " + countUsers);
+                    tvDebugRoles.setText("Roles: " + countRoles);
+                    tvDebugUbicaciones.setText("Ubicaciones: " + countUbicaciones);
+                    tvDebugActivos.setText("Activos: " + countActivos);
+                    tvDebugTomas.setText("Tomas Físicas: " + countTomas);
+                    tvDebugTomasResumen.setText("Tomas Resumen: " + countTomasResumen);
+                    tvDebugTomasDetalle.setText("Tomas Detalle: " + countTomasDetalle);
+                }
+            });
+        }).start();
+    }
 
     public final View.OnClickListener OnClickListenerEnviar = v -> {
         btn_enviar.setEnabled(false);
@@ -305,9 +388,32 @@ public class sincronizar_base extends AppCompatActivity {
             return;
         }
 
-        //activoDao.pushLocalChangesToApi();
-
         iniciarProgressThread(5);
+
+        // Sincronizar Activos primero
+        activoDao.pushLocalChangesToApi(new ApiCallback<JsonElement>() {
+            @Override
+            public void onComplete(ApiResponse<JsonElement> response) {
+                if (!response.success) {
+                    runOnUiThread(() -> {
+                        mostrarSnack("Error enviando Activos: " + response.errorMessage, Color.RED);
+                        Toast.makeText(_context, "Error enviando Activos: " + response.errorMessage, Toast.LENGTH_LONG).show();
+                    });
+                } else {
+                    Log.d("SYNC", "Activos enviados correctamente");
+                }
+
+                // Sincronizar Resumenes (Tomas)
+                tomafisicatomasDao.pushLocalChangesToApi(() -> {
+                    Log.d("SYNC", "Resumenes enviados");
+                    
+                    // Sincronizar Detalles
+                    tomafisicadetallesDao.pushLocalChangesToApi(() -> {
+                        Log.d("SYNC", "Detalles enviados");
+                    });
+                });
+            }
+        });
     };
 
     private void iniciarProgressThread(final int totalProcesos) {

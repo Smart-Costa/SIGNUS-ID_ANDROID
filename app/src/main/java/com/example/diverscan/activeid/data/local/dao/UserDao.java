@@ -100,6 +100,10 @@ public class UserDao {
     /* NEW FUNCTIONS */
 
     public void fetchAndSyncFromApi() {
+        fetchAndSyncFromApi(null);
+    }
+
+    public void fetchAndSyncFromApi(final Runnable onComplete) {
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<List<LoginEntity>>() {}.getType();
 
@@ -112,6 +116,7 @@ public class UserDao {
                 } else {
                     Log.e(TAG, "Error al sincronizar desde API: " + response.errorMessage);
                 }
+                if (onComplete != null) onComplete.run();
             }
         });
     }

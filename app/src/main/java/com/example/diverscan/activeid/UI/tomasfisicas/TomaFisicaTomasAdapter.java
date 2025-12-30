@@ -16,9 +16,37 @@ import java.util.List;
 public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomasAdapter.ViewHolder> {
 
     private List<TomaFisicaTomasEntity> lista;
+    private OnItemClickListener itemClickListener;
+    private OnGoToCountsClickListener goToCountsClickListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(TomaFisicaTomasEntity item);
+    }
+
+    public interface OnGoToCountsClickListener {
+        void onGoToCountsClick(TomaFisicaTomasEntity item);
+    }
+
+    public TomaFisicaTomasAdapter(List<TomaFisicaTomasEntity> lista, OnItemClickListener listener) {
+        this.lista = lista;
+        this.itemClickListener = listener;
+        this.goToCountsClickListener = item -> listener.onItemClick(item);
+    }
 
     public TomaFisicaTomasAdapter(List<TomaFisicaTomasEntity> lista) {
         this.lista = lista;
+        this.itemClickListener = null;
+        this.goToCountsClickListener = null;
+    }
+
+    public TomaFisicaTomasAdapter(
+            List<TomaFisicaTomasEntity> lista,
+            OnItemClickListener itemClickListener,
+            OnGoToCountsClickListener goToCountsClickListener
+    ) {
+        this.lista = lista;
+        this.itemClickListener = itemClickListener;
+        this.goToCountsClickListener = goToCountsClickListener;
     }
 
     public void actualizar(List<TomaFisicaTomasEntity> nuevaLista) {
@@ -38,24 +66,70 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         TomaFisicaTomasEntity item = lista.get(position);
 
-        holder.txtNumeroToma.setText(item.getNumeroToma());
-        holder.txtIdToma.setText(item.getIdToma());
-        holder.txtTotalLecturas.setText(item.getTotalLecturas());
+        holder.txtNumeroToma.setText("Toma " + item.getNumeroToma());
+        
+        // Fecha dd/mm/yyyy
+        String fechaOriginal = item.getFechaCreacion(); // e.g., 2023-10-27T10:00:00
+        String fechaFormateada = "";
+        if (fechaOriginal != null && fechaOriginal.contains("T")) {
+             try {
+                 String[] parts = fechaOriginal.split("T")[0].split("-");
+                 if (parts.length == 3) {
+                     fechaFormateada = parts[2] + "/" + parts[1] + "/" + parts[0];
+                 } else {
+                     fechaFormateada = fechaOriginal.split("T")[0];
+                 }
+             } catch (Exception e) {
+                 fechaFormateada = fechaOriginal;
+             }
+        } else {
+            fechaFormateada = fechaOriginal;
+        }
+        holder.txtFecha.setText(fechaFormateada);
+
+        // Uploaded status (Assuming if it's in the list it is uploaded/synced)
+        // If needed, check a specific field. For now, always visible if item exists.
+        holder.imgUploaded.setVisibility(View.VISIBLE);
+        
+        // Checkbox logic (if needed, currently just visual)
+        holder.chkSeleccion.setChecked(false); 
+        
+        holder.btnGoToCounts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (goToCountsClickListener != null) {
+                    goToCountsClickListener.onGoToCountsClick(item);
+                }
+            }
+        });
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (itemClickListener != null) {
+                    itemClickListener.onItemClick(item);
+                }
+            }
+        });
     }
 
-    @Override
     public int getItemCount() {
         return lista != null ? lista.size() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView txtNumeroToma, txtIdToma, txtTotalLecturas;
+        TextView txtNumeroToma, txtFecha;
+        android.widget.CheckBox chkSeleccion;
+        android.widget.ImageView imgUploaded;
+        android.widget.ImageView btnGoToCounts;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             txtNumeroToma = itemView.findViewById(R.id.txtNumeroToma);
-            txtIdToma = itemView.findViewById(R.id.txtIdToma);
-            txtTotalLecturas = itemView.findViewById(R.id.txtTotalLecturas);
+            txtFecha = itemView.findViewById(R.id.txtFecha);
+            chkSeleccion = itemView.findViewById(R.id.chkSeleccion);
+            imgUploaded = itemView.findViewById(R.id.imgUploaded);
+            btnGoToCounts = itemView.findViewById(R.id.btnGoToCounts);
         }
     }
 }

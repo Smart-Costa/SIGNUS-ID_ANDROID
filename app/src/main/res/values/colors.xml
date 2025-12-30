@@ -10,6 +10,7 @@
     <color name="blanco">#FFFFFF</color>
     <color name="rojo">#E51A1A</color>
     <color name="verde">#00C264</color>
+    <color name="amarillo">#EBB71E</color>
     <color name="AlertaVerde">#00C264</color>
     <color name="SeleccionAjuste">#FC7676</color>
     <color name="colorError">#D81622</color>

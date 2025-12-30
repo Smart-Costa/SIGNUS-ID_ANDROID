@@ -15,7 +15,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.io.IOException;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -185,13 +187,44 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
 
     @Override
     public void handleTagdata(TagData[] tagData) {
-        if (tagData != null && tagData.length > 0) {
-            String epc = tagData[0].getTagID();
-            runOnUiThread(() -> {
-                etRfidTag.setText(epc);
-                Toast.makeText(this, "TAG leído: " + epc, Toast.LENGTH_SHORT).show();
-            });
+        if (tagData == null || tagData.length == 0) {
+            return;
         }
+        if (etRfidTag.getText() != null && !etRfidTag.getText().toString().trim().isEmpty()) {
+            return;
+        }
+
+        Set<String> epcs = new HashSet<>();
+        for (TagData item : tagData) {
+            if (item == null) {
+                continue;
+            }
+            String epc = item.getTagID();
+            if (epc == null || epc.trim().isEmpty()) {
+                continue;
+            }
+            epcs.add(epc);
+            if (epcs.size() > 1) {
+                break;
+            }
+        }
+
+        if (epcs.size() != 1) {
+            if (rfidHandler != null) {
+                rfidHandler.stopInventory();
+            }
+            runOnUiThread(() -> Toast.makeText(this, "Se detectaron múltiples TAGs. Acerque solo 1 y reintente.", Toast.LENGTH_SHORT).show());
+            return;
+        }
+
+        String epcLeido = epcs.iterator().next();
+        if (rfidHandler != null) {
+            rfidHandler.stopInventory();
+        }
+        runOnUiThread(() -> {
+            etRfidTag.setText(epcLeido);
+            Toast.makeText(this, "TAG leído: " + epcLeido, Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override
@@ -199,6 +232,10 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         if (pressed) {
              runOnUiThread(() -> Toast.makeText(this, "Gatillo presionado - Leyendo...", Toast.LENGTH_SHORT).show());
              if (rfidHandler != null) {
+                 if (etRfidTag.getText() != null && !etRfidTag.getText().toString().trim().isEmpty()) {
+                     runOnUiThread(() -> Toast.makeText(this, "TAG ya asignado. Limpie el campo para leer otro.", Toast.LENGTH_SHORT).show());
+                     return;
+                 }
                  rfidHandler.performInventory();
              }
         } else {
@@ -271,6 +308,11 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         activo.setNumeroActivo(prefs.getString("NumeroActivo", ""));
         activo.setNumeroEtiqueta(prefs.getString("NumeroEtiqueta", ""));
         activo.setDescripcionCorta(prefs.getString("Descripcion", ""));
+        activo.setCategoria(prefs.getString("Categoria", ""));
+        activo.setEstado(prefs.getString("Estado", ""));
+        activo.setEmpresa(prefs.getString("Empresa", ""));
+        activo.setMarca(prefs.getString("Marca", ""));
+        activo.setModelo(prefs.getString("Modelo", ""));
 
         activo.setUbicacionA(prefs.getString("UbicacionA", ""));
         activo.setUbicacionB(prefs.getString("UbicacionB", ""));

@@ -46,17 +46,18 @@
                     android:layout_marginBottom="4dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/RoundedTextInput"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     app:boxBackgroundMode="outline"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txtNumeroActivo"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="56dp"
+                        android:layout_height="match_parent"
                         android:inputType="text"
+                        android:padding="8dp"
                         android:textColor="#606060"
                         android:backgroundTint="#FFF"
                         android:singleLine="true" />
@@ -81,18 +82,18 @@
                     android:layout_marginBottom="4dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/RoundedTextInput"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     app:boxBackgroundMode="outline"
                     app:hintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txtNumeroEtiqueta"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="56dp"
+                        android:layout_height="match_parent"
                         android:inputType="text"
-                        android:paddingHorizontal="10dp"
+                        android:padding="8dp"
                         android:textColor="#000000"
                         android:backgroundTint="#FFF"
                         android:singleLine="true" />

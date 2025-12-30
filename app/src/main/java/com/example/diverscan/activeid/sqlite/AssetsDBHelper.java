@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class AssetsDBHelper extends SQLiteOpenHelper{
 
     public static final String DATABASE_NAME = "Test_ActiveId_v1";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 8;
     private static final String DATABASE_FILE_PATH = "/Android/DBActive";
     Context _context;
     public AssetsDBHelper(Context context) {
@@ -82,6 +82,44 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
             return  entidadActivos;
         }
         return  null;
+    }
+
+    public ArrayList<String> ObtenerUbicacionesSecundarias(String idCompania, String idEdificio, String idPiso, String idOficina) {
+        ArrayList<String> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        try {
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT DISTINCT Departamento FROM Activos WHERE Departamento IS NOT NULL AND Departamento != ''");
+
+            if (idCompania != null && !idCompania.equals("-1")) {
+                queryBuilder.append(" AND IdCompania = '").append(idCompania).append("'");
+            }
+            if (idEdificio != null && !idEdificio.equals("-1")) {
+                queryBuilder.append(" AND IdEdificio = '").append(idEdificio).append("'");
+            }
+            if (idPiso != null && !idPiso.equals("-1")) {
+                queryBuilder.append(" AND IdPiso = '").append(idPiso).append("'");
+            }
+            if (idOficina != null && !idOficina.equals("-1")) {
+                queryBuilder.append(" AND IdOficina = '").append(idOficina).append("'");
+            }
+
+            queryBuilder.append(" ORDER BY Departamento");
+
+            Cursor cursor = db.rawQuery(queryBuilder.toString(), null);
+            if (cursor.moveToFirst()) {
+                do {
+                    String dep = cursor.getString(0);
+                    if (dep != null) {
+                        list.add(dep);
+                    }
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
     }
 
     public boolean ActualizarSubActivo(String idActivo){
@@ -163,15 +201,25 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
     }
 
     public EntidadActivosInventarios ActivosUbicacionInventario(String epc){
-        String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag from Oficina o " +
+        String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag, " +
+                "p._id as IdPiso, e._id as IdEdificio, r._id as IdCompania " +
+                "from Oficina o " +
                 " Inner Join Activos a ON a.IdOficina = o._id " +
+                " Left Join Pisos p ON o.idPiso = p._id " +
+                " Left Join Edificios e ON p.idEdificio = e._id " +
+                " Left Join RazonSocial r ON e.idRazonSocial = r._id " +
                 " where a.Tag='"+epc+"'";
         return CargarActivosInventario(query);
 
     }
     public EntidadActivosInventarios ActivosUbicacionInventarioBarcode(String Placa) {
-        String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag from Oficina o " +
+        String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag, " +
+                "p._id as IdPiso, e._id as IdEdificio, r._id as IdCompania " +
+                "from Oficina o " +
                 " Inner Join Activos a ON a.IdOficina = o._id " +
+                " Left Join Pisos p ON o.idPiso = p._id " +
+                " Left Join Edificios e ON p.idEdificio = e._id " +
+                " Left Join RazonSocial r ON e.idRazonSocial = r._id " +
                 " where a.CodeBar='" + Placa + "'";
         return CargarActivosInventario(query);
 
@@ -274,9 +322,13 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
         String capacidad= cursor.getString(cursor.getColumnIndex("Capacidad"));
         String estadoDescripcion = cursor.getString(cursor.getColumnIndex("EstadoDescripcion"));
         String estadoConservacion = cursor.getString(cursor.getColumnIndex("EstadoConservacion"));
+        String departamento = null;
+        if(cursor.getColumnIndex("Departamento") != -1) {
+            departamento = cursor.getString(cursor.getColumnIndex("Departamento"));
+        }
         EntidadActivos entidadActivos= new EntidadActivos(idActivo,descripcion,compania,idcompania,edificio,idEdificio,piso,idPiso,oficina,idOficina,Tag
                 ,numero,codeBar,Marca,Modelo,Serie,Encargado,IdCategoria, employeeRelated, assetStatusSysId, parentAssetSysId, anoFabricacion, capacidad
-                ,estadoDescripcion,estadoConservacion);
+                ,estadoDescripcion,estadoConservacion, departamento);
         return  entidadActivos;
     }
 
@@ -289,7 +341,15 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
         String idOficina = cursor.getString(cursor.getColumnIndex("IdOficina"));
         String Tag=cursor.getString(cursor.getColumnIndex("Tag"));
         String codeBar =cursor.getString(cursor.getColumnIndex("CodeBar"));
-      EntidadActivosInventarios entidadActivos= new EntidadActivosInventarios(codeBar,descripcion,Tag,idActivo,oficina,idOficina);
+        String idPiso = cursor.getString(cursor.getColumnIndex("IdPiso"));
+        String idEdificio = cursor.getString(cursor.getColumnIndex("IdEdificio"));
+        String idCompania = cursor.getString(cursor.getColumnIndex("IdCompania"));
+        String departamento = null;
+        if(cursor.getColumnIndex("Departamento") != -1) {
+            departamento = cursor.getString(cursor.getColumnIndex("Departamento"));
+        }
+
+      EntidadActivosInventarios entidadActivos= new EntidadActivosInventarios(codeBar,descripcion,Tag,idActivo,oficina,idOficina, idPiso, idEdificio, idCompania, departamento);
         return  entidadActivos;
     }
 

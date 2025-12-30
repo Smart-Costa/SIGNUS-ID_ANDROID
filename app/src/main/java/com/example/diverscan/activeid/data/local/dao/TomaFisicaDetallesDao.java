@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.util.Log;
 
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaDetallesEntity;
@@ -14,8 +15,10 @@ import com.example.diverscan.activeid.data.remote.response.ApiResponse;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class TomaFisicaDetallesDao {
     private final AppDatabaseHelper dbHelper;
@@ -50,6 +53,11 @@ public class TomaFisicaDetallesDao {
         db.beginTransaction();
         try {
             for (TomaFisicaDetallesEntity a : list) {
+                if (a == null) continue;
+                if (a.getIdToma() == null || a.getIdToma().trim().isEmpty()) continue;
+                if (a.getIdTakeDetail() == null || a.getIdTakeDetail().trim().isEmpty()) {
+                    a.setIdTakeDetail(generarIdTakeDetail(a));
+                }
                 db.insertWithOnConflict("TomasFisicasDetalle", null, entityToValues(a),
                         SQLiteDatabase.CONFLICT_REPLACE);
             }
@@ -63,10 +71,23 @@ public class TomaFisicaDetallesDao {
     }
 
     public void fetchAndSyncFromApi() {
+        fetchAndSyncFromApi(null);
+    }
+
+    public void fetchAndSyncFromApi(final Runnable onComplete) {
+        fetchAndSyncFromApi(null, onComplete);
+    }
+
+    public void fetchAndSyncFromApi(String idToma, final Runnable onComplete) {
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<List<TomaFisicaDetallesEntity>>() {}.getType();
 
-        api.<List<TomaFisicaDetallesEntity>>get("TomasFisicas/TFDetalle", type, new ApiCallback<List<TomaFisicaDetallesEntity>>() {
+        String endpoint = "TomasFisicas/TFDetalle";
+        if (idToma != null && !idToma.trim().isEmpty()) {
+            endpoint += "?idToma=" + Uri.encode(idToma.trim());
+        }
+
+        api.<List<TomaFisicaDetallesEntity>>get(endpoint, type, new ApiCallback<List<TomaFisicaDetallesEntity>>() {
             @Override
             public void onComplete(ApiResponse<List<TomaFisicaDetallesEntity>> response) {
                 if (response.success && response.data != null) {
@@ -74,6 +95,9 @@ public class TomaFisicaDetallesDao {
                     Log.d(TAG, "Tomas Fisicas sincronizadas desde API: " + response.data.size());
                 } else {
                     Log.e(TAG, "Error al sincronizar tomas fisicas desde API: " + response.errorMessage);
+                }
+                if (onComplete != null) {
+                    onComplete.run();
                 }
             }
         });
@@ -121,10 +145,41 @@ public class TomaFisicaDetallesDao {
         return list;
     }
 
-    public void pushLocalChangesToApi() {
+    public List<TomaFisicaDetallesEntity> getByIdToma(String idToma) {
+        List<TomaFisicaDetallesEntity> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sql = "SELECT * FROM TomasFisicasDetalle WHERE LOWER(IdToma) = LOWER(?)";
+
+        try (Cursor c = db.rawQuery(sql, new String[]{idToma})) {
+            while (c.moveToNext()) {
+                TomaFisicaDetallesEntity r = new TomaFisicaDetallesEntity();
+                r.setIdTakeDetail(c.getString(c.getColumnIndexOrThrow("IdTakeDetail")));
+                r.setIdToma(c.getString(c.getColumnIndexOrThrow("IdToma")));
+                r.setNumeroToma(c.getString(c.getColumnIndexOrThrow("NumeroToma")));
+                r.setFechaToma(c.getString(c.getColumnIndexOrThrow("FechaToma")));
+                r.setEpc(c.getString(c.getColumnIndexOrThrow("EPC")));
+                r.setDateRead(c.getString(c.getColumnIndexOrThrow("DateRead")));
+                r.setActivoId(c.getString(c.getColumnIndexOrThrow("ActivoId")));
+                r.setEstadoInventario(c.getString(c.getColumnIndexOrThrow("EstadoInventario")));
+                r.setUbicacionDetalleA(c.getString(c.getColumnIndexOrThrow("UbicacionDetalleA")));
+                r.setUbicacionDetalleB(c.getString(c.getColumnIndexOrThrow("UbicacionDetalleB")));
+                r.setUbicacionDetalleC(c.getString(c.getColumnIndexOrThrow("UbicacionDetalleC")));
+                r.setUbicacionDetalleD(c.getString(c.getColumnIndexOrThrow("UbicacionDetalleD")));
+                r.setObservaciones(c.getString(c.getColumnIndexOrThrow("Observaciones")));
+                list.add(r);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching detail by IdToma", e);
+        }
+
+        return list;
+    }
+
+    public void pushLocalChangesToApi(final Runnable onComplete) {
         List<TomaFisicaDetallesEntity> localData = getAll();
         if (localData.isEmpty()) {
             Log.d(TAG, "No hay detalles locales para enviar al servidor");
+            if (onComplete != null) onComplete.run();
             return;
         }
 
@@ -140,7 +195,18 @@ public class TomaFisicaDetallesDao {
                 } else {
                     Log.e(TAG, "Error enviando detalles al servidor: " + response.errorMessage);
                 }
+                if (onComplete != null) onComplete.run();
             }
         });
+    }
+
+    private static String generarIdTakeDetail(TomaFisicaDetallesEntity a) {
+        String idToma = a.getIdToma() != null ? a.getIdToma().trim() : "";
+        String epc = a.getEpc() != null ? a.getEpc().trim() : "";
+        String activoId = a.getActivoId() != null ? a.getActivoId().trim() : "";
+        String dateRead = a.getDateRead() != null ? a.getDateRead().trim() : "";
+        String estado = a.getEstadoInventario() != null ? a.getEstadoInventario().trim() : "";
+        String seed = idToma + "|" + epc + "|" + activoId + "|" + dateRead + "|" + estado;
+        return UUID.nameUUIDFromBytes(seed.getBytes(StandardCharsets.UTF_8)).toString();
     }
 }

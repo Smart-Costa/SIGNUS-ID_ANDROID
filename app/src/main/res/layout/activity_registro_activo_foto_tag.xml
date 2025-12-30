@@ -128,21 +128,20 @@
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             app:boxBackgroundMode="outline"
             app:hintEnabled="false">
 
             <AutoCompleteTextView
                 android:id="@+id/spUbicacionSecundaria"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:dropDownHeight="wrap_content"
                 android:dropDownHorizontalOffset="0dp"
                 android:dropDownVerticalOffset="8dp"
                 android:gravity="center_vertical"
                 android:inputType="none"
-                android:paddingHorizontal="8dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:singleLine="true"
                 android:textColor="#606060"
                 android:textColorHint="#898989"
@@ -160,17 +159,18 @@
             android:layout_marginBottom="4dp" />
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/RoundedTextInput"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             app:boxBackgroundMode="outline"
             app:hintEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etRfidTag"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="match_parent"
                 android:inputType="text"
-                android:paddingHorizontal="10dp"
+                android:padding="8dp"
                 android:textColor="#000000"
                 android:backgroundTint="#FFF"
                 android:singleLine="true" />

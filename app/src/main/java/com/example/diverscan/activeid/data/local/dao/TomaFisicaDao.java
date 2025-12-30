@@ -105,6 +105,33 @@ public class TomaFisicaDao {
         return listbyName;
     }
 
+    public TomaFisicaEntity getTomaFisicaById(String id) {
+        TomaFisicaEntity entity = null;
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        try (Cursor c = db.rawQuery("SELECT * FROM TomasFisicas WHERE tomaFisicaId = ?", new String[]{id})) {
+            if (c.moveToFirst()) {
+                entity = new TomaFisicaEntity();
+                entity.setTomaFisicaId(c.getString(c.getColumnIndexOrThrow("tomaFisicaId")));
+                entity.setNombre(c.getString(c.getColumnIndexOrThrow("nombre")));
+                entity.setFechaInicial(c.getString(c.getColumnIndexOrThrow("fechaInicial")));
+                entity.setFechaFinal(c.getString(c.getColumnIndexOrThrow("fechaFinal")));
+                entity.setCategoria(c.getString(c.getColumnIndexOrThrow("categoria")));
+                entity.setUsuarioAsignado(c.getString(c.getColumnIndexOrThrow("usuarioAsignado")));
+                entity.setUnidadOrganizativa(c.getString(c.getColumnIndexOrThrow("unidadOrganizativa")));
+                entity.setEstadoActivo(c.getString(c.getColumnIndexOrThrow("estadoActivo")));
+                entity.setUbicacionA(c.getString(c.getColumnIndexOrThrow("ubicacionA")));
+                entity.setUbicacionB(c.getString(c.getColumnIndexOrThrow("ubicacionB")));
+                entity.setUbicacionC(c.getString(c.getColumnIndexOrThrow("ubicacionC")));
+                entity.setUbicacionD(c.getString(c.getColumnIndexOrThrow("ubicacionD")));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error obteniendo toma fisica por ID", e);
+        } finally {
+            db.close();
+        }
+        return entity;
+    }
+
     public void syncTomasFisicas(List<TomaFisicaEntity> tomasfisicas) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();

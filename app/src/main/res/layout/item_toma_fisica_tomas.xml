@@ -3,32 +3,55 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="12dp">
+    android:gravity="center_vertical"
+    android:padding="4dp"
+    android:descendantFocusability="blocksDescendants"
+    android:background="?android:attr/selectableItemBackground">
+
+    <CheckBox
+        android:id="@+id/chkSeleccion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:focusable="false"
+        android:layout_marginEnd="8dp"/>
 
     <TextView
         android:id="@+id/txtNumeroToma"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Toma #"
+        android:text="Toma 1"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_marginEnd="16dp"/>
 
     <TextView
-        android:id="@+id/txtIdToma"
+        android:id="@+id/txtFecha"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="ID"
-        android:textSize="14sp" />
+        android:text="dd/mm/yyyy"
+        android:textSize="14sp"
+        android:textColor="#555555"/>
 
-    <TextView
-        android:id="@+id/txtTotalLecturas"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="end"
-        android:text="0"
-        android:textSize="14sp" />
+    <ImageView
+        android:id="@+id/imgUploaded"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_check_circle"
+        android:tint="#58a4c8"
+        android:visibility="visible"
+        android:layout_marginEnd="8dp"/>
+
+    <ImageView
+        android:id="@+id/btnGoToCounts"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@android:drawable/ic_media_play"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
+        android:tint="#FF5722"/>
 
 </LinearLayout>

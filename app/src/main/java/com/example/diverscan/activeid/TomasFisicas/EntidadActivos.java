@@ -74,6 +74,15 @@ public class EntidadActivos {
                           String marca, String modelo, String serial,String alias, String idCategoria,
                           String employeeRelatedSysId, String assetStatusSysId, String parentAssetSysId,
                           String anoFabricacion, String capacidad, String estadoDescripcion, String estadoConservacion){
+        this(idActivo, descripcion, compania, idCompania, edificio, idEdificio, piso, idPiso, oficina, idOficina, tag, numero, codeBar, marca, modelo, serial, alias, idCategoria, employeeRelatedSysId, assetStatusSysId, parentAssetSysId, anoFabricacion, capacidad, estadoDescripcion, estadoConservacion, null);
+    }
+
+    public EntidadActivos(String idActivo, String descripcion,
+                          String compania,String idCompania,String edificio,String idEdificio, String piso,String idPiso,
+                          String oficina,String idOficina,String tag, String numero, String codeBar,
+                          String marca, String modelo, String serial,String alias, String idCategoria,
+                          String employeeRelatedSysId, String assetStatusSysId, String parentAssetSysId,
+                          String anoFabricacion, String capacidad, String estadoDescripcion, String estadoConservacion, String departamento){
 
         this.IdActivo = idActivo;
         this.Descripcion = descripcion;
@@ -100,6 +109,7 @@ public class EntidadActivos {
         this.Capacidad = capacidad;
         this.EstadoDescripcion = estadoDescripcion;
         this.EstadoConservacion = estadoConservacion;
+        this.Departamento = departamento;
     }
 
 
