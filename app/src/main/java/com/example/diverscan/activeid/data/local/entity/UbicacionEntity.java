@@ -1,13 +1,30 @@
 package com.example.diverscan.activeid.data.local.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 public class UbicacionEntity {
+    @SerializedName("aSysId")
     public String ASysId;
+
+    @SerializedName("ubicacionA")
     public String UbicacionA;
+
+    @SerializedName("bSysId")
     public String BSysId;
+
+    @SerializedName("ubicacionB")
     public String UbicacionB;
+
+    @SerializedName("cSysId")
     public String CSysId;
+
+    @SerializedName("ubicacionC")
     public String UbicacionC;
+
+    @SerializedName("dSysId")
     public String DSysId;
+
+    @SerializedName("ubicacionD")
     public String UbicacionD;
 
     public String getASysId() { return ASysId; }

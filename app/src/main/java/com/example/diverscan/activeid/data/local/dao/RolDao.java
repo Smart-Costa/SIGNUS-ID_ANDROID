@@ -52,7 +52,7 @@ public class RolDao {
 
     private ContentValues entityToContentValues(RolEntity r) {
         ContentValues v = new ContentValues();
-        v.put("IdRol", r.getIdRol());
+        v.put("_idRol", r.getIdRol());
         v.put("Page", r.getPage());
         v.put("Description", r.getDescription());
         v.put("Username", r.getUsername());
@@ -70,7 +70,7 @@ public class RolDao {
             if (c.moveToFirst()) {
                 do {
                     RolEntity r = new RolEntity(
-                            c.getString(c.getColumnIndexOrThrow("IdRol")),
+                            c.getString(c.getColumnIndexOrThrow("_idRol")),
                             c.getString(c.getColumnIndexOrThrow("Page")),
                             c.getString(c.getColumnIndexOrThrow("Description")),
                             c.getString(c.getColumnIndexOrThrow("Username")),

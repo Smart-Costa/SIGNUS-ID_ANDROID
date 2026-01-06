@@ -166,6 +166,13 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         super.onResume();
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    return; 
+                }
+            }
+
             if (!rfidHandler.isInitialized()) {
                  rfidHandler.onCreate(this);
             } else {
@@ -321,12 +328,19 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         activo.setUbicacionSecundaria(ubicacionSec);
 
         activo.setTagEpc(rfid);
+        
+        // Asignar estado activo explícitamente a true para evitar que se cuente como baja
+        activo.setEstadoActivo(true);
 
         viewModel.guardarActivoFinal(this, activo);
 
         Toast.makeText(this, "Activo registrado correctamente", Toast.LENGTH_LONG).show();
 
         prefs.edit().clear().apply();
+        
+        Intent intent = new Intent(this, com.example.diverscan.activeid.UI.main.MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
         finish();
     }
 }

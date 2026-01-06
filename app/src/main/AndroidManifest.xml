@@ -189,6 +189,10 @@
             android:exported="false"/>
 
         <!-- 🧾 Inventario -->
+        <activity android:name=".UI.tomasfisicas.DetalleTomaFisicaActivity"
+            android:label="Detalle de Toma"
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity android:name=".Inventory.Cargar_Toma_Fisica"
             android:label="@string/SectorInventarios"
             android:parentActivityName=".UI.main.MainActivity"

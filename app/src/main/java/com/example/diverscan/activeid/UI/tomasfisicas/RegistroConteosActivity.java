@@ -7,6 +7,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.Toast;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Collections;
+import java.util.UUID;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,7 +33,9 @@ import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaDetallesDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
+import com.example.diverscan.activeid.data.local.dao.TomaFisicaDao;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
+import com.example.diverscan.activeid.data.local.entity.TomaFisicaEntity;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaDetallesEntity;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaTomasEntity;
 import com.example.diverscan.activeid.data.remote.response.ApiCallback;
@@ -57,6 +68,12 @@ public class RegistroConteosActivity extends AppCompatActivity {
     private TextView txtDeTotal;
     private CircularProgressIndicator kpiProgressCircle;
     private CircularProgressIndicator progressActivos;
+    
+    private LinearLayout containerTomasTabs;
+    private Spinner spinnerActivos;
+    private Button btnAgregarLectura;
+    private List<ActivoEntity> listaActivosSpinner;
+    private ActivoEntity activoSeleccionado;
 
     private String tomaFisicaId;
     private String idToma;
@@ -67,6 +84,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
     private TomaFisicaDetallesDao detallesDao;
     private ActivoDao activoDao;
     private TomaFisicaTomasDao tomasDao;
+    private TomaFisicaDao tomaFisicaDao;
 
     private final ActivosAdapter adapter = new ActivosAdapter();
     private final List<TomaFisicaDetallesEntity> filasRemotas = new ArrayList<>();
@@ -90,6 +108,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
         detallesDao = new TomaFisicaDetallesDao(this);
         activoDao = new ActivoDao(this);
         tomasDao = new TomaFisicaTomasDao(this);
+        tomaFisicaDao = new TomaFisicaDao(this);
 
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
@@ -105,6 +124,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
         tabResumen = findViewById(R.id.tabResumen);
         tabActivos = findViewById(R.id.tabActivos);
         tabsView = findViewById(R.id.tabsView);
+        containerTomasTabs = findViewById(R.id.containerTomasTabs);
         viewResumen = findViewById(R.id.viewResumen);
         viewActivos = findViewById(R.id.viewActivos);
         recyclerActivos = findViewById(R.id.recyclerActivos);
@@ -121,6 +141,12 @@ public class RegistroConteosActivity extends AppCompatActivity {
 
         recyclerActivos.setLayoutManager(new LinearLayoutManager(this));
         recyclerActivos.setAdapter(adapter);
+
+        spinnerActivos = findViewById(R.id.spinnerActivos);
+        btnAgregarLectura = findViewById(R.id.btnAgregarLectura);
+        if (btnAgregarLectura != null) {
+            btnAgregarLectura.setOnClickListener(v -> agregarLecturaManual());
+        }
 
         tabResumen.setOnClickListener(v -> setTab(true));
         tabActivos.setOnClickListener(v -> setTab(false));
@@ -141,16 +167,272 @@ public class RegistroConteosActivity extends AppCompatActivity {
         } else {
             setTab(true);
         }
+        
+        validarBaseDeDatosLocal();
+    }
+
+    private void validarBaseDeDatosLocal() {
+        new Thread(() -> {
+            int count = activoDao.getActivosCount();
+            if (count == 0) {
+                runOnUiThread(() -> {
+                    new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setTitle("Base de datos vacía")
+                        .setMessage("No se encontraron activos en la base de datos local. Por favor, sincronice para obtener los registros.")
+                        .setPositiveButton("Entendido", (dialog, which) -> dialog.dismiss())
+                        .setCancelable(false)
+                        .show();
+                });
+            }
+        }).start();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         cargarDatos();
+        cargarActivosSpinner();
         if (tomaFisicaId != null && !tomaFisicaId.trim().isEmpty()) {
             tomasDao.fetchAndSyncFromApi(tomaFisicaId.trim(), () -> runOnUiThread(this::cargarDatos));
         }
         detallesDao.fetchAndSyncFromApi(idToma, () -> runOnUiThread(this::cargarDatos));
+        updateTomasTabs();
+    }
+
+
+
+    private void updateTomasTabs() {
+        if (containerTomasTabs == null) return;
+        new Thread(() -> {
+            List<TomaFisicaTomasEntity> subtomas = tomasDao.getByTomaFisicaId(tomaFisicaId);
+            if (subtomas == null) subtomas = new ArrayList<>();
+            Collections.sort(subtomas, (o1, o2) -> {
+                try {
+                    return Integer.compare(Integer.parseInt(o1.getNumeroToma()), Integer.parseInt(o2.getNumeroToma()));
+                } catch (Exception e) { return 0; }
+            });
+
+            final List<TomaFisicaTomasEntity> finalList = subtomas;
+            runOnUiThread(() -> {
+                containerTomasTabs.removeAllViews();
+                for (TomaFisicaTomasEntity t : finalList) {
+                    TextView tab = new TextView(this);
+                    tab.setText("Toma " + t.getNumeroToma());
+                    boolean isSelected = t.getIdToma().equals(idToma);
+                    
+                    if (isSelected) {
+                         tab.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+                         tab.setBackgroundResource(R.drawable.btn_primary);
+                    } else {
+                         tab.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint));
+                         tab.setBackgroundResource(R.drawable.btn_secondary_gray);
+                    }
+                    tab.setPadding(48, 16, 48, 16);
+                    android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 
+                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    params.setMargins(0, 0, 16, 0);
+                    tab.setLayoutParams(params);
+                    
+                    tab.setOnClickListener(v -> {
+                        if (!isSelected) {
+                            Intent intent = new Intent(this, RegistroConteosActivity.class);
+                            intent.putExtra("tomaFisicaId", tomaFisicaId);
+                            intent.putExtra("idToma", t.getIdToma());
+                            intent.putExtra("numeroToma", t.getNumeroToma());
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                    containerTomasTabs.addView(tab);
+                }
+
+                TextView tabAdd = new TextView(this);
+                tabAdd.setText("+");
+                tabAdd.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint));
+                tabAdd.setBackgroundResource(R.drawable.btn_secondary_gray);
+                tabAdd.setPadding(48, 16, 48, 16);
+                android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(0, 0, 16, 0);
+                tabAdd.setLayoutParams(params);
+
+                boolean canAdd = finalList.size() < 5;
+                tabAdd.setAlpha(canAdd ? 1f : 0.45f);
+                tabAdd.setOnClickListener(v -> {
+                    if (!canAdd) {
+                        Toast.makeText(this, "Límite de 5 tomas alcanzado", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Intent intent = new Intent(this, NuevaTomaActivity.class);
+                    intent.putExtra("tomaFisicaId", tomaFisicaId);
+                    startActivity(intent);
+                    finish();
+                });
+                containerTomasTabs.addView(tabAdd);
+            });
+        }).start();
+    }
+
+    private void cargarActivosSpinner() {
+        if (btnAgregarLectura != null) btnAgregarLectura.setEnabled(false);
+        new Thread(() -> {
+            listaActivosSpinner = activoDao.getAllLocalActivos();
+            runOnUiThread(() -> {
+                if (listaActivosSpinner != null && !listaActivosSpinner.isEmpty()) {
+                    List<String> descripciones = new ArrayList<>();
+                    for (ActivoEntity a : listaActivosSpinner) {
+                        descripciones.add(buildActivoDisplay(a));
+                    }
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, descripciones);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    if (spinnerActivos != null) spinnerActivos.setAdapter(adapter);
+                    if (btnAgregarLectura != null) btnAgregarLectura.setEnabled(true);
+                } else {
+                    List<String> empty = new ArrayList<>();
+                    empty.add("Sin activos");
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, empty);
+                    if (spinnerActivos != null) spinnerActivos.setAdapter(adapter);
+                }
+            });
+        }).start();
+    }
+
+    private static String buildActivoDisplay(ActivoEntity a) {
+        if (a == null) return "Activo";
+
+        String placa = a.getNumeroActivo();
+        String numeroEtiqueta = a.getNumeroEtiqueta();
+        String serie = a.getNumeroSerie();
+        String nombre = a.getDescripcionCorta();
+
+        String id;
+        if (placa != null && !placa.trim().isEmpty()) {
+            id = placa.trim();
+        } else if (numeroEtiqueta != null && !numeroEtiqueta.trim().isEmpty()) {
+            id = numeroEtiqueta.trim();
+        } else {
+            id = a.getIdActivo() != null ? a.getIdActivo().trim() : "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (id != null && !id.isEmpty()) sb.append(id);
+        if (serie != null && !serie.trim().isEmpty()) {
+            if (sb.length() > 0) sb.append(" / ");
+            sb.append(serie.trim());
+        }
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            if (sb.length() > 0) sb.append(" - ");
+            sb.append(nombre.trim());
+        }
+
+        if (sb.length() == 0) {
+            return "Sin Descripción";
+        }
+        return sb.toString();
+    }
+
+    private void agregarLecturaManual() {
+        if (listaActivosSpinner == null || listaActivosSpinner.isEmpty()) {
+             Toast.makeText(this, "No hay activos cargados", Toast.LENGTH_SHORT).show();
+             return;
+        }
+        int pos = spinnerActivos.getSelectedItemPosition();
+        if (pos < 0 || pos >= listaActivosSpinner.size()) return;
+        
+        btnAgregarLectura.setEnabled(false);
+        btnAgregarLectura.setText("Guardando...");
+
+        ActivoEntity activo = listaActivosSpinner.get(pos);
+        String epc = activo.getTagEpc() != null ? activo.getTagEpc() : "MANUAL-" + System.currentTimeMillis();
+        
+        new Thread(() -> {
+             try {
+                 String activoId = activo.getIdActivo() != null ? activo.getIdActivo().trim() : "";
+                 if (activoId.isEmpty()) {
+                     runOnUiThread(() -> {
+                         Toast.makeText(RegistroConteosActivity.this, "Activo inválido", Toast.LENGTH_SHORT).show();
+                         restaurarBoton();
+                     });
+                     return;
+                 }
+
+                 List<TomaFisicaDetallesEntity> existentes = detallesDao.getByIdToma(idToma);
+                 if (existentes != null) {
+                     for (TomaFisicaDetallesEntity d : existentes) {
+                         if (d == null) continue;
+                         String dActivoId = d.getActivoId() != null ? d.getActivoId().trim() : "";
+                         String dEpc = d.getEpc() != null ? d.getEpc().trim() : "";
+                         if (!dActivoId.isEmpty() && dActivoId.equalsIgnoreCase(activoId)) {
+                             runOnUiThread(() -> {
+                                 Toast.makeText(RegistroConteosActivity.this, "Este activo ya fue leído", Toast.LENGTH_SHORT).show();
+                                 restaurarBoton();
+                             });
+                             return;
+                         }
+                         if (!dEpc.isEmpty() && dEpc.equalsIgnoreCase(epc)) {
+                             runOnUiThread(() -> {
+                                 Toast.makeText(RegistroConteosActivity.this, "Este activo ya fue leído", Toast.LENGTH_SHORT).show();
+                                 restaurarBoton();
+                             });
+                             return;
+                         }
+                     }
+                 }
+
+                 String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+                 
+                 // Determinar estado correcto
+                 TomaFisicaEntity tomaFisica = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
+                 boolean esEsperado = false;
+                 if (tomaFisica != null && tomaFisica.getUbicacionD() != null) {
+                     List<ActivoEntity> expected = activoDao.getActivosByUbicacion(tomaFisica.getUbicacionD());
+                     if (expected != null) {
+                         for(ActivoEntity a : expected) {
+                             if ((a.getIdActivo() != null && a.getIdActivo().equalsIgnoreCase(activoId)) || 
+                                 (a.getTagEpc() != null && a.getTagEpc().equalsIgnoreCase(epc))) {
+                                 esEsperado = true;
+                                 break;
+                             }
+                         }
+                     }
+                 }
+                 
+                 String estado = esEsperado ? "ENCONTRADO" : "SOBRANTE";
+
+                 TomaFisicaDetallesEntity detail = new TomaFisicaDetallesEntity();
+                 detail.setIdTakeDetail(UUID.randomUUID().toString());
+                 detail.setIdToma(idToma);
+                 detail.setNumeroToma(numeroToma);
+                 detail.setEpc(epc);
+                 detail.setDateRead(now);
+                 detail.setActivoId(activoId);
+                 detail.setEstadoInventario(estado);
+                 
+                 detallesDao.saveLocal(Collections.singletonList(detail));
+                 recalcularResumenCompleto(idToma);
+
+                 runOnUiThread(() -> {
+                     Toast.makeText(RegistroConteosActivity.this, "Guardada localmente", Toast.LENGTH_SHORT).show();
+                     cargarDatos();
+                     restaurarBoton();
+                 });
+             } catch (Exception e) {
+                 Log.e("RegistroConteos", "Error agregando lectura manual", e);
+                 runOnUiThread(() -> {
+                     Toast.makeText(RegistroConteosActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                     restaurarBoton();
+                 });
+             }
+        }).start();
+    }
+
+    private void restaurarBoton() {
+        if (btnAgregarLectura != null) {
+            btnAgregarLectura.setEnabled(true);
+            btnAgregarLectura.setText("Añadir Lectura");
+        }
     }
 
     private void setTab(boolean mostrarResumen) {
@@ -210,58 +492,89 @@ public class RegistroConteosActivity extends AppCompatActivity {
                 setCargando(true);
 
                 if (filtro == Categoria.BLANCO) {
-                    detallesDao.fetchAndSyncFromApi(idTomaValue, () -> runOnUiThread(() -> {
-                        List<TomaFisicaDetallesEntity> filas = cargarFilasBlancoDesdeLocal(idTomaValue);
-                        remotoIdToma = idTomaValue;
-                        remotoCategoria = filtro;
-                        remotoCargando = false;
-                        filasRemotas.clear();
-                        filasRemotas.addAll(filas);
-                        setCargando(false);
-                        cargarDatos();
-                    }));
-                } else {
-                    activoDao.fetchAndSyncActivosPorEstado(idTomaValue, filtro.name(), new ApiCallback<List<ActivoEntity>>() {
-                        @Override
-                        public void onComplete(ApiResponse<List<ActivoEntity>> response) {
-                            List<TomaFisicaDetallesEntity> filas = new ArrayList<>();
-                            if (response.success && response.data != null) {
-                                for (ActivoEntity a : response.data) {
-                                    if (a == null) continue;
-                                    String activoId = a.getIdActivo();
-                                    if (activoId == null || activoId.trim().isEmpty()) continue;
-                                    TomaFisicaDetallesEntity d = new TomaFisicaDetallesEntity();
-                                    d.setIdToma(idTomaValue);
-                                    d.setActivoId(activoId.trim());
-                                    d.setEstadoInventario(estadoInventarioDeCategoria(filtro));
-                                    filas.add(d);
-                                }
-                            }
-                            runOnUiThread(() -> {
-                                Log.d("RegistroConteos", "Filas remotas recibidas: " + filas.size());
+                    // Carga combinada: Primero local, luego API si está disponible
+                    new Thread(() -> {
+                        List<TomaFisicaDetallesEntity> filasLocales = cargarFilasBlancoDesdeLocal(idTomaValue);
+                        runOnUiThread(() -> {
+                            // Mostrar locales primero mientras cargan remotos
+                            adapter.setDao(activoDao);
+                            adapter.setItems(new ArrayList<>(filasLocales));
+                            
+                            detallesDao.fetchAndSyncFromApi(idTomaValue, () -> runOnUiThread(() -> {
+                                List<TomaFisicaDetallesEntity> filasActualizadas = cargarFilasBlancoDesdeLocal(idTomaValue);
                                 remotoIdToma = idTomaValue;
                                 remotoCategoria = filtro;
                                 remotoCargando = false;
                                 filasRemotas.clear();
-                                filasRemotas.addAll(filas);
+                                filasRemotas.addAll(filasActualizadas);
                                 setCargando(false);
                                 cargarDatos();
+                            }));
+                        });
+                    }).start();
+                } else {
+                    // Fallback local primero para categorías distintas de Blanco
+                    new Thread(() -> {
+                         // Buscar locales que coincidan con el filtro
+                         List<TomaFisicaDetallesEntity> localesFiltrados = new ArrayList<>();
+                         List<TomaFisicaDetallesEntity> locales = detallesDao.getByIdToma(idTomaValue);
+                         if (locales != null) {
+                             for (TomaFisicaDetallesEntity d : locales) {
+                                 if (d != null && categoriaDe(d.getEstadoInventario()) == filtro) {
+                                     localesFiltrados.add(d);
+                                 }
+                             }
+                         }
+                         
+                         runOnUiThread(() -> {
+                             if (!localesFiltrados.isEmpty()) {
+                                 adapter.setDao(activoDao);
+                                 adapter.setItems(new ArrayList<>(localesFiltrados));
+                             }
+                             
+                             activoDao.fetchAndSyncActivosPorEstado(idTomaValue, filtro.name(), new ApiCallback<List<ActivoEntity>>() {
+                                @Override
+                                public void onComplete(ApiResponse<List<ActivoEntity>> response) {
+                                    List<TomaFisicaDetallesEntity> filas = new ArrayList<>();
+                                    if (response.success && response.data != null) {
+                                        for (ActivoEntity a : response.data) {
+                                            if (a == null) continue;
+                                            String activoId = a.getIdActivo();
+                                            if (activoId == null || activoId.trim().isEmpty()) continue;
+                                            TomaFisicaDetallesEntity d = new TomaFisicaDetallesEntity();
+                                            d.setIdToma(idTomaValue);
+                                            d.setActivoId(activoId.trim());
+                                            d.setEstadoInventario(estadoInventarioDeCategoria(filtro));
+                                            filas.add(d);
+                                        }
+                                    }
+                                    runOnUiThread(() -> {
+                                        Log.d("RegistroConteos", "Filas remotas recibidas: " + filas.size());
+                                        remotoIdToma = idTomaValue;
+                                        remotoCategoria = filtro;
+                                        remotoCargando = false;
+                                        filasRemotas.clear();
+                                        filasRemotas.addAll(filas);
+                                        setCargando(false);
+                                        cargarDatos();
+                                    });
+                                }
                             });
-                        }
-                    });
+                         });
+                    }).start();
                 }
                 return;
             }
 
             if (remotoCargando) {
                 adapter.setDao(activoDao);
-                adapter.setItems(new ArrayList<>(filasRemotas));
+                adapter.setItems(new ArrayList<>(mergeFilasRemotasConLocales(idTomaValue, filtro, filasRemotas)));
                 setCargando(true);
                 return;
             }
 
             adapter.setDao(activoDao);
-            adapter.setItems(new ArrayList<>(filasRemotas));
+            adapter.setItems(new ArrayList<>(mergeFilasRemotasConLocales(idTomaValue, filtro, filasRemotas)));
             setCargando(false);
             return;
         }
@@ -293,12 +606,12 @@ public class RegistroConteosActivity extends AppCompatActivity {
             amarillo = Math.max(0, sobrantes);
             blanco = Math.max(0, total - (rojo + verde + amarillo));
 
-            if (txtEscaneados != null) txtEscaneados.setText(String.valueOf(Math.max(0, escaneados)));
+            if (txtEscaneados != null) txtEscaneados.setText(String.valueOf(Math.max(0, encontrados)));
             if (txtDeTotal != null) txtDeTotal.setText("De " + Math.max(0, totalActivos));
             if (kpiProgressCircle != null) {
                 int progress = 0;
                 if (totalActivos > 0) {
-                    progress = (int) Math.round((Math.min(escaneados, totalActivos) * 100.0) / totalActivos);
+                    progress = (int) Math.round((Math.min(encontrados, totalActivos) * 100.0) / totalActivos);
                     if (progress < 0) progress = 0;
                     if (progress > 100) progress = 100;
                 }
@@ -435,6 +748,119 @@ public class RegistroConteosActivity extends AppCompatActivity {
         return list;
     }
 
+    private List<TomaFisicaDetallesEntity> mergeFilasRemotasConLocales(String idTomaValue, Categoria filtro, List<TomaFisicaDetallesEntity> filasRemotasValue) {
+        List<TomaFisicaDetallesEntity> locales = detallesDao.getByIdToma(idTomaValue);
+        List<TomaFisicaDetallesEntity> localesFiltradas = new ArrayList<>();
+        if (locales != null) {
+            for (TomaFisicaDetallesEntity d : locales) {
+                if (d == null) continue;
+                if (categoriaDe(d.getEstadoInventario()) != filtro) continue;
+                if (d.getActivoId() == null && d.getEpc() == null) continue;
+                localesFiltradas.add(d);
+            }
+        }
+
+        List<TomaFisicaDetallesEntity> merged = new ArrayList<>();
+        java.util.HashSet<String> keys = new java.util.HashSet<>();
+
+        for (TomaFisicaDetallesEntity d : localesFiltradas) {
+            String key = detalleKey(d);
+            if (key == null) continue;
+            if (keys.add(key)) merged.add(d);
+        }
+
+        if (filasRemotasValue != null) {
+            for (TomaFisicaDetallesEntity d : filasRemotasValue) {
+                String key = detalleKey(d);
+                if (key == null) continue;
+                if (keys.add(key)) merged.add(d);
+            }
+        }
+
+        return merged;
+    }
+
+    private static String detalleKey(TomaFisicaDetallesEntity d) {
+        if (d == null) return null;
+        String activoId = d.getActivoId();
+        if (activoId != null && !activoId.trim().isEmpty()) return "A:" + activoId.trim().toLowerCase(Locale.ROOT);
+        String epc = d.getEpc();
+        if (epc != null && !epc.trim().isEmpty()) return "E:" + epc.trim().toLowerCase(Locale.ROOT);
+        return null;
+    }
+
+    private void recalcularResumenCompleto(String idTomaValue) {
+        if (idTomaValue == null || idTomaValue.trim().isEmpty()) return;
+        TomaFisicaTomasEntity header = tomasDao.getByIdToma(idTomaValue.trim());
+        if (header == null) return;
+
+        List<TomaFisicaDetallesEntity> detalles = detallesDao.getByIdToma(idTomaValue.trim());
+        
+        // 2. Obtener esperados
+        TomaFisicaEntity tomaFisica = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
+        java.util.Set<String> expectedEpcs = new java.util.HashSet<>();
+        java.util.Set<String> expectedIds = new java.util.HashSet<>();
+        int totalExpectedCount = 0;
+        
+        if (tomaFisica != null && tomaFisica.getUbicacionD() != null) {
+            List<ActivoEntity> expected = activoDao.getActivosByUbicacion(tomaFisica.getUbicacionD());
+            if (expected != null) {
+                totalExpectedCount = expected.size();
+                for (ActivoEntity a : expected) {
+                    if (a.getTagEpc() != null && !a.getTagEpc().trim().isEmpty()) 
+                        expectedEpcs.add(a.getTagEpc().trim().toUpperCase());
+                    if (a.getIdActivo() != null && !a.getIdActivo().trim().isEmpty()) 
+                        expectedIds.add(a.getIdActivo().trim().toUpperCase());
+                }
+            }
+        }
+
+        // 3. Calcular contadores
+        int encontrados = 0;
+        int sobrantes = 0;
+        
+        // Deduplicate scans
+        java.util.Set<String> processedEpcs = new java.util.HashSet<>();
+        
+        if (detalles != null) {
+            for (TomaFisicaDetallesEntity d : detalles) {
+                String epc = d.getEpc() != null ? d.getEpc().trim() : "";
+                if (epc.isEmpty()) continue;
+                
+                if (processedEpcs.contains(epc)) continue; // Already processed this EPC
+                processedEpcs.add(epc);
+                
+                String activoId = d.getActivoId() != null ? d.getActivoId().trim() : "";
+                
+                boolean isFound = false;
+                if (expectedEpcs.contains(epc.toUpperCase())) {
+                    isFound = true;
+                } else if (!activoId.isEmpty() && expectedIds.contains(activoId.toUpperCase())) {
+                    isFound = true;
+                }
+                
+                if (isFound) encontrados++;
+                else sobrantes++;
+            }
+        }
+
+        int totalLecturas = processedEpcs.size();
+        int faltantes = totalExpectedCount - encontrados;
+        if (faltantes < 0) faltantes = 0;
+
+        // 4. Actualizar Header
+        header.setTotalActivos(String.valueOf(totalExpectedCount));
+        header.setActivosLeidos(String.valueOf(totalLecturas));
+        header.setTotalLecturas(String.valueOf(totalLecturas));
+        header.setFaltantes(String.valueOf(faltantes));
+        header.setSobrantes(String.valueOf(sobrantes));
+
+        // 5. Guardar
+        List<TomaFisicaTomasEntity> list = new ArrayList<>();
+        list.add(header);
+        tomasDao.saveLocal(list);
+    }
+
     private static class ActivosAdapter extends RecyclerView.Adapter<ActivosAdapter.VH> {
 
         private final List<TomaFisicaDetallesEntity> items = new ArrayList<>();
@@ -473,10 +899,10 @@ public class RegistroConteosActivity extends AppCompatActivity {
 
             ActivoEntity activo = null;
             String lookupKey = null;
-            if (epc != null && !epc.trim().isEmpty()) {
-                lookupKey = "EPC:" + epc.trim();
-            } else if (activoId != null && !activoId.trim().isEmpty()) {
+            if (activoId != null && !activoId.trim().isEmpty()) {
                 lookupKey = "ID_ACTIVO:" + activoId.trim();
+            } else if (epc != null && !epc.trim().isEmpty()) {
+                lookupKey = "EPC:" + epc.trim();
             }
 
             if (activoDao != null && lookupKey != null) {

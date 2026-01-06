@@ -15,7 +15,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TomaFisicaDao {
     private static final String TAG = "DB_DAO_TOMASFISICAS";
@@ -140,6 +142,10 @@ public class TomaFisicaDao {
                 ContentValues values = entityToContentValues(a);
                 db.insertWithOnConflict("TomasFisicas", null, values, SQLiteDatabase.CONFLICT_REPLACE);
             }
+
+            // Evita volver a mostrar tomas huérfanas: si el servidor ya no envía una toma (porque fue eliminada
+            // o dejó de ser válida), se limpia del SQLite junto con sus subtomas y detalles asociados.
+            deleteOrphanedTomasFisicas(db, tomasfisicas);
             db.setTransactionSuccessful();
 
         } catch (Exception e) {
@@ -168,6 +174,70 @@ public class TomaFisicaDao {
                 }
             }
         });
+    }
+
+    private void deleteOrphanedTomasFisicas(SQLiteDatabase db, List<TomaFisicaEntity> remote) {
+        if (db == null || remote == null) return;
+
+        Set<String> remoteIds = new HashSet<>();
+        for (TomaFisicaEntity r : remote) {
+            if (r == null) continue;
+            String id = r.getTomaFisicaId();
+            if (id != null && !id.trim().isEmpty()) {
+                remoteIds.add(id.trim().toLowerCase());
+            }
+        }
+
+        List<String> localIds = new ArrayList<>();
+        try (Cursor c = db.rawQuery("SELECT tomaFisicaId FROM TomasFisicas", null)) {
+            while (c.moveToNext()) {
+                String id = c.getString(0);
+                if (id != null && !id.trim().isEmpty()) {
+                    localIds.add(id.trim());
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error leyendo IDs locales de TomasFisicas", e);
+            return;
+        }
+
+        for (String localId : localIds) {
+            if (localId == null) continue;
+            String normalized = localId.trim().toLowerCase();
+            if (normalized.isEmpty()) continue;
+
+            if (!remoteIds.contains(normalized)) {
+                try {
+                    List<String> idTomas = new ArrayList<>();
+                    try (Cursor c = db.rawQuery(
+                            "SELECT IdToma FROM TomasFisicasResumen WHERE LOWER(TomaFisicaId) = LOWER(?)",
+                            new String[]{localId})) {
+                        while (c.moveToNext()) {
+                            String idToma = c.getString(0);
+                            if (idToma != null && !idToma.trim().isEmpty()) {
+                                idTomas.add(idToma.trim());
+                            }
+                        }
+                    }
+
+                    for (String idToma : idTomas) {
+                        db.delete("TomasFisicasDetalle", "LOWER(IdToma) = LOWER(?)", new String[]{idToma});
+                    }
+
+                    db.delete("TomasFisicasResumen", "LOWER(TomaFisicaId) = LOWER(?)", new String[]{localId});
+                    db.delete("TomasFisicas", "LOWER(tomaFisicaId) = LOWER(?)", new String[]{localId});
+
+                    try {
+                        db.delete("TomaFisicaDetalle", "LOWER(FK_TomaFisica) = LOWER(?)", new String[]{localId});
+                    } catch (Exception ignored) {
+                    }
+
+                    Log.d(TAG, "Eliminada toma huérfana local: " + localId);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error eliminando toma huérfana local: " + localId, e);
+                }
+            }
+        }
     }
 
     public void fetchAndSyncFromApi() {

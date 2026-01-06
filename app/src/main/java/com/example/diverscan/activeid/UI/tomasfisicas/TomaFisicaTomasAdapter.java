@@ -18,6 +18,7 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
     private List<TomaFisicaTomasEntity> lista;
     private OnItemClickListener itemClickListener;
     private OnGoToCountsClickListener goToCountsClickListener;
+    private OnDeleteClickListener deleteClickListener;
 
     public interface OnItemClickListener {
         void onItemClick(TomaFisicaTomasEntity item);
@@ -25,6 +26,14 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
 
     public interface OnGoToCountsClickListener {
         void onGoToCountsClick(TomaFisicaTomasEntity item);
+    }
+
+    public interface OnDeleteClickListener {
+        void onDeleteClick(TomaFisicaTomasEntity item);
+    }
+
+    public void setOnDeleteClickListener(OnDeleteClickListener listener) {
+        this.deleteClickListener = listener;
     }
 
     public TomaFisicaTomasAdapter(List<TomaFisicaTomasEntity> lista, OnItemClickListener listener) {
@@ -103,6 +112,16 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
             }
         });
 
+        holder.btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                android.util.Log.d("DEBUG_DELETE", "Click en eliminar: " + item.getIdToma());
+                if (deleteClickListener != null) {
+                    deleteClickListener.onDeleteClick(item);
+                }
+            }
+        });
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,6 +141,7 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
         android.widget.CheckBox chkSeleccion;
         android.widget.ImageView imgUploaded;
         android.widget.ImageView btnGoToCounts;
+        android.widget.ImageView btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -130,6 +150,7 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
             chkSeleccion = itemView.findViewById(R.id.chkSeleccion);
             imgUploaded = itemView.findViewById(R.id.imgUploaded);
             btnGoToCounts = itemView.findViewById(R.id.btnGoToCounts);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
 }

@@ -3,43 +3,43 @@ package com.example.diverscan.activeid.data.local.entity;
 import com.google.gson.annotations.SerializedName;
 
 public class TomaFisicaDetallesEntity {
-    @SerializedName("IdTakeDetail")
+    @SerializedName(value = "IdTakeDetail", alternate = {"idTakeDetail"})
     private String idTakeDetail;
 
-    @SerializedName("IdToma")
+    @SerializedName(value = "IdToma", alternate = {"idToma"})
     private String idToma;
 
-    @SerializedName("NumeroToma")
+    @SerializedName(value = "NumeroToma", alternate = {"numeroToma"})
     private String numeroToma;
 
-    @SerializedName("FechaToma")
+    @SerializedName(value = "FechaToma", alternate = {"fechaToma"})
     private String fechaToma;
 
-    @SerializedName("EPC")
+    @SerializedName(value = "EPC", alternate = {"epc"})
     private String epc;
 
-    @SerializedName("DateRead")
+    @SerializedName(value = "DateRead", alternate = {"dateRead"})
     private String dateRead;
 
-    @SerializedName("ActivoId")
+    @SerializedName(value = "ActivoId", alternate = {"activoId"})
     private String activoId;
 
-    @SerializedName("EstadoInventario")
+    @SerializedName(value = "EstadoInventario", alternate = {"estadoInventario"})
     private String estadoInventario;
 
-    @SerializedName("UbicacionDetalleA")
+    @SerializedName(value = "UbicacionDetalleA", alternate = {"ubicacionDetalleA"})
     private String ubicacionDetalleA;
 
-    @SerializedName("UbicacionDetalleB")
+    @SerializedName(value = "UbicacionDetalleB", alternate = {"ubicacionDetalleB"})
     private String ubicacionDetalleB;
 
-    @SerializedName("UbicacionDetalleC")
+    @SerializedName(value = "UbicacionDetalleC", alternate = {"ubicacionDetalleC"})
     private String ubicacionDetalleC;
 
-    @SerializedName("UbicacionDetalleD")
+    @SerializedName(value = "UbicacionDetalleD", alternate = {"ubicacionDetalleD"})
     private String ubicacionDetalleD;
 
-    @SerializedName("Observaciones")
+    @SerializedName(value = "Observaciones", alternate = {"observaciones"})
     private String observaciones;
 
     public String getIdTakeDetail() { return idTakeDetail; }

@@ -15,6 +15,21 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import java.util.ArrayList;
 import java.util.List;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
+import com.example.diverscan.activeid.data.local.dao.ActivoDao;
+import com.example.diverscan.activeid.data.local.dao.TomaFisicaDetallesDao;
+import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
+import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
+import com.example.diverscan.activeid.data.local.entity.TomaFisicaDetallesEntity;
+import com.example.diverscan.activeid.data.remote.response.ApiCallback;
+import com.example.diverscan.activeid.data.remote.response.ApiResponse;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Locale;
+import java.util.UUID;
 
 public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
 
@@ -24,6 +39,10 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
     TextView txtTitulo;
     TextView kpiValor, kpiTotal;
     CircularProgressIndicator kpiProgress;
+    
+    ActivoDao activoDao;
+    TomaFisicaDetallesDao detallesDao;
+    TomaFisicaTomasDao tomasDao;
 
     TomaFisicaTomasRepository repository;
     TomaFisicaTomasAdapter adapter;
@@ -44,6 +63,9 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
         }
 
         repository = new TomaFisicaTomasRepository(this);
+        activoDao = new ActivoDao(this);
+        detallesDao = new TomaFisicaDetallesDao(this);
+        tomasDao = new TomaFisicaTomasDao(this);
 
         txtTitulo = findViewById(R.id.txtTitulo);
         String nombre = getIntent().getStringExtra("nombre");
@@ -59,12 +81,13 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
                 this::abrirResumen,
                 this::abrirResumen
         );
+        adapter.setOnDeleteClickListener(this::confirmarEliminacion);
         recyclerView.setAdapter(adapter);
 
         btnTomas = findViewById(R.id.btnTomas);
         btnTomasCompletas = findViewById(R.id.btnTomasCompletas);
         btnNuevaToma = findViewById(R.id.btnNuevaToma);
-
+        
         kpiProgress = findViewById(R.id.kpiProgress);
         kpiValor = findViewById(R.id.kpiValor);
         kpiTotal = findViewById(R.id.kpiTotal);
@@ -177,6 +200,43 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
         intent.putExtra("idToma", item.getIdToma());
         intent.putExtra("numeroToma", item.getNumeroToma());
         startActivity(intent);
+    }
+
+    private void confirmarEliminacion(TomaFisicaTomasEntity item) {
+        android.util.Log.d("DEBUG_DELETE", "Mostrando diálogo de confirmación para: " + item.getIdToma());
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Eliminar Toma")
+                .setMessage("¿Estás seguro de eliminar la Toma " + item.getNumeroToma() + "? Esta acción no se puede deshacer.")
+                .setPositiveButton("Eliminar", (dialog, which) -> {
+                    android.util.Log.d("DEBUG_DELETE", "Usuario confirmó eliminación de: " + item.getIdToma());
+                    eliminarToma(item);
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> {
+                    android.util.Log.d("DEBUG_DELETE", "Usuario canceló eliminación");
+                })
+                .show();
+    }
+
+    private void eliminarToma(TomaFisicaTomasEntity item) {
+        android.util.Log.d("DEBUG_DELETE", "Iniciando eliminación de toma: " + item.getIdToma());
+        new Thread(() -> {
+            try {
+                tomasDao.deleteToma(item.getIdToma());
+                detallesDao.deleteByToma(item.getIdToma());
+                android.util.Log.d("DEBUG_DELETE", "Eliminación exitosa en BD para: " + item.getIdToma());
+
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Toma eliminada", Toast.LENGTH_SHORT).show();
+                    setToggleMostrandoCompletas(mostrandoCompletas);
+                    cargarKpi();
+                });
+            } catch (Exception e) {
+                android.util.Log.e("DEBUG_DELETE", "Excepción al eliminar", e);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Error al eliminar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
     }
 
 }

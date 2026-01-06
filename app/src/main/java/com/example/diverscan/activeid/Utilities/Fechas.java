@@ -91,15 +91,16 @@ public class Fechas {
     public static String FechaActual(){
         SimpleDateFormat dateFormat;
         Date date = new Date();
-       /* if(app.glo_idioma.equals("esp")){
-            dateFormat   = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-
-        }else{
-       */     dateFormat   = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        //}
+        dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         String fecha = dateFormat.format(date);
-
         return fecha;
+    }
+
+    public static String FechaActualISO(){
+        SimpleDateFormat dateFormat;
+        Date date = new Date();
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        return dateFormat.format(date);
     }
 
 

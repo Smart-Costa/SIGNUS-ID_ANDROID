@@ -108,6 +108,14 @@ public class RegistroTomaFisicaActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (viewModel != null) {
+            viewModel.cargarTomasFisicas();
+        }
+    }
+
     private void buscar() {
         String nombre = txtBusquedaNombre.getText().toString().trim();
 

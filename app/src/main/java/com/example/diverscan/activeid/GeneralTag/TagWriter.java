@@ -491,6 +491,12 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
             } catch (InvalidUsageException e) {
                 e.printStackTrace();
                 invalidUsageException = e;
+            } catch (SecurityException e) {
+                Log.e(TAG, "SecurityException al inicializar Readers (Bluetooth): " + e.getMessage());
+                invalidUsageException = new InvalidUsageException("Permiso Bluetooth denegado", "SECURITY_EXCEPTION");
+            } catch (Exception e) {
+                Log.e(TAG, "Error genérico al inicializar Readers (Bluetooth): " + e.getMessage());
+                invalidUsageException = new InvalidUsageException(e.getMessage(), "GENERIC_ERROR");
             }
 
             // Si Bluetooth falla o no encuentra lectores, intentar SERVICE_SERIAL

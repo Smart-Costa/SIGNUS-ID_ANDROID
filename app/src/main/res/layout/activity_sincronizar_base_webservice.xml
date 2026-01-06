@@ -82,6 +82,36 @@
                     android:textSize="14sp" />
             </androidx.cardview.widget.CardView>
 
+            <!-- Fecha última sincronización -->
+            <TextView
+                android:id="@+id/tv_last_sync_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Última actualización: --/--/---- --:--"
+                android:textColor="#666666"
+                android:textSize="12sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Botón limpiar BD -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="6dp"
+                app:cardBackgroundColor="#D32F2F"
+                app:cardElevation="2dp">
+
+                <Button
+                    android:id="@+id/btn_limpiar_bd"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:text="LIMPIAR BASE DE DATOS LOCAL"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </androidx.cardview.widget.CardView>
+
             <!-- Botón enviar -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"

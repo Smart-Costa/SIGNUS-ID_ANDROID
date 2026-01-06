@@ -71,6 +71,12 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Rf
 
         ActivoEntity activo = activoDAO.getActivoByEpc(epc);
         if (activo != null) {
+            if (activo.getEstadoActivo() != null && !activo.getEstadoActivo()) {
+                Toast.makeText(this, "El activo ya se encuentra dado de baja", Toast.LENGTH_LONG).show();
+                rfidManager.stopReading();
+                return;
+            }
+
             activoLeido = activo;
             binding.txtNumeroActivo.setText(activo.getNumeroActivo());
             binding.txtNumeroEtiqueta.setText(activo.getNumeroEtiqueta());

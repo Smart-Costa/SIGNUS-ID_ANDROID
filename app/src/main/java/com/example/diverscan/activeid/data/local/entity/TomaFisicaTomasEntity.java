@@ -3,31 +3,31 @@ package com.example.diverscan.activeid.data.local.entity;
 import com.google.gson.annotations.SerializedName;
 
 public class TomaFisicaTomasEntity {
-    @SerializedName("TomaFisicaId")
+    @SerializedName(value = "TomaFisicaId", alternate = {"tomaFisicaId"})
     private String tomaFisicaId;
 
-    @SerializedName("NumeroToma")
+    @SerializedName(value = "NumeroToma", alternate = {"numeroToma"})
     private String numeroToma;
 
-    @SerializedName("IdToma")
+    @SerializedName(value = "IdToma", alternate = {"idToma"})
     private String idToma;
 
-    @SerializedName("TotalLecturas")
+    @SerializedName(value = "TotalLecturas", alternate = {"totalLecturas"})
     private String totalLecturas;
 
-    @SerializedName("FechaCreacion")
+    @SerializedName(value = "FechaCreacion", alternate = {"fechaCreacion"})
     private String fechaCreacion;
 
-    @SerializedName("ActivosLeidos")
+    @SerializedName(value = "ActivosLeidos", alternate = {"activosLeidos"})
     private String activosLeidos;
 
-    @SerializedName("Sobrantes")
+    @SerializedName(value = "Sobrantes", alternate = {"sobrantes"})
     private String sobrantes;
 
-    @SerializedName("Faltantes")
+    @SerializedName(value = "Faltantes", alternate = {"faltantes"})
     private String faltantes;
 
-    @SerializedName("TotalActivos")
+    @SerializedName(value = "TotalActivos", alternate = {"totalActivos"})
     private String totalActivos;
 
     public String getTomaFisicaId() { return tomaFisicaId; }

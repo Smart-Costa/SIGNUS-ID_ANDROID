@@ -87,6 +87,13 @@ public class ActivoRepository {
 
     // ✅ Guardar el activo en backend o local
     public void guardarActivo(Context context, ActivoEntity activo) {
+        com.example.diverscan.activeid.data.local.dao.ActivoDao dao = new com.example.diverscan.activeid.data.local.dao.ActivoDao(context);
+        long result = dao.insertActivo(activo);
+        if (result != -1) {
+            Log.d("ActivoRepository", "Activo guardado localmente con ID: " + activo.getIdActivo());
+        } else {
+            Log.e("ActivoRepository", "Error al guardar activo localmente: " + activo.getIdActivo());
+        }
     }
 
     // ✅ Guardar RFID y fotos

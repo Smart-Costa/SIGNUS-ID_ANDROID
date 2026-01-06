@@ -24,6 +24,8 @@ import android.os.Message;
 import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import java.util.List;
+
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.data.local.dao.RolDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaDao;
@@ -31,6 +33,7 @@ import com.example.diverscan.activeid.data.local.dao.TomaFisicaDetallesDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
 import com.example.diverscan.activeid.data.local.dao.UbicacionDao;
 import com.example.diverscan.activeid.data.local.dao.UserDao;
+import com.example.diverscan.activeid.data.local.entity.TomaFisicaEntity;
 import com.example.diverscan.activeid.data.remote.response.ApiCallback;
 import com.example.diverscan.activeid.data.remote.response.ApiResponse;
 import com.google.gson.JsonElement;
@@ -98,6 +101,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -140,10 +144,11 @@ public class sincronizar_base extends AppCompatActivity {
     private ConstraintLayout rlsnackbar;
     private Snackbar _snackbar;
     private View mSincronizarView;
-    private Button btn_enviar, btn_obtener;
+    private Button btn_enviar, btn_obtener, btn_limpiar_bd;
     private Spinner PreOpcionesSincr;
     private RadioButton radio_sincro, radio_Tags;
     private TextView Mensaje;
+    private TextView tvLastSyncDate;
     private LinearLayout progressSegmented;
     private View[] pasos;
     private ProgressDialog dialogEnvio;
@@ -211,10 +216,14 @@ public class sincronizar_base extends AppCompatActivity {
         SincronizarDBHelper = new SincronizarDBHelper(mSincronizarView.getContext());
         btn_enviar = findViewById(R.id.btn_enviar);
         btn_obtener = findViewById(R.id.btn_obtener);
+        btn_limpiar_bd = findViewById(R.id.btn_limpiar_bd); // Initialized
         PreOpcionesSincr = findViewById(R.id.SpinnerSincronizacion);
         Mensaje = findViewById(R.id.mensaje);
+        tvLastSyncDate = findViewById(R.id.tv_last_sync_date);
         rlsnackbar = findViewById(R.id.sincronizar_view);
         progressSegmented = findViewById(R.id.progress_segmented);
+
+        loadLastSyncDate();
 
         // Debug UI initialization
         debugContainer = findViewById(R.id.debug_container);
@@ -230,7 +239,46 @@ public class sincronizar_base extends AppCompatActivity {
     public void eventos() {
         btn_enviar.setOnClickListener(OnClickListenerEnviar);
         btn_obtener.setOnClickListener(OnClickListenerObtener);
+        if (btn_limpiar_bd != null) {
+            btn_limpiar_bd.setOnClickListener(OnClickListenerLimpiarBD);
+        }
     }
+
+    private void loadLastSyncDate() {
+        android.content.SharedPreferences prefs = getSharedPreferences("ActiveID_Prefs", MODE_PRIVATE);
+        String lastDate = prefs.getString("last_sync_date", "--/--/---- --:--");
+        if (tvLastSyncDate != null) {
+            tvLastSyncDate.setText("Última actualización: " + lastDate);
+        }
+    }
+
+    private void saveLastSyncDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault());
+        String currentDate = sdf.format(new java.util.Date());
+        
+        android.content.SharedPreferences prefs = getSharedPreferences("ActiveID_Prefs", MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("last_sync_date", currentDate);
+        editor.apply();
+        
+        if (tvLastSyncDate != null) {
+            tvLastSyncDate.setText("Última actualización: " + currentDate);
+        }
+    }
+
+    public final View.OnClickListener OnClickListenerLimpiarBD = v -> {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmar limpieza")
+                .setMessage("¿Estás seguro de que quieres eliminar TODOS los datos locales? Esta acción no se puede deshacer.")
+                .setPositiveButton("Sí, eliminar", (dialog, which) -> {
+                    com.example.diverscan.activeid.data.local.dao.AppDatabaseHelper helper = new com.example.diverscan.activeid.data.local.dao.AppDatabaseHelper(mSincronizarView.getContext());
+                    helper.clearAllData();
+                    mostrarSnack("Base de datos limpiada correctamente.", Color.rgb(4, 165, 77));
+                    updateDebugSummary();
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    };
 
     private void CargarOpciones() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
@@ -304,6 +352,11 @@ public class sincronizar_base extends AppCompatActivity {
         btn_enviar.setEnabled(false);
         if (debugContainer != null) debugContainer.setVisibility(View.GONE);
 
+        // Limpiar datos sincronizados previos (excepto cambios pendientes)
+        // Solo para Activos, ya que los otros (Usuarios, Roles, Ubicaciones) se limpian completos en su DAO
+        // o no manejan estado pendiente.
+        activoDao.clearSyncedData();
+
         // Cadena secuencial de sincronización
         // 1. Usuarios
         userDao.fetchAndSyncFromApi(() -> {
@@ -330,19 +383,42 @@ public class sincronizar_base extends AppCompatActivity {
                                 runOnUiThread(() -> actualizarBarraSegmentada(90));
 
                                 // 7. Tomas Fisicas (Detalles)
-                                tomafisicadetallesDao.fetchAndSyncFromApi(() -> {
+                                // Fetch details ONLY for the currently active/visible Tomas Fisicas
+                                List<TomaFisicaEntity> activeTomas = tomafisicaDao.getAllTomasFisicas();
+                                if (activeTomas != null && !activeTomas.isEmpty()) {
+                                    final int[] processedCount = {0};
+                                    final int totalTomas = activeTomas.size();
+
+                                    for (TomaFisicaEntity toma : activeTomas) {
+                                        tomafisicadetallesDao.fetchAndSyncFromApi(toma.getTomaFisicaId(), () -> {
+                                            processedCount[0]++;
+                                            if (processedCount[0] >= totalTomas) {
+                                                runOnUiThread(() -> {
+                                                    actualizarBarraSegmentada(100);
+                                                    updateDebugSummary();
+                                                    
+                                                    btn_enviar.setEnabled(true);
+                                                    btn_obtener.setEnabled(true);
+                                                    mostrarSnack("Sincronización completada con éxito.", Color.rgb(4, 165, 77));
+                                                    saveLastSyncDate();
+                                                    
+                                                    new Handler().postDelayed(() -> resetBarraSegmentada(), 2000);
+                                                });
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    // Fallback if no active tomas found, or maybe just finish
                                     runOnUiThread(() -> {
                                         actualizarBarraSegmentada(100);
                                         updateDebugSummary();
-                                        
                                         btn_enviar.setEnabled(true);
                                         btn_obtener.setEnabled(true);
-                                        mostrarSnack("Sincronización completada con éxito.", Color.rgb(4, 165, 77));
-                                        
-                                        // Reset bar after a delay
+                                        mostrarSnack("Sincronización completada (sin tomas activas).", Color.rgb(4, 165, 77));
+                                        saveLastSyncDate();
                                         new Handler().postDelayed(() -> resetBarraSegmentada(), 2000);
                                     });
-                                });
+                                }
                             });
                         });
                     });
@@ -388,16 +464,41 @@ public class sincronizar_base extends AppCompatActivity {
             return;
         }
 
-        iniciarProgressThread(5);
+        // Recopilar estadísticas ANTES de enviar (porque el envío limpia los pendientes)
+        java.util.Map<String, Integer> activoStats = activoDao.getPendingSummary();
+        int activosCreados = 0;
+        int activosBajas = 0;
+        if (activoStats != null) {
+            if (activoStats.containsKey("creados")) activosCreados = activoStats.get("creados");
+            if (activoStats.containsKey("bajas")) activosBajas = activoStats.get("bajas");
+        }
+        
+        // Para Tomas, al no tener flag de pendiente, reportamos el total local que se intentará enviar.
+        // Esto es consistente con la lógica de envío actual que envía todo lo local.
+        int countTomasResumen = tomafisicatomasDao.getPendingResumen().size();
+        int countTomasDetalle = tomafisicadetallesDao.getPendingDetalles().size();
+
+        String resumenMsg = "Resumen de datos enviados:\n\n" +
+                "- Activos Creados/Modificados: " + activosCreados + "\n" +
+                "- Activos Dados de Baja: " + activosBajas + "\n" +
+                "- Subtomas de Inventario: " + countTomasResumen + "\n" +
+                "- Detalles de Inventario: " + countTomasDetalle;
+
+        // Reset progress
+        resetBarraSegmentada();
+        actualizarBarraSegmentada(10); // Start
 
         // Sincronizar Activos primero
         activoDao.pushLocalChangesToApi(new ApiCallback<JsonElement>() {
             @Override
             public void onComplete(ApiResponse<JsonElement> response) {
+                runOnUiThread(() -> actualizarBarraSegmentada(40)); // Update progress
+                
                 if (!response.success) {
                     runOnUiThread(() -> {
                         mostrarSnack("Error enviando Activos: " + response.errorMessage, Color.RED);
-                        Toast.makeText(_context, "Error enviando Activos: " + response.errorMessage, Toast.LENGTH_LONG).show();
+                        // Don't stop, continue to next steps? Or stop? 
+                        // Usually better to continue to try sending other data.
                     });
                 } else {
                     Log.d("SYNC", "Activos enviados correctamente");
@@ -405,16 +506,76 @@ public class sincronizar_base extends AppCompatActivity {
 
                 // Sincronizar Resumenes (Tomas)
                 tomafisicatomasDao.pushLocalChangesToApi(() -> {
+                    runOnUiThread(() -> actualizarBarraSegmentada(70)); // Update progress
                     Log.d("SYNC", "Resumenes enviados");
                     
                     // Sincronizar Detalles
                     tomafisicadetallesDao.pushLocalChangesToApi(() -> {
-                        Log.d("SYNC", "Detalles enviados");
+                        runOnUiThread(() -> {
+                            actualizarBarraSegmentada(100); // Finish
+                            
+                            Log.d("SYNC", "Detalles enviados");
+                            
+                            resetBarraSegmentada();
+                            btn_enviar.setEnabled(true);
+                            btn_obtener.setEnabled(true);
+                            
+                            // Mostrar resumen en diálogo
+                            new AlertDialog.Builder(_context)
+                                    .setTitle("Sincronización Completada")
+                                    .setMessage(resumenMsg)
+                                    .setPositiveButton("Aceptar", null)
+                                    .setIcon(R.drawable.ic_check_circle)
+                                    .show();
+                                    
+                            mostrarSnack("Sincronización completada.", Color.rgb(4, 165, 77));
+                        });
                     });
                 });
             }
         });
     };
+
+    private void iniciarProgressThreadConResumen(final int totalProcesos, final String resumen) {
+        Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                int progresoActual = msg.arg1;
+                actualizarBarraSegmentada(progresoActual);
+            }
+        };
+
+        new Thread(() -> {
+            try {
+                int progreso = 0;
+                int incremento = 100 / totalProcesos;
+
+                while (progreso <= 100) {
+                    Thread.sleep(300);
+                    progreso += incremento;
+                    Message msg = handler.obtainMessage();
+                    msg.arg1 = progreso;
+                    handler.sendMessage(msg);
+                }
+
+                runOnUiThread(() -> {
+                    resetBarraSegmentada();
+                    btn_enviar.setEnabled(true);
+                    btn_obtener.setEnabled(true);
+                    
+                    // Mostrar resumen en diálogo
+                    new AlertDialog.Builder(_context)
+                            .setTitle("Sincronización Completada")
+                            .setMessage(resumen)
+                            .setPositiveButton("Aceptar", null)
+                            .setIcon(R.drawable.ic_check_circle)
+                            .show();
+                            
+                    mostrarSnack("Sincronización completada con éxito.", Color.rgb(4, 165, 77));
+                });
+            } catch (Exception ignored) {}
+        }).start();
+    }
 
     private void iniciarProgressThread(final int totalProcesos) {
         Handler handler = new Handler() {
@@ -1879,30 +2040,27 @@ public class sincronizar_base extends AppCompatActivity {
                 for (int i = 0; i < listActivos.size(); i++) {
 
                     JSONObject asset = new JSONObject();
-                    asset.put("assetId", listActivos.get(i).getAssetId());
-                    asset.put("numero", listActivos.get(i).getNumero());
-                    asset.put("placa", listActivos.get(i).getCodeBar());
-                    asset.put("longDescription", listActivos.get(i).getDescripcion());
-                    asset.put("companySysId", listActivos.get(i).getIdCompania());
-                    asset.put("buildingSysId", listActivos.get(i).getIdEdificio());
-                    asset.put("floorSysId", listActivos.get(i).getIdPiso());
-                    asset.put("officeSysId", listActivos.get(i).getIdOficina());
-                    asset.put("encargado", listActivos.get(i).getEmployeeRelated());
-                    asset.put("brand", listActivos.get(i).getMarca());
-                    asset.put("modelNo", listActivos.get(i).getModelo());
-                    asset.put("serial", listActivos.get(i).getSerial());
-                    asset.put("tagId", listActivos.get(i).getTag());
-                    asset.put("compania", listActivos.get(i).getCompania());
-                    asset.put("edificio", listActivos.get(i).getEdificio());
-                    asset.put("piso", listActivos.get(i).getPiso());
-                    asset.put("oficina", listActivos.get(i).getOficina());
-                    asset.put("parentAssetSysId", listActivos.get(i).getParentAssetSysId());
-                    asset.put("assetStatusSysId", listActivos.get(i).getAssetStatusSysId());
-                    asset.put("entryUser", listActivos.get(i).getEntryUser());
-                    asset.put("AnnoFabricacion", listActivos.get(i).getAnoFabricacion());
-                    asset.put("Capacidad", listActivos.get(i).getCapacidad());
-                    asset.put("EstadoDescripcion", listActivos.get(i).getEstadoDescripcion());
-                    asset.put("EstadoConservacion", listActivos.get(i).getEstadoConservacion());
+                    // Mapping to API ActivosController.cs
+                    asset.put("ID_ACTIVO", listActivos.get(i).getAssetId());
+                    asset.put("NUMERO_ACTIVO", listActivos.get(i).getNumero());
+                    asset.put("NUMERO_ETIQUETA", listActivos.get(i).getCodeBar());
+                    asset.put("DESCRIPCION_LARGA", listActivos.get(i).getDescripcion());
+                    asset.put("DESCRIPCION_CORTA", listActivos.get(i).getDescripcion());
+                    asset.put("EMPRESA", listActivos.get(i).getIdCompania());
+                    asset.put("UBICACION_A", listActivos.get(i).getIdEdificio());
+                    asset.put("UBICACION_B", listActivos.get(i).getIdPiso());
+                    asset.put("UBICACION_D", listActivos.get(i).getIdOficina());
+                    asset.put("EMPLEADO", listActivos.get(i).getEmployeeRelated());
+                    asset.put("MARCA", listActivos.get(i).getMarca());
+                    asset.put("MODELO", listActivos.get(i).getModelo());
+                    asset.put("NUMERO_SERIE", listActivos.get(i).getSerial());
+                    asset.put("TAG_EPC", listActivos.get(i).getTag());
+                    asset.put("ESTADO", listActivos.get(i).getAssetStatusSysId());
+                    asset.put("ANOS_VIDA_UTIL", listActivos.get(i).getAnoFabricacion());
+                    asset.put("TAMANIO_MEDIDA", listActivos.get(i).getCapacidad());
+                    asset.put("DESCRIPCION_ESTADO_ULTIMO_INVENTARIO", listActivos.get(i).getEstadoDescripcion());
+                    asset.put("OBSERVACIONES", listActivos.get(i).getEstadoConservacion());
+                    asset.put("ESTADO_ACTIVO", true);
 
                     //poner todos
                     //al final de todos

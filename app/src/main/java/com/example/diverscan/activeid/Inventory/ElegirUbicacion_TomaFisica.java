@@ -54,11 +54,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.example.diverscan.activeid.data.local.dao.UbicacionDao;
+import com.example.diverscan.activeid.data.local.dao.ActivoDao;
+import com.example.diverscan.activeid.data.local.entity.UbicacionEntity;
+import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
+import java.util.HashSet;
+import java.util.Set;
+
 public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements ResponseHandlerInterface {
 
     private View ElegirUbicacionView;
     InventoryDBHelper InventoryDBHelper;
-    OfficesDBHelper OfficesDBHelper;
+    // OfficesDBHelper OfficesDBHelper; // Deprecated
     List<String> listSpinner;
     Context _context;
     Activity _activity;
@@ -66,10 +73,12 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
     private Button btn_continuar;
     private Spinner CompaniaView, EdificioView, PisoView, OficinaView, TipoInventarioView;
 
-    private Map<Integer, RazonNuevo> _mapRazonSociales = new HashMap<Integer, RazonNuevo>();
-    private Map<Integer, EdificioNuevo> _mapEdificios = new HashMap<Integer, EdificioNuevo>();
-    private Map<Integer, PisoNuevo> _mapPisos = new HashMap<Integer, PisoNuevo>();
-    private Map<Integer, oficinaNuevo> _mapOficinas = new HashMap<Integer, oficinaNuevo>();
+    // Maps now store selection logic but are filled from UbicacionEntity
+    private Map<String, RazonNuevo> _mapRazonSociales = new HashMap<>();
+    private Map<String, EdificioNuevo> _mapEdificios = new HashMap<>();
+    private Map<String, PisoNuevo> _mapPisos = new HashMap<>();
+    private Map<String, oficinaNuevo> _mapOficinas = new HashMap<>();
+    
     private Map<Integer, EntidadTiposInventarios> _mapTipoInventarios = new HashMap<Integer, EntidadTiposInventarios>();
 
     private boolean _itemSelectedUserCompania, _itemSelectedUserEdificio, _itemSelectedUserPiso = true;
@@ -87,6 +96,11 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
     private TomaFisicaTomasDao subTomasDao;
     private android.widget.TextView lblTituloDinamico;
     private android.widget.TextView txtProgressCircle;
+    
+    // New DAO access
+    private UbicacionDao ubicacionDao;
+    private ActivoDao activoDao;
+    private List<UbicacionEntity> allUbicaciones;
 
     private static final String TAG = "ElegirUbicacion";
 
@@ -108,11 +122,23 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
 
         _context = this;
         _activity = this;
+        
+        // Initialize new DAO
+        ubicacionDao = new UbicacionDao(this);
+        activoDao = new ActivoDao(this);
+        allUbicaciones = ubicacionDao.getAllUbicaciones();
+        
+        if (allUbicaciones.isEmpty()) {
+            AlertasPersonalizadas.showAlertDialog(_activity, "Datos faltantes", 
+                "No se encontraron ubicaciones cargadas. Por favor vaya a 'Sincronizar' y presione 'Obtener Datos' para actualizar la información.");
+        }
+        
         controles();
         eventos();
         cargarTiposInventarios();
-        cargarRazonesSociales();
-        cargarUbicaciones();
+        // Cargar ubicaciones desde nueva estructura
+        cargarRazonesSocialesDesdeEntity();
+        
         RecibirTakesInfo();
         configurarSubTomas();
         
@@ -137,7 +163,7 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
         OficinaView = findViewById(R.id.oficina_toma);
         TipoInventarioView = findViewById(R.id.sp_tipoInventario);
 
-        OfficesDBHelper = new OfficesDBHelper(ElegirUbicacionView.getContext());
+        // OfficesDBHelper = new OfficesDBHelper(ElegirUbicacionView.getContext()); // Deprecated
         txtAjusteOficina = findViewById(R.id.txtSectorBusquedaAS);
         clsnackbar = findViewById(R.id.clActivosToma);
     }
@@ -162,7 +188,9 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
                     buscarOficinaPorIdPisoNombre();
                 } else if (txtAjusteOficina.getText().length() == 0) {
                     PisoNuevo pisoRecord = (PisoNuevo) PisoView.getSelectedItem();
-                    cargarOficinas(pisoRecord.getIdPiso());
+                    if (pisoRecord != null) {
+                        cargarOficinasDesdeEntity(pisoRecord.getIdPiso());
+                    }
                 }
             }
         });
@@ -172,17 +200,17 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
         if (CompaniaView.getSelectedItem() != null) {
             RazonNuevo razonSocialRecord = (RazonNuevo) CompaniaView.getSelectedItem();
             idCompania = razonSocialRecord.getIdRazon();
-            cargarEdificios(idCompania);
+            cargarEdificiosDesdeEntity(idCompania);
 
             if (EdificioView.getSelectedItem() != null) {
                 EdificioNuevo edificioRecord = (EdificioNuevo) EdificioView.getSelectedItem();
                 idedificioActivo = edificioRecord.getIdEdificio();
-                cargarPisos(idedificioActivo);
+                cargarPisosDesdeEntity(idedificioActivo);
 
                 if (PisoView.getSelectedItem() != null) {
                     PisoNuevo pisoRecord = (PisoNuevo) PisoView.getSelectedItem();
                     idpisoActivo = pisoRecord.getIdPiso();
-                    cargarOficinas(idpisoActivo);
+                    cargarOficinasDesdeEntity(idpisoActivo);
                 }
             }
         }
@@ -315,21 +343,105 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
 
     //region Se rellenan los spinners
 
+    private void cargarRazonesSocialesDesdeEntity() {
+        _mapRazonSociales.clear();
+        Set<String> added = new HashSet<>();
+        
+        for (UbicacionEntity u : allUbicaciones) {
+            if (u.getASysId() != null && u.getUbicacionA() != null && added.add(u.getASysId())) {
+                RazonNuevo item = new RazonNuevo(u.getASysId(), u.getUbicacionA());
+                _mapRazonSociales.put(u.getASysId(), item);
+            }
+        }
+        
+        RazonNuevo[] razones = _mapRazonSociales.values().toArray(new RazonNuevo[0]);
+        fillSpinnerRazon(razones);
+        
+        // Trigger selection if needed or handle nothing selected
+        if (razones.length > 0) {
+            // Usually first item is selected automatically
+        }
+    }
+
+    private void cargarEdificiosDesdeEntity(String idCompania) {
+        _mapEdificios.clear();
+        Set<String> added = new HashSet<>();
+        
+        for (UbicacionEntity u : allUbicaciones) {
+            if (u.getASysId() != null && u.getASysId().equals(idCompania)) {
+                if (u.getBSysId() != null && u.getUbicacionB() != null && added.add(u.getBSysId())) {
+                    EdificioNuevo item = new EdificioNuevo(u.getBSysId(), u.getUbicacionB(), idCompania);
+                    _mapEdificios.put(u.getBSysId(), item);
+                }
+            }
+        }
+        
+        EdificioNuevo[] edificios = _mapEdificios.values().toArray(new EdificioNuevo[0]);
+        fillSpinnerEdificio(edificios);
+    }
+
+    private void cargarPisosDesdeEntity(String idEdificio) {
+        _mapPisos.clear();
+        Set<String> added = new HashSet<>();
+        
+        for (UbicacionEntity u : allUbicaciones) {
+            if (u.getBSysId() != null && u.getBSysId().equals(idEdificio)) {
+                if (u.getCSysId() != null && u.getUbicacionC() != null && added.add(u.getCSysId())) {
+                    PisoNuevo item = new PisoNuevo(u.getCSysId(), u.getUbicacionC(), idEdificio);
+                    _mapPisos.put(u.getCSysId(), item);
+                }
+            }
+        }
+        
+        PisoNuevo[] pisos = _mapPisos.values().toArray(new PisoNuevo[0]);
+        fillSpinnerPiso(pisos);
+    }
+
+    private void cargarOficinasDesdeEntity(String idPiso) {
+        _mapOficinas.clear();
+        Set<String> added = new HashSet<>();
+        
+        for (UbicacionEntity u : allUbicaciones) {
+            if (u.getCSysId() != null && u.getCSysId().equals(idPiso)) {
+                if (u.getDSysId() != null && u.getUbicacionD() != null && added.add(u.getDSysId())) {
+                    oficinaNuevo item = new oficinaNuevo(u.getDSysId(), u.getUbicacionD(), idPiso);
+                    _mapOficinas.put(u.getDSysId(), item);
+                }
+            }
+        }
+        
+        oficinaNuevo[] oficinas = _mapOficinas.values().toArray(new oficinaNuevo[0]);
+        fillSpinnerOficina(oficinas);
+    }
+
     private void buscarOficinaPorIdPisoNombre() {
-        if (_itemSelectedUserPiso) {
+        if (_itemSelectedUserPiso && PisoView.getSelectedItem() != null) {
             PisoNuevo pisoRecord = (PisoNuevo) PisoView.getSelectedItem();
             String nombreBusqueda = txtAjusteOficina.getText().toString();
-            cargarOficinasPorPisoNombre(pisoRecord.getIdPiso(), nombreBusqueda);
+            
+            _mapOficinas.clear();
+            Set<String> added = new HashSet<>();
+            String idPiso = pisoRecord.getIdPiso();
+            
+            for (UbicacionEntity u : allUbicaciones) {
+                if (u.getCSysId() != null && u.getCSysId().equals(idPiso)) {
+                    if (u.getDSysId() != null && u.getUbicacionD() != null) {
+                        if (nombreBusqueda.isEmpty() || u.getUbicacionD().toLowerCase().contains(nombreBusqueda.toLowerCase())) {
+                            if (added.add(u.getDSysId())) {
+                                oficinaNuevo item = new oficinaNuevo(u.getDSysId(), u.getUbicacionD(), idPiso);
+                                _mapOficinas.put(u.getDSysId(), item);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            oficinaNuevo[] oficinas = _mapOficinas.values().toArray(new oficinaNuevo[0]);
+            fillSpinnerOficina(oficinas);
         }
         _itemSelectedUserPiso = true;
     }
 
-    private void cargarOficinasPorPisoNombre(String idPiso, String nombre) {
-
-        _mapOficinas = (Map<Integer, oficinaNuevo>) OfficesDBHelper.ObtenerOficinaPorPisoDescripcion3(idPiso, nombre);
-        oficinaNuevo[] oficinas = _mapOficinas.values().toArray(new oficinaNuevo[0]);
-        fillSpinnerOficina(oficinas);
-    }
     private void cargarTiposInventarios() {
         try {
             InventoryDBHelper inventoryDBHelper = new InventoryDBHelper(ElegirUbicacionView.getContext());
@@ -341,82 +453,60 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
         }
     }
 
-    private void cargarRazonesSociales() {
-        RazonSocialDBHelper razonSocialDBHelper = new RazonSocialDBHelper(ElegirUbicacionView.getContext());
-        _mapRazonSociales = (Map<Integer, RazonNuevo>) razonSocialDBHelper.ObtenerRazon();
-        RazonNuevo[] razones = _mapRazonSociales.values().toArray(new RazonNuevo[0]);
-        fillSpinnerRazon(razones);
-    }
-
-    private void cargarEdificios(String idCompania) {
-        EdificioDBHelper edificioDBHelper = new EdificioDBHelper(ElegirUbicacionView.getContext());
-        _mapEdificios = (Map<Integer, EdificioNuevo>) edificioDBHelper.ObtenerEdificio(idCompania);
-        EdificioNuevo[] edificios = _mapEdificios.values().toArray(new EdificioNuevo[0]);
-        fillSpinnerEdificio(edificios);
-    }
-
-    private void cargarPisos(String idEdificio) {
-        PisoDBHelper pisoDBHelper = new PisoDBHelper(ElegirUbicacionView.getContext());
-        _mapPisos = (Map<Integer, PisoNuevo>) pisoDBHelper.ObtenerPiso(idEdificio);
-        PisoNuevo[] pisos = _mapPisos.values().toArray(new PisoNuevo[0]);
-        fillSpinnerPiso(pisos);
-    }
-
-    private void cargarOficinas(String idPiso) {
-        OficinaDBHelper oficinaDBHelper = new OficinaDBHelper(ElegirUbicacionView.getContext());
-        _mapOficinas = (Map<Integer, oficinaNuevo>) oficinaDBHelper.ObtenerOficina(idPiso);
-        oficinaNuevo[] oficinas = _mapOficinas.values().toArray(new oficinaNuevo[0]);
-        fillSpinnerOficina(oficinas);
-    }
+    /* Deprecated methods replaced by above
+    private void cargarRazonesSociales() { ... }
+    private void cargarEdificios(String idCompania) { ... }
+    private void cargarPisos(String idEdificio) { ... }
+    private void cargarOficinas(String idPiso) { ... }
+    private void cargarOficinasPorPisoNombre(String idPiso, String nombre) { ... }
+    */
 
     private AdapterView.OnItemSelectedListener onItemSpinnerListenerCompania = new AdapterView.OnItemSelectedListener() {
-
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             if (_itemSelectedUserCompania) {
                 RazonNuevo razonSocialRecord = (RazonNuevo) CompaniaView.getSelectedItem();
-                cargarEdificios(razonSocialRecord.getIdRazon());
+                if (razonSocialRecord != null) {
+                    cargarEdificiosDesdeEntity(razonSocialRecord.getIdRazon());
+                }
             }
             _itemSelectedUserCompania = true;
         }
 
         @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
-        }
+        public void onNothingSelected(AdapterView<?> parent) {}
     };
 
     private AdapterView.OnItemSelectedListener onItemSpinnerListenerEdificio = new AdapterView.OnItemSelectedListener() {
-
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             if (_itemSelectedUserEdificio) {
                 EdificioNuevo edificioRecord = (EdificioNuevo) EdificioView.getSelectedItem();
-                cargarPisos(edificioRecord.getIdEdificio());
+                if (edificioRecord != null) {
+                    cargarPisosDesdeEntity(edificioRecord.getIdEdificio());
+                }
             }
             _itemSelectedUserEdificio = true;
         }
 
         @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
-        }
+        public void onNothingSelected(AdapterView<?> parent) {}
     };
 
     private AdapterView.OnItemSelectedListener onItemSpinnerListenerPiso = new AdapterView.OnItemSelectedListener() {
-
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             if (_itemSelectedUserPiso) {
                 PisoNuevo pisoRecord = (PisoNuevo) PisoView.getSelectedItem();
-                cargarOficinas(pisoRecord.getIdPiso());
+                if (pisoRecord != null) {
+                    cargarOficinasDesdeEntity(pisoRecord.getIdPiso());
+                }
             }
             _itemSelectedUserPiso = true;
         }
 
         @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-        }
+        public void onNothingSelected(AdapterView<?> parent) {}
     };
 
     private void fillTiposInventarios(EntidadTiposInventarios[] tiposInventarios) {
@@ -464,8 +554,10 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
             oficinaNuevo oficinaRecord = (oficinaNuevo) OficinaView.getSelectedItem();
             idOficina = oficinaRecord.getIdOficina();
 
-            boolean respuesta = OfficesDBHelper.ActivosEnUbicacion(idOficina);
-            if (!respuesta) {
+            // boolean respuesta = OfficesDBHelper.ActivosEnUbicacion(idOficina); // Deprecated
+            boolean tieneActivos = !activoDao.getActivosByUbicacion(idOficina).isEmpty();
+            
+            if (!tieneActivos) {
                 AlertasPersonalizadas.showAlertDialogAsk(_activity, "ALERTA", "Este sector " +
                         "no posee activos.", IrInventario, RespuestaNegativa);
                 return;
@@ -487,7 +579,9 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
     }
 
     private void cargarUbicacionPorEPC(String EPC) {
-        eUbicacionActivo = OfficesDBHelper.VerSectorEPC2(EPC);
+        // eUbicacionActivo = OfficesDBHelper.VerSectorEPC2(EPC); // Deprecated
+        eUbicacionActivo = null; 
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (Objects.isNull(eUbicacionActivo)) {
                 AlertasPersonalizadas.showAlertDialog(_activity, "Atención",
@@ -496,27 +590,30 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
                 return;
             }
         }
-        for (Map.Entry<Integer, RazonNuevo> item : _mapRazonSociales.entrySet()) {
+        for (Map.Entry<String, RazonNuevo> item : _mapRazonSociales.entrySet()) {
             if (item.getValue().getIdRazon().equals(eUbicacionActivo.getIdRazonSocial())) {
-                CompaniaView.setSelection(item.getKey());
+                CompaniaView.setSelection(((ArrayAdapter) CompaniaView.getAdapter()).getPosition(item.getValue()));
+                cargarEdificiosDesdeEntity(eUbicacionActivo.getIdRazonSocial());
             }
         }
 
-        for (Map.Entry<Integer, EdificioNuevo> item : _mapEdificios.entrySet()) {
+        for (Map.Entry<String, EdificioNuevo> item : _mapEdificios.entrySet()) {
             if (item.getValue().getIdEdificio().equals(eUbicacionActivo.getIdEdificio())) {
-                EdificioView.setSelection(item.getKey());
+                EdificioView.setSelection(((ArrayAdapter) EdificioView.getAdapter()).getPosition(item.getValue()));
+                cargarPisosDesdeEntity(eUbicacionActivo.getIdEdificio());
             }
         }
 
-        for (Map.Entry<Integer, PisoNuevo> item : _mapPisos.entrySet()) {
+        for (Map.Entry<String, PisoNuevo> item : _mapPisos.entrySet()) {
             if (item.getValue().getIdPiso().equals(eUbicacionActivo.getIdPiso())) {
-                PisoView.setSelection(item.getKey());
+                PisoView.setSelection(((ArrayAdapter) PisoView.getAdapter()).getPosition(item.getValue()));
+                cargarOficinasDesdeEntity(eUbicacionActivo.getIdPiso());
             }
         }
 
-        for (Map.Entry<Integer, oficinaNuevo> item : _mapOficinas.entrySet()) {
+        for (Map.Entry<String, oficinaNuevo> item : _mapOficinas.entrySet()) {
             if (item.getValue().getIdOficina().equals(eUbicacionActivo.getIdOficina())) {
-                OficinaView.setSelection(item.getKey());
+                OficinaView.setSelection(((ArrayAdapter) OficinaView.getAdapter()).getPosition(item.getValue()));
             }
         }
     }

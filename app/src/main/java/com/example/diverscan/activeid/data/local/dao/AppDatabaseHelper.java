@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class AppDatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DB_DAO";
     private static final String DB_NAME = "Test_ActiveId_v1";
-    private static final int DB_VERSION = 8;
+    private static final int DB_VERSION = 9;
     private final Context context;
 
     public AppDatabaseHelper(Context context) {
@@ -42,9 +42,19 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "ActivosLeidos TEXT, " +
                 "Sobrantes TEXT, " +
                 "Faltantes TEXT, " +
-                "TotalActivos TEXT)");
+                "TotalActivos TEXT, " +
+                "SYNC_STATUS INTEGER DEFAULT 0)");
+
+        if (!checkColumnExists(db, "TomasFisicasResumen", "SYNC_STATUS")) {
+            try {
+                db.execSQL("ALTER TABLE TomasFisicasResumen ADD COLUMN SYNC_STATUS INTEGER DEFAULT 0");
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
 
         ensureTomasFisicasDetalleTable(db);
+        ensurePendingDeletesTable(db);
         ensureActivosApiTable(db);
         ensureUbicacionHHTable(db);
 
@@ -57,7 +67,17 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
         super.onOpen(db);
         ensureActivosApiTable(db);
         ensureTomasFisicasDetalleTable(db);
+        ensurePendingDeletesTable(db);
         ensureUbicacionHHTable(db);
+        
+        // Ensure SYNC_STATUS column in TomasFisicasResumen on open
+        if (!checkColumnExists(db, "TomasFisicasResumen", "SYNC_STATUS")) {
+            try {
+                db.execSQL("ALTER TABLE TomasFisicasResumen ADD COLUMN SYNC_STATUS INTEGER DEFAULT 0");
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
     }
 
     private static void ensureTomasFisicasDetalleTable(SQLiteDatabase db) {
@@ -74,7 +94,26 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "UbicacionDetalleB TEXT, " +
                 "UbicacionDetalleC TEXT, " +
                 "UbicacionDetalleD TEXT, " +
-                "Observaciones TEXT)");
+                "Observaciones TEXT, " +
+                "SYNC_STATUS INTEGER DEFAULT 0)");
+
+        if (!checkColumnExists(db, "TomasFisicasDetalle", "SYNC_STATUS")) {
+            try {
+                db.execSQL("ALTER TABLE TomasFisicasDetalle ADD COLUMN SYNC_STATUS INTEGER DEFAULT 0");
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+    }
+
+    private static void ensurePendingDeletesTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS PendingDeletes (" +
+                "Id TEXT PRIMARY KEY, " +
+                "EntityType TEXT, " +
+                "RefId TEXT, " +
+                "CreatedAt TEXT" +
+                ")");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_PendingDeletes_Entity_RefId ON PendingDeletes (EntityType, RefId)");
     }
 
     private static void ensureActivosApiTable(SQLiteDatabase db) {
@@ -117,16 +156,66 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "OBSERVACIONES TEXT, " +
                 "ESTADO_ACTIVO INTEGER, " +
                 "FECHA_CREACION_ACTIVO TEXT, " +
+                "EPC TEXT, " +
+                "CATEGORIA_A TEXT, " +
+                "CATEGORIA_B TEXT, " +
+                "CATEGORIA_C TEXT, " +
+                "UBICACION_LOGICA_A TEXT, " +
+                "UBICACION_LOGICA_B TEXT, " +
+                "UBICACION_LOGICA_C TEXT, " +
+                "ENTIDAD_ASOCIADA TEXT, " +
+                "COSTO_DEPRECIACION REAL, " +
                 "SYNC_STATUS INTEGER DEFAULT 1" +
                 ")");
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_ActivosApi_TAG_EPC ON ActivosApi (TAG_EPC)");
         
         // Ensure column exists for upgrades from older versions if table existed
-        try {
-            db.execSQL("ALTER TABLE ActivosApi ADD COLUMN SYNC_STATUS INTEGER DEFAULT 1");
-        } catch (Exception e) {
-            // Column likely exists
+        if (!checkColumnExists(db, "ActivosApi", "SYNC_STATUS")) {
+            try {
+                db.execSQL("ALTER TABLE ActivosApi ADD COLUMN SYNC_STATUS INTEGER DEFAULT 1");
+            } catch (Exception e) {
+                // Column likely exists or other error
+            }
         }
+        
+        // Ensure new columns for model consistency
+        String[] newColumns = {
+            "EPC", "CATEGORIA_A", "CATEGORIA_B", "CATEGORIA_C", 
+            "UBICACION_LOGICA_A", "UBICACION_LOGICA_B", "UBICACION_LOGICA_C", 
+            "ENTIDAD_ASOCIADA", "COSTO_DEPRECIACION"
+        };
+        
+        for (String col : newColumns) {
+            if (!checkColumnExists(db, "ActivosApi", col)) {
+                try {
+                    String type = col.equals("COSTO_DEPRECIACION") ? "REAL" : "TEXT";
+                    db.execSQL("ALTER TABLE ActivosApi ADD COLUMN " + col + " " + type);
+                } catch (Exception e) {
+                    // Ignore
+                }
+            }
+        }
+    }
+
+    private static boolean checkColumnExists(SQLiteDatabase db, String tableName, String columnName) {
+        boolean exists = false;
+        try (android.database.Cursor cursor = db.rawQuery("PRAGMA table_info(" + tableName + ")", null)) {
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    int nameIndex = cursor.getColumnIndex("name");
+                    if (nameIndex >= 0) {
+                        String name = cursor.getString(nameIndex);
+                        if (columnName.equalsIgnoreCase(name)) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+        return exists;
     }
 
     private static void ensureUbicacionHHTable(SQLiteDatabase db) {
@@ -147,6 +236,27 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
         if (newVersion > oldVersion) {
             onCreate(db);
             ensureActivosApiTable(db);
+        }
+    }
+
+    public void clearAllData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.delete("TomasFisicas", null, null);
+            db.delete("TomasFisicasResumen", null, null);
+            db.delete("TomasFisicasDetalle", null, null);
+            db.delete("PendingDeletes", null, null);
+            db.delete("ActivosApi", null, null);
+            db.delete("UbicacionHH", null, null);
+            db.delete("TipoTomaInventario", null, null);
+            // Add other tables here if needed
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+            db.close();
         }
     }
 }

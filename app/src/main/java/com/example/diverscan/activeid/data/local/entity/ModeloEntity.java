@@ -1,7 +1,12 @@
 package com.example.diverscan.activeid.data.local.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ModeloEntity {
+    @SerializedName("mSysId")
     private String MSysId;
+
+    @SerializedName("modelo")
     private String Modelo;
 
     public String getMSysId() { return MSysId; }

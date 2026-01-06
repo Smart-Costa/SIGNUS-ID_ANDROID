@@ -24,6 +24,13 @@ public class RegistroActivoDetailActivity extends AppCompatActivity {
 
     private String ubicacionA, ubicacionB, ubicacionC, ubicacionD;
 
+    // IDs seleccionados
+    private String selectedCategoriaId;
+    private String selectedEstadoId;
+    private String selectedEmpresaId;
+    private String selectedMarcaId;
+    private String selectedModeloId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,28 +48,59 @@ public class RegistroActivoDetailActivity extends AppCompatActivity {
         viewModel.cargarCatalogos(this);
 
         viewModel.getCategorias().observe(this, categorias -> {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, categorias);
+            ArrayAdapter<RegistroActivoDetailViewModel.ComboItem> adapter = 
+                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, categorias);
             spCategoria.setAdapter(adapter);
         });
 
         viewModel.getEstados().observe(this, estados -> {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, estados);
+            ArrayAdapter<RegistroActivoDetailViewModel.ComboItem> adapter = 
+                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, estados);
             spEstado.setAdapter(adapter);
         });
 
         viewModel.getEmpresas().observe(this, empresas -> {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, empresas);
+            ArrayAdapter<RegistroActivoDetailViewModel.ComboItem> adapter = 
+                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, empresas);
             spEmpresa.setAdapter(adapter);
         });
 
         viewModel.getMarcas().observe(this, marcas -> {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, marcas);
+            ArrayAdapter<RegistroActivoDetailViewModel.ComboItem> adapter = 
+                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, marcas);
             spMarca.setAdapter(adapter);
         });
 
         viewModel.getModelos().observe(this, modelos -> {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, modelos);
+            ArrayAdapter<RegistroActivoDetailViewModel.ComboItem> adapter = 
+                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, modelos);
             spModelo.setAdapter(adapter);
+        });
+
+        // Listeners para capturar IDs
+        spCategoria.setOnItemClickListener((parent, view, position, id) -> {
+            RegistroActivoDetailViewModel.ComboItem item = (RegistroActivoDetailViewModel.ComboItem) parent.getItemAtPosition(position);
+            selectedCategoriaId = item.getId();
+        });
+
+        spEstado.setOnItemClickListener((parent, view, position, id) -> {
+            RegistroActivoDetailViewModel.ComboItem item = (RegistroActivoDetailViewModel.ComboItem) parent.getItemAtPosition(position);
+            selectedEstadoId = item.getId();
+        });
+
+        spEmpresa.setOnItemClickListener((parent, view, position, id) -> {
+            RegistroActivoDetailViewModel.ComboItem item = (RegistroActivoDetailViewModel.ComboItem) parent.getItemAtPosition(position);
+            selectedEmpresaId = item.getId();
+        });
+
+        spMarca.setOnItemClickListener((parent, view, position, id) -> {
+            RegistroActivoDetailViewModel.ComboItem item = (RegistroActivoDetailViewModel.ComboItem) parent.getItemAtPosition(position);
+            selectedMarcaId = item.getId();
+        });
+
+        spModelo.setOnItemClickListener((parent, view, position, id) -> {
+            RegistroActivoDetailViewModel.ComboItem item = (RegistroActivoDetailViewModel.ComboItem) parent.getItemAtPosition(position);
+            selectedModeloId = item.getId();
         });
 
         btnGuardarDetail.setOnClickListener(v -> guardarActivo());
@@ -84,13 +122,16 @@ public class RegistroActivoDetailActivity extends AppCompatActivity {
         String numeroActivo = txtNumeroActivo.getText().toString();
         String etiqueta = txtNumeroEtiqueta.getText().toString();
         String descripcion = txtDescripcionCorta.getText().toString();
-        String categoria = spCategoria.getText().toString();
-        String estado = spEstado.getText().toString();
-        String empresa = spEmpresa.getText().toString();
-        String marca = spMarca.getText().toString();
-        String modelo = spModelo.getText().toString();
+        
+        // Validar selección de catálogos
+        if (selectedCategoriaId == null) {
+            // Intentar recuperar ID si el texto coincide (caso borde) o forzar selección
+            // Para simplificar, requerimos selección explícita si el campo no está vacío
+             Toast.makeText(this, "Debe seleccionar una Categoría de la lista", Toast.LENGTH_SHORT).show();
+             return;
+        }
 
-        if (numeroActivo.isEmpty() || etiqueta.isEmpty() || categoria.isEmpty()) {
+        if (numeroActivo.isEmpty() || etiqueta.isEmpty() || descripcion.isEmpty()) {
             Toast.makeText(this, "Por favor completa los campos obligatorios", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -103,11 +144,14 @@ public class RegistroActivoDetailActivity extends AppCompatActivity {
         activo.setNumeroActivo(numeroActivo);
         activo.setNumeroEtiqueta(etiqueta);
         activo.setDescripcionCorta(descripcion);
-        activo.setCategoria(categoria);
-        activo.setEstado(estado);
-        activo.setEmpresa(empresa);
-        activo.setMarca(marca);
-        activo.setModelo(modelo);
+        
+        // Usar los IDs seleccionados
+        activo.setCategoria(selectedCategoriaId);
+        activo.setEstado(selectedEstadoId);
+        activo.setEmpresa(selectedEmpresaId);
+        activo.setMarca(selectedMarcaId);
+        activo.setModelo(selectedModeloId);
+        
         activo.setUbicacionA(ubicacionA);
         activo.setUbicacionB(ubicacionB);
         activo.setUbicacionC(ubicacionC);
@@ -120,11 +164,11 @@ public class RegistroActivoDetailActivity extends AppCompatActivity {
                 .putString("NumeroActivo", numeroActivo)
                 .putString("NumeroEtiqueta", etiqueta)
                 .putString("Descripcion", descripcion)
-                .putString("Categoria", categoria)
-                .putString("Estado", estado)
-                .putString("Empresa", empresa)
-                .putString("Marca", marca)
-                .putString("Modelo", modelo)
+                .putString("Categoria", selectedCategoriaId) // Guardamos ID
+                .putString("Estado", selectedEstadoId)
+                .putString("Empresa", selectedEmpresaId)
+                .putString("Marca", selectedMarcaId)
+                .putString("Modelo", selectedModeloId)
                 .apply();
 
         Intent intent = new Intent(this, RegistroActivoFotoTagActivity.class);

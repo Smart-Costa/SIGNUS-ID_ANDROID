@@ -85,7 +85,7 @@ public class ActivoEntity {
     @SerializedName(value = "DESCRIPCION_ESTADO_ULTIMO_INVENTARIO", alternate = {"DescripcionEstadoUltimoInventario", "descripcionEstadoUltimoInventario"})
     private String descripcionEstadoUltimoInventario;
 
-    @SerializedName(value = "TAG_EPC", alternate = {"TagEpc", "tagEpc", "EPC", "epc"})
+    @SerializedName(value = "TAG_EPC", alternate = {"TagEpc", "tagEpc"})
     private String tagEpc;
 
     @SerializedName(value = "EMPLEADO", alternate = {"Empleado", "empleado"})
@@ -124,6 +124,33 @@ public class ActivoEntity {
     @SerializedName(value = "FECHA_CREACION_ACTIVO", alternate = {"FechaCreacionActivo", "fechaCreacionActivo"})
     private String fechaCreacionActivo;
 
+    @SerializedName(value = "EPC", alternate = {"Epc", "epc"})
+    private String epc;
+
+    @SerializedName(value = "CATEGORIA_A", alternate = {"CategoriaA", "categoriaA"})
+    private String categoriaA;
+
+    @SerializedName(value = "CATEGORIA_B", alternate = {"CategoriaB", "categoriaB"})
+    private String categoriaB;
+
+    @SerializedName(value = "CATEGORIA_C", alternate = {"CategoriaC", "categoriaC"})
+    private String categoriaC;
+
+    @SerializedName(value = "UBICACION_LOGICA_A", alternate = {"UbicacionLogicaA", "ubicacionLogicaA"})
+    private String ubicacionLogicaA;
+
+    @SerializedName(value = "UBICACION_LOGICA_B", alternate = {"UbicacionLogicaB", "ubicacionLogicaB"})
+    private String ubicacionLogicaB;
+
+    @SerializedName(value = "UBICACION_LOGICA_C", alternate = {"UbicacionLogicaC", "ubicacionLogicaC"})
+    private String ubicacionLogicaC;
+
+    @SerializedName(value = "ENTIDAD_ASOCIADA", alternate = {"EntidadAsociada", "entidadAsociada"})
+    private String entidadAsociada;
+
+    @SerializedName(value = "COSTO_DEPRECIACION", alternate = {"CostoDepreciacion", "costoDepreciacion"})
+    private Double costoDepreciacion;
+
     // --- Getters y Setters ---
 
     @NonNull
@@ -132,18 +159,6 @@ public class ActivoEntity {
 
     public String getNumeroActivo() {
         if (numeroActivo == null) return null;
-        if (numeroActivo instanceof String) {
-            return (String) numeroActivo;
-        }
-        if (numeroActivo instanceof Number) {
-            try {
-                BigDecimal bd = new BigDecimal(numeroActivo.toString());
-                bd = bd.stripTrailingZeros();
-                return bd.toPlainString();
-            } catch (Exception e) {
-                return String.valueOf(numeroActivo);
-            }
-        }
         return String.valueOf(numeroActivo);
     }
     public void setNumeroActivo(String numeroActivo) { this.numeroActivo = numeroActivo; }
@@ -255,4 +270,31 @@ public class ActivoEntity {
 
     public String getFechaCreacionActivo() { return fechaCreacionActivo; }
     public void setFechaCreacionActivo(String fechaCreacionActivo) { this.fechaCreacionActivo = fechaCreacionActivo; }
+
+    public String getEpc() { return epc; }
+    public void setEpc(String epc) { this.epc = epc; }
+
+    public String getCategoriaA() { return categoriaA; }
+    public void setCategoriaA(String categoriaA) { this.categoriaA = categoriaA; }
+
+    public String getCategoriaB() { return categoriaB; }
+    public void setCategoriaB(String categoriaB) { this.categoriaB = categoriaB; }
+
+    public String getCategoriaC() { return categoriaC; }
+    public void setCategoriaC(String categoriaC) { this.categoriaC = categoriaC; }
+
+    public String getUbicacionLogicaA() { return ubicacionLogicaA; }
+    public void setUbicacionLogicaA(String ubicacionLogicaA) { this.ubicacionLogicaA = ubicacionLogicaA; }
+
+    public String getUbicacionLogicaB() { return ubicacionLogicaB; }
+    public void setUbicacionLogicaB(String ubicacionLogicaB) { this.ubicacionLogicaB = ubicacionLogicaB; }
+
+    public String getUbicacionLogicaC() { return ubicacionLogicaC; }
+    public void setUbicacionLogicaC(String ubicacionLogicaC) { this.ubicacionLogicaC = ubicacionLogicaC; }
+
+    public String getEntidadAsociada() { return entidadAsociada; }
+    public void setEntidadAsociada(String entidadAsociada) { this.entidadAsociada = entidadAsociada; }
+
+    public Double getCostoDepreciacion() { return costoDepreciacion; }
+    public void setCostoDepreciacion(Double costoDepreciacion) { this.costoDepreciacion = costoDepreciacion; }
 }

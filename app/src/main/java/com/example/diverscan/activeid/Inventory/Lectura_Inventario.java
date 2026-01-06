@@ -1114,7 +1114,7 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
                     subtoma.setFaltantes(String.valueOf(contadorActivosFaltantes));
                     subtoma.setSobrantes(String.valueOf(contadorActivosSobrantes));
                     // Guardar localmente
-                    subTomasDao.syncResumen(java.util.Collections.singletonList(subtoma));
+                    subTomasDao.saveLocal(java.util.Collections.singletonList(subtoma));
                 }
 
                 // 2. Guardar Detalles
@@ -1143,7 +1143,7 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
                 }
                 
                 if (!nuevosDetalles.isEmpty()) {
-                    detallesDao.syncDetalle(nuevosDetalles);
+                    detallesDao.saveLocal(nuevosDetalles);
                 }
             }
             // -------------------------------------------------------------------------------------

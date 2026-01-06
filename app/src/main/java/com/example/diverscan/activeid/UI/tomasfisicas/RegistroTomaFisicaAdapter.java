@@ -45,12 +45,9 @@ public class RegistroTomaFisicaAdapter extends RecyclerView.Adapter<RegistroToma
         holder.itemFechaFinal.setText(formatearFecha(item.getFechaFinal()));
 
         holder.btnLupa.setOnClickListener(v -> {
-            Intent intent = new Intent(holder.itemView.getContext(),
-                    RegistroInventarioElectronicosActivity.class);
-
+            Intent intent = new Intent(holder.itemView.getContext(), DetalleTomaFisicaActivity.class);
             intent.putExtra("tomaFisicaId", item.getTomaFisicaId());
             intent.putExtra("nombre", item.getNombre());
-
             holder.itemView.getContext().startActivity(intent);
         });
     }

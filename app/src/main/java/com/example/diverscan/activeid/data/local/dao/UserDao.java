@@ -54,13 +54,13 @@ public class UserDao {
     public void saveUser(LoginEntity u) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("userSysId", u.userSysId);
+        values.put("_id", u.userSysId);
         values.put("username", u.username);
         values.put("email", u.email);
-        values.put("password", u.password);
-        values.put("isApproved", u.isApproved ? 1 : 0);
+        values.put("pass", u.password);
+        values.put("aprobado", u.isApproved ? 1 : 0);
         values.put("isOnLine", u.isOnLine ? 1 : 0);
-        values.put("isLockedOut", u.isLockedOut ? 1 : 0);
+        values.put("bloqueado", u.isLockedOut ? 1 : 0);
         values.put("Idrol", u.Idrol);
 
         db.insertWithOnConflict("Users", null, values, SQLiteDatabase.CONFLICT_REPLACE);
@@ -151,13 +151,13 @@ public class UserDao {
         if (cursor.moveToFirst()) {
             do {
                 LoginEntity u = new LoginEntity();
-                u.userSysId = cursor.getString(cursor.getColumnIndexOrThrow("userSysId"));
+                u.userSysId = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
                 u.username = cursor.getString(cursor.getColumnIndexOrThrow("username"));
                 u.email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
-                u.password = cursor.getString(cursor.getColumnIndexOrThrow("password"));
-                u.isApproved = cursor.getInt(cursor.getColumnIndexOrThrow("isApproved")) == 1;
+                u.password = cursor.getString(cursor.getColumnIndexOrThrow("pass"));
+                u.isApproved = cursor.getInt(cursor.getColumnIndexOrThrow("aprobado")) == 1;
                 u.isOnLine = cursor.getInt(cursor.getColumnIndexOrThrow("isOnLine")) == 1;
-                u.isLockedOut = cursor.getInt(cursor.getColumnIndexOrThrow("isLockedOut")) == 1;
+                u.isLockedOut = cursor.getInt(cursor.getColumnIndexOrThrow("bloqueado")) == 1;
                 u.Idrol = cursor.getString(cursor.getColumnIndexOrThrow("Idrol"));
                 users.add(u);
             } while (cursor.moveToNext());

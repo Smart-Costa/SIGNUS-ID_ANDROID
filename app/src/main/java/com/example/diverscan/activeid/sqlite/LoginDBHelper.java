@@ -16,7 +16,7 @@ public class LoginDBHelper extends SQLiteOpenHelper
 {
 
     public static final String DATABASE_NAME = "Test_ActiveId_v1";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
     int i = 1;
     public LoginDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -29,7 +29,7 @@ public class LoginDBHelper extends SQLiteOpenHelper
 
             db.execSQL("CREATE TABLE if not exists Users (_id text PRIMARY KEY, username Text, pass Text, email Text, bloqueado Text," +
                     " aprobado Text, sesionActiva Text, contrasenaFallida Text, UltimaActividad Text, UltimoInicio Text," +
-                    " FechaBloqueo Text, Sync Text)");
+                    " FechaBloqueo Text, Sync Text, isOnLine INTEGER, Idrol Text)");
             db.execSQL("CREATE UNIQUE INDEX idx_Users_id ON Users (_id)"); //cada tabla Necesita el index sino no reemplaza y inserta duplicados
 
             db.execSQL("CREATE TABLE if not exists Oficina (_id Text PRIMARY KEY, Nombre Text, idPiso Text, Piso Text, Tag Text, EPC Text, Nuevo Text, sinc Text)");

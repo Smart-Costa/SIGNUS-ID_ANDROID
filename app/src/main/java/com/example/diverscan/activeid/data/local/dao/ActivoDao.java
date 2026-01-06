@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
+import com.example.diverscan.activeid.Utilities.Fechas;
 import com.example.diverscan.activeid.TomasFisicas.EntidadActivosInventarios;
 import com.example.diverscan.activeid.data.remote.api.ApiClient;
 import com.example.diverscan.activeid.data.remote.response.ApiCallback;
@@ -31,6 +32,19 @@ public class ActivoDao {
     public ActivoDao(Context context) {
         this.context = context.getApplicationContext();
         this.dbHelper = new AppDatabaseHelper(context);
+    }
+
+    public int getActivosCount() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        int count = 0;
+        try (Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_ACTIVOS, null)) {
+            if (c.moveToFirst()) {
+                count = c.getInt(0);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error counting activos", e);
+        }
+        return count;
     }
 
     private ContentValues entityToContentValues(ActivoEntity a) {
@@ -75,6 +89,16 @@ public class ActivoDao {
         v.put("ESTADO_ACTIVO", (a.getEstadoActivo() != null && a.getEstadoActivo()) ? 1 : 0);
         v.put("FECHA_CREACION_ACTIVO", a.getFechaCreacionActivo());
 
+        v.put("EPC", a.getEpc());
+        v.put("CATEGORIA_A", a.getCategoriaA());
+        v.put("CATEGORIA_B", a.getCategoriaB());
+        v.put("CATEGORIA_C", a.getCategoriaC());
+        v.put("UBICACION_LOGICA_A", a.getUbicacionLogicaA());
+        v.put("UBICACION_LOGICA_B", a.getUbicacionLogicaB());
+        v.put("UBICACION_LOGICA_C", a.getUbicacionLogicaC());
+        v.put("ENTIDAD_ASOCIADA", a.getEntidadAsociada());
+        v.put("COSTO_DEPRECIACION", a.getCostoDepreciacion());
+
         return v;
     }
 
@@ -106,67 +130,149 @@ public class ActivoDao {
         }
     }
 
-    public void pushLocalChangesToApi(final Runnable onComplete) {
+    public void pushLocalChangesToApi(final ApiCallback<JsonElement> callback) {
         final List<ActivoEntity> pending = getPendingActivos();
         if (pending.isEmpty()) {
             Log.d(TAG, "No hay activos pendientes de sincronizar.");
-            if (onComplete != null) onComplete.run();
+            if (callback != null) callback.onComplete(ApiResponse.success(null, 200));
             return;
         }
 
         ApiClient api = ApiClient.getInstance(context);
-        
-        // Construir JsonArray
+
         JsonArray jsonArray = new JsonArray();
         for (ActivoEntity a : pending) {
             JsonObject o = new JsonObject();
-            // Mapear campos requeridos por el API (según ActivosController.cs)
-            // Nota: El API espera nombres de propiedades específicos.
-            // Si el API usa deserialización automática, deben coincidir con las propiedades de la clase C#.
-            // ActivosController usa: item.Value<string>("NUMERO_ACTIVO") etc.
+            // Mapeo manual para asegurar nombres de campos y validar GUIDs
+            o.addProperty("ID_ACTIVO", validateGuid(a.getIdActivo()));
             
-            o.addProperty("ID_ACTIVO", a.getIdActivo());
-            o.addProperty("NUMERO_ACTIVO", a.getNumeroActivo());
+            Number numActivo = validateLong(a.getNumeroActivo());
+            if (numActivo != null) {
+                o.addProperty("NUMERO_ACTIVO", numActivo);
+            } else {
+                o.add("NUMERO_ACTIVO", com.google.gson.JsonNull.INSTANCE);
+            }
+
             o.addProperty("NUMERO_ETIQUETA", a.getNumeroEtiqueta());
             o.addProperty("DESCRIPCION_CORTA", a.getDescripcionCorta());
             o.addProperty("DESCRIPCION_LARGA", a.getDescripcionLarga());
-            o.addProperty("CATEGORIA", a.getCategoria());
-            o.addProperty("ESTADO", a.getEstado());
-            o.addProperty("EMPRESA", a.getEmpresa());
-            o.addProperty("MARCA", a.getMarca());
-            o.addProperty("MODELO", a.getModelo());
+            o.addProperty("CATEGORIA", validateGuid(a.getCategoria()));
+            o.addProperty("ESTADO", validateGuid(a.getEstado()));
+            o.addProperty("EMPRESA", validateGuid(a.getEmpresa()));
+            o.addProperty("MARCA", validateGuid(a.getMarca()));
+            o.addProperty("MODELO", validateGuid(a.getModelo()));
             o.addProperty("NUMERO_SERIE", a.getNumeroSerie());
             o.addProperty("COSTO", a.getCosto());
             o.addProperty("NUMERO_FACTURA", a.getNumeroFactura());
-            o.addProperty("FECHA_COMPRA", a.getFechaCompra());
-            o.addProperty("FECHA_CAPITALIZACION", a.getFechaCapitalizacion());
+            o.addProperty("FECHA_COMPRA", validateDate(a.getFechaCompra()));
+            o.addProperty("FECHA_CAPITALIZACION", validateDate(a.getFechaCapitalizacion()));
             o.addProperty("VALOR_RESIDUAL", a.getValorResidual());
+            o.addProperty("DOCUMENTO", a.getDocumento());
+            o.addProperty("FOTOS", a.getFotos());
+            o.addProperty("NUMERO_PARTE_FABRICANTE", a.getNumeroParteFabricante());
+            o.addProperty("DEPRECIADO", a.getDepreciado());
+            o.addProperty("DESCRIPCION_DEPRECIADO", a.getDescripcionDepreciado());
+            o.addProperty("ANOS_VIDA_UTIL", a.getAnosVidaUtil());
+            o.addProperty("CUENTA_CONTABLE_DEPRESIACION", a.getCuentaContableDepresiacion());
+            o.addProperty("CENTRO_COSTOS", a.getCentroCostos());
+            o.addProperty("DESCRIPCION_ESTADO_ULTIMO_INVENTARIO", a.getDescripcionEstadoUltimoInventario());
             o.addProperty("TAG_EPC", a.getTagEpc());
+            o.addProperty("EMPLEADO", validateGuid(a.getEmpleado()));
+            o.addProperty("UBICACION_A", validateGuid(a.getUbicacionA()));
+            o.addProperty("UBICACION_B", validateGuid(a.getUbicacionB()));
+            o.addProperty("UBICACION_C", validateGuid(a.getUbicacionC()));
+            o.addProperty("UBICACION_D", validateGuid(a.getUbicacionD()));
             o.addProperty("COLOR", a.getColor());
             o.addProperty("TAMANIO_MEDIDA", a.getTamanioMedida());
             o.addProperty("OBSERVACIONES", a.getObservaciones());
             o.addProperty("ESTADO_ACTIVO", (a.getEstadoActivo() != null && a.getEstadoActivo()));
-            // Añadir más campos si es necesario
-            
+            o.addProperty("FECHA_CREACION_ACTIVO", validateDate(a.getFechaCreacionActivo()));
+
             jsonArray.add(o);
         }
 
-        // Endpoint: api/Activos/sincronizar
-        // ApiClient.post espera un objeto, pasamos JsonArray
-        Type type = new TypeToken<JsonElement>() {}.getType(); // Respuesta genérica
+        Type type = new TypeToken<JsonElement>() {}.getType();
 
-        api.post("Activos/sincronizar", jsonArray, type, new ApiCallback<JsonElement>() {
+        String jsonLog = jsonArray.toString();
+        Log.d(TAG, "Enviando SyncBatch payload (pending_count=" + pending.size() + ", size_bytes=" + jsonLog.length() + "): " + jsonLog);
+
+        api.post("Activos/SyncBatch", jsonArray, type, new ApiCallback<JsonElement>() {
             @Override
             public void onComplete(ApiResponse<JsonElement> response) {
                 if (response.success) {
                     Log.d(TAG, "Activos sincronizados correctamente: " + pending.size());
                     markAsSynced(pending);
                 } else {
-                    Log.e(TAG, "Error al sincronizar activos: " + response.errorMessage);
+                    Log.e(TAG, "Error al sincronizar activos: " + response.errorMessage + " Code: " + response.statusCode);
                 }
-                if (onComplete != null) onComplete.run();
+                if (callback != null) callback.onComplete(response);
             }
         });
+    }
+
+    private String validateGuid(String guid) {
+        if (guid == null || guid.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            java.util.UUID.fromString(guid);
+            return guid;
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    private Number validateLong(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            Double d = Double.parseDouble(value);
+            return d.longValue();
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private String validateDate(String date) {
+        if (date == null || date.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            // Convert dd-MM-yyyy to yyyy-MM-dd if necessary
+            if (date.matches("\\d{2}-\\d{2}-\\d{4}")) {
+                String[] parts = date.split("-");
+                return parts[2] + "-" + parts[1] + "-" + parts[0];
+            }
+            // Check if already ISO
+            if (date.matches("\\d{4}-\\d{2}-\\d{2}.*")) {
+                return date;
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return null;
+    }
+
+
+    public java.util.Map<String, Integer> getPendingSummary() {
+        java.util.Map<String, Integer> summary = new java.util.HashMap<>();
+        int creados = 0;
+        int bajas = 0;
+        List<ActivoEntity> pending = getPendingActivos();
+        
+        for (ActivoEntity a : pending) {
+            // Asumimos que si ESTADO_ACTIVO es false, es una baja. Si es true, es creado/modificado.
+            if (a.getEstadoActivo() != null && !a.getEstadoActivo()) {
+                bajas++;
+            } else {
+                creados++;
+            }
+        }
+        summary.put("creados", creados);
+        summary.put("bajas", bajas);
+        summary.put("total", pending.size());
+        return summary;
     }
 
     private List<ActivoEntity> getPendingActivos() {
@@ -243,47 +349,271 @@ public class ActivoDao {
         a.setObservaciones(c.getString(c.getColumnIndexOrThrow("OBSERVACIONES")));
         a.setEstadoActivo(c.getInt(c.getColumnIndexOrThrow("ESTADO_ACTIVO")) == 1);
         a.setFechaCreacionActivo(c.getString(c.getColumnIndexOrThrow("FECHA_CREACION_ACTIVO")));
+        // Handle optional columns that might not exist in older DB versions if ensureActivosApiTable wasn't fully effective yet
+        try { a.setEpc(c.getString(c.getColumnIndexOrThrow("EPC"))); } catch (IllegalArgumentException e) {}
+        try { a.setCategoriaA(c.getString(c.getColumnIndexOrThrow("CATEGORIA_A"))); } catch (IllegalArgumentException e) {}
+        try { a.setCategoriaB(c.getString(c.getColumnIndexOrThrow("CATEGORIA_B"))); } catch (IllegalArgumentException e) {}
+        try { a.setCategoriaC(c.getString(c.getColumnIndexOrThrow("CATEGORIA_C"))); } catch (IllegalArgumentException e) {}
+        try { a.setUbicacionLogicaA(c.getString(c.getColumnIndexOrThrow("UBICACION_LOGICA_A"))); } catch (IllegalArgumentException e) {}
+        try { a.setUbicacionLogicaB(c.getString(c.getColumnIndexOrThrow("UBICACION_LOGICA_B"))); } catch (IllegalArgumentException e) {}
+        try { a.setUbicacionLogicaC(c.getString(c.getColumnIndexOrThrow("UBICACION_LOGICA_C"))); } catch (IllegalArgumentException e) {}
+        try { a.setEntidadAsociada(c.getString(c.getColumnIndexOrThrow("ENTIDAD_ASOCIADA"))); } catch (IllegalArgumentException e) {}
+        try { a.setCostoDepreciacion(c.getDouble(c.getColumnIndexOrThrow("COSTO_DEPRECIACION"))); } catch (IllegalArgumentException e) {}
+        
         return a;
     }
 
-    public List<ActivoEntity> getActivosByUbicacion(String idOficina) {
+    public List<ActivoEntity> getActivosByFiltros(String ua, String ub, String uc, String ud) {
+        return getActivosByFiltros(ua, ub, uc, ud, null);
+    }
+
+    public List<ActivoEntity> getActivosByFiltros(String ua, String ub, String uc, String ud, String us) {
+        // Implementation delegates to a private helper or we build the query here
+        // For simplicity, let's build the query.
+        // If parameters are null or empty, we ignore them (wildcard behavior).
+        // BUT if the user strictly wants "only A", and B is not selected, do we filter B?
+        // Usually, if B is not selected, we don't filter by B.
+        // However, the caller (NuevaTomaActivity) will pass the selected values.
+        
         List<ActivoEntity> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        try (Cursor c = db.rawQuery("SELECT * FROM " + TABLE_ACTIVOS + " WHERE UBICACION_D = ?", new String[]{idOficina})) {
+        
+        StringBuilder selection = new StringBuilder("1=1");
+        List<String> args = new ArrayList<>();
+        
+        if (ua != null && !ua.isEmpty() && !ua.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND UBICACION_A = ?");
+            args.add(ua);
+        }
+        if (ub != null && !ub.isEmpty() && !ub.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND UBICACION_B = ?");
+            args.add(ub);
+        }
+        if (uc != null && !uc.isEmpty() && !uc.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND UBICACION_C = ?");
+            args.add(uc);
+        }
+        if (ud != null && !ud.isEmpty() && !ud.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND UBICACION_D = ?");
+            args.add(ud);
+        }
+        if (us != null && !us.isEmpty() && !us.equals("Todas")) { // Assuming "Todas" is the default "All" value
+             // If US is "NULL", we might want to search for IS NULL?
+             // Or if it's a specific string.
+             selection.append(" AND UBICACION_SECUNDARIA = ?");
+             args.add(us);
+        }
+
+        Cursor c = null;
+        try {
+            c = db.query(TABLE_ACTIVOS, null, selection.toString(), args.toArray(new String[0]), null, null, null);
             if (c.moveToFirst()) {
                 do {
-                    ActivoEntity a = new ActivoEntity();
-                    a.setIdActivo(c.getString(c.getColumnIndexOrThrow("ID_ACTIVO")));
-                    a.setNumeroActivo(c.getString(c.getColumnIndexOrThrow("NUMERO_ACTIVO")));
-                    a.setNumeroEtiqueta(c.getString(c.getColumnIndexOrThrow("NUMERO_ETIQUETA")));
-                    a.setDescripcionCorta(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")));
-                    a.setDescripcionLarga(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_LARGA")));
-                    a.setCategoria(c.getString(c.getColumnIndexOrThrow("CATEGORIA")));
-                    a.setEstado(c.getString(c.getColumnIndexOrThrow("ESTADO")));
-                    a.setEmpresa(c.getString(c.getColumnIndexOrThrow("EMPRESA")));
-                    a.setMarca(c.getString(c.getColumnIndexOrThrow("MARCA")));
-                    a.setModelo(c.getString(c.getColumnIndexOrThrow("MODELO")));
-                    a.setNumeroSerie(c.getString(c.getColumnIndexOrThrow("NUMERO_SERIE")));
-                    a.setCosto(c.getDouble(c.getColumnIndexOrThrow("COSTO")));
-                    a.setNumeroFactura(c.getString(c.getColumnIndexOrThrow("NUMERO_FACTURA")));
-                    a.setValorResidual(c.getDouble(c.getColumnIndexOrThrow("VALOR_RESIDUAL")));
-                    a.setTagEpc(c.getString(c.getColumnIndexOrThrow("TAG_EPC")));
-                    a.setColor(c.getString(c.getColumnIndexOrThrow("COLOR")));
-                    a.setObservaciones(c.getString(c.getColumnIndexOrThrow("OBSERVACIONES")));
-                    a.setUbicacionA(c.getString(c.getColumnIndexOrThrow("UBICACION_A")));
-                    a.setUbicacionB(c.getString(c.getColumnIndexOrThrow("UBICACION_B")));
-                    a.setUbicacionC(c.getString(c.getColumnIndexOrThrow("UBICACION_C")));
-                    a.setUbicacionD(c.getString(c.getColumnIndexOrThrow("UBICACION_D")));
-                    a.setUbicacionSecundaria(c.getString(c.getColumnIndexOrThrow("UBICACION_SECUNDARIA")));
-                    list.add(a);
+                    list.add(cursorToEntity(c));
                 } while (c.moveToNext());
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error leyendo activos por ubicacion", e);
+            Log.e(TAG, "Error getActivosByFiltros", e);
+        } finally {
+            if (c != null) c.close();
+            db.close();
+        }
+        return list;
+    }
+
+    public int countActivosByFiltros(String ua, String ub, String uc, String ud) {
+        return countActivosByFiltros(ua, ub, uc, ud, null);
+    }
+
+    public int countActivosByFiltros(String ua, String ub, String uc, String ud, String us) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        StringBuilder selection = new StringBuilder("1=1");
+        List<String> args = new ArrayList<>();
+
+        if (ua != null && !ua.isEmpty() && !ua.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND UBICACION_A = ?");
+            args.add(ua);
+        }
+        if (ub != null && !ub.isEmpty() && !ub.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND UBICACION_B = ?");
+            args.add(ub);
+        }
+        if (uc != null && !uc.isEmpty() && !uc.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND UBICACION_C = ?");
+            args.add(uc);
+        }
+        if (ud != null && !ud.isEmpty() && !ud.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND UBICACION_D = ?");
+            args.add(ud);
+        }
+        if (us != null && !us.isEmpty() && !us.equals("Todas")) {
+            selection.append(" AND UBICACION_SECUNDARIA = ?");
+            args.add(us);
+        }
+
+        Cursor c = null;
+        try {
+            c = db.rawQuery(
+                "SELECT COUNT(*) FROM " + TABLE_ACTIVOS + " WHERE " + selection,
+                args.toArray(new String[0])
+            );
+            if (c.moveToFirst()) {
+                return c.getInt(0);
+            }
+            return 0;
+        } catch (Exception e) {
+            Log.e(TAG, "Error countActivosByFiltros", e);
+            return 0;
+        } finally {
+            if (c != null) c.close();
+            db.close();
+        }
+    }
+
+    public List<String> getDistinctUbicacionSecundaria(String ud) {
+        List<String> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = null;
+        try {
+            String selection = "UBICACION_SECUNDARIA IS NOT NULL AND UBICACION_SECUNDARIA != ''";
+            List<String> args = new ArrayList<>();
+            if (ud != null && !ud.isEmpty() && !ud.equals("00000000-0000-0000-0000-000000000000")) {
+                selection += " AND UBICACION_D = ?";
+                args.add(ud);
+            }
+            
+            c = db.query(true, TABLE_ACTIVOS, new String[]{"UBICACION_SECUNDARIA"}, selection, args.toArray(new String[0]), null, null, "UBICACION_SECUNDARIA ASC", null);
+            if (c.moveToFirst()) {
+                do {
+                    list.add(c.getString(0));
+                } while (c.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getDistinctUbicacionSecundaria", e);
+        } finally {
+            if (c != null) c.close();
+            db.close();
+        }
+        return list;
+    }
+
+    public List<ActivoEntity> getActivosByUbicacion(String idOficina) {
+        // Mantenemos este metodo por compatibilidad, asumiendo que idOficina mapea a UBICACION_D
+        return getActivosByFiltros(null, null, null, idOficina);
+    }
+
+    public List<ActivoEntity> getActivosByUbicacionColumn(String column, String ubicacionId) {
+        if (ubicacionId == null || ubicacionId.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String safeColumn;
+        if ("UBICACION_A".equalsIgnoreCase(column)) safeColumn = "UBICACION_A";
+        else if ("UBICACION_B".equalsIgnoreCase(column)) safeColumn = "UBICACION_B";
+        else if ("UBICACION_C".equalsIgnoreCase(column)) safeColumn = "UBICACION_C";
+        else if ("UBICACION_D".equalsIgnoreCase(column)) safeColumn = "UBICACION_D";
+        else throw new IllegalArgumentException("Invalid column: " + column);
+
+        List<ActivoEntity> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        try (Cursor c = db.rawQuery(
+                "SELECT * FROM " + TABLE_ACTIVOS + " WHERE " + safeColumn + " = ?",
+                new String[]{ubicacionId.trim()}
+        )) {
+            if (c.moveToFirst()) {
+                do {
+                    list.add(cursorToEntity(c));
+                } while (c.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error leyendo activos por columna de ubicacion", e);
         } finally {
             db.close();
         }
         return list;
+    }
+
+    public int countActivosByUbicacionColumn(String column, String ubicacionId) {
+        if (ubicacionId == null || ubicacionId.trim().isEmpty()) {
+            return 0;
+        }
+
+        String safeColumn;
+        if ("UBICACION_A".equalsIgnoreCase(column)) safeColumn = "UBICACION_A";
+        else if ("UBICACION_B".equalsIgnoreCase(column)) safeColumn = "UBICACION_B";
+        else if ("UBICACION_C".equalsIgnoreCase(column)) safeColumn = "UBICACION_C";
+        else if ("UBICACION_D".equalsIgnoreCase(column)) safeColumn = "UBICACION_D";
+        else throw new IllegalArgumentException("Invalid column: " + column);
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        try (Cursor c = db.rawQuery(
+                "SELECT COUNT(*) FROM " + TABLE_ACTIVOS + " WHERE " + safeColumn + " = ?",
+                new String[]{ubicacionId.trim()}
+        )) {
+            if (c.moveToFirst()) {
+                return c.getInt(0);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error contando activos por columna de ubicacion", e);
+        } finally {
+            db.close();
+        }
+        return 0;
+    }
+
+    public List<ActivoEntity> getActivosByAnyUbicacion(String ubicacionId) {
+        if (ubicacionId == null || ubicacionId.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String id = ubicacionId.trim();
+        List<ActivoEntity> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_ACTIVOS + " WHERE UBICACION_A = ? OR UBICACION_B = ? OR UBICACION_C = ? OR UBICACION_D = ?";
+        Log.d(TAG, "getActivosByAnyUbicacion: Executing query: " + query + " with param: " + id);
+        try (Cursor c = db.rawQuery(
+                query,
+                new String[]{id, id, id, id}
+        )) {
+            if (c.moveToFirst()) {
+                do {
+                    list.add(cursorToEntity(c));
+                } while (c.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error leyendo activos por cualquier ubicacion", e);
+        } finally {
+            db.close();
+        }
+        Log.d(TAG, "getActivosByAnyUbicacion: Found " + list.size() + " records.");
+        return list;
+    }
+
+    public int countActivosByAnyUbicacion(String ubicacionId) {
+        if (ubicacionId == null || ubicacionId.trim().isEmpty()) {
+            return 0;
+        }
+
+        String id = ubicacionId.trim();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_ACTIVOS + " WHERE UBICACION_A = ? OR UBICACION_B = ? OR UBICACION_C = ? OR UBICACION_D = ?";
+        Log.d(TAG, "countActivosByAnyUbicacion: Executing query: " + query + " with param: " + id);
+        try (Cursor c = db.rawQuery(
+                query,
+                new String[]{id, id, id, id}
+        )) {
+            if (c.moveToFirst()) {
+                int count = c.getInt(0);
+                Log.d(TAG, "countActivosByAnyUbicacion: Count result=" + count);
+                return count;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error contando activos por cualquier ubicacion", e);
+        } finally {
+            db.close();
+        }
+        return 0;
     }
 
     public List<ActivoEntity> getAllLocalActivos() {
@@ -292,24 +622,7 @@ public class ActivoDao {
         try (Cursor c = db.rawQuery("SELECT * FROM " + TABLE_ACTIVOS, null)) {
             if (c.moveToFirst()) {
                 do {
-                    ActivoEntity a = new ActivoEntity();
-                    a.setIdActivo(c.getString(c.getColumnIndexOrThrow("ID_ACTIVO")));
-                    a.setNumeroActivo(c.getString(c.getColumnIndexOrThrow("NUMERO_ACTIVO")));
-                    a.setNumeroEtiqueta(c.getString(c.getColumnIndexOrThrow("NUMERO_ETIQUETA")));
-                    a.setDescripcionCorta(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")));
-                    a.setDescripcionLarga(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_LARGA")));
-                    a.setCategoria(c.getString(c.getColumnIndexOrThrow("CATEGORIA")));
-                    a.setEstado(c.getString(c.getColumnIndexOrThrow("ESTADO")));
-                    a.setEmpresa(c.getString(c.getColumnIndexOrThrow("EMPRESA")));
-                    a.setMarca(c.getString(c.getColumnIndexOrThrow("MARCA")));
-                    a.setModelo(c.getString(c.getColumnIndexOrThrow("MODELO")));
-                    a.setNumeroSerie(c.getString(c.getColumnIndexOrThrow("NUMERO_SERIE")));
-                    a.setCosto(c.getDouble(c.getColumnIndexOrThrow("COSTO")));
-                    a.setNumeroFactura(c.getString(c.getColumnIndexOrThrow("NUMERO_FACTURA")));
-                    a.setValorResidual(c.getDouble(c.getColumnIndexOrThrow("VALOR_RESIDUAL")));
-                    a.setTagEpc(c.getString(c.getColumnIndexOrThrow("TAG_EPC")));
-                    a.setColor(c.getString(c.getColumnIndexOrThrow("COLOR")));
-                    a.setObservaciones(c.getString(c.getColumnIndexOrThrow("OBSERVACIONES")));
+                    ActivoEntity a = cursorToEntity(c);
                     list.add(a);
                 } while (c.moveToNext());
             }
@@ -323,34 +636,30 @@ public class ActivoDao {
     }
 
     public ActivoEntity getActivoByEpc(String epc) {
+        return getActivoByEpc(epc, true);
+    }
+
+    public ActivoEntity getActivoByEpc(String epc, boolean incluirBajas) {
         ActivoEntity activo = null;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        try (Cursor c = db.rawQuery(
-                "SELECT * FROM " + TABLE_ACTIVOS + " WHERE TAG_EPC = ? LIMIT 1",
-                new String[]{epc}
+        String selection = "TAG_EPC = ?";
+        if (!incluirBajas) {
+            selection += " AND ESTADO_ACTIVO = 1";
+        }
+
+        try (Cursor c = db.query(
+                TABLE_ACTIVOS,
+                null,
+                selection,
+                new String[]{epc},
+                null,
+                null,
+                null,
+                "1"
         )) {
             if (c.moveToFirst()) {
-                activo = new ActivoEntity();
-
-                activo.setIdActivo(c.getString(c.getColumnIndexOrThrow("ID_ACTIVO")));
-                activo.setNumeroActivo(c.getString(c.getColumnIndexOrThrow("NUMERO_ACTIVO")));
-                activo.setNumeroEtiqueta(c.getString(c.getColumnIndexOrThrow("NUMERO_ETIQUETA")));
-                activo.setDescripcionCorta(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")));
-                activo.setDescripcionLarga(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_LARGA")));
-                activo.setCategoria(c.getString(c.getColumnIndexOrThrow("CATEGORIA")));
-                activo.setEstado(c.getString(c.getColumnIndexOrThrow("ESTADO")));
-                activo.setEmpresa(c.getString(c.getColumnIndexOrThrow("EMPRESA")));
-                activo.setMarca(c.getString(c.getColumnIndexOrThrow("MARCA")));
-                activo.setModelo(c.getString(c.getColumnIndexOrThrow("MODELO")));
-                activo.setNumeroSerie(c.getString(c.getColumnIndexOrThrow("NUMERO_SERIE")));
-                activo.setCosto(c.getDouble(c.getColumnIndexOrThrow("COSTO")));
-                activo.setNumeroFactura(c.getString(c.getColumnIndexOrThrow("NUMERO_FACTURA")));
-                activo.setValorResidual(c.getDouble(c.getColumnIndexOrThrow("VALOR_RESIDUAL")));
-                activo.setTagEpc(c.getString(c.getColumnIndexOrThrow("TAG_EPC")));
-                activo.setFotos(c.getString(c.getColumnIndexOrThrow("FOTOS")));
-                activo.setColor(c.getString(c.getColumnIndexOrThrow("COLOR")));
-                activo.setObservaciones(c.getString(c.getColumnIndexOrThrow("OBSERVACIONES")));
+                activo = cursorToEntity(c);
             }
         } catch (Exception e) {
             Log.e("TAG", "Error consultando por EPC", e);
@@ -362,27 +671,33 @@ public class ActivoDao {
     }
 
     public ActivoEntity getActivoById(String id) {
+        return getActivoById(id, true);
+    }
+
+    public ActivoEntity getActivoById(String id, boolean incluirBajas) {
         ActivoEntity activo = null;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        try (Cursor c = db.rawQuery(
-                "SELECT * FROM " + TABLE_ACTIVOS + " WHERE NUMERO_ACTIVO = ? LIMIT 1",
-                new String[]{id}
+        String selection = "NUMERO_ACTIVO = ?";
+        if (!incluirBajas) {
+            selection += " AND ESTADO_ACTIVO = 1";
+        }
+
+        try (Cursor c = db.query(
+                TABLE_ACTIVOS,
+                null,
+                selection,
+                new String[]{id},
+                null,
+                null,
+                null,
+                "1"
         )) {
             if (c.moveToFirst()) {
-                activo = new ActivoEntity();
-
-                activo.setIdActivo(c.getString(c.getColumnIndexOrThrow("ID_ACTIVO")));
-                activo.setNumeroActivo(c.getString(c.getColumnIndexOrThrow("NUMERO_ACTIVO")));
-                activo.setNumeroEtiqueta(c.getString(c.getColumnIndexOrThrow("NUMERO_ETIQUETA")));
-                activo.setDescripcionCorta(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")));
-                activo.setNumeroSerie(c.getString(c.getColumnIndexOrThrow("NUMERO_SERIE")));
-                activo.setTagEpc(c.getString(c.getColumnIndexOrThrow("TAG_EPC")));
-                activo.setFotos(c.getString(c.getColumnIndexOrThrow("FOTOS")));
-                activo.setObservaciones(c.getString(c.getColumnIndexOrThrow("OBSERVACIONES")));
+                activo = cursorToEntity(c);
             }
         } catch (Exception e) {
-            Log.e("TAG", "Error consultando por EPC", e);
+            Log.e("TAG", "Error consultando por ID", e);
         } finally {
             db.close();
         }
@@ -434,7 +749,7 @@ public class ActivoDao {
                     c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")),
                     c.getString(c.getColumnIndexOrThrow("TAG_EPC")),
                     c.getString(c.getColumnIndexOrThrow("ID_ACTIVO")),
-                    c.getString(c.getColumnIndex("NombreOficina")), // Use getColumnIndex, might be -1 if not found? No, rawQuery returns it.
+                    c.getString(c.getColumnIndexOrThrow("NombreOficina")),
                     c.getString(c.getColumnIndexOrThrow("UBICACION_D")),
                     c.getString(c.getColumnIndexOrThrow("UBICACION_C")),
                     c.getString(c.getColumnIndexOrThrow("UBICACION_B")),
@@ -465,7 +780,7 @@ public class ActivoDao {
                     c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")),
                     c.getString(c.getColumnIndexOrThrow("TAG_EPC")),
                     c.getString(c.getColumnIndexOrThrow("ID_ACTIVO")),
-                    c.getString(c.getColumnIndex("NombreOficina")),
+                    c.getString(c.getColumnIndexOrThrow("NombreOficina")),
                     c.getString(c.getColumnIndexOrThrow("UBICACION_D")),
                     c.getString(c.getColumnIndexOrThrow("UBICACION_C")),
                     c.getString(c.getColumnIndexOrThrow("UBICACION_B")),
@@ -487,6 +802,7 @@ public class ActivoDao {
             ContentValues values = new ContentValues();
             boolean estadoActivo = activo.getEstadoActivo() != null && activo.getEstadoActivo();
             values.put("ESTADO_ACTIVO", estadoActivo ? 1 : 0);
+            values.put("SYNC_STATUS", 0); // Mark as pending sync
 
             return db.update(
                     TABLE_ACTIVOS,
@@ -499,24 +815,57 @@ public class ActivoDao {
         }
     }
 
+    public void clearSyncedData() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        try {
+            int deleted = db.delete(TABLE_ACTIVOS, "SYNC_STATUS = 1", null);
+            Log.d(TAG, "Limpieza de datos sincronizados: " + deleted + " registros eliminados.");
+        } catch (Exception e) {
+            Log.e(TAG, "Error limpiando datos sincronizados", e);
+        } finally {
+            db.close();
+        }
+    }
+
     public void fetchAndSyncFromApi() {
         fetchAndSyncFromApi(null);
     }
 
     public void fetchAndSyncFromApi(final Runnable onComplete) {
+        // Start pagination with page 1 and size 5000
+        fetchPage(1, 5000, onComplete);
+    }
+
+    private void fetchPage(int page, int pageSize, final Runnable onComplete) {
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<List<ActivoEntity>>() {}.getType();
+        
+        // Filter by specific company to avoid fetching unrelated data (and millions of records)
+        String empresaId = "58A817F3-E67F-4989-B230-E9E3D4BC6A91";
+        String endpoint = "Activos?page=" + page + "&pageSize=" + pageSize + "&empresaId=" + empresaId;
+        Log.d(TAG, "Requesting Activos page " + page + " (size=" + pageSize + ") for Empresa: " + empresaId);
 
-        api.<List<ActivoEntity>>get("Activos", type, new ApiCallback<List<ActivoEntity>>() {
+        api.<List<ActivoEntity>>get(endpoint, type, new ApiCallback<List<ActivoEntity>>() {
             @Override
             public void onComplete(ApiResponse<List<ActivoEntity>> response) {
                 if (response.success && response.data != null) {
-                    syncActivos(response.data);
-                    Log.d(TAG, "Activos sincronizados desde API: " + response.data.size());
+                    int count = response.data.size();
+                    if (count > 0) {
+                        syncActivos(response.data);
+                        Log.d(TAG, "Page " + page + " synced: " + count + " assets.");
+                        
+                        // Fetch next page recursively
+                        fetchPage(page + 1, pageSize, onComplete);
+                    } else {
+                        // Empty page means we are done
+                        Log.d(TAG, "Finished syncing all pages.");
+                        if (onComplete != null) onComplete.run();
+                    }
                 } else {
-                    Log.e(TAG, "Error al sincronizar activos desde API: " + response.errorMessage);
+                    Log.e(TAG, "Error syncing page " + page + ": " + response.errorMessage);
+                    // Stop on error, but notify completion
+                    if (onComplete != null) onComplete.run();
                 }
-                if (onComplete != null) onComplete.run();
             }
         });
     }
@@ -585,19 +934,9 @@ public class ActivoDao {
         });
     }
 
-    public void pushLocalChangesToApi(final ApiCallback<JsonElement> callback) {
-        List<ActivoEntity> localActivos = getAllLocalActivos();
-        if (localActivos.isEmpty()) {
-            Log.d(TAG, "No hay activos locales para sincronizar");
-            if (callback != null) callback.onComplete(ApiResponse.success(null, 200));
-            return;
-        }
 
-        ApiClient api = ApiClient.getInstance(context);
-        Type type = new TypeToken<JsonElement>() {}.getType();
 
-        // Use SyncBatch as it is available on the remote server
-        api.post("Activos/SyncBatch", localActivos, type, callback);
-    }
+
+
 }
 

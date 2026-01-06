@@ -22,8 +22,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         
         // URL Base por defecto (Ambiente de Pruebas)
-        buildConfigField "String", "BASE_URL", "\"http://3.85.211.90:70/ApiHH/Api\""
-        // buildConfigField "String", "BASE_URL", "\"http://10.0.2.2:5200/api\""
+        // buildConfigField "String", "BASE_URL", "\"http://3.85.211.90:70/ApiHH/Api\""
+        buildConfigField "String", "BASE_URL", "\"http://192.168.1.10:5200/api\""
     }
     buildTypes {
         release {
@@ -32,13 +32,13 @@ android {
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // URL Base para Producción / Pruebas
-            buildConfigField "String", "BASE_URL", "\"http://3.85.211.90:70/ApiHH/Api\""
-            // buildConfigField "String", "BASE_URL", "\"http://10.0.2.2:5200/api\""
+            // buildConfigField "String", "BASE_URL", "\"http://3.85.211.90:70/ApiHH/Api\""
+            buildConfigField "String", "BASE_URL", "\"http://192.168.1.10:5200/api\""
         }
         debug {
             // URL Base para Debug (Ambiente de Pruebas)
+            // buildConfigField "String", "BASE_URL", "\"http://3.85.211.90:70/ApiHH/Api\""
             buildConfigField "String", "BASE_URL", "\"http://3.85.211.90:70/ApiHH/Api\""
-            // buildConfigField "String", "BASE_URL", "\"http://10.0.2.2:5200/api\""
         }
     }
     compileOptions {

@@ -30,24 +30,24 @@ public class RegistroActivoDetailViewModel extends AndroidViewModel {
     private final MutableLiveData<List<ModeloEntity>> modelosEntity = new MutableLiveData<>();
     private final MutableLiveData<List<UbicacionSecundariaEntity>> ubicacionesSecundariasEntity = new MutableLiveData<>();
 
-    private final MutableLiveData<List<String>> categorias = new MutableLiveData<>();
-    private final MutableLiveData<List<String>> estados = new MutableLiveData<>();
-    private final MutableLiveData<List<String>> empresas = new MutableLiveData<>();
-    private final MutableLiveData<List<String>> marcas = new MutableLiveData<>();
-    private final MutableLiveData<List<String>> modelos = new MutableLiveData<>();
-    private final MutableLiveData<List<String>> ubicacionesSecundarias = new MutableLiveData<>();
+    private final MutableLiveData<List<ComboItem>> categorias = new MutableLiveData<>();
+    private final MutableLiveData<List<ComboItem>> estados = new MutableLiveData<>();
+    private final MutableLiveData<List<ComboItem>> empresas = new MutableLiveData<>();
+    private final MutableLiveData<List<ComboItem>> marcas = new MutableLiveData<>();
+    private final MutableLiveData<List<ComboItem>> modelos = new MutableLiveData<>();
+    private final MutableLiveData<List<ComboItem>> ubicacionesSecundarias = new MutableLiveData<>();
 
     public RegistroActivoDetailViewModel(@NonNull Application application) {
         super(application);
         repository = new ActivoRepository();
     }
 
-    public MutableLiveData<List<String>> getCategorias() { return categorias; }
-    public MutableLiveData<List<String>> getEstados() { return estados; }
-    public MutableLiveData<List<String>> getEmpresas() { return empresas; }
-    public MutableLiveData<List<String>> getMarcas() { return marcas; }
-    public MutableLiveData<List<String>> getModelos() { return modelos; }
-    public MutableLiveData<List<String>> getUbicacionesSecundarias() { return ubicacionesSecundarias; }
+    public MutableLiveData<List<ComboItem>> getCategorias() { return categorias; }
+    public MutableLiveData<List<ComboItem>> getEstados() { return estados; }
+    public MutableLiveData<List<ComboItem>> getEmpresas() { return empresas; }
+    public MutableLiveData<List<ComboItem>> getMarcas() { return marcas; }
+    public MutableLiveData<List<ComboItem>> getModelos() { return modelos; }
+    public MutableLiveData<List<ComboItem>> getUbicacionesSecundarias() { return ubicacionesSecundarias; }
 
     public void cargarCatalogos(Context context) {
         repository.obtenerCatalogos(context,
@@ -71,57 +71,76 @@ public class RegistroActivoDetailViewModel extends AndroidViewModel {
         Toast.makeText(context, "Activo guardado correctamente", Toast.LENGTH_SHORT).show();
     }
 
-    private List<String> mapearCategorias(List<CategoriaEntity> lista) {
-        List<String> nombres = new ArrayList<>();
+    private List<ComboItem> mapearCategorias(List<CategoriaEntity> lista) {
+        List<ComboItem> items = new ArrayList<>();
         if (lista != null)
             for (CategoriaEntity item : lista)
                 if (item.getCategoria() != null)
-                    nombres.add(item.getCategoria());
-        return nombres;
+                    items.add(new ComboItem(item.getCSysId(), item.getCategoria()));
+        return items;
     }
 
-    private List<String> mapearEstados(List<EstadoEntity> lista) {
-        List<String> nombres = new ArrayList<>();
+    private List<ComboItem> mapearEstados(List<EstadoEntity> lista) {
+        List<ComboItem> items = new ArrayList<>();
         if (lista != null)
             for (EstadoEntity item : lista)
                 if (item.getEstado() != null)
-                    nombres.add(item.getEstado());
-        return nombres;
+                    items.add(new ComboItem(item.getESysId(), item.getEstado()));
+        return items;
     }
 
-    private List<String> mapearEmpresas(List<EmpresaEntity> lista) {
-        List<String> nombres = new ArrayList<>();
+    private List<ComboItem> mapearEmpresas(List<EmpresaEntity> lista) {
+        List<ComboItem> items = new ArrayList<>();
         if (lista != null)
             for (EmpresaEntity item : lista)
                 if (item.getEmpresa() != null)
-                    nombres.add(item.getEmpresa());
-        return nombres;
+                    items.add(new ComboItem(item.getESysId(), item.getEmpresa()));
+        return items;
     }
 
-    private List<String> mapearMarcas(List<MarcaEntity> lista) {
-        List<String> nombres = new ArrayList<>();
+    private List<ComboItem> mapearMarcas(List<MarcaEntity> lista) {
+        List<ComboItem> items = new ArrayList<>();
         if (lista != null)
             for (MarcaEntity item : lista)
                 if (item.getMarca() != null)
-                    nombres.add(item.getMarca());
-        return nombres;
+                    items.add(new ComboItem(item.getMSysId(), item.getMarca()));
+        return items;
     }
 
-    private List<String> mapearModelos(List<ModeloEntity> lista) {
-        List<String> nombres = new ArrayList<>();
+    private List<ComboItem> mapearModelos(List<ModeloEntity> lista) {
+        List<ComboItem> items = new ArrayList<>();
         if (lista != null)
             for (ModeloEntity item : lista)
                 if (item.getModelo() != null)
-                    nombres.add(item.getModelo());
-        return nombres;
+                    items.add(new ComboItem(item.getMSysId(), item.getModelo()));
+        return items;
     }
 
-    private List<String> mapearUbicacionesSec(List<UbicacionSecundariaEntity> lista) {
-        List<String> nombres = new ArrayList<>();
+    private List<ComboItem> mapearUbicacionesSec(List<UbicacionSecundariaEntity> lista) {
+        List<ComboItem> items = new ArrayList<>();
         if (lista != null)
             for (UbicacionSecundariaEntity item : lista)
                 if (item.getUbicacionS() != null)
-                    nombres.add(item.getUbicacionS());
-        return nombres;
+                    items.add(new ComboItem(item.getUSSysId(), item.getUbicacionS()));
+        return items;
+    }
+
+    public static class ComboItem {
+        private final String id;
+        private final String nombre;
+
+        public ComboItem(String id, String nombre) {
+            this.id = id;
+            this.nombre = nombre;
+        }
+
+        public String getId() { return id; }
+        public String getNombre() { return nombre; }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return nombre;
+        }
     }
 }
