@@ -98,11 +98,12 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
 
         // Uploaded status (Assuming if it's in the list it is uploaded/synced)
         // If needed, check a specific field. For now, always visible if item exists.
-        holder.imgUploaded.setVisibility(View.VISIBLE);
+        // holder.imgUploaded.setVisibility(View.VISIBLE);
         
         // Checkbox logic (if needed, currently just visual)
         holder.chkSeleccion.setChecked(false); 
         
+        /*
         holder.btnGoToCounts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,6 +112,7 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
                 }
             }
         });
+        */
 
         holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,8 +141,8 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtNumeroToma, txtFecha;
         android.widget.CheckBox chkSeleccion;
-        android.widget.ImageView imgUploaded;
-        android.widget.ImageView btnGoToCounts;
+        // android.widget.ImageView imgUploaded;
+        // android.widget.ImageView btnGoToCounts;
         android.widget.ImageView btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
@@ -148,8 +150,8 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
             txtNumeroToma = itemView.findViewById(R.id.txtNumeroToma);
             txtFecha = itemView.findViewById(R.id.txtFecha);
             chkSeleccion = itemView.findViewById(R.id.chkSeleccion);
-            imgUploaded = itemView.findViewById(R.id.imgUploaded);
-            btnGoToCounts = itemView.findViewById(R.id.btnGoToCounts);
+            // imgUploaded = itemView.findViewById(R.id.imgUploaded);
+            // btnGoToCounts = itemView.findViewById(R.id.btnGoToCounts);
             btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }

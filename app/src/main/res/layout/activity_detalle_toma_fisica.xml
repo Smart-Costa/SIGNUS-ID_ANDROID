@@ -10,7 +10,7 @@
         android:id="@+id/headerBar"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:background="#EF6C00"
+        android:background="#FF5100"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="16dp"
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Inventario"
+            android:text="Hacer inventario"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -43,19 +43,33 @@
             android:layout_height="24dp" />
     </LinearLayout>
 
+    <!-- Subtitle: Inventario {Categoria} -->
+    <TextView
+        android:id="@+id/txtCategoriaTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:text="Inventario"
+        android:textColor="#606060"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/headerBar"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <!-- Tabs: Tomas / Tomas Completas -->
     <LinearLayout
         android:id="@+id/layoutTabs"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:layout_marginHorizontal="16dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/headerBar"
+        app:layout_constraintTop_toBottomOf="@id/txtCategoriaTitulo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnTabTomas"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -66,7 +80,7 @@
             android:textAllCaps="false"
             android:layout_marginEnd="8dp"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnTabCompletas"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -78,33 +92,66 @@
             android:layout_marginStart="8dp"/>
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/layoutGauge"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardListContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
         app:layout_constraintTop_toBottomOf="@id/layoutTabs"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/layoutGauge">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerTomas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            tools:listitem="@layout/item_toma_fisica_tomas" />
+
+        <TextView
+            android:id="@+id/txtSinSubtomas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="No hay subtomas registradas"
+            android:gravity="center"
+            android:textColor="#757575"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+    </androidx.cardview.widget.CardView>
+
+    <FrameLayout
+        android:id="@+id/layoutGauge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/cardListContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnNuevaToma">
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/gaugeResumen"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:indeterminate="false"
             android:max="5"
-            app:indicatorColor="#4CAF50"
-            app:trackColor="#E6E6E6"
-            app:trackThickness="14dp"
+            app:indicatorColor="#4DB6AC"
+            app:trackColor="#F0F0F0"
+            app:trackThickness="20dp"
             app:indicatorSize="200dp"
             app:showAnimationBehavior="inward"
             app:hideAnimationBehavior="outward"
             app:indicatorDirectionCircular="clockwise" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -126,47 +173,16 @@
         </LinearLayout>
     </FrameLayout>
 
-    <!-- CardView Container for List -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardListContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="16dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
-        app:layout_constraintTop_toBottomOf="@id/layoutGauge"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btnNuevaToma">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerTomas"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="8dp"
-            tools:listitem="@layout/item_toma_fisica_tomas" />
-
-        <TextView
-            android:id="@+id/txtSinSubtomas"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="No hay subtomas registradas"
-            android:gravity="center"
-            android:textColor="#757575"
-            android:textSize="16sp"
-            android:visibility="gone" />
-
-    </androidx.cardview.widget.CardView>
-
     <!-- Orange Circular + Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnNuevaToma"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/ic_add_to_photos_black_24dp"
-        app:backgroundTint="#FF5722"
+        android:layout_marginBottom="16dp"
+        app:srcCompat="@drawable/ic_plus_white"
+        app:backgroundTint="#FF5100"
         app:tint="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/layoutGauge"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

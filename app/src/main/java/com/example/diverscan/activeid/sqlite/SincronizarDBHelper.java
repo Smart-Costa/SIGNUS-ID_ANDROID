@@ -27,7 +27,7 @@ import java.util.ArrayList;
 public class SincronizarDBHelper  extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "Test_ActiveId_v1";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     public SincronizarDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -360,9 +360,9 @@ public class SincronizarDBHelper  extends SQLiteOpenHelper {
 
         try{
             for (EntidadCategoriaActivos item: categoriaActivos){
-
-                String query = "INSERT OR REPLACE INTO categoriaActivos (assetCategorySysId, description, name)" +
-                        "VALUES ('"+item.getAssetCategorySysId()+"','"+item.getDescription()+"','"+item.getName()+"')";
+                // Use assetCategorySysId as _id
+                String query = "INSERT OR REPLACE INTO categoriaActivos (_id, assetCategorySysId, description, name)" +
+                        "VALUES ('"+item.getAssetCategorySysId()+"','"+item.getAssetCategorySysId()+"','"+item.getDescription()+"','"+item.getName()+"')";
                 db.execSQL(query);
             }
 

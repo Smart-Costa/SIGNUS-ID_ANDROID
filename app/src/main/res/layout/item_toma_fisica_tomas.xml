@@ -35,26 +35,6 @@
         android:textColor="#555555"/>
 
     <ImageView
-        android:id="@+id/imgUploaded"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_check_circle"
-        app:tint="#58a4c8"
-        android:visibility="visible"
-        android:layout_marginEnd="8dp"/>
-
-    <ImageView
-        android:id="@+id/btnGoToCounts"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@android:drawable/ic_media_play"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="8dp"
-        app:tint="#FF5722"/>
-
-    <ImageView
         android:id="@+id/btnDelete"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -64,6 +44,7 @@
         android:focusable="true"
         android:padding="8dp"
         app:tint="#D32F2F"
-        android:layout_marginStart="4dp"/>
+        android:layout_marginStart="4dp"
+        android:visibility="gone"/>
 
 </LinearLayout>

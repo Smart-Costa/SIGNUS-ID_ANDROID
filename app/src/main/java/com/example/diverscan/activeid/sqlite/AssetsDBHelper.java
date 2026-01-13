@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class AssetsDBHelper extends SQLiteOpenHelper{
 
     public static final String DATABASE_NAME = "Test_ActiveId_v1";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
     private static final String DATABASE_FILE_PATH = "/Android/DBActive";
     Context _context;
     public AssetsDBHelper(Context context) {
@@ -36,6 +36,27 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i2) {
 
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        ensureCategoriaActivos(db);
+    }
+
+    private void ensureCategoriaActivos(SQLiteDatabase db) {
+        try {
+            db.execSQL("CREATE TABLE if not exists categoriaActivos (_id Text PRIMARY KEY, assetCategorySysId Text, " +
+                    "description Text,  name Text, " +
+                    "sinc Text)");
+            try {
+                db.execSQL("CREATE UNIQUE INDEX idx_categoriaActivos_id ON categoriaActivos (assetCategorySysId)");
+            } catch (Exception e) {
+                // Index likely exists
+            }
+        } catch (Exception e) {
+            // Log or ignore
+        }
     }
 
     public boolean ActualizarEPC (String numactivo, String epcnuevo){

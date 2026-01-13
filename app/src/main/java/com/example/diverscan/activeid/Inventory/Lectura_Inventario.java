@@ -611,7 +611,7 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
         for (InventarioVisual item : inventarioVisuals) {
             if ("Faltante".equals(item.getStatus())) contadorActivosFaltantes++;
             else if ("Encontrado".equals(item.getStatus())) contActivosEncontrados++;
-            else if ("No Pertenece".equals(item.getStatus()) || "Sin Asignar".equals(item.getStatus())) contadorActivosSobrantes++;
+            else if ("No Pertenece".equals(item.getStatus()) || "Sin Asignar".equals(item.getStatus()) || "No Inventariado".equals(item.getStatus())) contadorActivosSobrantes++;
         }
 
         txtFaltantes.setText(String.valueOf(contadorActivosFaltantes));

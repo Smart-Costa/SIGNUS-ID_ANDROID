@@ -150,10 +150,12 @@
         <activity android:name=".UI.tomasfisicas.NuevaTomaActivity"
             android:parentActivityName=".UI.tomasfisicas.RegistroInventarioElectronicosActivity"
             android:label="Nueva Toma Física"
+            android:theme="@style/AppTheme.NoActionBar"
             android:exported="false" />
         <activity android:name=".UI.tomasfisicas.RegistroConteosActivity"
             android:parentActivityName=".UI.tomasfisicas.RegistroInventarioElectronicosActivity"
             android:label="Resumen de conteos"
+            android:theme="@style/AppTheme.NoActionBar"
             android:exported="false" />
 
         <!-- 🏗️ Flujo de DarBaja de activos -->
@@ -166,6 +168,13 @@
         <activity android:name=".UI.activo.LocalizarActivoDetailActivity"
             android:parentActivityName=".UI.main.MainActivity"
             android:label="Localizar Activo"
+            android:exported="false" />
+
+        <!-- 🔔 Activos para Reubicar -->
+        <activity android:name=".UI.main.ActivosReubicarActivity"
+            android:label="Activos para Reubicar"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <!--<activity android:name=".CreateAsset.SelectLocationActivity"
@@ -191,6 +200,7 @@
         <!-- 🧾 Inventario -->
         <activity android:name=".UI.tomasfisicas.DetalleTomaFisicaActivity"
             android:label="Detalle de Toma"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
             android:exported="false" />
         <activity android:name=".Inventory.Cargar_Toma_Fisica"

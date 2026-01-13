@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +28,7 @@ public class DetalleTomaFisicaActivity extends AppCompatActivity {
     private String nombreInventario;
     
     private TextView txtNombreInventario;
+    private TextView txtCategoriaTitulo;
     private TextView txtGaugeCount;
     private TextView txtSinSubtomas;
     private CircularProgressIndicator gaugeResumen;
@@ -36,6 +38,7 @@ public class DetalleTomaFisicaActivity extends AppCompatActivity {
     private ImageView btnBack;
     
     private TomaFisicaTomasDao dao;
+    private com.example.diverscan.activeid.data.local.dao.TomaFisicaDao tomaFisicaDao;
     private TomaFisicaTomasAdapter adapter;
     private List<TomaFisicaTomasEntity> listaTomas = new ArrayList<>();
     
@@ -54,6 +57,7 @@ public class DetalleTomaFisicaActivity extends AppCompatActivity {
 
         // Init UI
         txtNombreInventario = findViewById(R.id.txtNombreInventario);
+        txtCategoriaTitulo = findViewById(R.id.txtCategoriaTitulo);
         txtGaugeCount = findViewById(R.id.txtGaugeCount);
         txtSinSubtomas = findViewById(R.id.txtSinSubtomas);
         gaugeResumen = findViewById(R.id.gaugeResumen);
@@ -64,7 +68,7 @@ public class DetalleTomaFisicaActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
 
         if (nombreInventario != null) {
-            txtNombreInventario.setText(nombreInventario);
+            // txtNombreInventario.setText(nombreInventario);
         }
 
         if (btnBack != null) {
@@ -73,6 +77,7 @@ public class DetalleTomaFisicaActivity extends AppCompatActivity {
 
         // Init DAO
         dao = new TomaFisicaTomasDao(this);
+        tomaFisicaDao = new com.example.diverscan.activeid.data.local.dao.TomaFisicaDao(this);
 
         // Setup Recycler
         recyclerTomas.setLayoutManager(new LinearLayoutManager(this));
@@ -116,10 +121,32 @@ public class DetalleTomaFisicaActivity extends AppCompatActivity {
             }
         });
         
-        // Tabs logic (Visual for now, or filter if needed)
-        // User asked for layout primarily, logic might be extended later.
-        // For now, assume "Tomas" tab is active.
+        // Tabs logic
+        updateTabs(true); // Default to Tomas active
         
+        btnTabTomas.setOnClickListener(v -> updateTabs(true));
+        btnTabCompletas.setOnClickListener(v -> updateTabs(false));
+    }
+
+    private void updateTabs(boolean isTomasActive) {
+        if (isTomasActive) {
+            btnTabTomas.setBackgroundResource(R.drawable.btn_primary);
+            btnTabTomas.setTextColor(ContextCompat.getColor(this, R.color.blanco));
+            
+            btnTabCompletas.setBackgroundResource(R.drawable.btn_secondary_gray);
+            btnTabCompletas.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint));
+            
+            // Show Tomas content logic here if needed (e.g., filter list)
+            // For now, assuming list is always Tomas
+        } else {
+            btnTabTomas.setBackgroundResource(R.drawable.btn_secondary_gray);
+            btnTabTomas.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint));
+            
+            btnTabCompletas.setBackgroundResource(R.drawable.btn_primary);
+            btnTabCompletas.setTextColor(ContextCompat.getColor(this, R.color.blanco));
+            
+            // Show Completas content logic here
+        }
     }
 
     @Override
@@ -137,6 +164,29 @@ public class DetalleTomaFisicaActivity extends AppCompatActivity {
 
     private void cargarDatosLocal() {
         new Thread(() -> {
+            // Cargar Header con Categoria
+            if (tomaFisicaDao != null && tomaFisicaId != null) {
+                com.example.diverscan.activeid.data.local.entity.TomaFisicaEntity parent = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
+                if (parent != null) {
+                    String catId = parent.getCategoria();
+                    String catName = "";
+                    if (catId != null && !catId.trim().isEmpty()) {
+                        catName = tomaFisicaDao.getCategoryNameById(catId);
+                    }
+                    
+                    // Fallback to ID if name is empty, or just empty string
+                    if (catName == null || catName.isEmpty()) {
+                        catName = (catId != null) ? catId : "";
+                    }
+                    
+                    String title = "Inventario " + catName.trim();
+                    runOnUiThread(() -> {
+                        if (txtNombreInventario != null) txtNombreInventario.setText("Hacer inventario");
+                        if (txtCategoriaTitulo != null) txtCategoriaTitulo.setText(title);
+                    });
+                }
+            }
+
             List<TomaFisicaTomasEntity> result = dao.getByTomaFisicaId(tomaFisicaId);
             if (result == null) result = new ArrayList<>();
             android.util.Log.d("DetalleTomaFisica", "cargarDatosLocal: Encontrados " + result.size() + " registros locales para tomaFisicaId=" + tomaFisicaId);

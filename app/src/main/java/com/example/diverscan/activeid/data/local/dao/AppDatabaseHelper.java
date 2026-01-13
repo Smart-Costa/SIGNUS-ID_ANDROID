@@ -19,39 +19,8 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         // Solo creamos las tablas que son responsabilidad de este módulo y no existen en LoginDBHelper
         
-        db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicas (" +
-                "tomaFisicaId TEXT PRIMARY KEY, " +
-                "nombre TEXT, " +
-                "fechaInicial TEXT, " +
-                "fechaFinal TEXT, " +
-                "categoria TEXT, " +
-                "usuarioAsignado TEXT, " +
-                "unidadOrganizativa TEXT, " +
-                "estadoActivo TEXT, " +
-                "ubicacionA TEXT, " +
-                "ubicacionB TEXT, " +
-                "ubicacionC TEXT, " +
-                "ubicacionD TEXT ) ");
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicasResumen (" +
-                "IdToma TEXT PRIMARY KEY, " +
-                "TomaFisicaId TEXT, " +
-                "NumeroToma TEXT, " +
-                "TotalLecturas TEXT, " +
-                "FechaCreacion TEXT, " +
-                "ActivosLeidos TEXT, " +
-                "Sobrantes TEXT, " +
-                "Faltantes TEXT, " +
-                "TotalActivos TEXT, " +
-                "SYNC_STATUS INTEGER DEFAULT 0)");
-
-        if (!checkColumnExists(db, "TomasFisicasResumen", "SYNC_STATUS")) {
-            try {
-                db.execSQL("ALTER TABLE TomasFisicasResumen ADD COLUMN SYNC_STATUS INTEGER DEFAULT 0");
-            } catch (Exception e) {
-                // Ignore
-            }
-        }
+        ensureTomasFisicasTable(db);
+        ensureTomasFisicasResumenTable(db);
 
         ensureTomasFisicasDetalleTable(db);
         ensurePendingDeletesTable(db);
@@ -65,12 +34,52 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
+        ensureTomasFisicasTable(db);
+        ensureTomasFisicasResumenTable(db);
         ensureActivosApiTable(db);
         ensureTomasFisicasDetalleTable(db);
         ensurePendingDeletesTable(db);
         ensureUbicacionHHTable(db);
         
         // Ensure SYNC_STATUS column in TomasFisicasResumen on open
+        if (!checkColumnExists(db, "TomasFisicasResumen", "SYNC_STATUS")) {
+            try {
+                db.execSQL("ALTER TABLE TomasFisicasResumen ADD COLUMN SYNC_STATUS INTEGER DEFAULT 0");
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+    }
+
+    private static void ensureTomasFisicasTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicas (" +
+                "tomaFisicaId TEXT PRIMARY KEY, " +
+                "nombre TEXT, " +
+                "fechaInicial TEXT, " +
+                "fechaFinal TEXT, " +
+                "categoria TEXT, " +
+                "usuarioAsignado TEXT, " +
+                "unidadOrganizativa TEXT, " +
+                "estadoActivo TEXT, " +
+                "ubicacionA TEXT, " +
+                "ubicacionB TEXT, " +
+                "ubicacionC TEXT, " +
+                "ubicacionD TEXT ) ");
+    }
+
+    private static void ensureTomasFisicasResumenTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicasResumen (" +
+                "IdToma TEXT PRIMARY KEY, " +
+                "TomaFisicaId TEXT, " +
+                "NumeroToma TEXT, " +
+                "TotalLecturas TEXT, " +
+                "FechaCreacion TEXT, " +
+                "ActivosLeidos TEXT, " +
+                "Sobrantes TEXT, " +
+                "Faltantes TEXT, " +
+                "TotalActivos TEXT, " +
+                "SYNC_STATUS INTEGER DEFAULT 0)");
+
         if (!checkColumnExists(db, "TomasFisicasResumen", "SYNC_STATUS")) {
             try {
                 db.execSQL("ALTER TABLE TomasFisicasResumen ADD COLUMN SYNC_STATUS INTEGER DEFAULT 0");

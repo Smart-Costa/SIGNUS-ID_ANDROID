@@ -31,14 +31,14 @@ public class UserDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String encryptedInput = EncryptUtil.encrypting(pass, true);
         Cursor cursor = db.rawQuery(
-                "SELECT * FROM Users WHERE username=? AND password=?",
+                "SELECT * FROM Users WHERE username=? AND pass=?",
                 new String[]{user, encryptedInput}
         );
 
         if (cursor.moveToFirst()) {
             do {
                 String dbUser = cursor.getString(cursor.getColumnIndexOrThrow("username"));
-                String dbPass = cursor.getString(cursor.getColumnIndexOrThrow("password"));
+                String dbPass = cursor.getString(cursor.getColumnIndexOrThrow("pass"));
             } while (cursor.moveToNext());
         } else {
         }
@@ -46,7 +46,7 @@ public class UserDao {
         boolean valid = cursor.moveToFirst();
 
         cursor.close();
-        db.close();
+        // db.close();
 
         return valid;
     }
@@ -64,13 +64,14 @@ public class UserDao {
         values.put("Idrol", u.Idrol);
 
         db.insertWithOnConflict("Users", null, values, SQLiteDatabase.CONFLICT_REPLACE);
-        db.close();
+        // db.close();
     }
 
     public void syncUsers(List<LoginEntity> users) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         try {
+            db.delete("Users", null, null);
             for (LoginEntity u : users) {
                 ContentValues values = entityToContentValues(u);
                 db.insertWithOnConflict("Users", null, values, SQLiteDatabase.CONFLICT_REPLACE);
@@ -80,19 +81,19 @@ public class UserDao {
             Log.e(TAG, "Error syncing users", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 
     private ContentValues entityToContentValues(LoginEntity u) {
         ContentValues values = new ContentValues();
-        values.put("userSysId", u.userSysId);
+        values.put("_id", u.userSysId);
         values.put("username", u.username);
         values.put("email", u.email);
-        values.put("password", u.password);
-        values.put("isApproved", u.isApproved ? 1 : 0);
+        values.put("pass", u.password);
+        values.put("aprobado", u.isApproved ? 1 : 0);
         values.put("isOnLine", u.isOnLine ? 1 : 0);
-        values.put("isLockedOut", u.isLockedOut ? 1 : 0);
+        values.put("bloqueado", u.isLockedOut ? 1 : 0);
         values.put("Idrol", u.Idrol);
         return values;
     }
@@ -164,7 +165,7 @@ public class UserDao {
         }
 
         cursor.close();
-        db.close();
+        // db.close();
         return users;
     }
 }

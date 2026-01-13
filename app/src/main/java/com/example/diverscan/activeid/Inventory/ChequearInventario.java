@@ -82,15 +82,18 @@ public class ChequearInventario {
             boolean isFound = false;
 
             for (TagData tagData : tagDatas) {
-                final String epc = tagData.getTagID();
+                String epc = tagData.getTagID();
                 if (epc.isEmpty()) {
                     continue;
                 }
-
+                
+                // Buscamos coincidencia exacta con lo que hay en BD (que ya sabemos es HexString)
                 if (!_tags.containsKey(epc)) {
-                    _tags.put(epc, epc);
-                    AgregarActivos(epc, iChequearInventario);
-                    isFound = true;
+                     boolean found = TryAddActivo(epc, iChequearInventario);
+                     if (found) {
+                         _tags.put(epc, epc);
+                         isFound = true;
+                     }
                 }
             }
             return isFound;
@@ -98,7 +101,12 @@ public class ChequearInventario {
             return false;
         }
     }
-    public void AgregarActivos(String epc, IChequearInventario iChequearInventario) {
+    
+    private boolean TryAddActivo(String epc, IChequearInventario iChequearInventario) {
+         return AgregarActivos(epc, iChequearInventario);
+    }
+
+    public boolean AgregarActivos(String epc, IChequearInventario iChequearInventario) {
         try {
             EntidadActivosInventarios entidadActivos = activoDao.getActivoInventarioByEpc(epc);
             
@@ -111,11 +119,11 @@ public class ChequearInventario {
                 InventarioVisual inventarioVisual = new InventarioVisual();
 
                 if(_activosEncontrado.containsKey(entidadActivos.getAssetSysId())){
-                    return;
+                    return true;
                 }
 
                 if(_activosSobrantes.containsKey(entidadActivos.getAssetSysId())){
-                    return;
+                    return true;
                 }
 
                 if (_activosUbicacion.containsKey(entidadActivos.getAssetSysId())) {
@@ -151,15 +159,35 @@ public class ChequearInventario {
                     _activosSobrantes.put(entidadActivos.getAssetSysId(), inventarioVisual);
                     //endregion
                 }
+                // Aquí guardamos el EPC con el que SE ENCONTRÓ en la BD (entidadActivos.getEPC())
+                // Si se encontró convirtiendo a ASCII, se guardará el ASCII.
                 InsertarDetalleInventario(inventarioVisual.getEPC());
 
                 iChequearInventario.RetornarActivo(inventarioVisual);
-                return;
+                return true;
 
+            } else {
+                // Activo No Inventariado (No existe en BD local)
+                // Lo agregamos a Sobrantes con estado "No Inventariado"
+                if (!_activosSobrantes.containsKey(epc) && !_activosEncontrado.containsKey(epc)) {
+                    InventarioVisual inventarioVisual = new InventarioVisual();
+                    inventarioVisual.setEPC(epc);
+                    inventarioVisual.setDescripcion("No Inventariado");
+                    inventarioVisual.setAssetSysId(UUID.randomUUID().toString()); // ID temporal
+                    inventarioVisual.setStatus("No Inventariado");
+                    
+                    _activosSobrantes.put(epc, inventarioVisual); // Usamos EPC como Key si no hay AssetID
+                    
+                    InsertarDetalleInventario(epc);
+                    iChequearInventario.RetornarActivo(inventarioVisual);
+                    return true;
+                }
             }
+            return false;
 
         } catch (final Exception e) {
             Log.e("ChequearInventario", "Error en AgregarActivos: ", e);
+            return false;
         }
     }
 

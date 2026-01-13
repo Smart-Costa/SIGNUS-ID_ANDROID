@@ -9,7 +9,9 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 public class ACTIVEID_API {
     //private static final String BASE_URL = BuildConfig.BASE_URL;
     //private static final String BASE_URL = "http://srvapppro/ApiHH/api";
-    private static final String BASE_URL = "http://3.85.211.90:70/ApiHH/Api";
+    //private static final String BASE_URL = "http://192.168.1.8:5200/api";
+    private static final String BASE_URL = "http://44.193.11.135:70/ApiHH/Api";
+    //private static final String BASE_URL = "http://3.85.211.90:70/ApiHH/Api";
     //private static final String BASE_URL = "http://192.168.1.10:5200/api";
     //private static final String BASE_URL = "http://10.0.2.2:5200/api";
     //private static final String BASE_URL = "http://10.211.136.196/WCFActivos_EMERSON/Service1.svc";

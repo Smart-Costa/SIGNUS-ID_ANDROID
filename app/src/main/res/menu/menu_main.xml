@@ -4,6 +4,13 @@
 
     <!-- Opción Mi Perfil -->
     <item
+        android:id="@+id/action_notifications"
+        android:icon="@drawable/ic_notifications"
+        android:title="Notificaciones"
+        android:orderInCategory="50"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/mi_perfil"
         android:orderInCategory="100"
         android:title="@string/miperfil"

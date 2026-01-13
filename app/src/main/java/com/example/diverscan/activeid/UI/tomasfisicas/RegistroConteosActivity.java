@@ -34,10 +34,12 @@ import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaDetallesDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaDao;
+import com.example.diverscan.activeid.data.local.dao.UbicacionDao;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaEntity;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaDetallesEntity;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaTomasEntity;
+import com.example.diverscan.activeid.data.local.entity.UbicacionEntity;
 import com.example.diverscan.activeid.data.remote.response.ApiCallback;
 import com.example.diverscan.activeid.data.remote.response.ApiResponse;
 import com.example.diverscan.activeid.sqlite.FotoDBHelper;
@@ -56,7 +58,11 @@ public class RegistroConteosActivity extends AppCompatActivity {
     private View tabsView;
     private View viewResumen;
     private View viewActivos;
+    private View layoutActivosResumen;
+    private View layoutActivosListado;
+    private Button btnVolverListado;
     private RecyclerView recyclerActivos;
+    private Categoria currentFilter = null;
 
     private TextView txtTotales;
     private TextView txtNoEncontrados;
@@ -85,6 +91,47 @@ public class RegistroConteosActivity extends AppCompatActivity {
     private ActivoDao activoDao;
     private TomaFisicaTomasDao tomasDao;
     private TomaFisicaDao tomaFisicaDao;
+    private UbicacionDao ubicacionDao;
+
+    // Filter Logic
+    private Spinner spinnerUbicacionA;
+    private Spinner spinnerUbicacionB;
+    private Spinner spinnerUbicacionC;
+    private Spinner spinnerUbicacionD;
+    private Spinner spinnerUbicacionSecundaria;
+
+    private TextView txtCountActivosFiltrados;
+    private TextView txtCountUbicacionA;
+    private TextView txtCountUbicacionB;
+    private TextView txtCountUbicacionC;
+    private TextView txtCountUbicacionD;
+    private TextView txtCountUbicacionSecundaria;
+
+    private List<SpinnerItem> listUbicacionA = new ArrayList<>();
+    private List<SpinnerItem> listUbicacionB = new ArrayList<>();
+    private List<SpinnerItem> listUbicacionC = new ArrayList<>();
+    private List<SpinnerItem> listUbicacionD = new ArrayList<>();
+    private List<String> listUbicacionSecundaria = new ArrayList<>();
+
+    private String selectedUbicacionAId = null;
+    private String selectedUbicacionBId = null;
+    private String selectedUbicacionCId = null;
+    private String selectedUbicacionDId = null;
+    private String selectedUbicacionSecundariaId = null;
+
+    private String baseUbicacionAId = null;
+    private String baseUbicacionBId = null;
+    private String baseUbicacionCId = null;
+    private String baseUbicacionDId = null;
+    
+    private boolean isUpdatingSpinners = false;
+
+    private static class SpinnerItem {
+        String id;
+        String text;
+        public SpinnerItem(String id, String text) { this.id = id; this.text = text; }
+        @Override public String toString() { return text; }
+    }
 
     private final ActivosAdapter adapter = new ActivosAdapter();
     private final List<TomaFisicaDetallesEntity> filasRemotas = new ArrayList<>();
@@ -102,6 +149,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
         numeroToma = getIntent().getStringExtra("numeroToma");
         estadoFiltro = getIntent().getStringExtra("estadoFiltro");
         tituloFiltro = getIntent().getStringExtra("tituloFiltro");
+        currentFilter = filtroCategoria();
 
         Log.d("RegistroConteos", "onCreate: tomaFisicaId=" + tomaFisicaId + ", idToma=" + idToma + ", estadoFiltro=" + estadoFiltro);
 
@@ -109,17 +157,20 @@ public class RegistroConteosActivity extends AppCompatActivity {
         activoDao = new ActivoDao(this);
         tomasDao = new TomaFisicaTomasDao(this);
         tomaFisicaDao = new TomaFisicaDao(this);
+        ubicacionDao = new UbicacionDao(this);
 
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
         txtTitulo = findViewById(R.id.txtTitulo);
+        /*
         if (numeroToma != null && !numeroToma.trim().isEmpty()) {
             txtTitulo.setText("Resumen de conteos - Toma " + numeroToma.trim());
         }
         if (tituloFiltro != null && !tituloFiltro.trim().isEmpty()) {
             txtTitulo.setText(tituloFiltro.trim());
         }
+        */
 
         tabResumen = findViewById(R.id.tabResumen);
         tabActivos = findViewById(R.id.tabActivos);
@@ -127,7 +178,18 @@ public class RegistroConteosActivity extends AppCompatActivity {
         containerTomasTabs = findViewById(R.id.containerTomasTabs);
         viewResumen = findViewById(R.id.viewResumen);
         viewActivos = findViewById(R.id.viewActivos);
+        layoutActivosResumen = findViewById(R.id.layoutActivosResumen);
+        layoutActivosListado = findViewById(R.id.layoutActivosListado);
+        btnVolverListado = findViewById(R.id.btnVolverListado);
         recyclerActivos = findViewById(R.id.recyclerActivos);
+
+        if (btnVolverListado != null) {
+            btnVolverListado.setOnClickListener(v -> {
+                currentFilter = null;
+                mostrarVistaActivos(false);
+                cargarDatos();
+            });
+        }
 
         txtTotales = findViewById(R.id.txtTotales);
         txtNoEncontrados = findViewById(R.id.txtNoEncontrados);
@@ -142,23 +204,41 @@ public class RegistroConteosActivity extends AppCompatActivity {
         recyclerActivos.setLayoutManager(new LinearLayoutManager(this));
         recyclerActivos.setAdapter(adapter);
 
+        // Bind Filters UI
+        spinnerUbicacionA = findViewById(R.id.spinnerUbicacionA);
+        spinnerUbicacionB = findViewById(R.id.spinnerUbicacionB);
+        spinnerUbicacionC = findViewById(R.id.spinnerUbicacionC);
+        spinnerUbicacionD = findViewById(R.id.spinnerUbicacionD);
+        spinnerUbicacionSecundaria = findViewById(R.id.spinnerUbicacionSecundaria);
+
+        txtCountActivosFiltrados = findViewById(R.id.txtCountActivosFiltrados);
+        txtCountUbicacionA = findViewById(R.id.txtCountUbicacionA);
+        txtCountUbicacionB = findViewById(R.id.txtCountUbicacionB);
+        txtCountUbicacionC = findViewById(R.id.txtCountUbicacionC);
+        txtCountUbicacionD = findViewById(R.id.txtCountUbicacionD);
+        txtCountUbicacionSecundaria = findViewById(R.id.txtCountUbicacionSecundaria);
+
+        initFilters();
+
         spinnerActivos = findViewById(R.id.spinnerActivos);
         btnAgregarLectura = findViewById(R.id.btnAgregarLectura);
         if (btnAgregarLectura != null) {
             btnAgregarLectura.setOnClickListener(v -> agregarLecturaManual());
+            // Hide for now as requested
+            // if (lyAgregarLecturaManual != null) lyAgregarLecturaManual.setVisibility(View.GONE);
         }
 
         tabResumen.setOnClickListener(v -> setTab(true));
         tabActivos.setOnClickListener(v -> setTab(false));
 
-        Button btnVerNoEncontrados = findViewById(R.id.btnVerNoEncontrados);
-        Button btnVerEncontrados = findViewById(R.id.btnVerEncontrados);
-        Button btnVerNoPertenecen = findViewById(R.id.btnVerNoPertenecen);
-        Button btnVerNoInventariados = findViewById(R.id.btnVerNoInventariados);
+        View btnVerNoEncontrados = findViewById(R.id.btnVerNoEncontrados);
+        View btnVerEncontrados = findViewById(R.id.btnVerEncontrados);
+        View btnVerNoPertenecen = findViewById(R.id.btnVerNoPertenecen);
+        View btnVerNoInventariados = findViewById(R.id.btnVerNoInventariados);
 
-        btnVerNoEncontrados.setOnClickListener(v -> abrirListado(Categoria.ROJO, "No encontrados"));
+        btnVerNoEncontrados.setOnClickListener(v -> abrirListado(Categoria.ROJO, "Faltantes"));
         btnVerEncontrados.setOnClickListener(v -> abrirListado(Categoria.VERDE, "Encontrados"));
-        btnVerNoPertenecen.setOnClickListener(v -> abrirListado(Categoria.AMARILLO, "No pertenecen"));
+        btnVerNoPertenecen.setOnClickListener(v -> abrirListado(Categoria.AMARILLO, "Sobrantes"));
         btnVerNoInventariados.setOnClickListener(v -> abrirListado(Categoria.BLANCO, "No inventariados"));
 
         if (filtroCategoria() != null) {
@@ -169,6 +249,11 @@ public class RegistroConteosActivity extends AppCompatActivity {
         }
         
         validarBaseDeDatosLocal();
+    }
+
+    private void mostrarVistaActivos(boolean verListado) {
+        if (layoutActivosResumen != null) layoutActivosResumen.setVisibility(verListado ? View.GONE : View.VISIBLE);
+        if (layoutActivosListado != null) layoutActivosListado.setVisibility(verListado ? View.VISIBLE : View.GONE);
     }
 
     private void validarBaseDeDatosLocal() {
@@ -192,6 +277,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
         super.onResume();
         cargarDatos();
         cargarActivosSpinner();
+        updateHeaderTitle();
         if (tomaFisicaId != null && !tomaFisicaId.trim().isEmpty()) {
             tomasDao.fetchAndSyncFromApi(tomaFisicaId.trim(), () -> runOnUiThread(this::cargarDatos));
         }
@@ -199,7 +285,378 @@ public class RegistroConteosActivity extends AppCompatActivity {
         updateTomasTabs();
     }
 
+    private void updateHeaderTitle() {
+        if (tomaFisicaDao == null || tomaFisicaId == null) return;
+        new Thread(() -> {
+            Log.d("RegistroConteos", "Updating header for tomaFisicaId: " + tomaFisicaId);
+            TomaFisicaEntity parent = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
+            if (parent != null) {
+                String catId = parent.getCategoria();
+                Log.d("RegistroConteos", "Found parent entity. Categoria ID: " + catId);
+                
+                String catName = "";
+                if (catId != null && !catId.trim().isEmpty()) {
+                    catName = tomaFisicaDao.getCategoryNameById(catId);
+                    Log.d("RegistroConteos", "Fetched Category Name: " + catName);
+                }
+                
+                if (catName == null || catName.isEmpty()) {
+                    catName = (catId != null) ? catId : "";
+                    Log.d("RegistroConteos", "Using ID as fallback name");
+                }
+                
+                String title = "Hacer Inventario";
+                runOnUiThread(() -> {
+                    if (txtTitulo != null) txtTitulo.setText(title);
+                });
+            } else {
+                Log.e("RegistroConteos", "Parent TomaFisicaEntity not found for ID: " + tomaFisicaId);
+            }
+        }).start();
+    }
 
+
+
+    private static String normalizeGuidFilter(String value) {
+        if (value == null) return null;
+        String v = value.trim();
+        if (v.isEmpty()) return null;
+        if (v.equalsIgnoreCase("NULL")) return null;
+        if (v.equals("00000000-0000-0000-0000-000000000000")) return null;
+        return v;
+    }
+
+    private void initFilters() {
+        new Thread(() -> {
+            TomaFisicaEntity toma = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
+            baseUbicacionAId = toma != null ? normalizeGuidFilter(toma.getUbicacionA()) : null;
+            baseUbicacionBId = toma != null ? normalizeGuidFilter(toma.getUbicacionB()) : null;
+            baseUbicacionCId = toma != null ? normalizeGuidFilter(toma.getUbicacionC()) : null;
+            baseUbicacionDId = toma != null ? normalizeGuidFilter(toma.getUbicacionD()) : null;
+
+            runOnUiThread(() -> {
+                setupLocationSpinners();
+            });
+        }).start();
+    }
+
+    private void setSpinnerItems(Spinner spinner, List<SpinnerItem> items) {
+        if (spinner == null) return;
+        isUpdatingSpinners = true;
+        ArrayAdapter<SpinnerItem> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(0);
+        isUpdatingSpinners = false;
+    }
+
+    private void setSpinnerStrings(Spinner spinner, List<String> items) {
+        if (spinner == null) return;
+        isUpdatingSpinners = true;
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(0);
+        isUpdatingSpinners = false;
+    }
+
+    private void setSoloTodasForSpinnerItem(Spinner spinner) {
+        List<SpinnerItem> list = new ArrayList<>();
+        list.add(new SpinnerItem(null, "Todas"));
+        setSpinnerItems(spinner, list);
+    }
+
+    private void setSoloTodasForString(Spinner spinner) {
+        List<String> list = new ArrayList<>();
+        list.add("Todas");
+        setSpinnerStrings(spinner, list);
+    }
+    
+    private void setupLocationSpinners() {
+        if (spinnerUbicacionA == null) return;
+
+        setSoloTodasForSpinnerItem(spinnerUbicacionB);
+        setSoloTodasForSpinnerItem(spinnerUbicacionC);
+        setSoloTodasForSpinnerItem(spinnerUbicacionD);
+        setSoloTodasForString(spinnerUbicacionSecundaria);
+
+        spinnerUbicacionA.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isUpdatingSpinners) return;
+                SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
+                selectedUbicacionAId = (item != null && item.id != null) ? item.id : null;
+                
+                selectedUbicacionBId = null;
+                selectedUbicacionCId = null;
+                selectedUbicacionDId = null;
+                selectedUbicacionSecundariaId = null;
+                
+                if (selectedUbicacionAId != null) {
+                    loadUbicacionB(selectedUbicacionAId);
+                } else {
+                    runOnUiThread(() -> {
+                        setSoloTodasForSpinnerItem(spinnerUbicacionB);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionC);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionD);
+                        setSoloTodasForString(spinnerUbicacionSecundaria);
+                    });
+                }
+                refreshSummaryCounts();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        spinnerUbicacionB.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isUpdatingSpinners) return;
+                SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
+                selectedUbicacionBId = (item != null && item.id != null) ? item.id : null;
+                
+                selectedUbicacionCId = null;
+                selectedUbicacionDId = null;
+                selectedUbicacionSecundariaId = null;
+
+                if (selectedUbicacionBId != null) {
+                    loadUbicacionC(selectedUbicacionBId);
+                } else {
+                    runOnUiThread(() -> {
+                        setSoloTodasForSpinnerItem(spinnerUbicacionC);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionD);
+                        setSoloTodasForString(spinnerUbicacionSecundaria);
+                    });
+                }
+                refreshSummaryCounts();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        spinnerUbicacionC.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isUpdatingSpinners) return;
+                SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
+                selectedUbicacionCId = (item != null && item.id != null) ? item.id : null;
+                
+                selectedUbicacionDId = null;
+                selectedUbicacionSecundariaId = null;
+
+                if (selectedUbicacionCId != null) {
+                    loadUbicacionD(selectedUbicacionCId);
+                } else {
+                    runOnUiThread(() -> {
+                        setSoloTodasForSpinnerItem(spinnerUbicacionD);
+                        setSoloTodasForString(spinnerUbicacionSecundaria);
+                    });
+                }
+                refreshSummaryCounts();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        spinnerUbicacionD.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isUpdatingSpinners) return;
+                SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
+                selectedUbicacionDId = (item != null && item.id != null) ? item.id : null;
+                
+                selectedUbicacionSecundariaId = null;
+
+                if (selectedUbicacionDId != null) {
+                    loadUbicacionSecundaria(selectedUbicacionDId);
+                } else {
+                    runOnUiThread(() -> setSoloTodasForString(spinnerUbicacionSecundaria));
+                }
+                refreshSummaryCounts();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+        
+        spinnerUbicacionSecundaria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isUpdatingSpinners) return;
+                String item = (String) parent.getItemAtPosition(position);
+                selectedUbicacionSecundariaId = (item != null && !item.equals("Todas")) ? item : null;
+                refreshSummaryCounts();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        loadUbicacionA();
+    }
+
+    private void loadUbicacionA() {
+        new Thread(() -> {
+            listUbicacionA = new ArrayList<>();
+            if (baseUbicacionAId != null) {
+                UbicacionEntity u = ubicacionDao.getUbicacionByASysId(baseUbicacionAId);
+                String label = (u != null && u.getUbicacionA() != null && !u.getUbicacionA().trim().isEmpty()) ? u.getUbicacionA().trim() : baseUbicacionAId;
+                listUbicacionA.add(new SpinnerItem(baseUbicacionAId, label));
+            } else {
+                List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionA();
+                listUbicacionA.add(new SpinnerItem(null, "Todas"));
+                for (UbicacionEntity u : list) listUbicacionA.add(new SpinnerItem(u.getASysId(), u.getUbicacionA()));
+            }
+
+            runOnUiThread(() -> {
+                setSpinnerItems(spinnerUbicacionA, listUbicacionA);
+                if (baseUbicacionAId != null) {
+                    selectedUbicacionAId = baseUbicacionAId;
+                    loadUbicacionB(baseUbicacionAId);
+                } else {
+                    selectedUbicacionAId = null;
+                    setSoloTodasForSpinnerItem(spinnerUbicacionB);
+                    setSoloTodasForSpinnerItem(spinnerUbicacionC);
+                    setSoloTodasForSpinnerItem(spinnerUbicacionD);
+                    setSoloTodasForString(spinnerUbicacionSecundaria);
+                    refreshSummaryCounts();
+                }
+            });
+        }).start();
+    }
+
+    private void loadUbicacionB(String parentId) {
+        new Thread(() -> {
+            listUbicacionB = new ArrayList<>();
+            if (baseUbicacionBId != null) {
+                UbicacionEntity u = ubicacionDao.getUbicacionByBSysId(baseUbicacionBId);
+                String label = (u != null && u.getUbicacionB() != null && !u.getUbicacionB().trim().isEmpty()) ? u.getUbicacionB().trim() : baseUbicacionBId;
+                listUbicacionB.add(new SpinnerItem(baseUbicacionBId, label));
+            } else {
+                List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionB(parentId);
+                listUbicacionB.add(new SpinnerItem(null, "Todas"));
+                for (UbicacionEntity u : list) listUbicacionB.add(new SpinnerItem(u.getBSysId(), u.getUbicacionB()));
+            }
+
+            runOnUiThread(() -> {
+                setSpinnerItems(spinnerUbicacionB, listUbicacionB);
+                if (baseUbicacionBId != null) {
+                    selectedUbicacionBId = baseUbicacionBId;
+                    loadUbicacionC(baseUbicacionBId);
+                } else {
+                    selectedUbicacionBId = null;
+                    setSoloTodasForSpinnerItem(spinnerUbicacionC);
+                    setSoloTodasForSpinnerItem(spinnerUbicacionD);
+                    setSoloTodasForString(spinnerUbicacionSecundaria);
+                    refreshSummaryCounts();
+                }
+            });
+        }).start();
+    }
+
+    private void loadUbicacionC(String parentId) {
+        new Thread(() -> {
+            listUbicacionC = new ArrayList<>();
+            if (baseUbicacionCId != null) {
+                UbicacionEntity u = ubicacionDao.getUbicacionByCSysId(baseUbicacionCId);
+                String label = (u != null && u.getUbicacionC() != null && !u.getUbicacionC().trim().isEmpty()) ? u.getUbicacionC().trim() : baseUbicacionCId;
+                listUbicacionC.add(new SpinnerItem(baseUbicacionCId, label));
+            } else {
+                List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionC(parentId);
+                listUbicacionC.add(new SpinnerItem(null, "Todas"));
+                for (UbicacionEntity u : list) listUbicacionC.add(new SpinnerItem(u.getCSysId(), u.getUbicacionC()));
+            }
+
+            runOnUiThread(() -> {
+                setSpinnerItems(spinnerUbicacionC, listUbicacionC);
+                if (baseUbicacionCId != null) {
+                    selectedUbicacionCId = baseUbicacionCId;
+                    loadUbicacionD(baseUbicacionCId);
+                } else {
+                    selectedUbicacionCId = null;
+                    setSoloTodasForSpinnerItem(spinnerUbicacionD);
+                    setSoloTodasForString(spinnerUbicacionSecundaria);
+                    refreshSummaryCounts();
+                }
+            });
+        }).start();
+    }
+
+    private void loadUbicacionD(String parentId) {
+        new Thread(() -> {
+            listUbicacionD = new ArrayList<>();
+            if (baseUbicacionDId != null) {
+                UbicacionEntity u = ubicacionDao.getUbicacionByDSysId(baseUbicacionDId);
+                String label = (u != null && u.getUbicacionD() != null && !u.getUbicacionD().trim().isEmpty()) ? u.getUbicacionD().trim() : baseUbicacionDId;
+                listUbicacionD.add(new SpinnerItem(baseUbicacionDId, label));
+            } else {
+                List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionD(parentId);
+                listUbicacionD.add(new SpinnerItem(null, "Todas"));
+                for (UbicacionEntity u : list) listUbicacionD.add(new SpinnerItem(u.getDSysId(), u.getUbicacionD()));
+            }
+
+            runOnUiThread(() -> {
+                setSpinnerItems(spinnerUbicacionD, listUbicacionD);
+                if (baseUbicacionDId != null) {
+                    selectedUbicacionDId = baseUbicacionDId;
+                    loadUbicacionSecundaria(baseUbicacionDId);
+                } else {
+                    selectedUbicacionDId = null;
+                    setSoloTodasForString(spinnerUbicacionSecundaria);
+                    refreshSummaryCounts();
+                }
+            });
+        }).start();
+    }
+
+    private void loadUbicacionSecundaria(String parentId) {
+        new Thread(() -> {
+            List<String> list = activoDao.getDistinctUbicacionSecundaria(parentId);
+            listUbicacionSecundaria = new ArrayList<>();
+            listUbicacionSecundaria.add("Todas");
+            listUbicacionSecundaria.addAll(list);
+
+            runOnUiThread(() -> {
+                setSpinnerStrings(spinnerUbicacionSecundaria, listUbicacionSecundaria);
+                selectedUbicacionSecundariaId = null;
+                refreshSummaryCounts();
+            });
+        }).start();
+    }
+
+    private void refreshSummaryCounts() {
+        String ua = selectedUbicacionAId != null ? selectedUbicacionAId : baseUbicacionAId;
+        String ub = selectedUbicacionBId != null ? selectedUbicacionBId : baseUbicacionBId;
+        String uc = selectedUbicacionCId != null ? selectedUbicacionCId : baseUbicacionCId;
+        String ud = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
+        String us = selectedUbicacionSecundariaId;
+
+        // Count expected actives based on filters
+        int countFiltrados = activoDao.countActivosByFiltros(ua, ub, uc, ud, us);
+        if (txtCountActivosFiltrados != null) txtCountActivosFiltrados.setText("Activos filtrados: " + countFiltrados);
+
+        // Update counts per filter level
+        String ubForA = baseUbicacionBId;
+        String ucForA = baseUbicacionCId;
+        String udForA = baseUbicacionDId;
+
+        String ubForB = selectedUbicacionBId != null ? selectedUbicacionBId : baseUbicacionBId;
+        String ucForB = baseUbicacionCId;
+        String udForB = baseUbicacionDId;
+
+        String ucForC = selectedUbicacionCId != null ? selectedUbicacionCId : baseUbicacionCId;
+        String udForC = baseUbicacionDId;
+
+        String udForD = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
+
+        int countA = activoDao.countActivosByFiltros(ua, ubForA, ucForA, udForA);
+        int countB = activoDao.countActivosByFiltros(ua, ubForB, ucForB, udForB);
+        int countC = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForC);
+        int countD = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD);
+        int countS = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, us);
+
+        if (txtCountUbicacionA != null) txtCountUbicacionA.setText("Activos: " + countA);
+        if (txtCountUbicacionB != null) txtCountUbicacionB.setText("Activos: " + countB);
+        if (txtCountUbicacionC != null) txtCountUbicacionC.setText("Activos: " + countC);
+        if (txtCountUbicacionD != null) txtCountUbicacionD.setText("Activos: " + countD);
+        if (txtCountUbicacionSecundaria != null) txtCountUbicacionSecundaria.setText("Activos: " + countS);
+
+        // Update Main Summary (KPIs)
+        cargarDatos();
+    }
 
     private void updateTomasTabs() {
         if (containerTomasTabs == null) return;
@@ -221,8 +678,8 @@ public class RegistroConteosActivity extends AppCompatActivity {
                     boolean isSelected = t.getIdToma().equals(idToma);
                     
                     if (isSelected) {
-                         tab.setTextColor(ContextCompat.getColor(this, android.R.color.white));
-                         tab.setBackgroundResource(R.drawable.btn_primary);
+                         tab.setTextColor(ContextCompat.getColor(this, R.color.blanco));
+                         tab.setBackgroundResource(R.drawable.btn_dark_gray);
                     } else {
                          tab.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint));
                          tab.setBackgroundResource(R.drawable.btn_secondary_gray);
@@ -247,6 +704,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                     containerTomasTabs.addView(tab);
                 }
 
+                /*
                 TextView tabAdd = new TextView(this);
                 tabAdd.setText("+");
                 tabAdd.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint));
@@ -271,6 +729,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                     finish();
                 });
                 containerTomasTabs.addView(tabAdd);
+                */
             });
         }).start();
     }
@@ -390,8 +849,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                      List<ActivoEntity> expected = activoDao.getActivosByUbicacion(tomaFisica.getUbicacionD());
                      if (expected != null) {
                          for(ActivoEntity a : expected) {
-                             if ((a.getIdActivo() != null && a.getIdActivo().equalsIgnoreCase(activoId)) || 
-                                 (a.getTagEpc() != null && a.getTagEpc().equalsIgnoreCase(epc))) {
+                             if (a.getIdActivo() != null && a.getIdActivo().equalsIgnoreCase(activoId)) {
                                  esEsperado = true;
                                  break;
                              }
@@ -444,6 +902,10 @@ public class RegistroConteosActivity extends AppCompatActivity {
 
         tabResumen.setTextColor(ContextCompat.getColor(this, mostrarResumen ? R.color.blanco : R.color.nav_item_text_tint));
         tabActivos.setTextColor(ContextCompat.getColor(this, mostrarResumen ? R.color.nav_item_text_tint : R.color.blanco));
+        
+        if (!mostrarResumen) {
+            mostrarVistaActivos(currentFilter != null);
+        }
     }
 
     private void cargarDatos() {
@@ -453,7 +915,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
             return;
         }
 
-        Categoria filtro = filtroCategoria();
+        Categoria filtro = currentFilter;
         Log.d("RegistroConteos", "cargarDatos: filtro=" + (filtro != null ? filtro.name() : "null") + ", idToma=" + idToma);
 
         // Lógica de visibilidad de filas de resumen
@@ -640,11 +1102,17 @@ public class RegistroConteosActivity extends AppCompatActivity {
             }
         }
 
+        int totalExpected = 0;
+        if (resumen != null) {
+            totalExpected = parseIntOrZero(resumen.getTotalActivos());
+        }
+        String totalStr = String.valueOf(totalExpected);
+
         txtTotales.setText("Total: " + total);
-        txtNoEncontrados.setText(String.valueOf(rojo));
-        txtEncontrados.setText(String.valueOf(verde));
-        txtNoPertenecen.setText(String.valueOf(amarillo));
-        txtNoInventariados.setText(String.valueOf(blanco));
+        txtNoEncontrados.setText(rojo + "/" + totalStr);
+        txtEncontrados.setText(verde + "/" + totalStr);
+        txtNoPertenecen.setText(amarillo + "/" + totalStr);
+        txtNoInventariados.setText(blanco + "/" + totalStr);
 
         adapter.setDao(activoDao);
         adapter.setItems(filas);
@@ -674,20 +1142,20 @@ public class RegistroConteosActivity extends AppCompatActivity {
 
     private void abrirListado(Categoria categoria, String titulo) {
         if (categoria == null) return;
-        String displayTitle = titulo;
-        if (numeroToma != null && !numeroToma.trim().isEmpty()) {
-            displayTitle = titulo + " - Toma " + numeroToma.trim();
-        }
         
         Log.d("RegistroConteos", "abrirListado: " + categoria.name() + ", idToma=" + idToma);
 
-        Intent intent = new Intent(this, RegistroConteosActivity.class);
-        intent.putExtra("tomaFisicaId", tomaFisicaId);
-        intent.putExtra("idToma", idToma);
-        intent.putExtra("numeroToma", numeroToma);
-        intent.putExtra("estadoFiltro", categoria.name());
-        intent.putExtra("tituloFiltro", displayTitle);
-        startActivity(intent);
+        // Switch to Activos tab
+        setTab(false);
+        
+        // Update filter state
+        currentFilter = categoria;
+        
+        // Show List View
+        mostrarVistaActivos(true);
+        
+        // Reload data with new filter
+        cargarDatos();
     }
 
     private enum Categoria { ROJO, VERDE, AMARILLO, BLANCO }
@@ -698,11 +1166,11 @@ public class RegistroConteosActivity extends AppCompatActivity {
         if (s.isEmpty()) return Categoria.BLANCO;
         s = s.toUpperCase(Locale.ROOT);
 
-        if (s.contains("VERDE") || s.contains("ENCONTRADO")) return Categoria.VERDE;
-        if (s.contains("AMARILLO") || s.contains("SOBRANTE") || s.contains("NO PERTENECE") || s.contains("NO_PERTENECE") || s.contains("NOPERTENECE"))
-            return Categoria.AMARILLO;
         if (s.contains("ROJO") || s.contains("FALTANTE") || s.contains("NO ENCONTRADO") || s.contains("NO_ENCONTRADO"))
             return Categoria.ROJO;
+        if (s.contains("AMARILLO") || s.contains("SOBRANTE") || s.contains("NO PERTENECE") || s.contains("NO_PERTENECE") || s.contains("NOPERTENECE"))
+            return Categoria.AMARILLO;
+        if (s.contains("VERDE") || s.contains("ENCONTRADO")) return Categoria.VERDE;
         if (s.contains("BLANCO") || s.contains("NO INVENTARIADO") || s.contains("PENDIENTE"))
             return Categoria.BLANCO;
 
@@ -796,14 +1264,20 @@ public class RegistroConteosActivity extends AppCompatActivity {
 
         List<TomaFisicaDetallesEntity> detalles = detallesDao.getByIdToma(idTomaValue.trim());
         
-        // 2. Obtener esperados
+        // 2. Obtener esperados usando los filtros actuales si existen
         TomaFisicaEntity tomaFisica = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
         java.util.Set<String> expectedEpcs = new java.util.HashSet<>();
         java.util.Set<String> expectedIds = new java.util.HashSet<>();
         int totalExpectedCount = 0;
         
-        if (tomaFisica != null && tomaFisica.getUbicacionD() != null) {
-            List<ActivoEntity> expected = activoDao.getActivosByUbicacion(tomaFisica.getUbicacionD());
+        if (tomaFisica != null) {
+            String ua = selectedUbicacionAId != null ? selectedUbicacionAId : (baseUbicacionAId != null ? baseUbicacionAId : tomaFisica.getUbicacionA());
+            String ub = selectedUbicacionBId != null ? selectedUbicacionBId : (baseUbicacionBId != null ? baseUbicacionBId : tomaFisica.getUbicacionB());
+            String uc = selectedUbicacionCId != null ? selectedUbicacionCId : (baseUbicacionCId != null ? baseUbicacionCId : tomaFisica.getUbicacionC());
+            String ud = selectedUbicacionDId != null ? selectedUbicacionDId : (baseUbicacionDId != null ? baseUbicacionDId : tomaFisica.getUbicacionD());
+            String us = selectedUbicacionSecundariaId;
+            
+            List<ActivoEntity> expected = activoDao.getActivosByFiltros(ua, ub, uc, ud, us);
             if (expected != null) {
                 totalExpectedCount = expected.size();
                 for (ActivoEntity a : expected) {
@@ -923,23 +1397,23 @@ public class RegistroConteosActivity extends AppCompatActivity {
             String valNumeroEtiqueta = normalizar(activo != null ? activo.getNumeroEtiqueta() : null);
             String serie = normalizar(activo != null ? activo.getNumeroSerie() : null);
 
-            // Web Mapping: Placa -> NUMERO_ACTIVO, NoActivo -> NUMERO_ETIQUETA
-            // Originalmente: txtPlaca -> NUMERO_ETIQUETA (fallback numeroActivo), txtNumeroActivo -> NUMERO_ACTIVO
-
-            if (serie.isEmpty() && activo == null && epc != null && !epc.trim().isEmpty()) serie = epc.trim();
-
+            // Web Mapping: Placa -> NUMERO_ETIQUETA, Activo No -> NUMERO_ACTIVO
+            
             holder.txtNombre.setText(nombre.isEmpty() ? "Sin nombre" : nombre);
-            // Mostrar Etiqueta en "Activo:"
-            holder.txtNumeroActivo.setText("Activo: " + (valNumeroEtiqueta.isEmpty() ? "-" : valNumeroEtiqueta));
-            // Mostrar NumeroActivo en "Placa:"
-            holder.txtPlaca.setText("Placa: " + (valNumeroActivo.isEmpty() ? "-" : valNumeroActivo));
+            // Mostrar NumeroActivo en "Activo No:"
+            holder.txtNumeroActivo.setText("Activo No: " + (valNumeroActivo.isEmpty() ? "-" : valNumeroActivo));
+            // Mostrar Etiqueta en "Placa:"
+            holder.txtPlaca.setText("Placa: " + (valNumeroEtiqueta.isEmpty() ? "-" : valNumeroEtiqueta));
             holder.txtSerie.setText("S/N: " + (serie.isEmpty() ? "-" : serie));
 
-            holder.imgFoto.setImageResource(R.drawable.no_hay_foto);
+            holder.imgFoto.setImageDrawable(null);
+            boolean tieneFoto = false;
+            
             if (activo != null && lookupKey != null) {
                 Bitmap cached = bitmapCacheByKey.get(lookupKey);
                 if (cached != null) {
                     holder.imgFoto.setImageBitmap(cached);
+                    tieneFoto = true;
                 } else {
                     String fotoBase64 = extraerPrimeraFotoBase64(activo.getFotos());
                     Bitmap bmp = decodeBase64ToBitmap(fotoBase64);
@@ -950,37 +1424,31 @@ public class RegistroConteosActivity extends AppCompatActivity {
                     if (bmp != null) {
                         bitmapCacheByKey.put(lookupKey, bmp);
                         holder.imgFoto.setImageBitmap(bmp);
+                        tieneFoto = true;
                     }
                 }
             }
-
-            Categoria c = categoriaDe(d.getEstadoInventario());
-            int bg;
-            int tColor;
-            int t2Color;
-            if (c == Categoria.ROJO) {
-                bg = ContextCompat.getColor(holder.itemView.getContext(), R.color.rojo);
-                tColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.blanco);
-                t2Color = tColor;
-            } else if (c == Categoria.VERDE) {
-                bg = ContextCompat.getColor(holder.itemView.getContext(), R.color.verde);
-                tColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.blanco);
-                t2Color = tColor;
-            } else if (c == Categoria.AMARILLO) {
-                bg = ContextCompat.getColor(holder.itemView.getContext(), R.color.amarillo);
-                tColor = ContextCompat.getColor(holder.itemView.getContext(), android.R.color.black);
-                t2Color = tColor;
-            } else {
-                bg = ContextCompat.getColor(holder.itemView.getContext(), R.color.blanco);
-                tColor = ContextCompat.getColor(holder.itemView.getContext(), android.R.color.black);
-                t2Color = ContextCompat.getColor(holder.itemView.getContext(), android.R.color.darker_gray);
+            
+            if (!tieneFoto) {
+                holder.imgFoto.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                holder.imgFoto.setImageDrawable(null);
             }
 
-            holder.itemView.setBackgroundColor(bg);
-            holder.txtNombre.setTextColor(tColor);
-            holder.txtNumeroActivo.setTextColor(t2Color);
-            holder.txtSerie.setTextColor(t2Color);
-            holder.txtPlaca.setTextColor(t2Color);
+            Categoria c = categoriaDe(d.getEstadoInventario());
+            int colorRes;
+            if (c == Categoria.ROJO) {
+                colorRes = R.color.rojo;
+            } else if (c == Categoria.VERDE) {
+                colorRes = R.color.verde;
+            } else if (c == Categoria.AMARILLO) {
+                colorRes = R.color.amarillo;
+            } else {
+                colorRes = android.R.color.darker_gray;
+            }
+            
+            if (holder.imgEstadoIndicator != null) {
+                holder.imgEstadoIndicator.setColorFilter(ContextCompat.getColor(holder.itemView.getContext(), colorRes));
+            }
         }
 
         @Override
@@ -994,6 +1462,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
             final TextView txtNumeroActivo;
             final TextView txtSerie;
             final TextView txtPlaca;
+            final ImageView imgEstadoIndicator;
 
             VH(@NonNull View itemView) {
                 super(itemView);
@@ -1002,6 +1471,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                 txtNumeroActivo = itemView.findViewById(R.id.txtNumeroActivo);
                 txtSerie = itemView.findViewById(R.id.txtSerie);
                 txtPlaca = itemView.findViewById(R.id.txtPlaca);
+                imgEstadoIndicator = itemView.findViewById(R.id.imgEstadoIndicator);
             }
         }
 

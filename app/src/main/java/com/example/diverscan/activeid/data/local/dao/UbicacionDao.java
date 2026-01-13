@@ -51,7 +51,7 @@ public class UbicacionDao {
             Log.e(TAG, "Error sincronizando ubicaciones", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 
@@ -94,7 +94,7 @@ public class UbicacionDao {
             Log.e(TAG, "Error leyendo ubicaciones", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
 
         return list;
@@ -126,7 +126,7 @@ public class UbicacionDao {
             Log.e(TAG, "Error obteniendo ubicación por ASysId", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
 
         return u;
@@ -158,7 +158,7 @@ public class UbicacionDao {
             Log.e(TAG, "Error obteniendo ubicación por BSysId", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
 
         return u;
@@ -190,7 +190,7 @@ public class UbicacionDao {
             Log.e(TAG, "Error obteniendo ubicación por CSysId", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
 
         return u;
@@ -222,7 +222,7 @@ public class UbicacionDao {
             Log.e(TAG, "Error obteniendo ubicación por DSysId", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
 
         return u;
@@ -249,7 +249,7 @@ public class UbicacionDao {
             Log.e(TAG, "Error getDistinctUbicacionA", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
         return list;
     }
@@ -272,7 +272,7 @@ public class UbicacionDao {
             Log.e(TAG, "Error getDistinctUbicacionB", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
         return list;
     }
@@ -295,7 +295,7 @@ public class UbicacionDao {
             Log.e(TAG, "Error getDistinctUbicacionC", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
         return list;
     }
@@ -318,7 +318,7 @@ public class UbicacionDao {
             Log.e(TAG, "Error getDistinctUbicacionD", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
         return list;
     }

@@ -134,10 +134,57 @@ public class TomaFisicaDao {
         return entity;
     }
 
+    public String getCategoryNameById(String categoryId) {
+        String categoryName = "";
+        if (categoryId == null || categoryId.trim().isEmpty()) return categoryName;
+
+        String id = categoryId.trim();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        
+        // 1. Try match by assetCategorySysId
+        try (Cursor c = db.rawQuery("SELECT name FROM categoriaActivos WHERE assetCategorySysId = ?", new String[]{id})) {
+            if (c.moveToFirst()) {
+                categoryName = c.getString(0);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error consultando categoria por SysId: " + id, e);
+        }
+
+        // 2. If not found, try match by _id
+        if (categoryName.isEmpty()) {
+            try (Cursor c = db.rawQuery("SELECT name FROM categoriaActivos WHERE _id = ?", new String[]{id})) {
+                if (c.moveToFirst()) {
+                    categoryName = c.getString(0);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error consultando categoria por _id: " + id, e);
+            }
+        }
+        
+        // 3. If still not found, try case-insensitive match on SysId
+         if (categoryName.isEmpty()) {
+            try (Cursor c = db.rawQuery("SELECT name FROM categoriaActivos WHERE lower(assetCategorySysId) = ?", new String[]{id.toLowerCase()})) {
+                if (c.moveToFirst()) {
+                    categoryName = c.getString(0);
+                }
+            } catch (Exception e) {
+                 Log.e(TAG, "Error consultando categoria por SysId (lower): " + id, e);
+            }
+        }
+
+        if (db != null && db.isOpen()) {
+            db.close();
+        }
+        return categoryName;
+    }
+
     public void syncTomasFisicas(List<TomaFisicaEntity> tomasfisicas) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         try {
+            // Limpiar tabla antes de insertar nuevos registros del servidor
+            db.delete("TomasFisicas", null, null);
+            
             for (TomaFisicaEntity a : tomasfisicas) {
                 ContentValues values = entityToContentValues(a);
                 db.insertWithOnConflict("TomasFisicas", null, values, SQLiteDatabase.CONFLICT_REPLACE);

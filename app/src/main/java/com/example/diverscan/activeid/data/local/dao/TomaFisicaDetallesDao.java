@@ -636,6 +636,9 @@ public class TomaFisicaDetallesDao {
                             markHeaderAsPending(idTomaKey);
                         }
                     }
+                    if (em.toLowerCase().contains("duplicate key") || em.toLowerCase().contains("violation of unique key")) {
+                         Log.e(TAG, "ERROR CRITICO: Clave duplicada detectada. El servidor rechazo los datos porque ya existen con otros IDs. " + em);
+                    }
                 }
                 pushDeletesThenFinish.run();
             }

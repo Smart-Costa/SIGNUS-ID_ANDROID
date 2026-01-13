@@ -13,7 +13,7 @@
         android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#EF6C00"
+        android:background="#FF5100"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="16dp"
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Hacer inventarios"
+            android:text="Hacer inventario"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -72,13 +72,15 @@
             android:id="@+id/containerTomasTabs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:background="@drawable/btn_secondary_gray"
+            android:padding="4dp">
             <!-- Items added dynamically or static placeholder -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Toma 1"
-                android:background="@drawable/tab_selected_bg"
+                android:background="@drawable/btn_dark_gray"
                 android:textColor="@android:color/white"
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp"
@@ -123,7 +125,7 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintTop_toBottomOf="@id/scrollTomas">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/tabResumen"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -134,7 +136,7 @@
             android:textSize="14sp"
             android:layout_marginEnd="4dp" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/tabActivos"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -165,173 +167,186 @@
             android:orientation="vertical"
             android:visibility="visible">
 
-            <FrameLayout
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="16dp"
-                android:foregroundGravity="center"
-                android:gravity="center">
-
-                <com.google.android.material.progressindicator.CircularProgressIndicator
-                    android:id="@+id/gaugeResumen"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:indicatorSize="200dp"
-                    app:trackThickness="20dp"
-                    app:trackColor="#F0F0F0"
-                    app:indicatorColor="#4DB6AC"
-                    android:max="100"
-                    android:progress="0" />
+                android:layout_height="match_parent">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingBottom="16dp">
 
-                    <TextView
-                        android:id="@+id/txtGaugeCount"
+                    <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 de 0"
-                        android:textSize="34sp"
-                        android:textStyle="bold"
-                        android:textColor="#333" />
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:id="@+id/gaugeResumen"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            app:indicatorSize="200dp"
+                            app:trackThickness="20dp"
+                            app:trackColor="#F0F0F0"
+                            app:indicatorColor="#4DB6AC"
+                            android:max="100"
+                            android:progress="0" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/txtGaugeCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0 de 0"
+                                android:textSize="34sp"
+                                android:textStyle="bold"
+                                android:textColor="#333" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Activos"
+                                android:textSize="16sp"
+                                android:textColor="#666" />
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:id="@+id/lyFiltrosResumen"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Activos"
-                        android:textSize="16sp"
-                        android:textColor="#666" />
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_bloque_tabla"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Filtros"
+                            android:textStyle="bold"
+                            android:textColor="#606060"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:id="@+id/txtCountActivosFiltrados"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Activos filtrados: 0"
+                            android:textColor="#606060"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ubicación A"
+                            android:textColor="#808080"
+                            android:textSize="12sp" />
+                        <Spinner
+                            android:id="@+id/spinnerUbicacionA"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginBottom="4dp" />
+                        <TextView
+                            android:id="@+id/txtCountUbicacionA"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Activos: 0"
+                            android:textColor="#606060"
+                            android:textSize="12sp"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ubicación B"
+                            android:textColor="#808080"
+                            android:textSize="12sp" />
+                        <Spinner
+                            android:id="@+id/spinnerUbicacionB"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginBottom="4dp" />
+                        <TextView
+                            android:id="@+id/txtCountUbicacionB"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Activos: 0"
+                            android:textColor="#606060"
+                            android:textSize="12sp"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ubicación C"
+                            android:textColor="#808080"
+                            android:textSize="12sp" />
+                        <Spinner
+                            android:id="@+id/spinnerUbicacionC"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginBottom="4dp" />
+                        <TextView
+                            android:id="@+id/txtCountUbicacionC"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Activos: 0"
+                            android:textColor="#606060"
+                            android:textSize="12sp"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ubicación D"
+                            android:textColor="#808080"
+                            android:textSize="12sp" />
+                        <Spinner
+                            android:id="@+id/spinnerUbicacionD"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginBottom="4dp" />
+                        <TextView
+                            android:id="@+id/txtCountUbicacionD"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Activos: 0"
+                            android:textColor="#606060"
+                            android:textSize="12sp"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ubicación Secundaria"
+                            android:textColor="#808080"
+                            android:textSize="12sp" />
+                        <Spinner
+                            android:id="@+id/spinnerUbicacionSecundaria"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginBottom="4dp" />
+                        <TextView
+                            android:id="@+id/txtCountUbicacionSecundaria"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Activos: 0"
+                            android:textColor="#606060"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
                 </LinearLayout>
-            </FrameLayout>
-
-            <LinearLayout
-                android:id="@+id/lyFiltrosResumen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_bloque_tabla"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Filtros"
-                    android:textStyle="bold"
-                    android:textColor="#606060"
-                    android:layout_marginBottom="8dp"/>
-
-                <TextView
-                    android:id="@+id/txtCountActivosFiltrados"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Activos filtrados: 0"
-                    android:textColor="#606060"
-                    android:layout_marginBottom="12dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ubicación A"
-                    android:textColor="#808080"
-                    android:textSize="12sp" />
-                <Spinner
-                    android:id="@+id/spinnerUbicacionA"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginBottom="4dp" />
-                <TextView
-                    android:id="@+id/txtCountUbicacionA"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Activos: 0"
-                    android:textColor="#606060"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ubicación B"
-                    android:textColor="#808080"
-                    android:textSize="12sp" />
-                <Spinner
-                    android:id="@+id/spinnerUbicacionB"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginBottom="4dp" />
-                <TextView
-                    android:id="@+id/txtCountUbicacionB"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Activos: 0"
-                    android:textColor="#606060"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ubicación C"
-                    android:textColor="#808080"
-                    android:textSize="12sp" />
-                <Spinner
-                    android:id="@+id/spinnerUbicacionC"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginBottom="4dp" />
-                <TextView
-                    android:id="@+id/txtCountUbicacionC"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Activos: 0"
-                    android:textColor="#606060"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ubicación D"
-                    android:textColor="#808080"
-                    android:textSize="12sp" />
-                <Spinner
-                    android:id="@+id/spinnerUbicacionD"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginBottom="4dp" />
-                <TextView
-                    android:id="@+id/txtCountUbicacionD"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Activos: 0"
-                    android:textColor="#606060"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ubicación Secundaria"
-                    android:textColor="#808080"
-                    android:textSize="12sp" />
-                <Spinner
-                    android:id="@+id/spinnerUbicacionSecundaria"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginBottom="4dp" />
-                <TextView
-                    android:id="@+id/txtCountUbicacionSecundaria"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Activos: 0"
-                    android:textColor="#606060"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
+            </ScrollView>
         </LinearLayout>
 
         <!-- VISTA ACTIVOS -->
@@ -350,7 +365,8 @@
                 android:background="@drawable/bg_bloque_tabla"
                 android:padding="12dp"
                 android:layout_marginBottom="16dp"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -359,6 +375,14 @@
                     android:textStyle="bold"
                     android:textColor="#606060"
                     android:layout_marginBottom="8dp"/>
+
+                <CheckBox
+                    android:id="@+id/chkIncluirExternos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cargar todos los activos"
+                    android:textColor="#606060"
+                    android:layout_marginBottom="4dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"

@@ -34,6 +34,7 @@ import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
 import com.example.diverscan.activeid.data.local.dao.UbicacionDao;
 import com.example.diverscan.activeid.data.local.dao.UserDao;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaEntity;
+import com.example.diverscan.activeid.data.local.entity.EmpresaEntity;
 import com.example.diverscan.activeid.data.remote.response.ApiCallback;
 import com.example.diverscan.activeid.data.remote.response.ApiResponse;
 import com.google.gson.JsonElement;
@@ -217,6 +218,7 @@ public class sincronizar_base extends AppCompatActivity {
         btn_enviar = findViewById(R.id.btn_enviar);
         btn_obtener = findViewById(R.id.btn_obtener);
         btn_limpiar_bd = findViewById(R.id.btn_limpiar_bd); // Initialized
+        
         PreOpcionesSincr = findViewById(R.id.SpinnerSincronizacion);
         Mensaje = findViewById(R.id.mensaje);
         tvLastSyncDate = findViewById(R.id.tv_last_sync_date);
@@ -357,7 +359,11 @@ public class sincronizar_base extends AppCompatActivity {
         // o no manejan estado pendiente.
         activoDao.clearSyncedData();
 
-        // Cadena secuencial de sincronización
+        // Iniciar secuencia de sincronización directamente
+        startSyncSequence();
+    };
+
+    private void startSyncSequence() {
         // 1. Usuarios
         userDao.fetchAndSyncFromApi(() -> {
             runOnUiThread(() -> actualizarBarraSegmentada(15));
@@ -370,9 +376,12 @@ public class sincronizar_base extends AppCompatActivity {
                 ubicacionDao.fetchAndSyncFromApi(() -> {
                     runOnUiThread(() -> actualizarBarraSegmentada(45));
 
-                    // 4. Activos
-                    activoDao.fetchAndSyncFromApi(() -> {
-                        runOnUiThread(() -> actualizarBarraSegmentada(60));
+                    // 3.5 Categorias
+                    getCategoriaActivos(() -> {
+
+                        // 4. Activos
+                        activoDao.fetchAndSyncFromApi(() -> {
+                            runOnUiThread(() -> actualizarBarraSegmentada(60));
 
                         // 5. Tomas Fisicas (Encabezados)
                         tomafisicaDao.fetchAndSyncFromApi(() -> {
@@ -423,11 +432,14 @@ public class sincronizar_base extends AppCompatActivity {
                         });
                     });
                 });
+                });
             });
         });
-    };
+    }
 
     private void updateDebugSummary() {
+        // Debug summary hidden per user request
+        /*
         new Thread(() -> {
             // Obtener conteos de SQLite
             // Nota: Se asume que los DAOs tienen métodos para contar o listar. 
@@ -454,6 +466,7 @@ public class sincronizar_base extends AppCompatActivity {
                 }
             });
         }).start();
+        */
     }
 
     public final View.OnClickListener OnClickListenerEnviar = v -> {
@@ -1302,6 +1315,53 @@ public class sincronizar_base extends AppCompatActivity {
         catch (JSONException e)
         {
             Log.w("myApp", "Error 21 " +e.toString()+ " "+e.getStackTrace());
+        }
+    }
+    //endregion
+
+    //region Categorias
+    public void getCategoriaActivos(final Runnable onSuccess) {
+        ACTIVEID_API activeid_api = new ACTIVEID_API();
+        try {
+            // Use GET and correct endpoint: /ActivosDetail/Categorias
+            activeid_api.get("/ActivosDetail/Categorias", new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    deserializeCategoriaActivos(new String(responseBody));
+                    if (onSuccess != null) onSuccess.run();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Log.e("SYNC", "Error getting categories", error);
+                    if (onSuccess != null) onSuccess.run();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (onSuccess != null) onSuccess.run();
+        }
+    }
+
+    public void deserializeCategoriaActivos(String response) {
+        try {
+            categoriaActivos = new ArrayList<>();
+            // Response is a JSON Array, not Object with wrapper
+            JSONArray jsonArray = new JSONArray(response);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject item = jsonArray.getJSONObject(i);
+                // API keys: cSysId, categoria
+                categoriaActivos.add(new EntidadCategoriaActivos(
+                        item.getString("cSysId"), // assetCategorySysId
+                        item.getString("categoria"), // name
+                        "" // description (not provided by API)
+                ));
+            }
+            InsertOrReplaceCategoriaActivo(categoriaActivos);
+            Log.d("SYNC", "Categorias synced: " + categoriaActivos.size());
+        } catch (Exception e) {
+            Log.e("SYNC", "Error parsing categories", e);
         }
     }
     //endregion

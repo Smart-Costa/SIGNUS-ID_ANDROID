@@ -39,7 +39,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="#FF5100"
-                    android:text="OBTENER DATOS DE TAG DE UBICACIÓN"
+                    android:text="OBTENER DATOS DE TAG"
                     android:textColor="@android:color/white"
                     android:textSize="14sp" />
             </androidx.cardview.widget.CardView>
@@ -100,7 +100,8 @@
                 android:layout_marginBottom="12dp"
                 app:cardCornerRadius="6dp"
                 app:cardBackgroundColor="#D32F2F"
-                app:cardElevation="2dp">
+                app:cardElevation="2dp"
+                android:visibility="gone">
 
                 <Button
                     android:id="@+id/btn_limpiar_bd"

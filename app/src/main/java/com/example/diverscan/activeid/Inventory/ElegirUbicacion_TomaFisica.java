@@ -234,11 +234,7 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
         txtProgressCircle = findViewById(R.id.txtProgressCircle);
 
         // Setear título dinámico
-        if (takeName != null && !takeName.isEmpty()) {
-            lblTituloDinamico.setText(takeName);
-        } else {
-            lblTituloDinamico.setText("Inventario Electrónico");
-        }
+        lblTituloDinamico.setText("Hacer Inventario");
 
         recyclerSubTomas = findViewById(R.id.recyclerSubTomas);
             recyclerSubTomas.setLayoutManager(new LinearLayoutManager(this));

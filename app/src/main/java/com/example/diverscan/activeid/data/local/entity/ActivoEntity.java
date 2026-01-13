@@ -14,7 +14,7 @@ public class ActivoEntity {
     private String idActivo = UUID.randomUUID().toString();
 
     @SerializedName(value = "NUMERO_ACTIVO", alternate = {"NumeroActivo", "numeroActivo", "Placa", "placa"})
-    private Object numeroActivo;
+    private String numeroActivo;
 
     @SerializedName(value = "NUMERO_ETIQUETA", alternate = {"NumeroEtiqueta", "numeroEtiqueta", "Etiqueta", "etiqueta", "NoActivo", "noActivo"})
     private String numeroEtiqueta;
@@ -158,8 +158,7 @@ public class ActivoEntity {
     public void setIdActivo(@NonNull String idActivo) { this.idActivo = idActivo; }
 
     public String getNumeroActivo() {
-        if (numeroActivo == null) return null;
-        return String.valueOf(numeroActivo);
+        return numeroActivo;
     }
     public void setNumeroActivo(String numeroActivo) { this.numeroActivo = numeroActivo; }
 

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
+import com.example.diverscan.activeid.data.local.entity.EmpresaEntity;
 import com.example.diverscan.activeid.Utilities.Fechas;
 import com.example.diverscan.activeid.TomasFisicas.EntidadActivosInventarios;
 import com.example.diverscan.activeid.data.remote.api.ApiClient;
@@ -44,6 +45,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e(TAG, "Error counting activos", e);
         }
+        db.close();
         return count;
     }
 
@@ -75,7 +77,7 @@ public class ActivoDao {
         v.put("CUENTA_CONTABLE_DEPRESIACION", a.getCuentaContableDepresiacion());
         v.put("CENTRO_COSTOS", a.getCentroCostos());
         v.put("DESCRIPCION_ESTADO_ULTIMO_INVENTARIO", a.getDescripcionEstadoUltimoInventario());
-        v.put("TAG_EPC", a.getTagEpc());
+        v.put("TAG_EPC", "EPC Asignado"); // Valor fijo indicando que tiene tag
         v.put("EMPLEADO", a.getEmpleado());
         v.put("UBICACION_A", a.getUbicacionA());
         v.put("UBICACION_B", a.getUbicacionB());
@@ -89,7 +91,7 @@ public class ActivoDao {
         v.put("ESTADO_ACTIVO", (a.getEstadoActivo() != null && a.getEstadoActivo()) ? 1 : 0);
         v.put("FECHA_CREACION_ACTIVO", a.getFechaCreacionActivo());
 
-        v.put("EPC", a.getEpc());
+        v.put("EPC", a.getTagEpc()); // Guardamos el valor REAL del tag en la columna EPC
         v.put("CATEGORIA_A", a.getCategoriaA());
         v.put("CATEGORIA_B", a.getCategoriaB());
         v.put("CATEGORIA_C", a.getCategoriaC());
@@ -115,13 +117,16 @@ public class ActivoDao {
     public void syncActivos(List<ActivoEntity> activos) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
+        int count = 0;
         try {
             for (ActivoEntity a : activos) {
                 ContentValues values = entityToContentValues(a);
                 values.put("SYNC_STATUS", 1); // 1 = Sincronizado
                 db.insertWithOnConflict(TABLE_ACTIVOS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                count++;
             }
             db.setTransactionSuccessful();
+            Log.d(TAG, "Resumen de activos sincronizados: " + count);
         } catch (Exception e) {
             Log.e(TAG, "Error sincronizando activos", e);
         } finally {
@@ -146,9 +151,13 @@ public class ActivoDao {
             // Mapeo manual para asegurar nombres de campos y validar GUIDs
             o.addProperty("ID_ACTIVO", validateGuid(a.getIdActivo()));
             
-            Number numActivo = validateLong(a.getNumeroActivo());
-            if (numActivo != null) {
-                o.addProperty("NUMERO_ACTIVO", numActivo);
+            // Enviamos como tipos nativos para coincidir con el modelo Activos.cs del servidor (int, long, decimal)
+            if (a.getNumeroActivo() != null) {
+                 try {
+                     o.addProperty("NUMERO_ACTIVO", Long.parseLong(a.getNumeroActivo()));
+                 } catch (Exception e) {
+                     o.addProperty("NUMERO_ACTIVO", a.getNumeroActivo()); // Fallback a string si no es numero
+                 }
             } else {
                 o.add("NUMERO_ACTIVO", com.google.gson.JsonNull.INSTANCE);
             }
@@ -185,6 +194,7 @@ public class ActivoDao {
             o.addProperty("COLOR", a.getColor());
             o.addProperty("TAMANIO_MEDIDA", a.getTamanioMedida());
             o.addProperty("OBSERVACIONES", a.getObservaciones());
+            // El modelo API define ESTADO_ACTIVO como bool (ver Activos.cs en API), enviamos boolean nativo
             o.addProperty("ESTADO_ACTIVO", (a.getEstadoActivo() != null && a.getEstadoActivo()));
             o.addProperty("FECHA_CREACION_ACTIVO", validateDate(a.getFechaCreacionActivo()));
 
@@ -194,7 +204,8 @@ public class ActivoDao {
         Type type = new TypeToken<JsonElement>() {}.getType();
 
         String jsonLog = jsonArray.toString();
-        Log.d(TAG, "Enviando SyncBatch payload (pending_count=" + pending.size() + ", size_bytes=" + jsonLog.length() + "): " + jsonLog);
+        Log.d(TAG, "PAYLOAD_SYNC_BATCH: " + jsonLog);
+        Log.d(TAG, "Enviando SyncBatch payload (pending_count=" + pending.size() + ", size_bytes=" + jsonLog.length() + ")");
 
         api.post("Activos/SyncBatch", jsonArray, type, new ApiCallback<JsonElement>() {
             @Override
@@ -212,6 +223,10 @@ public class ActivoDao {
 
     private String validateGuid(String guid) {
         if (guid == null || guid.trim().isEmpty()) {
+            return null;
+        }
+        // Tratar GUID vacío como null para evitar errores de llave foránea
+        if (guid.equals("00000000-0000-0000-0000-000000000000")) {
             return null;
         }
         try {
@@ -416,7 +431,7 @@ public class ActivoDao {
             Log.e(TAG, "Error getActivosByFiltros", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
         return list;
     }
@@ -467,7 +482,7 @@ public class ActivoDao {
             return 0;
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
     }
 
@@ -493,7 +508,7 @@ public class ActivoDao {
             Log.e(TAG, "Error getDistinctUbicacionSecundaria", e);
         } finally {
             if (c != null) c.close();
-            db.close();
+            // db.close();
         }
         return list;
     }
@@ -529,7 +544,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e(TAG, "Error leyendo activos por columna de ubicacion", e);
         } finally {
-            db.close();
+            // db.close();
         }
         return list;
     }
@@ -557,7 +572,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e(TAG, "Error contando activos por columna de ubicacion", e);
         } finally {
-            db.close();
+            // db.close();
         }
         return 0;
     }
@@ -584,7 +599,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e(TAG, "Error leyendo activos por cualquier ubicacion", e);
         } finally {
-            db.close();
+            // db.close();
         }
         Log.d(TAG, "getActivosByAnyUbicacion: Found " + list.size() + " records.");
         return list;
@@ -611,7 +626,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e(TAG, "Error contando activos por cualquier ubicacion", e);
         } finally {
-            db.close();
+            // db.close();
         }
         return 0;
     }
@@ -629,25 +644,19 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e(TAG, "Error leyendo activos locales", e);
         } finally {
-            db.close();
+            // db.close();
         }
 
         return list;
     }
 
     public ActivoEntity getActivoByEpc(String epc) {
-        return getActivoByEpc(epc, true);
-    }
-
-    public ActivoEntity getActivoByEpc(String epc, boolean incluirBajas) {
         ActivoEntity activo = null;
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        String selection = "TAG_EPC = ?";
-        if (!incluirBajas) {
-            selection += " AND ESTADO_ACTIVO = 1";
-        }
-
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        
+        // CORREGIDO: Buscar por columna EPC en lugar de TAG_EPC
+        String selection = "EPC = ?"; 
+        
         try (Cursor c = db.query(
                 TABLE_ACTIVOS,
                 null,
@@ -664,7 +673,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e("TAG", "Error consultando por EPC", e);
         } finally {
-            db.close();
+            // db.close();
         }
 
         return activo;
@@ -699,7 +708,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e("TAG", "Error consultando por ID", e);
         } finally {
-            db.close();
+            // db.close();
         }
 
         return activo;
@@ -728,7 +737,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e("TAG", "Error consultando por ID_ACTIVO", e);
         } finally {
-            db.close();
+            // db.close();
         }
 
         return activo;
@@ -740,14 +749,14 @@ public class ActivoDao {
         
         String query = "SELECT a.*, o.Nombre as NombreOficina FROM " + TABLE_ACTIVOS + " a " +
                        "LEFT JOIN Oficina o ON a.UBICACION_D = o._id " +
-                       "WHERE a.TAG_EPC = ?";
+                       "WHERE a.EPC = ?";
                        
         try (Cursor c = db.rawQuery(query, new String[]{epc})) {
             if (c.moveToFirst()) {
                  result = new EntidadActivosInventarios(
                     c.getString(c.getColumnIndexOrThrow("NUMERO_ACTIVO")),
                     c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")),
-                    c.getString(c.getColumnIndexOrThrow("TAG_EPC")),
+                    c.getString(c.getColumnIndexOrThrow("EPC")),
                     c.getString(c.getColumnIndexOrThrow("ID_ACTIVO")),
                     c.getString(c.getColumnIndexOrThrow("NombreOficina")),
                     c.getString(c.getColumnIndexOrThrow("UBICACION_D")),
@@ -760,7 +769,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e(TAG, "Error fetching ActivoInventario", e);
         } finally {
-            db.close();
+            // db.close();
         }
         return result;
     }
@@ -827,9 +836,11 @@ public class ActivoDao {
         }
     }
 
-    public void fetchAndSyncFromApi() {
-        fetchAndSyncFromApi(null);
-    }
+    // public void fetchEmpresas(final ApiCallback<List<EmpresaEntity>> callback) {
+    //     ApiClient api = ApiClient.getInstance(context);
+    //     Type type = new TypeToken<List<EmpresaEntity>>() {}.getType();
+    //     api.get("ActivosDetail/Empresas", type, callback);
+    // }
 
     public void fetchAndSyncFromApi(final Runnable onComplete) {
         // Start pagination with page 1 and size 5000
@@ -841,9 +852,9 @@ public class ActivoDao {
         Type type = new TypeToken<List<ActivoEntity>>() {}.getType();
         
         // Filter by specific company to avoid fetching unrelated data (and millions of records)
-        String empresaId = "58A817F3-E67F-4989-B230-E9E3D4BC6A91";
-        String endpoint = "Activos?page=" + page + "&pageSize=" + pageSize + "&empresaId=" + empresaId;
-        Log.d(TAG, "Requesting Activos page " + page + " (size=" + pageSize + ") for Empresa: " + empresaId);
+        // Dynamic company ID passed from UI/Logic
+        String endpoint = "Activos?page=" + page + "&pageSize=" + pageSize;
+        Log.d(TAG, "Requesting Activos page " + page + " (size=" + pageSize + ")");
 
         api.<List<ActivoEntity>>get(endpoint, type, new ApiCallback<List<ActivoEntity>>() {
             @Override

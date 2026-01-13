@@ -43,9 +43,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 import android.content.Intent;
 import android.widget.AdapterView;
+import androidx.core.content.ContextCompat;
 
 public class NuevaTomaActivity extends AppCompatActivity implements ResponseHandlerInterface {
 
@@ -62,6 +64,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private android.widget.Spinner spinnerUbicacionC;
     private android.widget.Spinner spinnerUbicacionD;
     private android.widget.Spinner spinnerUbicacionSecundaria;
+    private android.widget.CheckBox chkIncluirExternos;
 
     private android.widget.ProgressBar progressCargaManual;
     private TextView txtSinDatosManual;
@@ -94,6 +97,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private TagWriter rfidHandler;
     private boolean isScanning = false;
     private java.util.Map<String, String> manualEpcToActivoId = new java.util.HashMap<>();
+    private java.util.Map<String, String> epcToDisplayName = new java.util.HashMap<>();
 
     private TomaFisicaTomasDao tomasDao;
     private TomaFisicaDetallesDao detallesDao;
@@ -143,8 +147,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             tomaFisicaId = getIntent().getStringExtra("tomaFisicaId");
             Log.d(TAG, "onCreate: tomaFisicaId recibido: " + tomaFisicaId);
         } else {
-            Log.e(TAG, "onCreate: Error: No se recibió ID de Toma Física");
-            Toast.makeText(this, "Error: No se recibió ID de Toma Física", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "onCreate: Error: No se recibiÃ³ ID de Toma FÃ­sica");
+            Toast.makeText(this, "Error: No se recibiÃ³ ID de Toma FÃ­sica", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -205,7 +209,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             if (count == 0) {
                 runOnUiThread(() -> {
                     new androidx.appcompat.app.AlertDialog.Builder(this)
-                        .setTitle("Base de datos vacía")
+                        .setTitle("Base de datos vacÃ­a")
                         .setMessage("No se encontraron activos en la base de datos local. Por favor, sincronice para obtener los registros.")
                         .setPositiveButton("Entendido", (dialog, which) -> dialog.dismiss())
                         .setCancelable(false)
@@ -252,6 +256,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         spinnerUbicacionC = findViewById(R.id.spinnerUbicacionC);
         spinnerUbicacionD = findViewById(R.id.spinnerUbicacionD);
         spinnerUbicacionSecundaria = findViewById(R.id.spinnerUbicacionSecundaria);
+        chkIncluirExternos = findViewById(R.id.chkIncluirExternos);
 
         progressCargaManual = findViewById(R.id.progressCargaManual);
         txtSinDatosManual = findViewById(R.id.txtSinDatosManual);
@@ -263,10 +268,37 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             btnAgregarLectura.setOnClickListener(v -> agregarLecturaManual());
         }
 
+        if (chkIncluirExternos != null) {
+            chkIncluirExternos.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                refreshActivosList();
+            });
+        }
+
         // Setup List Adapter
         scannedTagsList = new ArrayList<>();
         uniqueTags = new HashSet<>();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, scannedTagsList);
+        
+        // Custom Adapter to handle background color
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, scannedTagsList) {
+            @Override
+            public View getView(int position, View convertView, android.view.ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView text = (TextView) view.findViewById(android.R.id.text1);
+                
+                String epc = getItem(position);
+                if (epc != null) {
+                    boolean isSobrante = isActivoSobrante(epc);
+                    if (isSobrante) {
+                        view.setBackgroundColor(android.graphics.Color.parseColor("#FFEBEE")); // Light Red
+                        text.setTextColor(android.graphics.Color.RED);
+                    } else {
+                        view.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                        text.setTextColor(android.graphics.Color.BLACK);
+                    }
+                }
+                return view;
+            }
+        };
         listScannedTags.setAdapter(adapter);
 
         // Update Tabs (Tomas 1..5)
@@ -280,7 +312,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         btnSubir.setOnClickListener(v -> uploadTake());
         btnBack.setOnClickListener(v -> finish());
         
-        btnPotencia.setOnClickListener(v -> Toast.makeText(this, "Configuración de potencia no disponible", Toast.LENGTH_SHORT).show());
+        btnPotencia.setOnClickListener(v -> Toast.makeText(this, "ConfiguraciÃ³n de potencia no disponible", Toast.LENGTH_SHORT).show());
         
         // Initial Tab State
         switchTab(true);
@@ -370,12 +402,72 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         list.add("Todas");
         setSpinnerStrings(spinner, list);
     }
+
+    private boolean isActivoSobrante(String epc) {
+        if (epc == null) return false;
+        
+        // 1. Resolve ActivoId from EPC
+        String actId = manualEpcToActivoId.get(epc);
+        if (actId == null || actId.trim().isEmpty()) {
+            // Fallback: Check if we have cached expected data
+            if (cachedExpectedEpcs != null && cachedExpectedIds != null) {
+                if (cachedExpectedEpcs.contains(epc)) return false; // Found in expected EPCs -> Not Sobrante
+                
+                // Try to find Activo to check ID
+                // Warning: DB access on UI thread
+                ActivoEntity a = activoDao.getActivoByEpc(epc);
+                if (a != null && a.getIdActivo() != null) {
+                    return !cachedExpectedIds.contains(a.getIdActivo().trim().toUpperCase());
+                }
+                // If not found in DB but scanned, and not in expected EPCs -> Sobrante
+                return true; 
+            }
+            return false;
+        } else {
+            if (cachedExpectedIds != null) {
+                return !cachedExpectedIds.contains(actId.trim().toUpperCase());
+            }
+        }
+        return false;
+    }
+
+    // Cache for validation
+    private Set<String> cachedExpectedEpcs = null;
+    private Set<String> cachedExpectedIds = null;
+
+    private void updateExpectedCache() {
+        new Thread(() -> {
+            TomaFisicaEntity toma = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
+            if (toma != null) {
+                List<ActivoEntity> expected = activoDao.getActivosByFiltros(
+                        toma.getUbicacionA(),
+                        toma.getUbicacionB(),
+                        toma.getUbicacionC(),
+                        toma.getUbicacionD()
+                );
+                Set<String> epcs = new HashSet<>();
+                Set<String> ids = new HashSet<>();
+                for (ActivoEntity a : expected) {
+                    if (a.getTagEpc() != null) epcs.add(a.getTagEpc().trim());
+                    if (a.getIdActivo() != null) ids.add(a.getIdActivo().trim().toUpperCase());
+                }
+                cachedExpectedEpcs = epcs;
+                cachedExpectedIds = ids;
+                
+                runOnUiThread(() -> {
+                    if (adapter != null) adapter.notifyDataSetChanged();
+                });
+            }
+        }).start();
+    }
     
     private void setupLocationSpinners() {
         if (spinnerUbicacionA == null || spinnerUbicacionB == null || spinnerUbicacionC == null || spinnerUbicacionD == null || spinnerUbicacionSecundaria == null) {
             Log.w(TAG, "setupLocationSpinners: spinners no disponibles en layout");
             return;
         }
+
+        updateExpectedCache(); // Trigger cache update
 
         setSoloTodasForSpinnerItem(spinnerUbicacionB);
         setSoloTodasForSpinnerItem(spinnerUbicacionC);
@@ -669,7 +761,11 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             + " applied(A,B,C,D,S)=(" + ua + "," + ub + "," + uc + "," + ud + "," + us + ")"
             + " countFiltrados=" + countFiltrados);
 
-        cargarActivosSpinner(ua, ub, uc, ud, us);
+        if (chkIncluirExternos != null && chkIncluirExternos.isChecked()) {
+            cargarActivosSpinner(null, null, null, null, null);
+        } else {
+            cargarActivosSpinner(ua, ub, uc, ud, us);
+        }
     }
     
     private void cargarActivosSpinner(String ua, String ub, String uc, String ud, String us) {
@@ -683,7 +779,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         new Thread(() -> {
             listaActivosSpinner = new ArrayList<>();
 
-            // Si todos son null, podríamos querer cargar TODO o NADA.
+            // Si todos son null, podrÃ­amos querer cargar TODO o NADA.
             // Asumimos carga basada en filtros.
             
             listaActivosSpinner = activoDao.getActivosByFiltros(ua, ub, uc, ud, us);
@@ -703,6 +799,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
                 Log.d(TAG, "Actualizando UI spinner. Items: " + (listaActivosSpinner != null ? listaActivosSpinner.size() : "null"));
                 if (listaActivosSpinner != null && !listaActivosSpinner.isEmpty()) {
+                    // Manual entry is visible now
                     if (spinnerActivos != null) spinnerActivos.setVisibility(View.VISIBLE);
                     if (txtSinDatosManual != null) txtSinDatosManual.setVisibility(View.GONE);
                     
@@ -722,12 +819,13 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     
                     if (btnAgregarLectura != null) {
                         btnAgregarLectura.setVisibility(View.VISIBLE);
-                        btnAgregarLectura.setEnabled(true);
-                        btnAgregarLectura.setText("Añadir Lectura");
                     }
                 } else {
                     if (spinnerActivos != null) spinnerActivos.setVisibility(View.GONE);
-                    if (txtSinDatosManual != null) txtSinDatosManual.setVisibility(View.VISIBLE);
+                    if (txtSinDatosManual != null) {
+                        txtSinDatosManual.setVisibility(View.VISIBLE);
+                        txtSinDatosManual.setText("No se encontraron activos con estos filtros");
+                    }
                     if (btnAgregarLectura != null) btnAgregarLectura.setVisibility(View.GONE);
                     
                     spinnerActivos.setAdapter(null);
@@ -769,7 +867,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         }
 
         if (sb.length() == 0) {
-            return "Sin Descripción";
+            return "Sin DescripciÃ³n";
         }
         return sb.toString();
     }
@@ -794,7 +892,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 epc = epcTrim;
             }
             
-            // Si el EPC ya existe (ya fue leído o agregado), generamos uno nuevo manual 
+            // Si el EPC ya existe (ya fue leÃ­do o agregado), generamos uno nuevo manual 
             // para permitir agregar varios del mismo tipo (o copias)
             if (uniqueTags.contains(epc)) {
                  String id = activo.getIdActivo() != null ? activo.getIdActivo().trim() : "";
@@ -811,12 +909,12 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 }
                 adapter.notifyDataSetChanged();
                 updateGaugeDisplay();
-                Toast.makeText(this, "Lectura añadida: " + activo.getDescripcionCorta(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Lectura aÃ±adida: " + activo.getDescripcionCorta(), Toast.LENGTH_SHORT).show();
                 // Auto-save
                 new SaveLocalTask(false).execute();
             } else {
                 Log.d(TAG, "EPC duplicado: " + epc);
-                Toast.makeText(this, "Este activo ya fue leído", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Este activo ya fue leÃ­do", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -842,7 +940,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     
                     // In NuevaTomaActivity, we are creating a NEW one. 
                     // So existing ones are NEVER selected.
-                    tab.setTextColor(getResources().getColor(R.color.nav_item_text_tint)); 
+                    tab.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint)); 
                     tab.setBackgroundResource(R.drawable.btn_secondary_gray);
                     
                     tab.setPadding(48, 16, 48, 16);
@@ -871,8 +969,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 // 2. Add CURRENT (New) tab
                 TextView currentTab = new TextView(this);
                 currentTab.setText("Toma " + numeroToma);
-                currentTab.setTextColor(getResources().getColor(android.R.color.white));
-                currentTab.setBackgroundResource(R.drawable.btn_primary);
+                currentTab.setTextColor(ContextCompat.getColor(this, R.color.blanco));
+                currentTab.setBackgroundResource(R.drawable.btn_dark_gray);
                 currentTab.setPadding(48, 16, 48, 16);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT, 
@@ -891,22 +989,22 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             
             // Tab Resumen Activo (Naranja)
             tabResumen.setBackgroundResource(R.drawable.btn_primary);
-            tabResumen.setTextColor(getResources().getColor(android.R.color.white));
+            tabResumen.setTextColor(ContextCompat.getColor(this, R.color.blanco));
             
             // Tab Activos Inactivo (Gris)
             tabActivos.setBackgroundResource(R.drawable.btn_secondary_gray);
-            tabActivos.setTextColor(android.graphics.Color.parseColor("#333333"));
+            tabActivos.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint));
         } else {
             viewResumen.setVisibility(View.GONE);
             viewActivos.setVisibility(View.VISIBLE);
             
             // Tab Resumen Inactivo (Gris)
             tabResumen.setBackgroundResource(R.drawable.btn_secondary_gray);
-            tabResumen.setTextColor(android.graphics.Color.parseColor("#333333"));
+            tabResumen.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint));
 
             // Tab Activos Activo (Naranja)
             tabActivos.setBackgroundResource(R.drawable.btn_primary);
-            tabActivos.setTextColor(getResources().getColor(android.R.color.white));
+            tabActivos.setTextColor(ContextCompat.getColor(this, R.color.blanco));
         }
     }
 
@@ -946,8 +1044,15 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     ActivoEntity a = activoDao.getActivoByEpc(scannedTrim);
                     if (a != null && a.getIdActivo() != null) actId = a.getIdActivo();
                 }
-                boolean isExpected = (actId != null && expectedIds.contains(actId.trim().toUpperCase()))
-                        || expectedEpcs.contains(scannedTrim);
+                boolean isExpected;
+                if (manualEpcToActivoId.containsKey(scannedTrim)) {
+                    // Manual: Strict ID check
+                    isExpected = actId != null && expectedIds.contains(actId.trim().toUpperCase());
+                } else {
+                    // Auto: EPC match OR ID match
+                    isExpected = expectedEpcs.contains(scannedTrim)
+                            || (actId != null && expectedIds.contains(actId.trim().toUpperCase()));
+                }
 
                 if (isExpected) {
                     encontrados++;
@@ -1005,7 +1110,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     for (TomaFisicaDetallesEntity d : existing) existingEpcs.add(d.getEpc());
                 }
                 
-                // Preparar lógica de estados
+                // Preparar lÃ³gica de estados
                 TomaFisicaEntity tomaFisica = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
                 String baseA = tomaFisica != null ? normalizeGuidFilter(tomaFisica.getUbicacionA()) : null;
                 String baseB = tomaFisica != null ? normalizeGuidFilter(tomaFisica.getUbicacionB()) : null;
@@ -1047,7 +1152,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                             detail.setActivoId(activoId);
                             Log.d(TAG, "Asignado ActivoId: " + activoId + " para EPC: " + epc);
                         } else {
-                            Log.w(TAG, "No se encontró ActivoId para EPC: " + epc);
+                            Log.w(TAG, "No se encontrÃ³ ActivoId para EPC: " + epc);
                         }
 
                         ActivoEntity activo = null;
@@ -1069,13 +1174,21 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                         detail.setUbicacionDetalleD(ud != null ? ud : baseD);
                         detail.setObservaciones(detail.getObservaciones() != null ? detail.getObservaciones() : "");
                         
-                        boolean isExpected = (activoId != null && expectedIds.contains(activoId.trim().toUpperCase()))
-                                || expectedEpcs.contains(epc);
+                        boolean isExpected;
+                        if (manualEpcToActivoId.containsKey(epc)) {
+                             isExpected = activoId != null && expectedIds.contains(activoId.trim().toUpperCase());
+                        } else {
+                             isExpected = expectedEpcs.contains(epc) || (activoId != null && expectedIds.contains(activoId.trim().toUpperCase()));
+                        }
 
                         if (isExpected) {
                             detail.setEstadoInventario("ENCONTRADO");
                         } else {
-                            detail.setEstadoInventario("Sobrante");
+                            if (activo != null) {
+                                detail.setEstadoInventario("Sobrante");
+                            } else {
+                                detail.setEstadoInventario("No Inventariado");
+                            }
                         }
                         
                         detalles.add(detail);
@@ -1104,7 +1217,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         protected void onPostExecute(Boolean success) {
             if (success) {
                 if (navigateAfterSave) {
-                    Toast.makeText(NuevaTomaActivity.this, "Guardado localmente. Envíe desde Sincronizar", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NuevaTomaActivity.this, "Guardado localmente. EnvÃ­e desde Sincronizar", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             } else {
@@ -1217,7 +1330,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         protected Boolean doInBackground(Void... voids) {
             try {
                 // 1. Asignar EstadoInventario correcto antes de guardar
-                // Usamos la misma lógica que calculateSummary para determinar si es encontrado o sobrante
+                // Usamos la misma lÃ³gica que calculateSummary para determinar si es encontrado o sobrante
                 TomaFisicaEntity tomaFisica = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
                 String baseA = tomaFisica != null ? normalizeGuidFilter(tomaFisica.getUbicacionA()) : null;
                 String baseB = tomaFisica != null ? normalizeGuidFilter(tomaFisica.getUbicacionB()) : null;
@@ -1279,13 +1392,23 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     if (d.getObservaciones() == null) d.setObservaciones("");
 
                     String epcVal = d.getEpc() != null ? d.getEpc().trim() : "";
-                    boolean isExpected = (d.getActivoId() != null && expectedIds.contains(d.getActivoId().trim().toUpperCase()))
-                            || expectedEpcs.contains(epcVal);
+                    boolean isExpected;
+                    String epcKey = d.getEpc();
+                    if (epcKey != null && manualEpcToActivoId.containsKey(epcKey)) {
+                         isExpected = d.getActivoId() != null && expectedIds.contains(d.getActivoId().trim().toUpperCase());
+                    } else {
+                         isExpected = expectedEpcs.contains(epcVal) 
+                                || (d.getActivoId() != null && expectedIds.contains(d.getActivoId().trim().toUpperCase()));
+                    }
 
                     if (isExpected) {
                         d.setEstadoInventario("ENCONTRADO");
                     } else {
-                        d.setEstadoInventario("Sobrante");
+                        if (activo != null) {
+                            d.setEstadoInventario("Sobrante");
+                        } else {
+                            d.setEstadoInventario("No Inventariado");
+                        }
                     }
                 }
 
@@ -1386,22 +1509,64 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     public void handleTagdata(TagData[] tagData) {
         if (tagData == null) return;
 
-        runOnUiThread(() -> {
+        new Thread(() -> {
             boolean newTagsFound = false;
             for (TagData tag : tagData) {
                 String epc = tag.getTagID();
                 if (epc != null && !uniqueTags.contains(epc)) {
-                    uniqueTags.add(epc);
-                    scannedTagsList.add(epc);
-                    newTagsFound = true;
+                    // Resolver nombre
+                    ActivoEntity activo = activoDao.getActivoByEpc(epc);
+                    String desc = (activo != null && activo.getDescripcionCorta() != null) ? activo.getDescripcionCorta() : "Desconocido";
+                    
+                    synchronized (uniqueTags) {
+                        if (!uniqueTags.contains(epc)) {
+                            uniqueTags.add(epc);
+                            // Operaciones de UI deben ir al main thread, pero recolectamos datos aquÃ­
+                            // Usamos un objeto temporal o actualizamos maps aquÃ­ (es safe si es concurrent map o synchronized, pero scannedTagsList es usado por adapter en main thread)
+                        }
+                    }
+                    // Add to map (safe to do here if map is thread safe or we sync, but better to prepare data and post)
+                    // Let's do a batch update on UI thread.
+                }
+            }
+        }).start();
+
+        // Revert to simple UI thread approach but querying DB inside it? 
+        // Or better: Query DB in background for NEW tags.
+        
+        // Revised approach:
+        new Thread(() -> {
+            final List<String> newEpcs = new ArrayList<>();
+            final java.util.Map<String, String> resolvedNames = new java.util.HashMap<>();
+            
+            for (TagData tag : tagData) {
+                String epc = tag.getTagID();
+                if (epc != null && !uniqueTags.contains(epc)) {
+                    newEpcs.add(epc);
+                    ActivoEntity activo = activoDao.getActivoByEpc(epc);
+                    String desc = (activo != null && activo.getDescripcionCorta() != null) ? activo.getDescripcionCorta() : "Desconocido";
+                    resolvedNames.put(epc, desc + " - " + epc);
                 }
             }
 
-            if (newTagsFound) {
-                adapter.notifyDataSetChanged();
-                updateGaugeDisplay();
+            if (!newEpcs.isEmpty()) {
+                runOnUiThread(() -> {
+                    boolean changed = false;
+                    for (String epc : newEpcs) {
+                        if (!uniqueTags.contains(epc)) {
+                            uniqueTags.add(epc);
+                            scannedTagsList.add(epc);
+                            epcToDisplayName.put(epc, resolvedNames.get(epc));
+                            changed = true;
+                        }
+                    }
+                    if (changed) {
+                        adapter.notifyDataSetChanged();
+                        updateGaugeDisplay();
+                    }
+                });
             }
-        });
+        }).start();
     }
 
     @Override
@@ -1423,3 +1588,4 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         runOnUiThread(() -> Toast.makeText(this, Text, Toast.LENGTH_SHORT).show());
     }
 }
+

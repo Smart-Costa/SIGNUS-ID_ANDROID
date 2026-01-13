@@ -36,12 +36,14 @@ public class RolDao {
             db.delete("RolHH", null, null);
             Log.d(TAG, "Tabla RolHH limpiada");
 
+            int count = 0;
             for (RolEntity r : roles) {
                 ContentValues v = entityToContentValues(r);
-                long result = db.insertWithOnConflict("RolHH", null, v, SQLiteDatabase.CONFLICT_REPLACE);
-                Log.d(TAG, "Resultado insert: " + result + " | IdRol=" + r.getIdRol());
+                db.insertWithOnConflict("RolHH", null, v, SQLiteDatabase.CONFLICT_REPLACE);
+                count++;
             }
             db.setTransactionSuccessful();
+            Log.d(TAG, "Roles sincronizados desde API: " + count);
         } catch (Exception e) {
             Log.e(TAG, "Error sincronizando roles", e);
         } finally {

@@ -326,6 +326,10 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
         if (id == R.id.action_logout) {
             cerrarSesion();
             return true;
+        } else if (id == R.id.action_notifications) {
+            Intent intent = new Intent(this, ActivosReubicarActivity.class);
+            startActivity(intent);
+            return true;
         } else if (id == R.id.mi_perfil) {
             new AlertDialog.Builder(this)
                     .setIcon(R.drawable.alertaicono)
