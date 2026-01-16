@@ -23,6 +23,16 @@
         android:textStyle="bold"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Conteos Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Conteos"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#606060"
+        android:layout_marginBottom="12dp"/>
+
     <!-- Tabs for Sub-Tomas -->
     <HorizontalScrollView
         android:layout_width="match_parent"
@@ -68,8 +78,10 @@
 
     <!-- Content Area -->
     <FrameLayout
+        android:id="@+id/contentFrame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <!-- Resumen View -->
         <ScrollView
@@ -254,6 +266,60 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Manual Entry Section -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#F5F5F5">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Agregar Manualmente"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="#333333"
+                        android:layout_marginBottom="4dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <EditText
+                            android:id="@+id/etManualInput"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:hint="Placa o EPC"
+                            android:background="@android:drawable/editbox_background"
+                            android:paddingHorizontal="8dp"
+                            android:textSize="14sp"
+                            android:inputType="textCapCharacters"/>
+
+                        <Button
+                            android:id="@+id/btnManualAdd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:text="Agregar"
+                            android:textSize="12sp"
+                            android:backgroundTint="#009688"
+                            android:textColor="#FFFFFF"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
             <Button
                 android:id="@+id/btn_GuardarToma"
                 android:layout_width="wrap_content"
@@ -261,7 +327,8 @@
                 android:layout_gravity="center_horizontal"
                 android:text="Guardar Resultado"
                 android:backgroundTint="@color/colorPrimary"
-                android:textColor="#FFFFFF"/>
+                android:textColor="#FFFFFF"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -331,5 +398,96 @@
                 android:layout_marginTop="8dp"/>
         </LinearLayout>
     </FrameLayout>
+
+    <!-- Bottom Navbar (Potencia, Iniciar, Subir) -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:background="#F5F5F5"
+        android:padding="8dp">
+
+        <!-- Potencia -->
+        <LinearLayout
+            android:id="@+id/btnPotencia"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:background="?attr/selectableItemBackground">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_settings"
+                app:tint="#757575" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Potencia"
+                android:textSize="12sp"
+                android:textColor="#757575" />
+        </LinearLayout>
+
+        <!-- Iniciar (Central, destacado) -->
+        <LinearLayout
+            android:id="@+id/btnIniciar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/btn_primary"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_margin="4dp">
+                
+                <ImageView
+                    android:id="@+id/iconIniciar"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_nfc" 
+                    app:tint="@android:color/white" />
+                <TextView
+                    android:id="@+id/txtIniciar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Iniciar"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Subir -->
+        <LinearLayout
+            android:id="@+id/btnSubir"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:background="?attr/selectableItemBackground">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_upload"
+                app:tint="#757575" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Subir"
+                android:textSize="12sp"
+                android:textColor="#757575" />
+        </LinearLayout>
+
+    </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

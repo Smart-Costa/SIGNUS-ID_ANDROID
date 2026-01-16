@@ -113,6 +113,19 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         btnGuardar = findViewById(R.id.btnGuardar);
     }
 
+    private void initRFID() {
+        try {
+            if (rfidHandler == null) rfidHandler = TagWriter.getInstance();
+            if (!rfidHandler.isInitialized()) {
+                rfidHandler.onCreate(this);
+            } else {
+                rfidHandler.setResponseHandler(this);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error inicializando RFID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void checkAndRequestPermissions() {
         String[] permissions;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
@@ -137,6 +150,8 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
 
         if (!listPermissionsNeeded.isEmpty()) {
             androidx.core.app.ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+        } else {
+            initRFID();
         }
     }
 
@@ -154,9 +169,7 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
             if (!allGranted) {
                 Toast.makeText(this, "Permisos necesarios no concedidos. El lector RFID podría no funcionar.", Toast.LENGTH_LONG).show();
             } else {
-                if (rfidHandler != null && !rfidHandler.isInitialized()) {
-                    rfidHandler.onCreate(this);
-                }
+                initRFID();
             }
         }
     }
@@ -172,22 +185,15 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
                     return; 
                 }
             }
-
-            if (!rfidHandler.isInitialized()) {
-                 rfidHandler.onCreate(this);
-            } else {
-                 // Verificar conexión
-                 if (!rfidHandler.isConnected()) {
-                     rfidHandler.InitSDK();
-                 }
-            }
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        // rfidHandler.setResponseHandler(null); // Opcional
+        if (rfidHandler != null) {
+            rfidHandler.stopRead();
+        }
     }
 
     // --- Implementación de ResponseHandlerInterface ---
@@ -197,57 +203,54 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         if (tagData == null || tagData.length == 0) {
             return;
         }
+        
+        // Si ya tenemos un valor, ignorar nuevas lecturas (o podríamos permitir sobrescribir si el usuario borra primero)
         if (etRfidTag.getText() != null && !etRfidTag.getText().toString().trim().isEmpty()) {
             return;
         }
 
-        Set<String> epcs = new HashSet<>();
-        for (TagData item : tagData) {
-            if (item == null) {
-                continue;
-            }
-            String epc = item.getTagID();
-            if (epc == null || epc.trim().isEmpty()) {
-                continue;
-            }
-            epcs.add(epc);
-            if (epcs.size() > 1) {
+        // Validar si vienen múltiples tags en la misma lectura
+        if (tagData.length > 1) {
+            runOnUiThread(() -> {
+                if (rfidHandler != null) rfidHandler.stopRead();
+                Toast.makeText(this, "Múltiples activos detectados. Por favor acerque solo uno.", Toast.LENGTH_LONG).show();
+            });
+            return;
+        }
+
+        // Procesar el primer tag válido
+        String epcLeido = null;
+        for (TagData t : tagData) {
+            if (t.getTagID() != null && !t.getTagID().trim().isEmpty()) {
+                epcLeido = t.getTagID();
                 break;
             }
         }
 
-        if (epcs.size() != 1) {
-            if (rfidHandler != null) {
-                rfidHandler.stopInventory();
-            }
-            runOnUiThread(() -> Toast.makeText(this, "Se detectaron múltiples TAGs. Acerque solo 1 y reintente.", Toast.LENGTH_SHORT).show());
-            return;
+        if (epcLeido != null) {
+            final String finalEpc = epcLeido;
+            runOnUiThread(() -> {
+                if (rfidHandler != null) rfidHandler.stopRead();
+                etRfidTag.setText(finalEpc);
+                Toast.makeText(this, "TAG leído: " + finalEpc, Toast.LENGTH_SHORT).show();
+            });
         }
-
-        String epcLeido = epcs.iterator().next();
-        if (rfidHandler != null) {
-            rfidHandler.stopInventory();
-        }
-        runOnUiThread(() -> {
-            etRfidTag.setText(epcLeido);
-            Toast.makeText(this, "TAG leído: " + epcLeido, Toast.LENGTH_SHORT).show();
-        });
     }
 
     @Override
     public void handleTriggerPress(boolean pressed) {
         if (pressed) {
-             runOnUiThread(() -> Toast.makeText(this, "Gatillo presionado - Leyendo...", Toast.LENGTH_SHORT).show());
+             runOnUiThread(() -> Toast.makeText(this, "Leyendo...", Toast.LENGTH_SHORT).show());
              if (rfidHandler != null) {
                  if (etRfidTag.getText() != null && !etRfidTag.getText().toString().trim().isEmpty()) {
                      runOnUiThread(() -> Toast.makeText(this, "TAG ya asignado. Limpie el campo para leer otro.", Toast.LENGTH_SHORT).show());
                      return;
                  }
-                 rfidHandler.performInventory();
+                 rfidHandler.startRead();
              }
         } else {
              if (rfidHandler != null) {
-                 rfidHandler.stopInventory();
+                 rfidHandler.stopRead();
              }
         }
     }
@@ -327,7 +330,9 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         activo.setUbicacionD(prefs.getString("UbicacionD", ""));
         activo.setUbicacionSecundaria(ubicacionSec);
 
-        activo.setTagEpc(rfid);
+        // Usar la columna EPC real, no TAG_EPC
+        activo.setEpc(rfid);
+        activo.setTagEpc(rfid); // Set real EPC, not "EPC Asignado"
         
         // Asignar estado activo explícitamente a true para evitar que se cuente como baja
         activo.setEstadoActivo(true);

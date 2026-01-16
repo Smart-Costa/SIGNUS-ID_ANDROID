@@ -10,8 +10,9 @@ public class Assets implements Serializable {
     String Piso;
     String Oficina;
     String Tag;
+    String Epc;
 
-    public Assets (String numeroactivo, String descripcion, String razons,  String edificio, String piso, String oficina, String tag) {
+    public Assets (String numeroactivo, String descripcion, String razons,  String edificio, String piso, String oficina, String tag, String epc) {
         this.NumeroActivo = numeroactivo;
         this.Descripcion = descripcion;
         this.RazonS = razons;
@@ -19,6 +20,15 @@ public class Assets implements Serializable {
         this.Piso = piso;
         this.Oficina = oficina;
         this.Tag = tag;
+        this.Epc = epc;
+    }
+
+    public String getEpc() {
+        return Epc;
+    }
+
+    public void setEpc(String epc) {
+        this.Epc = epc;
     }
 
     public String getNumeroActivo() {

@@ -40,6 +40,8 @@ import com.example.diverscan.activeid.Sincronizar.sincronizar_base;
 import com.example.diverscan.activeid.UI.activo.DarBajaActivoDetailActivity;
 import com.example.diverscan.activeid.UI.activo.LocalizarActivoDetailActivity;
 import com.example.diverscan.activeid.UI.activo.RegistroActivoUbicacionActivity;
+import com.example.diverscan.activeid.UI.config.ViewLocalAssetsActivity;
+import com.example.diverscan.activeid.UI.config.LimpiarBaseDatosActivity;
 import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity;
 import com.example.diverscan.activeid.Utilities.SessionManager;
@@ -57,6 +59,12 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.List;
 
+import android.os.Handler;
+import android.os.Looper;
+import com.example.diverscan.activeid.data.remote.response.ApiCallback;
+import com.example.diverscan.activeid.data.remote.response.ApiResponse;
+import com.example.diverscan.activeid.data.remote.response.NovedadesResponse;
+
 public class MainActivity extends AppCompatActivity implements ResponseHandlerInterface {
     private ActivityMainBinding binding;
     private RolDao rolDao;
@@ -73,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
     private String username, userId;
     private TagWriter rfidHandler;
     private CountDownTimer sessionTimer;
+    private TextView notificationBadge; // Declared field
+    private Handler pollingHandler;
+    private Runnable pollingRunnable;
 
     private static final long SESSION_DURATION = 15 * 60 * 1000L; // 15 minutos
 
@@ -101,6 +112,68 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 
         List<String> roles = rolDao.getRolesForUser(userId);
         binding.navView.post(() -> applyUserPermissions(roles));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startPolling();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopPolling();
+    }
+
+    private static final long POLLING_INTERVAL = 60000; // 1 minuto
+
+    private void startPolling() {
+        if (pollingHandler == null) {
+            pollingHandler = new Handler(Looper.getMainLooper());
+        }
+        
+        pollingRunnable = new Runnable() {
+            @Override
+            public void run() {
+                checkNotifications();
+                pollingHandler.postDelayed(this, POLLING_INTERVAL);
+            }
+        };
+        pollingHandler.post(pollingRunnable);
+    }
+
+    private void stopPolling() {
+        if (pollingHandler != null && pollingRunnable != null) {
+            pollingHandler.removeCallbacks(pollingRunnable);
+        }
+    }
+
+    private void checkNotifications() {
+        String username = sessionManager.getUsername();
+        if (username == null || username.isEmpty()) return;
+
+        ApiClient.getInstance(this).get("ConsolidacionApi/ConsultarNovedades?username=" + username,
+                NovedadesResponse.class,
+                new ApiCallback<NovedadesResponse>() {
+                    @Override
+                    public void onComplete(ApiResponse<NovedadesResponse> response) {
+                        if (response.success && response.data != null && response.data.ok && response.data.data != null) {
+                            updateBadge(response.data.data.cantidadTareasPendientes);
+                        }
+                    }
+                });
+    }
+
+    private void updateBadge(int count) {
+        if (notificationBadge != null) {
+            if (count > 0) {
+                notificationBadge.setText(String.valueOf(count));
+                notificationBadge.setVisibility(View.VISIBLE);
+            } else {
+                notificationBadge.setVisibility(View.GONE);
+            }
+        }
     }
 
     /* Session Validation */
@@ -224,6 +297,10 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
             intent = new Intent(this, ConfiguracionAntena.class);
         } else if (id == R.id.sub_validar_conexion) {
             intent = new Intent(this, ConnectionValidationActivity.class);
+        } else if (id == R.id.sub_ver_activos_bd) {
+            intent = new Intent(this, ViewLocalAssetsActivity.class);
+        } else if (id == R.id.sub_limpiar_bd) {
+            intent = new Intent(this, LimpiarBaseDatosActivity.class);
         } else if (id == R.id.sub_sincronizar) {
             intent = new Intent(this, sincronizar_base.class);
 //        } else if (id == R.id.sub_activos_sector) {
@@ -252,6 +329,8 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 //        menu.findItem(R.id.sub_activos_sector).setVisible(false);
         menu.findItem(R.id.sub_configurar_antena).setVisible(false);
         menu.findItem(R.id.sub_validar_conexion).setVisible(false);
+        menu.findItem(R.id.sub_ver_activos_bd).setVisible(false);
+        menu.findItem(R.id.sub_limpiar_bd).setVisible(false);
     }
 
     private void setupExpandableMenus() {
@@ -297,6 +376,8 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
                     toggleGroup(menu,
                             R.id.sub_configurar_antena,
                             R.id.sub_validar_conexion
+                            //,R.id.sub_ver_activos_bd
+                            //,R.id.sub_limpiar_bd
                     );
                     return true;
             }
@@ -316,6 +397,17 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        
+        final MenuItem menuItem = menu.findItem(R.id.action_notifications);
+        View actionView = menuItem.getActionView();
+        
+        if (actionView != null) {
+            notificationBadge = actionView.findViewById(R.id.text_badge);
+            actionView.setOnClickListener(v -> {
+                onOptionsItemSelected(menuItem);
+            });
+        }
+        
         return true;
     }
 

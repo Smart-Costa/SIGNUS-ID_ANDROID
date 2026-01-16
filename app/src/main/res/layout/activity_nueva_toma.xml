@@ -357,6 +357,61 @@
             android:orientation="vertical"
             android:visibility="gone">
 
+            <!-- Manual Entry Section (Text Input)
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#F5F5F5">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Agregar Manualmente"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="#333333"
+                        android:layout_marginBottom="4dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <EditText
+                            android:id="@+id/etManualInput"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:hint="Placa o EPC"
+                            android:background="@android:drawable/editbox_background"
+                            android:paddingHorizontal="8dp"
+                            android:textSize="14sp"
+                            android:inputType="textCapCharacters"/>
+
+                        <Button
+                            android:id="@+id/btnManualAdd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:text="Agregar"
+                            android:textSize="12sp"
+                            android:backgroundTint="#009688"
+                            android:textColor="#FFFFFF"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            -->
+
             <LinearLayout
                 android:id="@+id/lyAgregarLecturaManual"
                 android:layout_width="match_parent"
@@ -366,7 +421,7 @@
                 android:padding="12dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginTop="8dp"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -428,7 +483,8 @@
             <ListView
                 android:id="@+id/listScannedTags"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="0dp"
+                android:layout_weight="1" />
         </LinearLayout>
 
     </FrameLayout>

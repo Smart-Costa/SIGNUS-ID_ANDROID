@@ -2115,6 +2115,7 @@ public class sincronizar_base extends AppCompatActivity {
                     asset.put("MODELO", listActivos.get(i).getModelo());
                     asset.put("NUMERO_SERIE", listActivos.get(i).getSerial());
                     asset.put("TAG_EPC", listActivos.get(i).getTag());
+                    asset.put("EPC", listActivos.get(i).getTag());
                     asset.put("ESTADO", listActivos.get(i).getAssetStatusSysId());
                     asset.put("ANOS_VIDA_UTIL", listActivos.get(i).getAnoFabricacion());
                     asset.put("TAMANIO_MEDIDA", listActivos.get(i).getCapacidad());

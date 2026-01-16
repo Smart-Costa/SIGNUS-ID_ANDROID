@@ -233,6 +233,17 @@
             android:screenOrientation="portrait"
             android:exported="false"/>
 
+        <activity android:name=".UI.config.LimpiarBaseDatosActivity"
+            android:label="Limpiar Base de Datos"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false"/>
+        <activity android:name=".UI.config.ViewLocalAssetsActivity"
+            android:label="Activos en BD Local"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false"/>
+
         <!-- 🏢 Gestión de oficinas -->
         <activity android:name=".Oficina.ActivosPorSector"
             android:label="@string/ActivosXSector"

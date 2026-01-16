@@ -29,6 +29,7 @@ public class EntidadActivos {
     String Capacidad;
     String EstadoDescripcion;
     String EstadoConservacion;
+    String Epc;
 
 
     public EntidadActivos(String idActivo, String alias, String descripcion, String departamento,
@@ -37,7 +38,7 @@ public class EntidadActivos {
                           String idEstante, String idCategoria, String idPiso, String idEdificio,
                           String idCompania, String marca, String modelo, String serial, String parentAssetSysId,
                           String employeeRelatedSysId, String assetStatusSysId, String anoFabricacion,
-                          String capacidad, String estadoDescripcion, String estadoConservacion){
+                          String capacidad, String estadoDescripcion, String estadoConservacion, String epc){
 
         this.IdActivo = idActivo;
         this.Alias = alias;
@@ -66,6 +67,7 @@ public class EntidadActivos {
         this.Capacidad = capacidad;
         this.EstadoDescripcion = estadoDescripcion;
         this.EstadoConservacion = estadoConservacion;
+        this.Epc = epc;
     }
 
     public EntidadActivos(String idActivo, String descripcion,
@@ -74,7 +76,7 @@ public class EntidadActivos {
                           String marca, String modelo, String serial,String alias, String idCategoria,
                           String employeeRelatedSysId, String assetStatusSysId, String parentAssetSysId,
                           String anoFabricacion, String capacidad, String estadoDescripcion, String estadoConservacion){
-        this(idActivo, descripcion, compania, idCompania, edificio, idEdificio, piso, idPiso, oficina, idOficina, tag, numero, codeBar, marca, modelo, serial, alias, idCategoria, employeeRelatedSysId, assetStatusSysId, parentAssetSysId, anoFabricacion, capacidad, estadoDescripcion, estadoConservacion, null);
+        this(idActivo, descripcion, compania, idCompania, edificio, idEdificio, piso, idPiso, oficina, idOficina, tag, numero, codeBar, marca, modelo, serial, alias, idCategoria, employeeRelatedSysId, assetStatusSysId, parentAssetSysId, anoFabricacion, capacidad, estadoDescripcion, estadoConservacion, null, null);
     }
 
     public EntidadActivos(String idActivo, String descripcion,
@@ -82,34 +84,8 @@ public class EntidadActivos {
                           String oficina,String idOficina,String tag, String numero, String codeBar,
                           String marca, String modelo, String serial,String alias, String idCategoria,
                           String employeeRelatedSysId, String assetStatusSysId, String parentAssetSysId,
-                          String anoFabricacion, String capacidad, String estadoDescripcion, String estadoConservacion, String departamento){
-
-        this.IdActivo = idActivo;
-        this.Descripcion = descripcion;
-        this.Oficina = oficina;
-        this.Piso = piso;
-        this.Edificio = edificio;
-        this.Compania = compania;
-        this.Tag = tag;
-        this.Numero = numero;
-        this.CodeBar = codeBar;
-        this.IdOficina = idOficina;
-        this.IdPiso = idPiso;
-        this.IdEdificio = idEdificio;
-        this.IdCompania = idCompania;
-        this.Marca = marca;
-        this.Modelo = modelo;
-        this.Serial = serial;
-        this.Alias = alias;
-        this.IdCategoria = idCategoria;
-        this.ParentAssetSysId = parentAssetSysId;
-        this.EmployeeRelatedSysId = employeeRelatedSysId;
-        this.AssetStatusSysId=assetStatusSysId;
-        this.AnoFabricacion = anoFabricacion;
-        this.Capacidad = capacidad;
-        this.EstadoDescripcion = estadoDescripcion;
-        this.EstadoConservacion = estadoConservacion;
-        this.Departamento = departamento;
+                          String anoFabricacion, String capacidad, String estadoDescripcion, String estadoConservacion, String departamento, String epc){
+        this(idActivo, alias, descripcion, departamento, oficina, piso, edificio, compania, tag, numero, codeBar, idOficina, null, idCategoria, idPiso, idEdificio, idCompania, marca, modelo, serial, parentAssetSysId, employeeRelatedSysId, assetStatusSysId, anoFabricacion, capacidad, estadoDescripcion, estadoConservacion, epc);
     }
 
 
@@ -321,6 +297,10 @@ public class EntidadActivos {
     public String getCapacidad() { return Capacidad; }
 
     public void setCapacidad (String capacidad) {Capacidad = capacidad;}
+
+    public String getEpc() { return Epc; }
+
+    public void setEpc(String epc) { Epc = epc; }
 
     @Override
     public String toString(){

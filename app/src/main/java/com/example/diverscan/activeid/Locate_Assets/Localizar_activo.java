@@ -96,8 +96,9 @@ public class Localizar_activo extends AppCompatActivity {
                      String Piso = cursor.getString(cursor.getColumnIndex("Piso"));
                      String Oficina = cursor.getString(cursor.getColumnIndex("Oficina"));
                      String Tag = cursor.getString(cursor.getColumnIndex("Tag"));
+                     String Epc = cursor.getString(cursor.getColumnIndex("EPC"));
 
-                     Assets Activos = new Assets(NumeroActivo, Descripcion,RazonSocial,Edificio,Piso, Oficina, Tag );
+                     Assets Activos = new Assets(NumeroActivo, Descripcion,RazonSocial,Edificio,Piso, Oficina, Tag, Epc);
                      assets.add(Activos);
                 }
 
@@ -128,7 +129,7 @@ public class Localizar_activo extends AppCompatActivity {
         public void onItemClick(AdapterView<?> adapter, View v, int position, long arg3){
 
             Intent intent = new Intent(Localizar_activo.this, Localizacion_activo.class);
-            intent.putExtra("Dato_Tag", assets.get(position).getTag());
+            intent.putExtra("Dato_Tag", assets.get(position).getEpc());
             startActivity(intent);
         }
     };

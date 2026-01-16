@@ -1,45 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_status"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Consultando..."
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tv_toma_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Toma Física: -"
-        android:layout_marginBottom="8dp"/>
+        <TextView
+            android:id="@+id/tv_header_ubicacion_hh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="UBICACIÓN HH"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:background="#DDDDDD"
+            android:padding="8dp"
+            android:layout_marginBottom="8dp"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Activos para Reubicar:"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"/>
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView
+                    android:id="@+id/tv_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Consultando..."
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+                <!-- tv_toma_id removed -->
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-    <ListView
-        android:id="@+id/lv_activos"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        <!-- Container for items without destination -->
+        <LinearLayout
+            android:id="@+id/ll_list_ubicacion_hh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp"/>
 
-    <Button
-        android:id="@+id/btn_refresh"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Actualizar"
-        android:layout_marginTop="8dp"/>
+        <TextView
+            android:id="@+id/tv_header_cambio_ubicacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CAMBIO DE UBICACIÓN"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:background="#DDDDDD"
+            android:padding="8dp"
+            android:layout_marginBottom="8dp"/>
 
-</LinearLayout>
+        <!-- Container for items with destination -->
+        <LinearLayout
+            android:id="@+id/ll_list_cambio_ubicacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btn_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Actualizar"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+</ScrollView>

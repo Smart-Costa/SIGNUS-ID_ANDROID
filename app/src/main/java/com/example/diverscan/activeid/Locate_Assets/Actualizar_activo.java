@@ -922,6 +922,14 @@ public class Actualizar_activo extends AppCompatActivity implements ResponseHand
                     String modelo = cursor.getString(cursor.getColumnIndex("Modelo"));
                     String serie = cursor.getString(cursor.getColumnIndex("Serial"));
                     String epc = cursor.getString(cursor.getColumnIndex("Tag"));
+                    String realEpc = "";
+                    if(cursor.getColumnIndex("EPC") != -1) {
+                        realEpc = cursor.getString(cursor.getColumnIndex("EPC"));
+                    }
+                    if (realEpc == null || realEpc.isEmpty()) {
+                        realEpc = epc;
+                    }
+
                     String IdCategoria = cursor.getString(cursor.getColumnIndex("IdCategoria"));
                     String employeeRelated = cursor.getString(cursor.getColumnIndex("EmployeeRelatedSysId"));
                     String assetStatusSysId = cursor.getString(cursor.getColumnIndex("AssetStatusSysId"));
@@ -933,7 +941,7 @@ public class Actualizar_activo extends AppCompatActivity implements ResponseHand
                     EntidadActivos entidadActivos = new EntidadActivos(_id, descripcion, compania,
                             idCompania, edificio, idEdicio, piso, idPiso, oficina, idOficina, epc,
                             numero, placa, marca, modelo, serie, encargado,IdCategoria, employeeRelated,
-                            assetStatusSysId, parentAssetSysId,anoFabricacion,capacidad,estadoDescripcion,estadoConservacion);
+                            assetStatusSysId, parentAssetSysId,anoFabricacion,capacidad,estadoDescripcion,estadoConservacion, null, realEpc);
                     activoRecords.add(entidadActivos);
                 }
                 inflateListViewActivos(activoRecords);

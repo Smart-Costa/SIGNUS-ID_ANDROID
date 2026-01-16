@@ -23,10 +23,19 @@ import android.os.Build;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.widget.Toast;
+import com.example.diverscan.activeid.data.local.dao.ActivoDao;
+import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
+import android.app.AlertDialog;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConnectionValidationActivity extends AppCompatActivity implements ResponseHandlerInterface {
+import com.zebra.rfid.api3.ENUM_TRANSPORT;
+import android.widget.RadioGroup;
+import android.widget.RadioButton;
+
+public class ConnectionValidationActivity extends AppCompatActivity implements ResponseHandlerInterface, ActivoDao.LogListener {
 
     private static final int PERMISSION_REQUEST_CODE = 100;
     private TextView tvStatus;
@@ -34,9 +43,17 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     private TextView tvFoundDevices;
     private TextView tvLog;
     private Button btnReconnect;
+    private Button btnTestSingle;
+    private Button btnTestMulti;
+    private RadioGroup rgTransport;
     private TagWriter rfidHandler;
     private Handler handler = new Handler(Looper.getMainLooper());
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+    
+    private boolean isMultiReading = false;
+    private boolean isSingleReading = false;
+    private Map<String, Integer> multiReadTags = new HashMap<>();
+    private ActivoDao activoDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +62,9 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
 
         checkAndRequestPermissions();
 
+        activoDao = new ActivoDao(this);
+        activoDao.setLogListener(this);
+
         tvStatus = findViewById(R.id.tv_connection_status);
         tvDevice = findViewById(R.id.tv_device_info);
         tvFoundDevices = findViewById(R.id.tv_found_devices);
@@ -52,6 +72,9 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
         tvLog.setMovementMethod(new ScrollingMovementMethod()); // Habilitar scroll
 
         btnReconnect = findViewById(R.id.btn_reconnect);
+        btnTestSingle = findViewById(R.id.btn_test_single);
+        btnTestMulti = findViewById(R.id.btn_test_multi);
+        rgTransport = findViewById(R.id.rg_transport);
 
         rfidHandler = TagWriter.getInstance();
         if (!rfidHandler.isInitialized()) {
@@ -62,9 +85,23 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
 
         btnReconnect.setOnClickListener(v -> {
             log("Reiniciando conexión...");
-            // Usamos InitSDK para forzar una nueva búsqueda de lectores si es necesario
+            
+            // Set transport based on selection
+            ENUM_TRANSPORT transport = ENUM_TRANSPORT.BLUETOOTH;
+            int checkedId = rgTransport.getCheckedRadioButtonId();
+            if (checkedId == R.id.rb_serial) {
+                transport = ENUM_TRANSPORT.SERVICE_SERIAL;
+            } else if (checkedId == R.id.rb_usb) {
+                transport = ENUM_TRANSPORT.SERVICE_USB;
+            }
+            
+            rfidHandler.setTransport(transport);
+            rfidHandler.setAutoDetect(false); // Disable auto-detect for validation
             rfidHandler.InitSDK();
         });
+
+        btnTestSingle.setOnClickListener(v -> startSingleRead());
+        btnTestMulti.setOnClickListener(v -> toggleMultiRead());
 
         updateUI();
     }
@@ -132,7 +169,116 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     // ResponseHandlerInterface implementation
     @Override
     public void handleTagdata(TagData[] tagData) {
-        // Not used here
+        if (tagData == null || tagData.length == 0) return;
+
+        final String epc = tagData[0].getTagID();
+
+        if (isSingleReading) {
+            runOnUiThread(() -> {
+                stopReading();
+                isSingleReading = false;
+                showSingleTagDialog(epc);
+            });
+        } else if (isMultiReading) {
+            runOnUiThread(() -> {
+                for (TagData tag : tagData) {
+                    String id = tag.getTagID();
+                    multiReadTags.put(id, multiReadTags.getOrDefault(id, 0) + 1);
+                    log("Tag leído: " + id);
+                }
+                updateMultiReadButton();
+            });
+        }
+    }
+    
+    private void startSingleRead() {
+        if (!rfidHandler.isConnected()) {
+            Toast.makeText(this, "Lector desconectado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        isSingleReading = true;
+        isMultiReading = false;
+        rfidHandler.startRead();
+        log("Esperando lectura sencilla...");
+    }
+
+    private void toggleMultiRead() {
+        if (!rfidHandler.isConnected()) {
+            Toast.makeText(this, "Lector desconectado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (isMultiReading) {
+            stopReading();
+            isMultiReading = false;
+            showMultiReadSummary();
+            btnTestMulti.setText("Lectura Múltiple");
+        } else {
+            isMultiReading = true;
+            isSingleReading = false;
+            multiReadTags.clear();
+            rfidHandler.startRead();
+            btnTestMulti.setText("Detener (0)");
+            log("Iniciando lectura múltiple...");
+        }
+    }
+
+    private void stopReading() {
+        try {
+            rfidHandler.stopRead();
+        } catch (Exception e) {
+            log("Error deteniendo lectura: " + e.getMessage());
+        }
+    }
+
+    private void updateMultiReadButton() {
+        btnTestMulti.setText("Detener (" + multiReadTags.size() + ")");
+    }
+
+    private void showSingleTagDialog(String epc) {
+        ActivoEntity activo = activoDao.getActivoByEpc(epc);
+        String mensaje = "EPC: " + epc + "\n";
+
+        if (activo != null) {
+            mensaje += "Estado: ENCONTRADO\n" +
+                       "Activo: " + activo.getNumeroActivo() + "\n" +
+                       "Desc: " + activo.getDescripcionCorta();
+        } else {
+            mensaje += "Estado: NO REGISTRADO EN BD LOCAL";
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Lectura Sencilla")
+                .setMessage(mensaje)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private void showMultiReadSummary() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Total Tags Únicos: ").append(multiReadTags.size()).append("\n\n");
+        
+        int encontrados = 0;
+        int desconocidos = 0;
+
+        for (String epc : multiReadTags.keySet()) {
+            ActivoEntity a = activoDao.getActivoByEpc(epc);
+            if (a != null) {
+                encontrados++;
+                sb.append("[OK] ").append(epc).append(" - ").append(a.getDescripcionCorta()).append("\n");
+            } else {
+                desconocidos++;
+                sb.append("[UNK] ").append(epc).append("\n");
+            }
+        }
+        
+        sb.insert(0, "Encontrados: " + encontrados + " | Desconocidos: " + desconocidos + "\n");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Resumen Lectura Múltiple")
+                .setMessage(sb.toString())
+                .setPositiveButton("Cerrar", null)
+                .show();
     }
 
     @Override
@@ -204,5 +350,11 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
                 }
             }
         }
+    }
+
+    // Implementación de ActivoDao.LogListener
+    @Override
+    public void onLog(String message) {
+        log(message);
     }
 }

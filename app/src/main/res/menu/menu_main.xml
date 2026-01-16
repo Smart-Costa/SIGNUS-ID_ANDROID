@@ -8,6 +8,7 @@
         android:icon="@drawable/ic_notifications"
         android:title="Notificaciones"
         android:orderInCategory="50"
+        app:actionLayout="@layout/action_notification_badge"
         app:showAsAction="ifRoom" />
 
     <item

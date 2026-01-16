@@ -217,7 +217,7 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
 //    }
 
     public EntidadActivos VerActivoEpc (String epc){
-        String query="Select * from Activos where Tag='"+epc+"'";  /*inner join Tags on Activos.Tag = Tags._id  where Tags.EPC='"+epc+"'";*/
+        String query="Select * from Activos where EPC='"+epc+"'";  /*inner join Tags on Activos.Tag = Tags._id  where Tags.EPC='"+epc+"'";*/
         return  cargarActivo(query);
     }
 
@@ -347,9 +347,14 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
         if(cursor.getColumnIndex("Departamento") != -1) {
             departamento = cursor.getString(cursor.getColumnIndex("Departamento"));
         }
+        String epc = null;
+        if(cursor.getColumnIndex("EPC") != -1) {
+            epc = cursor.getString(cursor.getColumnIndex("EPC"));
+        }
+
         EntidadActivos entidadActivos= new EntidadActivos(idActivo,descripcion,compania,idcompania,edificio,idEdificio,piso,idPiso,oficina,idOficina,Tag
                 ,numero,codeBar,Marca,Modelo,Serie,Encargado,IdCategoria, employeeRelated, assetStatusSysId, parentAssetSysId, anoFabricacion, capacidad
-                ,estadoDescripcion,estadoConservacion, departamento);
+                ,estadoDescripcion,estadoConservacion, departamento, epc);
         return  entidadActivos;
     }
 
@@ -392,7 +397,7 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
 
             String query = "Select A._id, A.CodeBar as NumeroActivo, A.Descripcion as Descripcion," +
                            "A.Compania as RazonSocial, A.Edificio as Edificio, A.Piso as Piso, " +
-                           "T.Nombre as Oficina, A.Tag as Tag from Activos A " +
+                           "T.Nombre as Oficina, A.Tag as Tag, A.EPC as EPC from Activos A " +
                     " INNER JOIN Oficina T ON T._id = A.IdOficina"+
                            " where A.CodeBar like " +"'%"+NumeroActivo+"%'";
 
@@ -504,7 +509,7 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
                     "Compania = '"+compania+"', IdEdificio = '"+idEdificio+"', Edificio = '"+edificio+"'," +
                     "IdPiso = '"+idPiso+"', Piso = '"+piso+"', IdOficina = '"+idOficina+"', Oficina = '"+oficina+"'," +
                     "Alias = '"+EmployeName+"', Marca = '"+marca+"', Modelo = '"+modelo+"', Serial = '"+serie+"'," +
-                    "Tag ='"+epc+"', SyncData = '1', CodeBar = '"+placa+"', UpdateUser = '"+userId+"',"+
+                    "Tag ='"+epc+"', EPC ='"+epc+"', SyncData = '1', CodeBar = '"+placa+"', UpdateUser = '"+userId+"',"+
                     " EmployeeRelatedSysId = '"+EmployeeRelated+"', AssetStatusSysId = '"+AssetStatusSysId+"', " +
                     " AnoFabricacion = '"+AnoFabricacion+"', Capacidad = '"+Capacidad+"', EstadoDescripcion = '"+DetalleEstado+"'," +
                     " EstadoConservacion = '"+EstadoConservacion+"'"+

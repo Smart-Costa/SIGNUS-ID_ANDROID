@@ -174,15 +174,16 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
             s1_singulationControl.Action.setSLFlag(SL_FLAG.SL_ALL);
             reader.Config.Antennas.setSingulationControl(1, s1_singulationControl);
         }
-        catch (InvalidUsageException e)
-        {
-            e.printStackTrace();
-        }
         catch (OperationFailureException e)
         {
             e.printStackTrace();
             value ="No se ha conectado al lector o no hay lectores disponibles.";
             return  value ;
+        }
+        catch (Throwable e)
+        {
+            e.printStackTrace();
+            // Defaults error
         }
         return value;
     }
@@ -370,7 +371,7 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     }
 
     public void onPause() {
-        disconnect();
+        // disconnect(); // Comentado para mantener conexión entre pantallas
     }
 
     //*******************************************************************************************
@@ -409,6 +410,11 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
                 if(responseHandlerInterface != null)
                     responseHandlerInterface.SetMessage("Fallo Operación: " + e.getVendorMessage() + " " + des);
                 return "Connection failed" + e.getVendorMessage() + " " + des;
+            } catch (Throwable e) {
+                e.printStackTrace();
+                if(responseHandlerInterface != null)
+                    responseHandlerInterface.SetMessage("Error inesperado al conectar: " + e.toString());
+                return "Error: " + e.getMessage();
             }
         }
         return "";
@@ -453,15 +459,25 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
 
     //*******************************************************************************************
 
+    private ENUM_TRANSPORT currentTransport = ENUM_TRANSPORT.BLUETOOTH; // Default
+    private boolean autoDetect = true;
+
+    public void setAutoDetect(boolean enable) {
+        this.autoDetect = enable;
+    }
+
+    public void setTransport(ENUM_TRANSPORT transport) {
+        this.currentTransport = transport;
+    }
+
     public void InitSDK()
     {
         Log.d(TAG, "InitSDK");
         if(responseHandlerInterface != null)
-            responseHandlerInterface.SetMessage("Iniciando búsqueda de lectores...");
+            responseHandlerInterface.SetMessage("Iniciando búsqueda de lectores (" + currentTransport.toString() + ")...");
 
-        // Si la lista de lectores está vacía, forzamos la recreación de la instancia Readers
-        // para asegurar que probamos todos los transportes (Bluetooth, etc.)
-        if (readers != null && (availableRFIDReaderList == null || availableRFIDReaderList.isEmpty())) {
+        // Forzar limpieza si cambiamos de transporte o queremos re-escanear
+        if (readers != null) {
             try {
                 readers.Dispose();
             } catch (Exception e) {
@@ -470,10 +486,7 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
             readers = null;
         }
 
-        if(readers == null){
-            new CreateInstanceTask().execute();
-        }else
-            new ConnectionTask().execute();
+        new CreateInstanceTask().execute();
     }
 
     //*******************************************************************************************
@@ -481,40 +494,64 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     private class CreateInstanceTask extends AsyncTask<Void, Void, Void>{
         @Override
         protected Void doInBackground(Void... voids){
-            Log.d(TAG, "CreateInstanceTask");
-            InvalidUsageException invalidUsageException = null;
-
-            // Intentar BLUETOOTH primero (Prioridad para RFD4031/Handhelds modernos)
-            try {
-                readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
-                availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-            } catch (InvalidUsageException e) {
-                e.printStackTrace();
-                invalidUsageException = e;
-            } catch (SecurityException e) {
-                Log.e(TAG, "SecurityException al inicializar Readers (Bluetooth): " + e.getMessage());
-                invalidUsageException = new InvalidUsageException("Permiso Bluetooth denegado", "SECURITY_EXCEPTION");
-            } catch (Exception e) {
-                Log.e(TAG, "Error genérico al inicializar Readers (Bluetooth): " + e.getMessage());
-                invalidUsageException = new InvalidUsageException(e.getMessage(), "GENERIC_ERROR");
-            }
-
-            // Si Bluetooth falla o no encuentra lectores, intentar SERVICE_SERIAL
-            if (invalidUsageException != null || availableRFIDReaderList == null || availableRFIDReaderList.isEmpty()) {
-                if (readers != null) {
-                    try {
-                        readers.Dispose();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    readers = null;
-                }
-
+            Log.d(TAG, "CreateInstanceTask. AutoDetect: " + autoDetect + ", Transport: " + currentTransport);
+            
+            if (autoDetect) {
+                // 1. Try Serial (eConnex) first
                 try {
                     readers = new Readers(context, ENUM_TRANSPORT.SERVICE_SERIAL);
                     availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
+                    if (availableRFIDReaderList != null && !availableRFIDReaderList.isEmpty()) {
+                        currentTransport = ENUM_TRANSPORT.SERVICE_SERIAL;
+                        Log.d(TAG, "Found reader on SERVICE_SERIAL");
+                        return null;
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, "Serial check failed or no readers: " + e.getMessage());
+                }
+
+                // 2. Try USB
+                try {
+                    if (readers != null) {
+                        try { readers.Dispose(); } catch(Exception e){}
+                        readers = null;
+                    }
+                    readers = new Readers(context, ENUM_TRANSPORT.SERVICE_USB);
+                    availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
+                    if (availableRFIDReaderList != null && !availableRFIDReaderList.isEmpty()) {
+                        currentTransport = ENUM_TRANSPORT.SERVICE_USB;
+                        Log.d(TAG, "Found reader on SERVICE_USB");
+                        return null;
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, "USB check failed or no readers: " + e.getMessage());
+                }
+
+                // 3. Try Bluetooth (Fallback)
+                try {
+                    if (readers != null) {
+                        try { readers.Dispose(); } catch(Exception e){}
+                        readers = null;
+                    }
+                    readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
+                    availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
+                    currentTransport = ENUM_TRANSPORT.BLUETOOTH;
+                    Log.d(TAG, "Fallback to BLUETOOTH");
                 } catch (InvalidUsageException e) {
                     e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // Strict mode: Use currentTransport only
+                try {
+                    readers = new Readers(context, currentTransport);
+                    availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    if (responseHandlerInterface != null) {
+                        responseHandlerInterface.SetMessage("Error crítico InitSDK: " + e.toString());
+                    }
                 }
             }
             return null;
@@ -587,9 +624,12 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
                 }
             }
         }
-        catch (InvalidUsageException e)
+        catch (Throwable e)
         {
             e.printStackTrace();
+            if (responseHandlerInterface != null) {
+                responseHandlerInterface.SetMessage("Error GetAvailableReader: " + e.toString());
+            }
         }
     }
 
@@ -615,10 +655,6 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     private void ConfigureReader() {
         Log.d(TAG,"ConfigureReader" + reader.getHostName());
         if (reader.isConnected()) {
-
-            TriggerInfo triggerInfo = new TriggerInfo();
-            triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_IMMEDIATE);
-            triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_IMMEDIATE);
             try{
                 if (eventHandler == null)
                     eventHandler = new EventHandler();
@@ -627,9 +663,11 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
                 reader.Events.setTagReadEvent(true);
                 reader.Events.setAttachTagDataWithReadEvent(false);
                 reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, true);
-                reader.Config.setStartTrigger(triggerInfo.StartTrigger);
-                reader.Config.setStopTrigger(triggerInfo.StopTrigger);
-                MAX_POWER =Integer.parseInt(Power);//reader.ReaderCapabilities.getTransmitPowerLevelValues().length -1;
+                
+                // Configure default trigger (Handheld/Physical)
+                configureTrigger(true);
+
+                MAX_POWER =Integer.parseInt(Power);
                 Antennas.AntennaRfConfig config = reader.Config.Antennas.getAntennaRfConfig(1);
                 config.setTransmitPowerIndex(MAX_POWER);
                 config.setrfModeTableIndex(0);
@@ -647,6 +685,28 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
             } catch (InvalidUsageException | OperationFailureException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void configureTrigger(boolean isHandheld) {
+        if (!isReaderConnected()) return;
+        try {
+            TriggerInfo triggerInfo = new TriggerInfo();
+            if (isHandheld) {
+                // Handheld Trigger (Physical Button)
+                triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_HANDHELD);
+                triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_HANDHELD_WITH_TIMEOUT);
+                // triggerInfo.StopTrigger.setHandheldTriggerTimeout(0); // Removing causing error
+            } else {
+                // Immediate Trigger (Soft Button)
+                triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_IMMEDIATE);
+                triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_IMMEDIATE);
+            }
+            reader.Config.setStartTrigger(triggerInfo.StartTrigger);
+            reader.Config.setStopTrigger(triggerInfo.StopTrigger);
+        } catch (InvalidUsageException | OperationFailureException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Error configuring trigger: " + e.getMessage());
         }
     }
 
@@ -740,6 +800,23 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
                 responseHandlerInterface.handleTagdata(params[0]);
             return null;
         }
+    }
+
+    //*******************************************************************************************
+
+    public synchronized void startRead(){
+        // Switch to Immediate mode for soft-button read
+        configureTrigger(false);
+        performInventory();
+    }
+
+    public synchronized void stopRead(){
+        stopInventory();
+        // Switch back to Handheld mode for physical trigger
+        // We use a small delay or just execute, but better to ensure inventory stopped
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            configureTrigger(true);
+        }, 500);
     }
 
     //*******************************************************************************************

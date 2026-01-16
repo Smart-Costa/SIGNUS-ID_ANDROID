@@ -94,7 +94,7 @@ public class UpdateAssetAdapter extends RecyclerView.Adapter<UpdateAssetAdapter.
         viewHolder.txtEdificio.setText(_activosActualizar.get(i).getEdificio());
         viewHolder.txtPiso.setText(_activosActualizar.get(i).getPiso());
         viewHolder.txtsector.setText(_activosActualizar.get(i).getOficina());
-        viewHolder.txtEPC.setText(_activosActualizar.get(i).getTag());
+        viewHolder.txtEPC.setText(_activosActualizar.get(i).getEpc());
         viewHolder.txtnumActivo.setText(_activosActualizar.get(i).getNumero());
         viewHolder.txtPlaca.setText(_activosActualizar.get(i).getCodeBar());
         viewHolder.txtMarca.setText(_activosActualizar.get(i).getMarca());

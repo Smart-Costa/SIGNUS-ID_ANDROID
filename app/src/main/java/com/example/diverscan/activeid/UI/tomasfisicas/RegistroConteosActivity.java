@@ -737,7 +737,28 @@ public class RegistroConteosActivity extends AppCompatActivity {
     private void cargarActivosSpinner() {
         if (btnAgregarLectura != null) btnAgregarLectura.setEnabled(false);
         new Thread(() -> {
-            listaActivosSpinner = activoDao.getAllLocalActivos();
+            try {
+                // OPTIMIZACIÓN: Cargar solo activos de la ubicación de la toma para evitar OOM/ANR
+                // Cargar todos los activos (getAllLocalActivos) puede causar crashes si hay muchos registros.
+                if (tomaFisicaDao != null && tomaFisicaId != null) {
+                    TomaFisicaEntity toma = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
+                    if (toma != null && toma.getUbicacionD() != null) {
+                        listaActivosSpinner = activoDao.getActivosByUbicacion(toma.getUbicacionD());
+                    } else {
+                        // Si no hay ubicación definida, intentamos cargar pero con precaución
+                        // Idealmente deberíamos tener un método con LIMIT en el DAO
+                        // Por ahora, para evitar crash, dejamos lista vacía o manejamos error
+                        listaActivosSpinner = new ArrayList<>();
+                        Log.w("RegistroConteos", "Toma sin UbicacionD, no se cargan activos para manual");
+                    }
+                } else {
+                    listaActivosSpinner = new ArrayList<>();
+                }
+            } catch (Exception e) {
+                Log.e("RegistroConteos", "Error cargando activos para spinner", e);
+                listaActivosSpinner = new ArrayList<>();
+            }
+
             runOnUiThread(() -> {
                 if (listaActivosSpinner != null && !listaActivosSpinner.isEmpty()) {
                     List<String> descripciones = new ArrayList<>();
@@ -750,7 +771,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                     if (btnAgregarLectura != null) btnAgregarLectura.setEnabled(true);
                 } else {
                     List<String> empty = new ArrayList<>();
-                    empty.add("Sin activos");
+                    empty.add("Sin activos en esta ubicación");
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, empty);
                     if (spinnerActivos != null) spinnerActivos.setAdapter(adapter);
                 }
@@ -1064,9 +1085,14 @@ public class RegistroConteosActivity extends AppCompatActivity {
             if (total < 0) total = 0;
 
             rojo = Math.max(0, faltantes);
-            verde = Math.max(0, encontrados);
-            amarillo = Math.max(0, sobrantes);
-            blanco = Math.max(0, total - (rojo + verde + amarillo));
+            // verde = Math.max(0, encontrados); // Se recalcula desde detalles
+            // amarillo = Math.max(0, sobrantes); // Se recalcula desde detalles para separar de Blanco
+            // blanco = Math.max(0, total - (rojo + verde + amarillo)); 
+
+            // Reiniciar contadores para calcular con precisión desde los detalles
+            verde = 0;
+            amarillo = 0;
+            blanco = 0;
 
             if (txtEscaneados != null) txtEscaneados.setText(String.valueOf(Math.max(0, encontrados)));
             if (txtDeTotal != null) txtDeTotal.setText("De " + Math.max(0, totalActivos));
@@ -1092,7 +1118,14 @@ public class RegistroConteosActivity extends AppCompatActivity {
             if (filtro == null || categoriaDe(d.getEstadoInventario()) == filtro) {
                 filas.add(d);
             }
-            if (resumen == null) {
+            
+            // Contar siempre desde detalles para tener la separación correcta
+            if (resumen != null) {
+                Categoria c = categoriaDe(d.getEstadoInventario());
+                if (c == Categoria.VERDE) verde++;
+                else if (c == Categoria.AMARILLO) amarillo++;
+                else if (c == Categoria.BLANCO) blanco++;
+            } else {
                 total++;
                 Categoria c = categoriaDe(d.getEstadoInventario());
                 if (c == Categoria.ROJO) rojo++;
@@ -1112,7 +1145,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
         txtNoEncontrados.setText(rojo + "/" + totalStr);
         txtEncontrados.setText(verde + "/" + totalStr);
         txtNoPertenecen.setText(amarillo + "/" + totalStr);
-        txtNoInventariados.setText(blanco + "/" + totalStr);
+        txtNoInventariados.setText(String.valueOf(blanco));
 
         adapter.setDao(activoDao);
         adapter.setItems(filas);

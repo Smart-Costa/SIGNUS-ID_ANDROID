@@ -137,6 +137,18 @@
                 android:textStyle="bold"
                 android:visibility="gone" />
 
+            <!-- Estado del Servidor -->
+            <TextView
+                android:id="@+id/txt_server_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="Verificando servidor..."
+                android:textColor="#808080"
+                android:textSize="12sp"
+                android:visibility="visible" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

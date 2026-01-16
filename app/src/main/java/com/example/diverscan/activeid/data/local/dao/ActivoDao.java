@@ -30,6 +30,22 @@ public class ActivoDao {
     private final AppDatabaseHelper dbHelper;
     private final Context context;
 
+    // Interface para enviar logs a la UI
+    public interface LogListener {
+        void onLog(String message);
+    }
+    private LogListener logListener;
+
+    public void setLogListener(LogListener listener) {
+        this.logListener = listener;
+    }
+
+    private void logToUI(String msg) {
+        if (logListener != null) {
+            logListener.onLog(msg);
+        }
+    }
+
     public ActivoDao(Context context) {
         this.context = context.getApplicationContext();
         this.dbHelper = new AppDatabaseHelper(context);
@@ -77,7 +93,7 @@ public class ActivoDao {
         v.put("CUENTA_CONTABLE_DEPRESIACION", a.getCuentaContableDepresiacion());
         v.put("CENTRO_COSTOS", a.getCentroCostos());
         v.put("DESCRIPCION_ESTADO_ULTIMO_INVENTARIO", a.getDescripcionEstadoUltimoInventario());
-        v.put("TAG_EPC", "EPC Asignado"); // Valor fijo indicando que tiene tag
+        // v.put("TAG_EPC", "EPC Asignado"); // REMOVED: Do not write garbage value
         v.put("EMPLEADO", a.getEmpleado());
         v.put("UBICACION_A", a.getUbicacionA());
         v.put("UBICACION_B", a.getUbicacionB());
@@ -91,7 +107,18 @@ public class ActivoDao {
         v.put("ESTADO_ACTIVO", (a.getEstadoActivo() != null && a.getEstadoActivo()) ? 1 : 0);
         v.put("FECHA_CREACION_ACTIVO", a.getFechaCreacionActivo());
 
-        v.put("EPC", a.getTagEpc()); // Guardamos el valor REAL del tag en la columna EPC
+        // Logica robusta para obtener el EPC real
+        String realEpc = a.getEpc();
+        if (realEpc == null || realEpc.trim().isEmpty() || "EPC Asignado".equalsIgnoreCase(realEpc)) {
+            realEpc = a.getTagEpc();
+        }
+        if ("EPC Asignado".equalsIgnoreCase(realEpc)) {
+            realEpc = null;
+        }
+        
+        v.put("EPC", realEpc); // Guardamos el valor REAL del tag en la columna EPC
+        v.put("TAG_EPC", realEpc); // Also update legacy column with REAL value
+
         v.put("CATEGORIA_A", a.getCategoriaA());
         v.put("CATEGORIA_B", a.getCategoriaB());
         v.put("CATEGORIA_C", a.getCategoriaC());
@@ -185,7 +212,17 @@ public class ActivoDao {
             o.addProperty("CUENTA_CONTABLE_DEPRESIACION", a.getCuentaContableDepresiacion());
             o.addProperty("CENTRO_COSTOS", a.getCentroCostos());
             o.addProperty("DESCRIPCION_ESTADO_ULTIMO_INVENTARIO", a.getDescripcionEstadoUltimoInventario());
-            o.addProperty("TAG_EPC", a.getTagEpc());
+            
+            // Fix: Send real EPC, not "EPC Asignado"
+            String realEpc = a.getEpc();
+            if (realEpc == null || realEpc.isEmpty() || "EPC Asignado".equalsIgnoreCase(realEpc)) {
+                 realEpc = a.getTagEpc();
+            }
+            if ("EPC Asignado".equalsIgnoreCase(realEpc)) realEpc = null;
+            
+            o.addProperty("TAG_EPC", realEpc);
+            o.addProperty("EPC", realEpc); // Also send as EPC just in case
+            
             o.addProperty("EMPLEADO", validateGuid(a.getEmpleado()));
             o.addProperty("UBICACION_A", validateGuid(a.getUbicacionA()));
             o.addProperty("UBICACION_B", validateGuid(a.getUbicacionB()));
@@ -351,7 +388,26 @@ public class ActivoDao {
         a.setCuentaContableDepresiacion(c.getString(c.getColumnIndexOrThrow("CUENTA_CONTABLE_DEPRESIACION")));
         a.setCentroCostos(c.getString(c.getColumnIndexOrThrow("CENTRO_COSTOS")));
         a.setDescripcionEstadoUltimoInventario(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_ESTADO_ULTIMO_INVENTARIO")));
-        a.setTagEpc(c.getString(c.getColumnIndexOrThrow("TAG_EPC")));
+        
+        // Fix: Read real EPC, prioritize EPC column, fallback to TAG_EPC but ignore "EPC Asignado"
+        String epcVal = "";
+        try { 
+            epcVal = c.getString(c.getColumnIndexOrThrow("EPC")); 
+        } catch (Exception e) { 
+            // EPC column might not exist in old DB versions, ignore
+        }
+        
+        if (epcVal == null || epcVal.isEmpty()) {
+            epcVal = c.getString(c.getColumnIndexOrThrow("TAG_EPC"));
+        }
+        
+        if ("EPC Asignado".equalsIgnoreCase(epcVal)) {
+            epcVal = "";
+        }
+        
+        a.setTagEpc(epcVal);
+        a.setEpc(epcVal);
+
         a.setEmpleado(c.getString(c.getColumnIndexOrThrow("EMPLEADO")));
         a.setUbicacionA(c.getString(c.getColumnIndexOrThrow("UBICACION_A")));
         a.setUbicacionB(c.getString(c.getColumnIndexOrThrow("UBICACION_B")));
@@ -365,7 +421,7 @@ public class ActivoDao {
         a.setEstadoActivo(c.getInt(c.getColumnIndexOrThrow("ESTADO_ACTIVO")) == 1);
         a.setFechaCreacionActivo(c.getString(c.getColumnIndexOrThrow("FECHA_CREACION_ACTIVO")));
         // Handle optional columns that might not exist in older DB versions if ensureActivosApiTable wasn't fully effective yet
-        try { a.setEpc(c.getString(c.getColumnIndexOrThrow("EPC"))); } catch (IllegalArgumentException e) {}
+        // a.setEpc set above
         try { a.setCategoriaA(c.getString(c.getColumnIndexOrThrow("CATEGORIA_A"))); } catch (IllegalArgumentException e) {}
         try { a.setCategoriaB(c.getString(c.getColumnIndexOrThrow("CATEGORIA_B"))); } catch (IllegalArgumentException e) {}
         try { a.setCategoriaC(c.getString(c.getColumnIndexOrThrow("CATEGORIA_C"))); } catch (IllegalArgumentException e) {}
@@ -651,9 +707,31 @@ public class ActivoDao {
     }
 
     public ActivoEntity getActivoByEpc(String epc) {
+        String msg1 = "getActivoByEpc: Buscando EPC='" + epc + "'";
+        Log.d(TAG, msg1);
+        logToUI(msg1);
+
         ActivoEntity activo = null;
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         
+        // Debug: check if any row exists with this EPC
+        try (Cursor debugC = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_ACTIVOS + " WHERE EPC = ?", new String[]{epc})) {
+             if (debugC.moveToFirst()) {
+                 String msg = "getActivoByEpc: Coincidencias exactas encontradas en columna EPC: " + debugC.getInt(0);
+                 Log.d(TAG, msg);
+                 logToUI(msg);
+             }
+        } catch (Exception e) { Log.e(TAG, "Error debug count EPC", e); }
+
+        // Debug: check if it exists in TAG_EPC just in case
+        try (Cursor debugC2 = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_ACTIVOS + " WHERE TAG_EPC = ?", new String[]{epc})) {
+             if (debugC2.moveToFirst()) {
+                 String msg = "getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: " + debugC2.getInt(0);
+                 Log.d(TAG, msg);
+                 logToUI(msg);
+             }
+        } catch (Exception e) { Log.e(TAG, "Error debug count TAG_EPC", e); }
+
         // CORREGIDO: Buscar por columna EPC en lugar de TAG_EPC
         String selection = "EPC = ?"; 
         
@@ -669,9 +747,17 @@ public class ActivoDao {
         )) {
             if (c.moveToFirst()) {
                 activo = cursorToEntity(c);
+                String msg = "getActivoByEpc: ACTIVO ENCONTRADO -> " + activo.getDescripcionCorta() + " ID: " + activo.getIdActivo();
+                Log.d(TAG, msg);
+                logToUI(msg);
+            } else {
+                String msg = "getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: " + epc;
+                Log.d(TAG, msg);
+                logToUI(msg);
             }
         } catch (Exception e) {
             Log.e("TAG", "Error consultando por EPC", e);
+            logToUI("Error consultando por EPC: " + e.getMessage());
         } finally {
             // db.close();
         }
@@ -730,7 +816,16 @@ public class ActivoDao {
                 activo.setNumeroEtiqueta(c.getString(c.getColumnIndexOrThrow("NUMERO_ETIQUETA")));
                 activo.setDescripcionCorta(c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")));
                 activo.setNumeroSerie(c.getString(c.getColumnIndexOrThrow("NUMERO_SERIE")));
-                activo.setTagEpc(c.getString(c.getColumnIndexOrThrow("TAG_EPC")));
+                
+                // Fix: Read real EPC
+                String epcVal = "";
+                try { epcVal = c.getString(c.getColumnIndexOrThrow("EPC")); } catch(Exception e) {}
+                if (epcVal == null || epcVal.isEmpty()) epcVal = c.getString(c.getColumnIndexOrThrow("TAG_EPC"));
+                if ("EPC Asignado".equalsIgnoreCase(epcVal)) epcVal = "";
+                
+                activo.setTagEpc(epcVal);
+                activo.setEpc(epcVal);
+                
                 activo.setFotos(c.getString(c.getColumnIndexOrThrow("FOTOS")));
                 activo.setObservaciones(c.getString(c.getColumnIndexOrThrow("OBSERVACIONES")));
             }
@@ -744,6 +839,7 @@ public class ActivoDao {
     }
 
     public EntidadActivosInventarios getActivoInventarioByEpc(String epc) {
+        Log.d(TAG, "getActivoInventarioByEpc: Buscando EPC='" + epc + "'");
         EntidadActivosInventarios result = null;
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         
@@ -765,6 +861,9 @@ public class ActivoDao {
                     c.getString(c.getColumnIndexOrThrow("UBICACION_A")),
                     c.getString(c.getColumnIndexOrThrow("UBICACION_SECUNDARIA"))
                  );
+                 Log.d(TAG, "getActivoInventarioByEpc: ENCONTRADO -> " + result.getDescripcion());
+            } else {
+                Log.d(TAG, "getActivoInventarioByEpc: NO ENCONTRADO");
             }
         } catch (Exception e) {
             Log.e(TAG, "Error fetching ActivoInventario", e);
@@ -787,7 +886,7 @@ public class ActivoDao {
                  result = new EntidadActivosInventarios(
                     c.getString(c.getColumnIndexOrThrow("NUMERO_ACTIVO")),
                     c.getString(c.getColumnIndexOrThrow("DESCRIPCION_CORTA")),
-                    c.getString(c.getColumnIndexOrThrow("TAG_EPC")),
+                    c.getString(c.getColumnIndexOrThrow("EPC")), // Usar EPC real en lugar de TAG_EPC
                     c.getString(c.getColumnIndexOrThrow("ID_ACTIVO")),
                     c.getString(c.getColumnIndexOrThrow("NombreOficina")),
                     c.getString(c.getColumnIndexOrThrow("UBICACION_D")),

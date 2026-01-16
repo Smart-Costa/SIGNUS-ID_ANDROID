@@ -13,6 +13,10 @@ import com.example.diverscan.activeid.Utilities.DialogUtils;
 import com.example.diverscan.activeid.Utilities.SessionManager;
 import com.example.diverscan.activeid.data.remote.api.AuthService;
 import com.example.diverscan.activeid.databinding.ActivityLoginBinding;
+import com.example.diverscan.activeid.BuildConfig;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import cz.msebera.android.httpclient.Header;
 
 public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
@@ -30,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         validateSessionExist();
         setupUI();
         observeViewModel();
+        checkServerHealth();
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override public void handleOnBackPressed() { finishAffinity(); }
@@ -83,5 +88,32 @@ public class LoginActivity extends AppCompatActivity {
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish();
+    }
+
+    private void checkServerHealth() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.setTimeout(5000); // 5 segundos de timeout
+        String url = BuildConfig.BASE_URL + "/health";
+
+        binding.txtServerStatus.setText("Verificando servidor...");
+        binding.txtServerStatus.setTextColor(android.graphics.Color.GRAY);
+
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                if (binding != null) {
+                    binding.txtServerStatus.setText("Servidor Disponible");
+                    binding.txtServerStatus.setTextColor(android.graphics.Color.GREEN);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                if (binding != null) {
+                    binding.txtServerStatus.setText("Servidor No Disponible");
+                    binding.txtServerStatus.setTextColor(android.graphics.Color.RED);
+                }
+            }
+        });
     }
 }

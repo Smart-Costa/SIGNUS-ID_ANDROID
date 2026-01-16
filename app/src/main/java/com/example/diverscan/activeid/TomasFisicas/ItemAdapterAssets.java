@@ -42,7 +42,7 @@ public class ItemAdapterAssets extends ArrayAdapter {
         oficina.setText(activoRecords.get(position).getOficina());
 
         TextView tag = (TextView) item.findViewById(R.id.tag);
-        tag.setText(activoRecords.get(position).getTag());
+        tag.setText(activoRecords.get(position).getEpc());
 
         TextView numero = (TextView) item.findViewById(R.id.numeroActivo);
         numero.setText(activoRecords.get(position).getNumero());

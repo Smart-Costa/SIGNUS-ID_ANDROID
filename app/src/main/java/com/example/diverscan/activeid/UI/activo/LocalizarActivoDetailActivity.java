@@ -132,7 +132,12 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
             ActivoEntity activo = activoDAO.getActivoById(id);
 
             if (activo != null) {
-                mostrarPopupActivo(activo, activo.getTagEpc());
+                // Usar getEpc() en lugar de getTagEpc() para mostrar el valor real
+                String epcReal = activo.getEpc();
+                if (epcReal == null || epcReal.isEmpty()) {
+                    epcReal = "Sin EPC";
+                }
+                mostrarPopupActivo(activo, epcReal);
             } else {
                 Toast.makeText(this, "Activo no encontrado", Toast.LENGTH_SHORT).show();
             }

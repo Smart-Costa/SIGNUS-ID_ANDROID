@@ -40,12 +40,65 @@
         android:gravity="center"
         android:layout_marginBottom="8dp"/>
 
+    <RadioGroup
+        android:id="@+id/rg_transport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="8dp">
+
+        <RadioButton
+            android:id="@+id/rb_bluetooth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bluetooth"
+            android:checked="true"
+            android:layout_marginEnd="16dp"/>
+
+        <RadioButton
+            android:id="@+id/rb_serial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Serial (MC33xx)"
+            android:layout_marginStart="16dp"/>
+
+        <RadioButton
+            android:id="@+id/rb_usb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="USB"
+            android:layout_marginStart="16dp"/>
+    </RadioGroup>
+
     <Button
         android:id="@+id/btn_reconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Reconectar / Validar"
         android:layout_marginBottom="16dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btn_test_single"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lectura Sencilla"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/btn_test_multi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lectura Múltiple"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"

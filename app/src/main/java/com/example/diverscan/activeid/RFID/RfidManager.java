@@ -24,33 +24,70 @@ public class RfidManager {
     }
 
     public void connect() {
-        try {
-            readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
+        new Thread(() -> {
+            try {
+                // 1. Try Serial first (Preferred for eConnex)
+                if (connectWithTransport(ENUM_TRANSPORT.SERVICE_SERIAL)) {
+                    return;
+                }
 
+                // 2. Try Bluetooth if Serial failed
+                if (connectWithTransport(ENUM_TRANSPORT.BLUETOOTH)) {
+                    return;
+                }
+
+                if (listener != null) listener.onError("No se encontraron lectores RFID (Serial/BT)");
+
+            } catch (Exception e) {
+                if (listener != null) listener.onError("Error al conectar: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    private boolean connectWithTransport(ENUM_TRANSPORT transport) {
+        try {
+            readers = new Readers(context, transport);
             var list = readers.GetAvailableRFIDReaderList();
 
-            if (list == null || list.isEmpty()) {
-                listener.onError("No se encontraron lectores RFID");
-                return;
+            if (list != null && !list.isEmpty()) {
+                rfidReader = list.get(0).getRFIDReader();
+                if (rfidReader != null) {
+                    rfidReader.connect();
+                    configureReader(); // Configure Antennas/Region
+                    
+                    rfidReader.Events.addEventsListener(eventHandler);
+                    rfidReader.Events.setTagReadEvent(true);
+                    rfidReader.Events.setReaderDisconnectEvent(true);
+                    
+                    if (listener != null) listener.onConnected();
+                    return true;
+                }
             }
-
-            rfidReader = list.get(0).getRFIDReader();
-
-            if (rfidReader == null) {
-                listener.onError("RFIDReader es null");
-                return;
-            }
-
-            rfidReader.connect();
-
-            rfidReader.Events.addEventsListener(eventHandler);
-            rfidReader.Events.setTagReadEvent(true);
-            rfidReader.Events.setReaderDisconnectEvent(true);
-
-            listener.onConnected();
-
         } catch (Exception e) {
-            listener.onError("Error al conectar: " + e.getMessage());
+            // Log or ignore to try next transport
+        }
+        return false;
+    }
+
+    private void configureReader() {
+        try {
+            if (rfidReader.isConnected()) {
+                // Set default power and region
+                // Note: Real apps should manage Region configuration properly.
+                // Here we assume defaults or try to set a safe config.
+                try {
+                   com.zebra.rfid.api3.Antennas.AntennaRfConfig config = rfidReader.Config.Antennas.getAntennaRfConfig(1);
+                   config.setTransmitPowerIndex(270); // Default safe power
+                   rfidReader.Config.Antennas.setAntennaRfConfig(1, config);
+                } catch (Exception e) {
+                    // Region might not be set, but we continue
+                }
+                
+                // Ensure Trigger Mode is RFID
+                rfidReader.Config.setTriggerMode(com.zebra.rfid.api3.ENUM_TRIGGER_MODE.RFID_MODE, true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

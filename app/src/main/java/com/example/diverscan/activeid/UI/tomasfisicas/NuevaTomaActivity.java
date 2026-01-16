@@ -69,6 +69,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private android.widget.ProgressBar progressCargaManual;
     private TextView txtSinDatosManual;
     private Button btnAgregarLectura;
+    private android.widget.EditText etManualInput;
+    private android.widget.Button btnManualAdd;
     private List<ActivoEntity> listaActivosSpinner;
     private TextView lblConteos;
     private HorizontalScrollView scrollTomas;
@@ -261,11 +263,17 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         progressCargaManual = findViewById(R.id.progressCargaManual);
         txtSinDatosManual = findViewById(R.id.txtSinDatosManual);
         btnAgregarLectura = findViewById(R.id.btnAgregarLectura);
+        etManualInput = findViewById(R.id.etManualInput);
+        btnManualAdd = findViewById(R.id.btnManualAdd);
         
         initResumenBaseAndFilters();
 
+        
         if (btnAgregarLectura != null) {
             btnAgregarLectura.setOnClickListener(v -> agregarLecturaManual());
+        }
+        if (btnManualAdd != null) {
+            btnManualAdd.setOnClickListener(v -> agregarLecturaManualTexto());
         }
 
         if (chkIncluirExternos != null) {
@@ -287,6 +295,21 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 
                 String epc = getItem(position);
                 if (epc != null) {
+                    // Try to resolve display text from cache map
+                    String displayText = null;
+                    if (manualEpcToActivoId != null && manualEpcToActivoId.containsKey(epc)) {
+                        String id = manualEpcToActivoId.get(epc);
+                        if (epcToDisplayName != null && epcToDisplayName.containsKey(id)) {
+                            displayText = epcToDisplayName.get(id);
+                        }
+                    }
+                    // If not in map (e.g. manual text entry or RFID not yet resolved to name), try direct cache
+                    if (displayText == null && epcToDisplayName != null && epcToDisplayName.containsKey(epc)) {
+                        displayText = epcToDisplayName.get(epc);
+                    }
+                    
+                    text.setText(displayText != null ? displayText : epc);
+
                     boolean isSobrante = isActivoSobrante(epc);
                     if (isSobrante) {
                         view.setBackgroundColor(android.graphics.Color.parseColor("#FFEBEE")); // Light Red
@@ -331,7 +354,41 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void updateGaugeDisplay() {
-        int leidos = uniqueTags != null ? uniqueTags.size() : 0;
+        int leidos = 0;
+        
+        if (uniqueTags != null) {
+            for (String epc : uniqueTags) {
+                if (epc == null) continue;
+                String epcTrim = epc.trim();
+                
+                // If the tag matches the current filter (by EPC or ID), it counts towards progress.
+                // Otherwise it is surplus/irrelevant for the current view.
+                
+                boolean isExpected = false;
+                
+                // 1. Check direct EPC match
+                if (currentFilterExpectedEpcs != null && currentFilterExpectedEpcs.contains(epcTrim.toUpperCase())) {
+                    isExpected = true;
+                }
+                
+                // 2. If not, check by ID (manual or mapped)
+                if (!isExpected) {
+                    String actId = manualEpcToActivoId.get(epcTrim);
+                    if (actId != null && currentFilterExpectedIds != null && currentFilterExpectedIds.contains(actId.trim().toUpperCase())) {
+                        isExpected = true;
+                    }
+                }
+                
+                // 3. Fallback: if we haven't mapped it yet but it might be in DB, we should check?
+                // But for gauge performance, we rely on the cached sets populated in refreshActivosList.
+                // If manualEpcToActivoId misses it, it might be an unmapped tag.
+                
+                if (isExpected) {
+                    leidos++;
+                }
+            }
+        }
+        
         if (gaugeResumen != null) {
             int max = totalActivosInventario > 0 ? totalActivosInventario : 1;
             gaugeResumen.setMax(max);
@@ -434,6 +491,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     // Cache for validation
     private Set<String> cachedExpectedEpcs = null;
     private Set<String> cachedExpectedIds = null;
+    private Set<String> currentFilterExpectedEpcs = new HashSet<>();
+    private Set<String> currentFilterExpectedIds = new HashSet<>();
 
     private void updateExpectedCache() {
         new Thread(() -> {
@@ -728,45 +787,71 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         String ud = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
         String us = selectedUbicacionSecundariaId;
 
-        int countFiltrados = activoDao.countActivosByFiltros(ua, ub, uc, ud, us);
-        if (txtCountActivosFiltrados != null) txtCountActivosFiltrados.setText("Activos filtrados: " + countFiltrados);
+        // Perform calculation in background to avoid UI lag and ensure correct filtered count
+        new Thread(() -> {
+            // 1. Get expected assets for current filter to update Gauge Logic
+            List<ActivoEntity> expected = activoDao.getActivosByFiltros(ua, ub, uc, ud, us);
+            
+            Set<String> expEpcs = new HashSet<>();
+            Set<String> expIds = new HashSet<>();
+            if (expected != null) {
+                for(ActivoEntity a : expected) {
+                    if(a.getTagEpc()!=null && !a.getTagEpc().trim().isEmpty()) expEpcs.add(a.getTagEpc().trim().toUpperCase());
+                    if(a.getIdActivo()!=null && !a.getIdActivo().trim().isEmpty()) expIds.add(a.getIdActivo().trim().toUpperCase());
+                }
+            }
+            int countFiltrados = expected != null ? expected.size() : 0;
 
-        String ubForA = baseUbicacionBId;
-        String ucForA = baseUbicacionCId;
-        String udForA = baseUbicacionDId;
+            // 2. Calculate Counts for Location levels
+            String ubForA = baseUbicacionBId;
+            String ucForA = baseUbicacionCId;
+            String udForA = baseUbicacionDId;
 
-        String ubForB = selectedUbicacionBId != null ? selectedUbicacionBId : baseUbicacionBId;
-        String ucForB = baseUbicacionCId;
-        String udForB = baseUbicacionDId;
+            String ubForB = selectedUbicacionBId != null ? selectedUbicacionBId : baseUbicacionBId;
+            String ucForB = baseUbicacionCId;
+            String udForB = baseUbicacionDId;
 
-        String ucForC = selectedUbicacionCId != null ? selectedUbicacionCId : baseUbicacionCId;
-        String udForC = baseUbicacionDId;
+            String ucForC = selectedUbicacionCId != null ? selectedUbicacionCId : baseUbicacionCId;
+            String udForC = baseUbicacionDId;
 
-        String udForD = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
+            String udForD = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
 
-        int countA = activoDao.countActivosByFiltros(ua, ubForA, ucForA, udForA);
-        int countB = activoDao.countActivosByFiltros(ua, ubForB, ucForB, udForB);
-        int countC = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForC);
-        int countD = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD);
-        int countS = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, us);
+            int countA = activoDao.countActivosByFiltros(ua, ubForA, ucForA, udForA);
+            int countB = activoDao.countActivosByFiltros(ua, ubForB, ucForB, udForB);
+            int countC = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForC);
+            int countD = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD);
+            int countS = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, us);
 
-        if (txtCountUbicacionA != null) txtCountUbicacionA.setText("Activos: " + countA);
-        if (txtCountUbicacionB != null) txtCountUbicacionB.setText("Activos: " + countB);
-        if (txtCountUbicacionC != null) txtCountUbicacionC.setText("Activos: " + countC);
-        if (txtCountUbicacionD != null) txtCountUbicacionD.setText("Activos: " + countD);
-        if (txtCountUbicacionSecundaria != null) txtCountUbicacionSecundaria.setText("Activos: " + countS);
+            runOnUiThread(() -> {
+                // Update Gauge Data
+                this.currentFilterExpectedEpcs = expEpcs;
+                this.currentFilterExpectedIds = expIds;
+                this.totalActivosInventario = countFiltrados;
+                
+                if (txtCountActivosFiltrados != null) txtCountActivosFiltrados.setText("Activos filtrados: " + countFiltrados);
+                updateGaugeDisplay();
 
-        Log.d(TAG, "refreshActivosList: base(A,B,C,D)=(" + baseUbicacionAId + "," + baseUbicacionBId + "," + baseUbicacionCId + "," + baseUbicacionDId + ")"
-            + " selected(A,B,C,D,S)=(" + selectedUbicacionAId + "," + selectedUbicacionBId + "," + selectedUbicacionCId + "," + selectedUbicacionDId + "," + selectedUbicacionSecundariaId + ")"
-            + " applied(A,B,C,D,S)=(" + ua + "," + ub + "," + uc + "," + ud + "," + us + ")"
-            + " countFiltrados=" + countFiltrados);
+                // Update Location Counts
+                if (txtCountUbicacionA != null) txtCountUbicacionA.setText("Activos: " + countA);
+                if (txtCountUbicacionB != null) txtCountUbicacionB.setText("Activos: " + countB);
+                if (txtCountUbicacionC != null) txtCountUbicacionC.setText("Activos: " + countC);
+                if (txtCountUbicacionD != null) txtCountUbicacionD.setText("Activos: " + countD);
+                if (txtCountUbicacionSecundaria != null) txtCountUbicacionSecundaria.setText("Activos: " + countS);
+            });
 
-        if (chkIncluirExternos != null && chkIncluirExternos.isChecked()) {
-            cargarActivosSpinner(null, null, null, null, null);
-        } else {
-            cargarActivosSpinner(ua, ub, uc, ud, us);
-        }
+            // 3. Load Spinner
+            
+            runOnUiThread(() -> {
+                if (chkIncluirExternos != null && chkIncluirExternos.isChecked()) {
+                    cargarActivosSpinner(null, null, null, null, null);
+                } else {
+                    cargarActivosSpinner(ua, ub, uc, ud, us);
+                }
+            });
+            
+        }).start();
     }
+    
     
     private void cargarActivosSpinner(String ua, String ub, String uc, String ud, String us) {
         Log.d(TAG, "cargarActivosSpinner: Filtros -> A:" + ua + " B:" + ub + " C:" + uc + " D:" + ud + " Sec:" + us);
@@ -833,6 +918,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             });
         }).start();
     }
+    
 
     private boolean isValidLocation(String loc) {
         return loc != null && !loc.trim().isEmpty() && !loc.trim().equalsIgnoreCase("NULL");
@@ -872,6 +958,75 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         return sb.toString();
     }
 
+    private void updateEpcDisplayCache(ActivoEntity a, String epc) {
+        if (a == null) return;
+        String display = buildActivoDisplay(a);
+        
+        // Cache by ID if available
+        if (a.getIdActivo() != null) {
+            epcToDisplayName.put(a.getIdActivo(), display);
+        }
+        // Cache by EPC as well for direct lookup
+        if (epc != null) {
+            epcToDisplayName.put(epc, display);
+        }
+    }
+
+    
+    private void agregarLecturaManualTexto() {
+        if (etManualInput == null) return;
+        String input = etManualInput.getText().toString().trim();
+        if (input.isEmpty()) {
+            Toast.makeText(this, "Ingrese Placa o EPC", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 1. Resolve Input to Activo to get real EPC if possible
+        ActivoEntity a = null;
+        // Try as EPC first
+        a = activoDao.getActivoByEpc(input);
+        
+        if (a == null) {
+             // Try as ID (Placa)
+             a = activoDao.getActivoById(input);
+        }
+
+        String targetEpc = input;
+        String activoId = null;
+
+        if (a != null) {
+            if (a.getTagEpc() != null && !a.getTagEpc().trim().isEmpty() && !a.getTagEpc().equalsIgnoreCase("EPC ASIGNADO")) {
+                targetEpc = a.getTagEpc().trim();
+            }
+            activoId = a.getIdActivo();
+        }
+
+        if (uniqueTags.contains(targetEpc)) {
+            Toast.makeText(this, "Este activo ya fue leído (" + targetEpc + ")", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        uniqueTags.add(targetEpc);
+        scannedTagsList.add(targetEpc);
+
+        if (activoId != null) {
+             manualEpcToActivoId.put(targetEpc, activoId);
+             updateEpcDisplayCache(a, targetEpc);
+             Toast.makeText(this, "Lectura añadida: " + (a.getDescripcionCorta() != null ? a.getDescripcionCorta() : targetEpc), Toast.LENGTH_SHORT).show();
+        } else {
+             Toast.makeText(this, "Lectura añadida: " + targetEpc, Toast.LENGTH_SHORT).show();
+        }
+
+        adapter.notifyDataSetChanged();
+        updateGaugeDisplay();
+        etManualInput.setText("");
+        
+        // Auto-save
+        new SaveLocalTask(false).execute();
+    }
+    
+
+    
     private void agregarLecturaManual() {
         if (listaActivosSpinner == null || listaActivosSpinner.isEmpty()) {
              Toast.makeText(this, "No hay activos cargados", Toast.LENGTH_SHORT).show();
@@ -892,7 +1047,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 epc = epcTrim;
             }
             
-            // Si el EPC ya existe (ya fue leÃ­do o agregado), generamos uno nuevo manual 
+            // Si el EPC ya existe (ya fue leído o agregado), generamos uno nuevo manual 
             // para permitir agregar varios del mismo tipo (o copias)
             if (uniqueTags.contains(epc)) {
                  String id = activo.getIdActivo() != null ? activo.getIdActivo().trim() : "";
@@ -906,18 +1061,22 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 scannedTagsList.add(epc);
                 if (activo.getIdActivo() != null) {
                     manualEpcToActivoId.put(epc, activo.getIdActivo());
+                    updateEpcDisplayCache(activo, epc);
                 }
                 adapter.notifyDataSetChanged();
                 updateGaugeDisplay();
-                Toast.makeText(this, "Lectura aÃ±adida: " + activo.getDescripcionCorta(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Lectura añadida: " + activo.getDescripcionCorta(), Toast.LENGTH_SHORT).show();
                 // Auto-save
                 new SaveLocalTask(false).execute();
             } else {
                 Log.d(TAG, "EPC duplicado: " + epc);
-                Toast.makeText(this, "Este activo ya fue leÃ­do", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Este activo ya fue leído", Toast.LENGTH_SHORT).show();
             }
         }
     }
+    
+
+
 
     private void updateTomasTabs() {
         new Thread(() -> {
@@ -1231,8 +1390,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             rfidHandler = TagWriter.getInstance();
             if (!rfidHandler.isInitialized()) {
                 rfidHandler.onCreate(this);
+            } else {
+                rfidHandler.setResponseHandler(this);
             }
-            rfidHandler.setResponseHandler(this);
         } catch (Exception e) {
             Log.e(TAG, "Error initializing RFID", e);
             Toast.makeText(this, "Error RFID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1243,7 +1403,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     protected void onResume() {
         super.onResume();
         if (rfidHandler != null) {
-            rfidHandler.onResume();
+            rfidHandler.setResponseHandler(this);
         }
     }
 
@@ -1251,7 +1411,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     protected void onPause() {
         super.onPause();
         if (rfidHandler != null) {
-            rfidHandler.onPause();
+            rfidHandler.stopRead();
         }
     }
 
@@ -1265,17 +1425,26 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     private void startScan() {
         if (rfidHandler != null) {
-            rfidHandler.performInventory();
-            isScanning = true;
-            updateUIState();
+            try {
+                rfidHandler.startRead();
+                isScanning = true;
+                updateUIState();
+            } catch (Exception e) {
+                Log.e(TAG, "Error starting scan", e);
+                Toast.makeText(this, "Error al iniciar lectura: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
     private void stopScan() {
         if (rfidHandler != null) {
-            rfidHandler.stopInventory();
-            isScanning = false;
-            updateUIState();
+            try {
+                rfidHandler.stopRead();
+                isScanning = false;
+                updateUIState();
+            } catch (Exception e) {
+                Log.e(TAG, "Error stopping scan", e);
+            }
         }
     }
 
@@ -1507,75 +1676,63 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     @Override
     public void handleTagdata(TagData[] tagData) {
-        if (tagData == null) return;
+        if (tagData == null || tagData.length == 0) return;
 
-        new Thread(() -> {
-            boolean newTagsFound = false;
+        runOnUiThread(() -> {
+            List<String> tagsToProcess = new ArrayList<>();
+            boolean listChanged = false;
+
             for (TagData tag : tagData) {
                 String epc = tag.getTagID();
                 if (epc != null && !uniqueTags.contains(epc)) {
-                    // Resolver nombre
-                    ActivoEntity activo = activoDao.getActivoByEpc(epc);
-                    String desc = (activo != null && activo.getDescripcionCorta() != null) ? activo.getDescripcionCorta() : "Desconocido";
-                    
-                    synchronized (uniqueTags) {
-                        if (!uniqueTags.contains(epc)) {
-                            uniqueTags.add(epc);
-                            // Operaciones de UI deben ir al main thread, pero recolectamos datos aquÃ­
-                            // Usamos un objeto temporal o actualizamos maps aquÃ­ (es safe si es concurrent map o synchronized, pero scannedTagsList es usado por adapter en main thread)
-                        }
-                    }
-                    // Add to map (safe to do here if map is thread safe or we sync, but better to prepare data and post)
-                    // Let's do a batch update on UI thread.
-                }
-            }
-        }).start();
-
-        // Revert to simple UI thread approach but querying DB inside it? 
-        // Or better: Query DB in background for NEW tags.
-        
-        // Revised approach:
-        new Thread(() -> {
-            final List<String> newEpcs = new ArrayList<>();
-            final java.util.Map<String, String> resolvedNames = new java.util.HashMap<>();
-            
-            for (TagData tag : tagData) {
-                String epc = tag.getTagID();
-                if (epc != null && !uniqueTags.contains(epc)) {
-                    newEpcs.add(epc);
-                    ActivoEntity activo = activoDao.getActivoByEpc(epc);
-                    String desc = (activo != null && activo.getDescripcionCorta() != null) ? activo.getDescripcionCorta() : "Desconocido";
-                    resolvedNames.put(epc, desc + " - " + epc);
+                    uniqueTags.add(epc);
+                    scannedTagsList.add(epc);
+                    tagsToProcess.add(epc);
+                    listChanged = true;
                 }
             }
 
-            if (!newEpcs.isEmpty()) {
-                runOnUiThread(() -> {
-                    boolean changed = false;
-                    for (String epc : newEpcs) {
-                        if (!uniqueTags.contains(epc)) {
-                            uniqueTags.add(epc);
-                            scannedTagsList.add(epc);
-                            epcToDisplayName.put(epc, resolvedNames.get(epc));
-                            changed = true;
+            if (listChanged) {
+                adapter.notifyDataSetChanged();
+                updateGaugeDisplay();
+
+                if (!tagsToProcess.isEmpty()) {
+                    new Thread(() -> {
+                        boolean cacheUpdated = false;
+                        for (String epc : tagsToProcess) {
+                            ActivoEntity activo = activoDao.getActivoByEpc(epc);
+                            if (activo != null) {
+                                String desc = (activo.getDescripcionCorta() != null) ? activo.getDescripcionCorta() : "Desconocido";
+                                String display = desc + " - " + epc;
+                                epcToDisplayName.put(epc, display);
+                                if (activo.getIdActivo() != null) {
+                                    manualEpcToActivoId.put(epc, activo.getIdActivo());
+                                }
+                                cacheUpdated = true;
+                            }
                         }
-                    }
-                    if (changed) {
-                        adapter.notifyDataSetChanged();
-                        updateGaugeDisplay();
-                    }
-                });
+                        if (cacheUpdated) {
+                            runOnUiThread(() -> {
+                                adapter.notifyDataSetChanged();
+                                updateGaugeDisplay();
+                                new SaveLocalTask(false).execute();
+                            });
+                        }
+                    }).start();
+                }
             }
-        }).start();
+        });
     }
 
     @Override
     public void handleTriggerPress(boolean pressed) {
-        if (pressed) {
-            startScan();
-        } else {
-            stopScan();
-        }
+        runOnUiThread(() -> {
+            if (pressed) {
+                startScan();
+            } else {
+                stopScan();
+            }
+        });
     }
 
     @Override

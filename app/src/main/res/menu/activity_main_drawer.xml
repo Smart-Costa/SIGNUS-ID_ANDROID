@@ -134,5 +134,16 @@
             android:visible="false"
             android:background="@color/blanco" />
 
+        <item
+            android:id="@+id/sub_ver_activos_bd"
+            android:title=" o Ver Activos BD Local"
+            android:visible="false"
+            android:background="@color/blanco" />
+
+        <item
+            android:id="@+id/sub_limpiar_bd"
+            android:title=" o Limpiar Base de Datos"
+            android:visible="false"
+            android:background="@color/blanco" />
     </group>
 </menu>

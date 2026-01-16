@@ -74,6 +74,8 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
     int contadorActivosFaltantes = 0, contActivosEncontrados = 0, contadorActivosSobrantes = 0;
     private RecyclerView ListaLectura;
     private EditText txtEncontrados, txtSobrantes, txtFaltantes, txtLeidas, txtBarcode, txtUbicacion;
+    private EditText etManualInput;
+    private Button btnManualAdd;
     public int CantidadEPCLeida, EPCEncontrados, EPCSobrantes, EPCActivosUbicacion, EPCFaltantes;
     OfficesDBHelper OfficesDBHelper;
     private Button GuardarRessultado;
@@ -118,6 +120,11 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
     private Button btnVerEncontrados, btnVerFaltantes, btnVerSobrantes;
     private String currentStatusFilter = "Todos";
     
+    // Bottom Navbar
+    private android.widget.LinearLayout btnPotencia, btnIniciar, btnSubir;
+    private android.widget.ImageView iconIniciar;
+    private TextView txtIniciar;
+
     private String currentIdSubToma;
     private com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao subTomasDao;
     private com.example.diverscan.activeid.data.local.dao.TomaFisicaDetallesDao detallesDao;
@@ -673,6 +680,8 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
         txtUbicacion = findViewById(R.id.txtUbicacion);
         GuardarRessultado = findViewById(R.id.btn_GuardarToma);
         txtBarcode = findViewById(R.id.txt_barcode);
+        etManualInput = findViewById(R.id.etManualInput);
+        btnManualAdd = findViewById(R.id.btnManualAdd);
         inventoryDBHelper = new InventoryDBHelper(LecturaInventarioView.getContext());
         AssetsDBHelper = new AssetsDBHelper(_context);
         OfficesDBHelper = new OfficesDBHelper(_context);
@@ -694,7 +703,43 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
                 }
             });
         }
+        
+        if (btnManualAdd != null) {
+            btnManualAdd.setOnClickListener(v -> {
+                String input = etManualInput.getText().toString().trim();
+                if (!input.isEmpty()) {
+                    AgregarActivoManual(input);
+                    etManualInput.setText("");
+                } else {
+                    Toast.makeText(_context, "Ingrese Placa o EPC", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
         GuardarRessultado.setOnClickListener(OnClickListenerGuardarResultado);
+        
+        // New Bottom Nav Listeners
+        if (btnSubir != null) {
+            btnSubir.setOnClickListener(v -> {
+                if (GuardarRessultado != null) GuardarRessultado.performClick();
+            });
+        }
+
+        if (btnPotencia != null) {
+            btnPotencia.setOnClickListener(v -> {
+                Intent intent = new Intent(Lectura_Inventario.this, com.example.diverscan.activeid.GeneralTag.ConfiguracionAntena.class);
+                startActivity(intent);
+            });
+        }
+
+        if (btnIniciar != null) {
+            btnIniciar.setOnClickListener(v -> {
+                if (OnRfid != null) {
+                    OnRfid.setChecked(!OnRfid.isChecked());
+                }
+            });
+        }
+
         txtFaltantes.setText(String.valueOf(contadorActivosFaltantes));
         txtSobrantes.setText(String.valueOf(contadorActivosSobrantes));
         txtEncontrados.setText(String.valueOf(contActivosEncontrados));
@@ -720,11 +765,23 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
         });
     }
 
+    private void updateIniciarButton(boolean isRunning) {
+        if (txtIniciar != null && iconIniciar != null) {
+            if (isRunning) {
+                txtIniciar.setText("Detener");
+                iconIniciar.setImageResource(R.drawable.ic_nfc); // Or stop icon
+            } else {
+                txtIniciar.setText("Iniciar");
+                iconIniciar.setImageResource(R.drawable.ic_nfc);
+            }
+        }
+    }
+
     private void AgregarActivoPlaca(String placa) {
         // Validar si el activo existe en la base de datos local (por Placa o EPC)
         ActivoEntity activo = activoDao.getActivoById(placa); // Busca por NUMERO_ACTIVO
         if (activo == null) {
-            activo = activoDao.getActivoByEpc(placa); // Busca por TAG_EPC
+            activo = activoDao.getActivoByEpc(placa); // Busca por EPC
         }
 
         if (activo != null) {
@@ -834,7 +891,9 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
 
         List<ActivoEntity> candidatos = new ArrayList<>();
         for (ActivoEntity a : todos) {
-            if (!epcExcluidos.contains(a.getTagEpc())) {
+            // Usar getEpc() en lugar de getTagEpc() ya que TAG_EPC es un flag
+            String epcReal = a.getEpc();
+            if (epcReal != null && !epcExcluidos.contains(epcReal)) {
                 candidatos.add(a);
             }
         }
@@ -842,7 +901,7 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
         String epcSimulado;
         if (!candidatos.isEmpty()) {
             int randomIndex = new java.util.Random().nextInt(candidatos.size());
-            epcSimulado = candidatos.get(randomIndex).getTagEpc();
+            epcSimulado = candidatos.get(randomIndex).getEpc();
         } else {
             // Generar uno totalmente ficticio
             epcSimulado = "E200" + UUID.randomUUID().toString().replace("-", "").substring(0, 20).toUpperCase();
@@ -920,6 +979,7 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
     Switch.OnCheckedChangeListener AccionRFID = new Switch.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+            updateIniciarButton(isChecked);
             if (isChecked) {
                 MostrarProgressDialog("Encendiendo RFID");
             } else {

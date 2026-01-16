@@ -46,7 +46,7 @@ public class ItemAdapterAssets extends ArrayAdapter {
         oficina.setText(assets.get(position).getOficina());
 
         TextView tag = (TextView) item.findViewById(R.id.tagL);
-        tag.setText(assets.get(position).getTag());
+        tag.setText(assets.get(position).getEpc());
 
         return item;
 

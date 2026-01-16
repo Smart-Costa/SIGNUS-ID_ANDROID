@@ -1,15 +1,11 @@
 package com.example.diverscan.activeid.data.remote.response;
 
 import com.google.gson.annotations.SerializedName;
+import java.util.List;
 
-public class ActivoReubicacionDto {
-    public String idActivo;
+public class TomaNovedadDto {
     public String tomaFisicaId;
-    public String placa;
-    public String descripcion;
-    public String serial;
-    public String ubicacionActual;
-    public String ubicacionDestino;
     @SerializedName(value = "nombreToma", alternate = {"NombreToma"})
     public String nombreToma;
+    public List<ActivoReubicacionDto> activos;
 }
