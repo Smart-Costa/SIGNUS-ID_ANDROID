@@ -74,8 +74,8 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     public void onCreate(ResponseHandlerInterface activity)
     {
         responseHandlerInterface = activity;
-        // Use ApplicationContext to prevent memory leaks and crashes on Activity destruction
-        context = activity.GetContext().getApplicationContext();
+        // Use Activity Context directly as some SDK versions require it for UI/Service binding
+        context = activity.GetContext();
         
         Power = SharedPreferencesGetSet.leer_local("potenciaAntena", context);
         try {
@@ -470,18 +470,37 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
         this.currentTransport = transport;
     }
 
+    private boolean validationMode = false;
+
+    public void setValidationMode(boolean enabled) {
+        this.validationMode = enabled;
+    }
+
+    private void log(String msg) {
+        Log.d(TAG, msg);
+        if (responseHandlerInterface != null && validationMode) {
+            // Send to UI (assuming SetMessage can handle it or we add a new method)
+            // For now, we prepend "LOG:" so the Activity knows it's a log entry
+            responseHandlerInterface.SetMessage("LOG: " + msg);
+        }
+    }
+
     public void InitSDK()
     {
-        Log.d(TAG, "InitSDK");
+        log("InitSDK - Iniciando SDK");
+        log("Configuración: AutoDetect=" + autoDetect + ", Transporte=" + currentTransport);
+        
         if(responseHandlerInterface != null)
             responseHandlerInterface.SetMessage("Iniciando búsqueda de lectores (" + currentTransport.toString() + ")...");
 
         // Forzar limpieza si cambiamos de transporte o queremos re-escanear
         if (readers != null) {
             try {
+                log("Disposing previous readers instance...");
                 readers.Dispose();
             } catch (Exception e) {
                 e.printStackTrace();
+                log("Error disposing readers: " + e.getMessage());
             }
             readers = null;
         }
@@ -494,73 +513,105 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     private class CreateInstanceTask extends AsyncTask<Void, Void, Void>{
         @Override
         protected Void doInBackground(Void... voids){
-            Log.d(TAG, "CreateInstanceTask. AutoDetect: " + autoDetect + ", Transport: " + currentTransport);
+            log("CreateInstanceTask running in background");
             
-            if (autoDetect) {
-                // 1. Try Serial (eConnex) first
-                try {
-                    readers = new Readers(context, ENUM_TRANSPORT.SERVICE_SERIAL);
-                    availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                    if (availableRFIDReaderList != null && !availableRFIDReaderList.isEmpty()) {
-                        currentTransport = ENUM_TRANSPORT.SERVICE_SERIAL;
-                        Log.d(TAG, "Found reader on SERVICE_SERIAL");
-                        return null;
-                    }
-                } catch (Exception e) {
-                    Log.d(TAG, "Serial check failed or no readers: " + e.getMessage());
-                }
+            if (readers == null) {
+                 try {
+                     if (autoDetect) {
+                         // Try Serial first
+                         log("AutoDetect: Trying SERVICE_SERIAL...");
+                         try {
+                             readers = new Readers(context, ENUM_TRANSPORT.SERVICE_SERIAL);
+                             log("Readers(SERIAL) instantiated");
+                             availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
+                             log("GetAvailableRFIDReaderList(SERIAL) called");
+                             
+                             if (isValidList(availableRFIDReaderList)) {
+                                 log("Found readers via SERIAL");
+                                 return null;
+                             }
+                         } catch (Exception e) {
+                             log("Serial check failed: " + e.getMessage());
+                         }
+                         
+                         // Try Bluetooth
+                         log("AutoDetect: Trying BLUETOOTH...");
+                         if (readers != null) { 
+                             try { readers.Dispose(); } catch (Exception e) {} 
+                             readers = null;
+                         }
+                         
+                         try {
+                             readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
+                             log("Readers(BLUETOOTH) instantiated");
+                             availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
+                             
+                             if (isValidList(availableRFIDReaderList)) {
+                                 log("Found readers via BLUETOOTH");
+                                 return null;
+                             }
+                         } catch (Exception e) {
+                             log("Bluetooth check failed: " + e.getMessage());
+                         }
 
-                // 2. Try USB
-                try {
-                    if (readers != null) {
-                        try { readers.Dispose(); } catch(Exception e){}
-                        readers = null;
-                    }
-                    readers = new Readers(context, ENUM_TRANSPORT.SERVICE_USB);
-                    availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                    if (availableRFIDReaderList != null && !availableRFIDReaderList.isEmpty()) {
-                        currentTransport = ENUM_TRANSPORT.SERVICE_USB;
-                        Log.d(TAG, "Found reader on SERVICE_USB");
-                        return null;
-                    }
-                } catch (Exception e) {
-                    Log.d(TAG, "USB check failed or no readers: " + e.getMessage());
-                }
-
-                // 3. Try Bluetooth (Fallback)
-                try {
-                    if (readers != null) {
-                        try { readers.Dispose(); } catch(Exception e){}
-                        readers = null;
-                    }
-                    readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
-                    availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                    currentTransport = ENUM_TRANSPORT.BLUETOOTH;
-                    Log.d(TAG, "Fallback to BLUETOOTH");
-                } catch (InvalidUsageException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else {
-                // Strict mode: Use currentTransport only
-                try {
-                    readers = new Readers(context, currentTransport);
-                    availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    if (responseHandlerInterface != null) {
-                        responseHandlerInterface.SetMessage("Error crítico InitSDK: " + e.toString());
-                    }
-                }
+                         // Try USB (Explicit)
+                         log("AutoDetect: Trying SERVICE_USB...");
+                         if (readers != null) { 
+                             try { readers.Dispose(); } catch (Exception e) {} 
+                             readers = null;
+                         }
+                         
+                         try {
+                             readers = new Readers(context, ENUM_TRANSPORT.SERVICE_USB);
+                             log("Readers(USB) instantiated");
+                             availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
+                             
+                             if (isValidList(availableRFIDReaderList)) {
+                                 log("Found readers via USB");
+                                 return null;
+                             }
+                         } catch (Exception e) {
+                             log("USB check failed: " + e.getMessage());
+                         }
+                         
+                     } else {
+                         // Specific transport
+                         log("Using specific transport: " + currentTransport);
+                         readers = new Readers(context, currentTransport);
+                         availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
+                         log("GetAvailableRFIDReaderList returned " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : "null") + " devices");
+                     }
+                 } catch (Exception e) {
+                     log("Error in CreateInstanceTask (General): " + e.getMessage());
+                     e.printStackTrace();
+                 }
             }
             return null;
         }
+        
+        private boolean isValidList(ArrayList<ReaderDevice> list) {
+            return list != null && !list.isEmpty();
+        }
 
         @Override
-        protected void onPostExecute(Void aVoid){
+        protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            new ConnectionTask().execute();
+            log("CreateInstanceTask finished");
+            
+            if (availableRFIDReaderList != null && !availableRFIDReaderList.isEmpty()) {
+                // get first reader from list
+                readerDevice = availableRFIDReaderList.get(0);
+                reader = readerDevice.getRFIDReader();
+                log("Selected reader: " + readerDevice.getName() + " (" + readerDevice.getAddress() + ")");
+                
+                if (reader != null) { 
+                    connect();
+                }
+            } else {
+                log("No se encontraron lectores disponibles.");
+                if (responseHandlerInterface != null)
+                    responseHandlerInterface.SetMessage("No se encontraron lectores. Verifique DataWedge o Bluetooth.");
+            }
         }
     }
 

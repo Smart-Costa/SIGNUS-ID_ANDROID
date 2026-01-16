@@ -104,6 +104,8 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
         btnTestMulti.setOnClickListener(v -> toggleMultiRead());
 
         updateUI();
+        
+        log("INFO: Si usa DataWedge, asegúrese de que el perfil para esta app tenga el Plugin RFID DESHABILITADO para permitir conexión directa por SDK.");
     }
 
     @Override
@@ -111,6 +113,7 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
         super.onResume();
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
+            rfidHandler.setValidationMode(true);
         }
         updateUI();
     }
@@ -118,6 +121,9 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     @Override
     protected void onPause() {
         super.onPause();
+        if (rfidHandler != null) {
+            rfidHandler.setValidationMode(false);
+        }
         // Don't nullify handler here if we want background updates, 
         // but for safety in this app structure:
         // if (rfidHandler != null) rfidHandler.setResponseHandler(null);
