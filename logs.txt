@@ -1,65 +1,21 @@
-2026-01-16 09:55:16.099 14076-14076 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
-2026-01-16 09:55:16.107 14076-14076 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_USB
-2026-01-16 09:55:16.118 14076-14076 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  java.lang.NullPointerException: Attempt to invoke virtual method 'void com.zebra.rfid.api3.TransportAbstract.Disconnect()' on a null object reference
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.API3TransportWrapper.Disconnect(API3TransportWrapper.java:217)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.Readers.Dispose(r8-map-id-bca5fc8b8792651bb9ee6694df90dd8142efc2a69e42ac4fdc3ae2bfb5dec52b:4)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at com.example.diverscan.activeid.GeneralTag.TagWriter.InitSDK(TagWriter.java:500)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity.lambda$onCreate$0(ConnectionValidationActivity.java:100)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity.$r8$lambda$QYZqXht8OKdZ2fA-T7MDYtggn2Y(Unknown Source:0)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity$$ExternalSyntheticLambda1.onClick(D8$$SyntheticClass:0)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at android.view.View.performClick(View.java:7506)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at com.google.android.material.button.MaterialButton.performClick(MaterialButton.java:1218)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at android.view.View.performClickInternal(View.java:7483)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at android.view.View.-$$Nest$mperformClickInternal(Unknown Source:0)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at android.view.View$PerformClick.run(View.java:29361)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at android.os.Handler.handleCallback(Handler.java:942)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at android.os.Handler.dispatchMessage(Handler.java:99)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at android.os.Looper.loopOnce(Looper.java:201)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at android.os.Looper.loop(Looper.java:288)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at android.app.ActivityThread.main(ActivityThread.java:7930)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at java.lang.reflect.Method.invoke(Native Method)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:548)
-2026-01-16 09:55:16.122 14076-14076 System.err              com.example.diverscan.activeid       W  	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:942)
-2026-01-16 09:55:16.122 14076-14076 RFID_SAMPLE             com.example.diverscan.activeid       D  Error disposing readers: Attempt to invoke virtual method 'void com.zebra.rfid.api3.TransportAbstract.Disconnect()' on a null object reference
-2026-01-16 09:55:16.126 14076-14151 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
-2026-01-16 09:55:16.127 14076-14151 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_USB
-2026-01-16 09:55:16.143 14076-14151 RFID_SAMPLE             com.example.diverscan.activeid       D  Error in CreateInstanceTask (General): Error while instantiating Transport class 
-2026-01-16 09:55:16.143 14076-14151 System.err              com.example.diverscan.activeid       W  java.lang.RuntimeException: Error while instantiating Transport class 
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.API3TransportWrapper.initTransport(API3TransportWrapper.java:200)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.API3TransportWrapper.AssignMethods(API3TransportWrapper.java:65)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.API3Wrapper.AssignMethods(API3Wrapper.java:39)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.RFIDReader.initRFID(r8-map-id-bca5fc8b8792651bb9ee6694df90dd8142efc2a69e42ac4fdc3ae2bfb5dec52b:22)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.RFIDReader.<init>(r8-map-id-bca5fc8b8792651bb9ee6694df90dd8142efc2a69e42ac4fdc3ae2bfb5dec52b:256)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.Readers.loadUsbDevices(r8-map-id-bca5fc8b8792651bb9ee6694df90dd8142efc2a69e42ac4fdc3ae2bfb5dec52b:11)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.Readers.GetAvailableRFIDReaderList(r8-map-id-bca5fc8b8792651bb9ee6694df90dd8142efc2a69e42ac4fdc3ae2bfb5dec52b:23)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.example.diverscan.activeid.GeneralTag.TagWriter$CreateInstanceTask.doInBackground(TagWriter.java:581)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.example.diverscan.activeid.GeneralTag.TagWriter$CreateInstanceTask.doInBackground(TagWriter.java:513)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at android.os.AsyncTask$3.call(AsyncTask.java:394)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at java.lang.Thread.run(Thread.java:1563)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  Caused by: java.lang.NoClassDefFoundError: Failed resolution of: Lcom/zebra/rfidhost/IRFIDHostCallBack$Stub;
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.API3UsbService.<init>(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:122)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.API3UsbService.getInstance(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:2)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.TransportUsbSerial.<init>(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:2)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at java.lang.reflect.Constructor.newInstance0(Native Method)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at java.lang.reflect.Constructor.newInstance(Constructor.java:343)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.API3TransportWrapper.initTransport(API3TransportWrapper.java:195)
-2026-01-16 09:55:16.144 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.API3TransportWrapper.AssignMethods(API3TransportWrapper.java:65)
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.API3Wrapper.AssignMethods(API3Wrapper.java:39)
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.RFIDReader.initRFID(r8-map-id-bca5fc8b8792651bb9ee6694df90dd8142efc2a69e42ac4fdc3ae2bfb5dec52b:22)
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.RFIDReader.<init>(r8-map-id-bca5fc8b8792651bb9ee6694df90dd8142efc2a69e42ac4fdc3ae2bfb5dec52b:256)
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.Readers.loadUsbDevices(r8-map-id-bca5fc8b8792651bb9ee6694df90dd8142efc2a69e42ac4fdc3ae2bfb5dec52b:11)
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.zebra.rfid.api3.Readers.GetAvailableRFIDReaderList(r8-map-id-bca5fc8b8792651bb9ee6694df90dd8142efc2a69e42ac4fdc3ae2bfb5dec52b:23)
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	at com.example.diverscan.activeid.GeneralTag.TagWriter$CreateInstanceTask.doInBackground(TagWriter.java:567)
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	... 7 more
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  Caused by: java.lang.ClassNotFoundException: Didn't find class "com.zebra.rfidhost.IRFIDHostCallBack$Stub" on path: DexPathList[[zip file "/data/app/~~cYVgkyw5XimajWbroubg4A==/com.example.diverscan.activeid-9OojrH9mO62GS-jHtyefMw==/base.apk"],nativeLibraryDirectories=[/data/app/~~cYVgkyw5XimajWbroubg4A==/com.example.diverscan.activeid-9OojrH9mO62GS-jHtyefMw==/lib/arm64, /system/lib64, /system_ext/lib64]]
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:259)
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	at java.lang.ClassLoader.loadClass(ClassLoader.java:642)
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	at java.lang.ClassLoader.loadClass(ClassLoader.java:578)
-2026-01-16 09:55:16.145 14076-14151 System.err              com.example.diverscan.activeid       W  	... 20 more
-2026-01-16 09:55:16.149 14076-14076 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
-2026-01-16 09:55:16.151 14076-14076 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.
+2026-01-16 10:06:42.180 18963-18963 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
+2026-01-16 10:06:42.182 18963-18963 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_USB
+2026-01-16 10:06:42.187 18963-18963 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
+2026-01-16 10:06:42.194 18963-19220 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
+2026-01-16 10:06:42.195 18963-19220 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_USB
+2026-01-16 10:06:42.199 18963-19220 protocol val is         com.example.diverscan.activeid       E  ASCII
+2026-01-16 10:06:42.199 18963-19220 IRFIDError              com.example.diverscan.activeid       D  RfidUsbMgr: connection failed: device not found
+2026-01-16 10:06:42.200 18963-19220 RFID_SAMPLE             com.example.diverscan.activeid       D  GetAvailableRFIDReaderList returned 0 devices
+2026-01-16 10:06:42.213 18963-18963 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
+2026-01-16 10:06:42.214 18963-18963 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.
+
+caso serial
+
+2026-01-16 10:08:55.820 20002-20002 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
+2026-01-16 10:08:55.823 20002-20002 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_SERIAL
+2026-01-16 10:08:55.833 20002-20002 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
+2026-01-16 10:08:55.843 20002-20151 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
+2026-01-16 10:08:55.844 20002-20151 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_SERIAL
+2026-01-16 10:08:55.847 20002-20151 RFID_SAMPLE             com.example.diverscan.activeid       D  GetAvailableRFIDReaderList returned 0 devices
+2026-01-16 10:08:55.854 20002-20002 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
+2026-01-16 10:08:55.855 20002-20002 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.
