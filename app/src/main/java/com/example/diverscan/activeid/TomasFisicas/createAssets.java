@@ -40,6 +40,9 @@ import com.example.diverscan.activeid.Piso.PisoNuevo;
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.RazonSocial.RazonNuevo;
 import com.example.diverscan.activeid.RazonSocial.RazonSocialDBHelper;
+import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
+import com.example.diverscan.activeid.GeneralTag.TagWriter;
+import com.zebra.rfid.api3.TagData;
 import com.example.diverscan.activeid.sqlite.newAssets;
 
 import java.text.SimpleDateFormat;
@@ -51,7 +54,7 @@ import java.util.Map;
 
 import static com.example.diverscan.activeid.R.id.lbl_numero_activo_crea;
 
-public class createAssets extends AppCompatActivity
+public class createAssets extends AppCompatActivity implements ResponseHandlerInterface
 {
 
     private RadioButton radio_PlacaView;
@@ -86,7 +89,7 @@ public class createAssets extends AppCompatActivity
     private EditText txtDetalleEstado;
     private Spinner spEstadoConservacion;
     Button btn_Crear;
-
+    private TagWriter rfidHandler;
 
     private String[] strEstadoConservacion;
     private List<String> listaEstadoConservacion;
@@ -125,6 +128,15 @@ public class createAssets extends AppCompatActivity
         setContentView(R.layout.activity_nuevo_activo);
         _activity = this;
         controles();
+        
+        // Inicializar RFID
+        rfidHandler = TagWriter.getInstance();
+        if (!rfidHandler.isInitialized()) {
+            rfidHandler.onCreate(this);
+        } else {
+            rfidHandler.setResponseHandler(this);
+        }
+
         eventos();
         cargarRazonesSociales();
         cargarUbicaciones();
@@ -134,6 +146,75 @@ public class createAssets extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(this);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (rfidHandler != null) {
+            rfidHandler.stopRead();
+        }
+    }
+
+    // --- ResponseHandlerInterface Implementation ---
+
+    @Override
+    public void handleTagdata(TagData[] tagData) {
+        if (tagData == null || tagData.length == 0) return;
+
+        // Validar si vienen múltiples tags (opcional, pero para creación suele ser uno a uno)
+        if (tagData.length > 1) {
+            runOnUiThread(() -> {
+                rfidHandler.stopRead();
+                Toast.makeText(this, "Múltiples etiquetas detectadas. Acerque solo el activo a etiquetar.", Toast.LENGTH_LONG).show();
+            });
+            return;
+        }
+
+        runOnUiThread(() -> {
+            for (TagData tag : tagData) {
+                if (tag.getTagID() != null && !tag.getTagID().isEmpty()) {
+                    // Lógica de lectura ÚNICA
+                    EPCView.setText(tag.getTagID());
+                    rfidHandler.stopRead();
+                    Toast.makeText(this, "Etiqueta leída correctamente", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+            }
+        });
+    }
+
+    @Override
+    public void handleTriggerPress(boolean pressed) {
+        runOnUiThread(() -> {
+            if (pressed) {
+                // Limpiar campo previo si se desea
+                EPCView.setText("");
+                rfidHandler.startRead();
+            } else {
+                rfidHandler.stopRead();
+            }
+        });
+    }
+
+    @Override
+    public void SetMessage(String message) {
+         // Opcional: Mostrar logs o toasts de depuración
+    }
+
+    @Override
+    public android.content.Context GetContext() {
+        return this;
+    }
+    // --- Fin Interface ---
+    
     //*******************************************************************************
     private void controles()
     {

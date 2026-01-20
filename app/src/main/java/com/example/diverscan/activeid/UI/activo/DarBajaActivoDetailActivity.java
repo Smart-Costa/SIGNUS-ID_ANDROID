@@ -36,16 +36,9 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
             rfidHandler.setResponseHandler(this);
         }
 
-        binding.opcRFID.setOnClickListener(v -> {
-            if (!rfidHandler.isConnected()) {
-                rfidHandler.InitSDK();
-            } else {
-                Toast.makeText(this, "Lector ya conectado", Toast.LENGTH_SHORT).show();
-                rfidHandler.startRead();
-            }
-        });
-
         initEvents();
+        // Estado inicial: RFID seleccionado por defecto
+        setInputMode(3);
     }
 
     @Override
@@ -72,6 +65,9 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
     public void handleTagdata(TagData[] tagData) {
         if (tagData == null || tagData.length == 0) return;
         
+        // Si no está en modo RFID, ignorar lecturas
+        if (!binding.opcRFID.isChecked()) return;
+
         // Validar si vienen múltiples tags en la misma lectura
         if (tagData.length > 1) {
             runOnUiThread(() -> {
@@ -95,6 +91,9 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
 
     @Override
     public void handleTriggerPress(boolean pressed) {
+        // Si no está en modo RFID, ignorar gatillo
+        if (!binding.opcRFID.isChecked()) return;
+
         runOnUiThread(() -> {
             if (pressed) {
                 rfidHandler.startRead();
@@ -122,6 +121,10 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         if (epc == null || epc.trim().isEmpty()) {
             return;
         }
+        
+        // Validación adicional de modo
+        if (!binding.opcRFID.isChecked()) return;
+
         if (activoLeido != null) {
             // Verificar contra el EPC real, no contra el TAG_EPC que puede ser "EPC Asignado"
             String storedEpc = activoLeido.getEpc();
@@ -135,17 +138,7 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         ActivoEntity activo = activoDAO.getActivoByEpc(epc);
         if (activo != null) {
             mostrarNotificacionActivo(epc, activo.getNumeroActivo(), activo.getDescripcionCorta(), true);
-            if (activo.getEstadoActivo() != null && !activo.getEstadoActivo()) {
-                Toast.makeText(this, "El activo ya se encuentra dado de baja", Toast.LENGTH_LONG).show();
-                rfidHandler.stopRead();
-                return;
-            }
-
-            activoLeido = activo;
-            binding.txtNumeroActivo.setText(activo.getNumeroActivo());
-            binding.txtNumeroEtiqueta.setText(activo.getNumeroEtiqueta());
-            binding.txtDescripcionCorta.setText(activo.getDescripcionCorta());
-            binding.txtDescripcionRazon.setText("Lectura RFID exitosa");
+            cargarDatosActivo(activo);
             rfidHandler.stopRead();
         } else {
             rfidHandler.stopRead();
@@ -168,25 +161,125 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
     }
 
     private void initEvents() {
-        binding.btnGuardar.setOnClickListener(view -> {
-            if (activoLeido == null || activoLeido.getIdActivo() == null || activoLeido.getIdActivo().trim().isEmpty()) {
-                Toast.makeText(this, "Primero lea un TAG RFID para buscar el activo", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        // Checkbox listeners para exclusividad
+        binding.opcTeclado.setOnClickListener(v -> setInputMode(1));
+        binding.opcScanner.setOnClickListener(v -> setInputMode(2));
+        binding.opcRFID.setOnClickListener(v -> setInputMode(3));
 
-            activoLeido.setEstadoActivo(Boolean.FALSE);
-            int updated = activoDAO.updateEstadoActivo(activoLeido);
-            if (updated > 0) {
-                Toast.makeText(this, "Activo dado de baja", Toast.LENGTH_SHORT).show();
-                activoLeido = null;
-                binding.txtNumeroActivo.setText("");
-                binding.txtNumeroEtiqueta.setText("");
-                binding.txtDescripcionCorta.setText("");
-                binding.txtDescripcionRazon.setText("");
-                rfidHandler.startRead();
-            } else {
-                Toast.makeText(this, "No se pudo dar de baja el activo", Toast.LENGTH_SHORT).show();
+        // Listener para búsqueda manual al perder foco o dar Enter (IME Action)
+        binding.txtNumeroActivo.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH ||
+                actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
+                buscarActivoPorNumero(binding.txtNumeroActivo.getText().toString());
+                return true;
+            }
+            return false;
+        });
+
+        binding.txtNumeroActivo.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus && binding.opcTeclado.isChecked()) {
+                buscarActivoPorNumero(binding.txtNumeroActivo.getText().toString());
             }
         });
+
+        binding.btnGuardar.setOnClickListener(view -> confirmarBaja());
+    }
+
+    private void setInputMode(int mode) {
+        // 1: Teclado, 2: Scanner, 3: RFID
+        binding.opcTeclado.setChecked(mode == 1);
+        binding.opcScanner.setChecked(mode == 2);
+        binding.opcRFID.setChecked(mode == 3);
+
+        boolean isKeyboard = (mode == 1);
+        binding.txtNumeroActivo.setEnabled(isKeyboard);
+        binding.txtNumeroActivo.setFocusable(isKeyboard);
+        binding.txtNumeroActivo.setFocusableInTouchMode(isKeyboard);
+        
+        if (!isKeyboard) {
+            binding.txtNumeroActivo.clearFocus();
+            // Ocultar teclado
+            android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) imm.hideSoftInputFromWindow(binding.txtNumeroActivo.getWindowToken(), 0);
+        }
+
+        // Si cambiamos de modo y no es RFID, paramos lectura
+        if (mode != 3 && rfidHandler != null) {
+            rfidHandler.stopRead();
+        }
+    }
+
+    private void buscarActivoPorNumero(String numero) {
+        if (numero == null || numero.trim().isEmpty()) return;
+        
+        ActivoEntity activo = activoDAO.getActivoById(numero.trim());
+        if (activo != null) {
+            cargarDatosActivo(activo);
+        } else {
+            Toast.makeText(this, "Activo no encontrado con número: " + numero, Toast.LENGTH_SHORT).show();
+            limpiarCampos(false);
+        }
+    }
+
+    private void cargarDatosActivo(ActivoEntity activo) {
+        if (activo.getEstadoActivo() != null && !activo.getEstadoActivo()) {
+             Toast.makeText(this, "El activo ya se encuentra dado de baja", Toast.LENGTH_LONG).show();
+        }
+        
+        activoLeido = activo;
+        binding.txtNumeroActivo.setText(activo.getNumeroActivo());
+        binding.txtNumeroEtiqueta.setText(activo.getNumeroEtiqueta());
+        binding.txtDescripcionCorta.setText(activo.getDescripcionCorta());
+        binding.txtDescripcionRazon.setText(""); 
+        
+        if (binding.opcRFID.isChecked()) {
+            binding.txtDescripcionRazon.setText("Lectura RFID exitosa");
+        } else if (binding.opcTeclado.isChecked()) {
+            binding.txtDescripcionRazon.requestFocus();
+        }
+    }
+
+    private void confirmarBaja() {
+        if (activoLeido == null || activoLeido.getIdActivo() == null) {
+            Toast.makeText(this, "Primero debe identificar un activo", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        String razon = binding.txtDescripcionRazon.getText().toString();
+        if (razon.trim().isEmpty()) {
+            binding.txtDescripcionRazon.setError("Debe ingresar un motivo para la baja");
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+            .setTitle("Confirmar Baja")
+            .setMessage("¿Está seguro de dar de baja el activo " + activoLeido.getNumeroActivo() + "?")
+            .setPositiveButton("Sí", (dialog, which) -> ejecutarBaja(razon))
+            .setNegativeButton("No", null)
+            .show();
+    }
+
+    private void ejecutarBaja(String razon) {
+        activoLeido.setEstadoActivo(Boolean.FALSE);
+        activoLeido.setObservaciones(razon);
+
+        int updated = activoDAO.updateEstadoActivo(activoLeido);
+        if (updated > 0) {
+            Toast.makeText(this, "Activo dado de baja correctamente", Toast.LENGTH_SHORT).show();
+            limpiarCampos(true);
+            if (binding.opcRFID.isChecked()) {
+                rfidHandler.startRead();
+            }
+        } else {
+            Toast.makeText(this, "Error al dar de baja el activo", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void limpiarCampos(boolean full) {
+        activoLeido = null;
+        if (full) binding.txtNumeroActivo.setText("");
+        binding.txtNumeroEtiqueta.setText("");
+        binding.txtDescripcionCorta.setText("");
+        binding.txtDescripcionRazon.setText("");
     }
 }

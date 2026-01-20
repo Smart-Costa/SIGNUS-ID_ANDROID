@@ -191,7 +191,7 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
         String[] newColumns = {
             "EPC", "CATEGORIA_A", "CATEGORIA_B", "CATEGORIA_C", 
             "UBICACION_LOGICA_A", "UBICACION_LOGICA_B", "UBICACION_LOGICA_C", 
-            "ENTIDAD_ASOCIADA", "COSTO_DEPRECIACION"
+            "ENTIDAD_ASOCIADA", "COSTO_DEPRECIACION", "UNIDAD_ORGANIZATIVA"
         };
         
         for (String col : newColumns) {

@@ -168,18 +168,7 @@ public class DetalleTomaFisicaActivity extends AppCompatActivity {
             if (tomaFisicaDao != null && tomaFisicaId != null) {
                 com.example.diverscan.activeid.data.local.entity.TomaFisicaEntity parent = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
                 if (parent != null) {
-                    String catId = parent.getCategoria();
-                    String catName = "";
-                    if (catId != null && !catId.trim().isEmpty()) {
-                        catName = tomaFisicaDao.getCategoryNameById(catId);
-                    }
-                    
-                    // Fallback to ID if name is empty, or just empty string
-                    if (catName == null || catName.isEmpty()) {
-                        catName = (catId != null) ? catId : "";
-                    }
-                    
-                    String title = "Inventario " + catName.trim();
+                    String title = parent.getNombre() != null ? parent.getNombre() : "";
                     runOnUiThread(() -> {
                         if (txtNombreInventario != null) txtNombreInventario.setText("Hacer inventario");
                         if (txtCategoriaTitulo != null) txtCategoriaTitulo.setText(title);

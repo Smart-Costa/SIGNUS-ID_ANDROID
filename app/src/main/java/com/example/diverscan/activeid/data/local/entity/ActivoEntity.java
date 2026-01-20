@@ -151,6 +151,9 @@ public class ActivoEntity {
     @SerializedName(value = "COSTO_DEPRECIACION", alternate = {"CostoDepreciacion", "costoDepreciacion"})
     private Double costoDepreciacion;
 
+    @SerializedName(value = "UNIDAD_ORGANIZATIVA", alternate = {"UnidadOrganizativa", "unidadOrganizativa"})
+    private String unidadOrganizativa;
+
     // --- Getters y Setters ---
 
     @NonNull
@@ -296,4 +299,7 @@ public class ActivoEntity {
 
     public Double getCostoDepreciacion() { return costoDepreciacion; }
     public void setCostoDepreciacion(Double costoDepreciacion) { this.costoDepreciacion = costoDepreciacion; }
+
+    public String getUnidadOrganizativa() { return unidadOrganizativa; }
+    public void setUnidadOrganizativa(String unidadOrganizativa) { this.unidadOrganizativa = unidadOrganizativa; }
 }

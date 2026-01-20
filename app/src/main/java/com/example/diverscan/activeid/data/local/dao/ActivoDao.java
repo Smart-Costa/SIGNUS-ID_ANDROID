@@ -127,6 +127,7 @@ public class ActivoDao {
         v.put("UBICACION_LOGICA_C", a.getUbicacionLogicaC());
         v.put("ENTIDAD_ASOCIADA", a.getEntidadAsociada());
         v.put("COSTO_DEPRECIACION", a.getCostoDepreciacion());
+        v.put("UNIDAD_ORGANIZATIVA", a.getUnidadOrganizativa());
 
         return v;
     }
@@ -430,15 +431,28 @@ public class ActivoDao {
         try { a.setUbicacionLogicaC(c.getString(c.getColumnIndexOrThrow("UBICACION_LOGICA_C"))); } catch (IllegalArgumentException e) {}
         try { a.setEntidadAsociada(c.getString(c.getColumnIndexOrThrow("ENTIDAD_ASOCIADA"))); } catch (IllegalArgumentException e) {}
         try { a.setCostoDepreciacion(c.getDouble(c.getColumnIndexOrThrow("COSTO_DEPRECIACION"))); } catch (IllegalArgumentException e) {}
+        try { a.setUnidadOrganizativa(c.getString(c.getColumnIndexOrThrow("UNIDAD_ORGANIZATIVA"))); } catch (IllegalArgumentException e) {}
         
         return a;
     }
 
     public List<ActivoEntity> getActivosByFiltros(String ua, String ub, String uc, String ud) {
-        return getActivosByFiltros(ua, ub, uc, ud, null);
+        return getActivosByFiltros(ua, ub, uc, ud, null, null);
     }
 
     public List<ActivoEntity> getActivosByFiltros(String ua, String ub, String uc, String ud, String us) {
+        return getActivosByFiltros(ua, ub, uc, ud, us, null);
+    }
+
+    public List<ActivoEntity> getActivosByFiltros(String ua, String ub, String uc, String ud, String us, String uo) {
+        return getActivosByFiltros(ua, ub, uc, ud, us, uo, null);
+    }
+
+    public List<ActivoEntity> getActivosByFiltros(String ua, String ub, String uc, String ud, String us, String uo, String cat) {
+        return getActivosByFiltros(ua, ub, uc, ud, us, uo, cat, null);
+    }
+
+    public List<ActivoEntity> getActivosByFiltros(String ua, String ub, String uc, String ud, String us, String uo, String cat, String est) {
         // Implementation delegates to a private helper or we build the query here
         // For simplicity, let's build the query.
         // If parameters are null or empty, we ignore them (wildcard behavior).
@@ -474,6 +488,18 @@ public class ActivoDao {
              selection.append(" AND UBICACION_SECUNDARIA = ?");
              args.add(us);
         }
+        if (uo != null && !uo.isEmpty() && !uo.equals("00000000-0000-0000-0000-000000000000")) {
+             selection.append(" AND UNIDAD_ORGANIZATIVA = ?");
+             args.add(uo);
+        }
+        if (cat != null && !cat.isEmpty() && !cat.equals("00000000-0000-0000-0000-000000000000")) {
+             selection.append(" AND CATEGORIA = ?");
+             args.add(cat);
+        }
+        if (est != null && !est.isEmpty() && !est.equals("00000000-0000-0000-0000-000000000000")) {
+             selection.append(" AND ESTADO = ?");
+             args.add(est);
+        }
 
         Cursor c = null;
         try {
@@ -493,10 +519,22 @@ public class ActivoDao {
     }
 
     public int countActivosByFiltros(String ua, String ub, String uc, String ud) {
-        return countActivosByFiltros(ua, ub, uc, ud, null);
+        return countActivosByFiltros(ua, ub, uc, ud, null, null);
     }
 
     public int countActivosByFiltros(String ua, String ub, String uc, String ud, String us) {
+        return countActivosByFiltros(ua, ub, uc, ud, us, null);
+    }
+
+    public int countActivosByFiltros(String ua, String ub, String uc, String ud, String us, String uo) {
+        return countActivosByFiltros(ua, ub, uc, ud, us, uo, null);
+    }
+
+    public int countActivosByFiltros(String ua, String ub, String uc, String ud, String us, String uo, String cat) {
+        return countActivosByFiltros(ua, ub, uc, ud, us, uo, cat, null);
+    }
+
+    public int countActivosByFiltros(String ua, String ub, String uc, String ud, String us, String uo, String cat, String est) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         StringBuilder selection = new StringBuilder("1=1");
@@ -521,6 +559,18 @@ public class ActivoDao {
         if (us != null && !us.isEmpty() && !us.equals("Todas")) {
             selection.append(" AND UBICACION_SECUNDARIA = ?");
             args.add(us);
+        }
+        if (uo != null && !uo.isEmpty() && !uo.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND UNIDAD_ORGANIZATIVA = ?");
+            args.add(uo);
+        }
+        if (cat != null && !cat.isEmpty() && !cat.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND CATEGORIA = ?");
+            args.add(cat);
+        }
+        if (est != null && !est.isEmpty() && !est.equals("00000000-0000-0000-0000-000000000000")) {
+            selection.append(" AND ESTADO = ?");
+            args.add(est);
         }
 
         Cursor c = null;
@@ -910,6 +960,7 @@ public class ActivoDao {
             ContentValues values = new ContentValues();
             boolean estadoActivo = activo.getEstadoActivo() != null && activo.getEstadoActivo();
             values.put("ESTADO_ACTIVO", estadoActivo ? 1 : 0);
+            values.put("OBSERVACIONES", activo.getObservaciones());
             values.put("SYNC_STATUS", 0); // Mark as pending sync
 
             return db.update(

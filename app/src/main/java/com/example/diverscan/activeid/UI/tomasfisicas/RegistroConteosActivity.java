@@ -123,6 +123,8 @@ public class RegistroConteosActivity extends AppCompatActivity {
     private String baseUbicacionBId = null;
     private String baseUbicacionCId = null;
     private String baseUbicacionDId = null;
+    private String baseUnidadOrganizativaId = null;
+    private String baseCategoriaId = null;
     
     private boolean isUpdatingSpinners = false;
 
@@ -333,6 +335,8 @@ public class RegistroConteosActivity extends AppCompatActivity {
             baseUbicacionBId = toma != null ? normalizeGuidFilter(toma.getUbicacionB()) : null;
             baseUbicacionCId = toma != null ? normalizeGuidFilter(toma.getUbicacionC()) : null;
             baseUbicacionDId = toma != null ? normalizeGuidFilter(toma.getUbicacionD()) : null;
+            baseUnidadOrganizativaId = toma != null ? normalizeGuidFilter(toma.getUnidadOrganizativa()) : null;
+            baseCategoriaId = toma != null ? normalizeGuidFilter(toma.getCategoria()) : null;
 
             runOnUiThread(() -> {
                 setupLocationSpinners();
@@ -504,14 +508,16 @@ public class RegistroConteosActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 setSpinnerItems(spinnerUbicacionA, listUbicacionA);
                 if (baseUbicacionAId != null) {
+                    spinnerUbicacionA.setEnabled(false);
                     selectedUbicacionAId = baseUbicacionAId;
                     loadUbicacionB(baseUbicacionAId);
                 } else {
+                    spinnerUbicacionA.setEnabled(true);
                     selectedUbicacionAId = null;
-                    setSoloTodasForSpinnerItem(spinnerUbicacionB);
-                    setSoloTodasForSpinnerItem(spinnerUbicacionC);
-                    setSoloTodasForSpinnerItem(spinnerUbicacionD);
-                    setSoloTodasForString(spinnerUbicacionSecundaria);
+                    setSoloTodasForSpinnerItem(spinnerUbicacionB); spinnerUbicacionB.setEnabled(false);
+                    setSoloTodasForSpinnerItem(spinnerUbicacionC); spinnerUbicacionC.setEnabled(false);
+                    setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
+                    setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
                     refreshSummaryCounts();
                 }
             });
@@ -526,22 +532,37 @@ public class RegistroConteosActivity extends AppCompatActivity {
                 String label = (u != null && u.getUbicacionB() != null && !u.getUbicacionB().trim().isEmpty()) ? u.getUbicacionB().trim() : baseUbicacionBId;
                 listUbicacionB.add(new SpinnerItem(baseUbicacionBId, label));
             } else {
-                List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionB(parentId);
-                listUbicacionB.add(new SpinnerItem(null, "Todas"));
-                for (UbicacionEntity u : list) listUbicacionB.add(new SpinnerItem(u.getBSysId(), u.getUbicacionB()));
+                if (baseUbicacionAId != null) {
+                    listUbicacionB.add(new SpinnerItem(null, "Todas"));
+                } else {
+                    List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionB(parentId);
+                    listUbicacionB.add(new SpinnerItem(null, "Todas"));
+                    for (UbicacionEntity u : list) listUbicacionB.add(new SpinnerItem(u.getBSysId(), u.getUbicacionB()));
+                }
             }
 
             runOnUiThread(() -> {
                 setSpinnerItems(spinnerUbicacionB, listUbicacionB);
                 if (baseUbicacionBId != null) {
+                    spinnerUbicacionB.setEnabled(false);
                     selectedUbicacionBId = baseUbicacionBId;
                     loadUbicacionC(baseUbicacionBId);
                 } else {
-                    selectedUbicacionBId = null;
-                    setSoloTodasForSpinnerItem(spinnerUbicacionC);
-                    setSoloTodasForSpinnerItem(spinnerUbicacionD);
-                    setSoloTodasForString(spinnerUbicacionSecundaria);
-                    refreshSummaryCounts();
+                    if (baseUbicacionAId != null) {
+                        spinnerUbicacionB.setEnabled(false);
+                        selectedUbicacionBId = null;
+                        setSoloTodasForSpinnerItem(spinnerUbicacionC); spinnerUbicacionC.setEnabled(false);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
+                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        refreshSummaryCounts();
+                    } else {
+                        spinnerUbicacionB.setEnabled(true);
+                        selectedUbicacionBId = null;
+                        setSoloTodasForSpinnerItem(spinnerUbicacionC); spinnerUbicacionC.setEnabled(false);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
+                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        refreshSummaryCounts();
+                    }
                 }
             });
         }).start();
@@ -555,21 +576,35 @@ public class RegistroConteosActivity extends AppCompatActivity {
                 String label = (u != null && u.getUbicacionC() != null && !u.getUbicacionC().trim().isEmpty()) ? u.getUbicacionC().trim() : baseUbicacionCId;
                 listUbicacionC.add(new SpinnerItem(baseUbicacionCId, label));
             } else {
-                List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionC(parentId);
-                listUbicacionC.add(new SpinnerItem(null, "Todas"));
-                for (UbicacionEntity u : list) listUbicacionC.add(new SpinnerItem(u.getCSysId(), u.getUbicacionC()));
+                if (baseUbicacionBId != null) {
+                    listUbicacionC.add(new SpinnerItem(null, "Todas"));
+                } else {
+                    List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionC(parentId);
+                    listUbicacionC.add(new SpinnerItem(null, "Todas"));
+                    for (UbicacionEntity u : list) listUbicacionC.add(new SpinnerItem(u.getCSysId(), u.getUbicacionC()));
+                }
             }
 
             runOnUiThread(() -> {
                 setSpinnerItems(spinnerUbicacionC, listUbicacionC);
                 if (baseUbicacionCId != null) {
+                    spinnerUbicacionC.setEnabled(false);
                     selectedUbicacionCId = baseUbicacionCId;
                     loadUbicacionD(baseUbicacionCId);
                 } else {
-                    selectedUbicacionCId = null;
-                    setSoloTodasForSpinnerItem(spinnerUbicacionD);
-                    setSoloTodasForString(spinnerUbicacionSecundaria);
-                    refreshSummaryCounts();
+                    if (baseUbicacionBId != null) {
+                        spinnerUbicacionC.setEnabled(false);
+                        selectedUbicacionCId = null;
+                        setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
+                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        refreshSummaryCounts();
+                    } else {
+                        spinnerUbicacionC.setEnabled(true);
+                        selectedUbicacionCId = null;
+                        setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
+                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        refreshSummaryCounts();
+                    }
                 }
             });
         }).start();
@@ -583,20 +618,33 @@ public class RegistroConteosActivity extends AppCompatActivity {
                 String label = (u != null && u.getUbicacionD() != null && !u.getUbicacionD().trim().isEmpty()) ? u.getUbicacionD().trim() : baseUbicacionDId;
                 listUbicacionD.add(new SpinnerItem(baseUbicacionDId, label));
             } else {
-                List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionD(parentId);
-                listUbicacionD.add(new SpinnerItem(null, "Todas"));
-                for (UbicacionEntity u : list) listUbicacionD.add(new SpinnerItem(u.getDSysId(), u.getUbicacionD()));
+                if (baseUbicacionCId != null) {
+                    listUbicacionD.add(new SpinnerItem(null, "Todas"));
+                } else {
+                    List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionD(parentId);
+                    listUbicacionD.add(new SpinnerItem(null, "Todas"));
+                    for (UbicacionEntity u : list) listUbicacionD.add(new SpinnerItem(u.getDSysId(), u.getUbicacionD()));
+                }
             }
 
             runOnUiThread(() -> {
                 setSpinnerItems(spinnerUbicacionD, listUbicacionD);
                 if (baseUbicacionDId != null) {
+                    spinnerUbicacionD.setEnabled(false);
                     selectedUbicacionDId = baseUbicacionDId;
                     loadUbicacionSecundaria(baseUbicacionDId);
                 } else {
-                    selectedUbicacionDId = null;
-                    setSoloTodasForString(spinnerUbicacionSecundaria);
-                    refreshSummaryCounts();
+                    if (baseUbicacionCId != null) {
+                        spinnerUbicacionD.setEnabled(false);
+                        selectedUbicacionDId = null;
+                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        refreshSummaryCounts();
+                    } else {
+                        spinnerUbicacionD.setEnabled(true);
+                        selectedUbicacionDId = null;
+                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        refreshSummaryCounts();
+                    }
                 }
             });
         }).start();
@@ -611,6 +659,11 @@ public class RegistroConteosActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
                 setSpinnerStrings(spinnerUbicacionSecundaria, listUbicacionSecundaria);
+                if (baseUbicacionDId != null) {
+                     spinnerUbicacionSecundaria.setEnabled(false);
+                } else {
+                     spinnerUbicacionSecundaria.setEnabled(true);
+                }
                 selectedUbicacionSecundariaId = null;
                 refreshSummaryCounts();
             });
@@ -623,9 +676,11 @@ public class RegistroConteosActivity extends AppCompatActivity {
         String uc = selectedUbicacionCId != null ? selectedUbicacionCId : baseUbicacionCId;
         String ud = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
         String us = selectedUbicacionSecundariaId;
+        String uo = baseUnidadOrganizativaId;
+        String cat = baseCategoriaId;
 
         // Count expected actives based on filters
-        int countFiltrados = activoDao.countActivosByFiltros(ua, ub, uc, ud, us);
+        int countFiltrados = activoDao.countActivosByFiltros(ua, ub, uc, ud, us, uo, cat);
         if (txtCountActivosFiltrados != null) txtCountActivosFiltrados.setText("Activos filtrados: " + countFiltrados);
 
         // Update counts per filter level
@@ -642,11 +697,11 @@ public class RegistroConteosActivity extends AppCompatActivity {
 
         String udForD = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
 
-        int countA = activoDao.countActivosByFiltros(ua, ubForA, ucForA, udForA);
-        int countB = activoDao.countActivosByFiltros(ua, ubForB, ucForB, udForB);
-        int countC = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForC);
-        int countD = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD);
-        int countS = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, us);
+        int countA = activoDao.countActivosByFiltros(ua, ubForA, ucForA, udForA, null, uo, cat);
+        int countB = activoDao.countActivosByFiltros(ua, ubForB, ucForB, udForB, null, uo, cat);
+        int countC = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForC, null, uo, cat);
+        int countD = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, null, uo, cat);
+        int countS = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, us, uo, cat);
 
         if (txtCountUbicacionA != null) txtCountUbicacionA.setText("Activos: " + countA);
         if (txtCountUbicacionB != null) txtCountUbicacionB.setText("Activos: " + countB);
@@ -1309,8 +1364,10 @@ public class RegistroConteosActivity extends AppCompatActivity {
             String uc = selectedUbicacionCId != null ? selectedUbicacionCId : (baseUbicacionCId != null ? baseUbicacionCId : tomaFisica.getUbicacionC());
             String ud = selectedUbicacionDId != null ? selectedUbicacionDId : (baseUbicacionDId != null ? baseUbicacionDId : tomaFisica.getUbicacionD());
             String us = selectedUbicacionSecundariaId;
+            String uo = baseUnidadOrganizativaId != null ? baseUnidadOrganizativaId : tomaFisica.getUnidadOrganizativa();
+            String cat = baseCategoriaId != null ? baseCategoriaId : tomaFisica.getCategoria();
             
-            List<ActivoEntity> expected = activoDao.getActivosByFiltros(ua, ub, uc, ud, us);
+            List<ActivoEntity> expected = activoDao.getActivosByFiltros(ua, ub, uc, ud, us, uo, cat);
             if (expected != null) {
                 totalExpectedCount = expected.size();
                 for (ActivoEntity a : expected) {

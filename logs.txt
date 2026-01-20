@@ -1,21 +1,77 @@
-2026-01-16 10:06:42.180 18963-18963 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
-2026-01-16 10:06:42.182 18963-18963 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_USB
-2026-01-16 10:06:42.187 18963-18963 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
-2026-01-16 10:06:42.194 18963-19220 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
-2026-01-16 10:06:42.195 18963-19220 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_USB
-2026-01-16 10:06:42.199 18963-19220 protocol val is         com.example.diverscan.activeid       E  ASCII
-2026-01-16 10:06:42.199 18963-19220 IRFIDError              com.example.diverscan.activeid       D  RfidUsbMgr: connection failed: device not found
-2026-01-16 10:06:42.200 18963-19220 RFID_SAMPLE             com.example.diverscan.activeid       D  GetAvailableRFIDReaderList returned 0 devices
-2026-01-16 10:06:42.213 18963-18963 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
-2026-01-16 10:06:42.214 18963-18963 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.
+2026-01-16 10:23:41.445 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
+2026-01-16 10:23:41.446 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_USB
+2026-01-16 10:23:41.448 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
+2026-01-16 10:23:41.451 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
+2026-01-16 10:23:41.451 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_USB
+2026-01-16 10:23:41.454 25463-25532 protocol val is         com.example.diverscan.activeid       E  ASCII
+2026-01-16 10:23:41.454 25463-25532 IRFIDError              com.example.diverscan.activeid       D  RfidUsbMgr: connection failed: device not found
+2026-01-16 10:23:41.454 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  GetAvailableRFIDReaderList returned 0 devices
+2026-01-16 10:23:41.482 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
+2026-01-16 10:23:41.484 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.
 
-caso serial
-
-2026-01-16 10:08:55.820 20002-20002 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
-2026-01-16 10:08:55.823 20002-20002 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_SERIAL
-2026-01-16 10:08:55.833 20002-20002 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
-2026-01-16 10:08:55.843 20002-20151 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
-2026-01-16 10:08:55.844 20002-20151 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_SERIAL
-2026-01-16 10:08:55.847 20002-20151 RFID_SAMPLE             com.example.diverscan.activeid       D  GetAvailableRFIDReaderList returned 0 devices
-2026-01-16 10:08:55.854 20002-20002 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
-2026-01-16 10:08:55.855 20002-20002 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.
+--------- beginning of main
+--------- beginning of system
+2026-01-16 10:26:20.883  1395-2566  ActivityTaskManager     system_server                        I  START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.example.diverscan.activeid/.UI.main.MainActivity} from uid 10264
+2026-01-16 10:26:20.917  2526-6856  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
+2026-01-16 10:26:20.918  1395-4088  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 25463
+2026-01-16 10:26:20.927  5650-6598  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
+2026-01-16 10:26:20.928  1395-4088  CoreBackPreview         system_server                        D  Window{7073de0 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback null
+2026-01-16 10:26:20.931  1395-4088  InputManager-JNI        system_server                        W  Input channel object '7073de0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity (client)' was disposed without first being removed with the input manager!
+2026-01-16 10:26:20.935  1395-1870  UsageStatsService       system_server                        W  Unexpected activity event reported! (com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity event : 23 instanceId : 195633162)
+2026-01-16 10:26:20.979  1395-9314  CoreBackPreview         system_server                        D  Window{561604e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@a17827c, mPriority=0}
+2026-01-16 10:26:20.987 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-01-16 10:26:21.015 25463-25494 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-01-16 10:26:21.017 25463-25463 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.193.11.135:70/ApiHH/Api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
+2026-01-16 10:26:21.021  1395-1850  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.main.MainActivity: +137ms
+2026-01-16 10:26:21.149 13178-13178 GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1349 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-01-16 10:26:21.520 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000072726c6e40 (RippleDrawable) with handle 0xb40000718266d460
+2026-01-16 10:26:21.530  1395-2905  CoreBackPreview         system_server                        D  Window{422e00f u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback null
+2026-01-16 10:26:21.531  1395-2905  InputManager-JNI        system_server                        W  Input channel object '422e00f com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity (client)' was disposed without first being removed with the input manager!
+2026-01-16 10:26:21.556 25463-25463 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 4789 (21%)
+2026-01-16 10:26:21.556 25463-25463 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 4789 from 4789 (100%)
+2026-01-16 10:26:28.455 25463-25463 OnBackInvokedCallback   com.example.diverscan.activeid       W  OnBackInvokedCallback is not enabled for the application.
+                                                                                                    Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+2026-01-16 10:26:30.052  1395-4088  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity} from uid 10264
+2026-01-16 10:26:30.090  1395-2905  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 25463
+2026-01-16 10:26:30.095  2526-6856  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
+2026-01-16 10:26:30.098  5650-6598  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
+2026-01-16 10:26:30.137  1395-2566  CoreBackPreview         system_server                        D  Window{acaf26a u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@20147f8, mPriority=0}
+2026-01-16 10:26:30.154 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-01-16 10:26:30.179 25463-25494 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-01-16 10:26:30.194  1395-1850  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity: +138ms
+2026-01-16 10:26:30.363 13178-13178 GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1349 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-01-16 10:26:30.729 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000072726f0bc0 (NavigationMenuItemView) with handle 0xb4000071826aee60
+2026-01-16 10:26:30.729 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000072726ecb60 (NavigationMenuItemView) with handle 0xb40000718267d6f0
+2026-01-16 10:26:35.142 25463-26877 protocol val is         com.example.diverscan.activeid       E  ASCII
+2026-01-16 10:26:35.147 25463-26877 UsbRequestJNI           com.example.diverscan.activeid       D  init
+2026-01-16 10:26:35.154 25463-26878 RFIDSerialIOMgr         com.example.diverscan.activeid       E  Run ending due to exception
+                                                                                                    java.io.IOException: Queueing USB request failed
+                                                                                                    	at com.zebra.rfid.api3.CommonUsbSerialPort.read(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:29)
+                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager.readData(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:12)
+                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager.run(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:49)
+                                                                                                    	at java.lang.Thread.run(Thread.java:1563)
+2026-01-16 10:26:35.803 25463-25463 UsbDeviceConnectionJNI  com.example.diverscan.activeid       D  close
+2026-01-16 10:26:35.809 25463-26879 RFIDSerialIOMgr         com.example.diverscan.activeid       E  Receive thread interrupted
+                                                                                                    java.lang.InterruptedException
+                                                                                                    	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727)
+                                                                                                    	at java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435)
+                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager$1.run(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:3)
+                                                                                                    	at java.lang.Thread.run(Thread.java:1563)
+2026-01-16 10:26:37.162 25463-26899 protocol val is         com.example.diverscan.activeid       E  ASCII
+2026-01-16 10:26:37.166 25463-26899 UsbRequestJNI           com.example.diverscan.activeid       D  init
+2026-01-16 10:26:43.576 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
+2026-01-16 10:26:43.578 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_SERIAL
+2026-01-16 10:26:43.583 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
+2026-01-16 10:26:43.587 25463-26901 RFIDSerialIOMgr         com.example.diverscan.activeid       E  Receive thread interrupted
+                                                                                                    java.lang.InterruptedException
+                                                                                                    	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727)
+                                                                                                    	at java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435)
+                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager$1.run(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:3)
+                                                                                                    	at java.lang.Thread.run(Thread.java:1563)
+2026-01-16 10:26:43.588 25463-26900 RFIDSerialIOMgr         com.example.diverscan.activeid       I  Recieving status mState=STOPPING
+2026-01-16 10:26:43.591 25463-25463 UsbDeviceConnectionJNI  com.example.diverscan.activeid       D  close
+2026-01-16 10:26:43.593 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
+2026-01-16 10:26:43.593 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_SERIAL
+2026-01-16 10:26:43.599 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  GetAvailableRFIDReaderList returned 0 devices
+2026-01-16 10:26:43.611 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
+2026-01-16 10:26:43.612 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.

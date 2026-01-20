@@ -61,13 +61,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Serial (MC33xx)"
+            android:visibility="gone"
             android:layout_marginStart="16dp"/>
 
         <RadioButton
             android:id="@+id/rb_usb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="USB"
+            android:text="SERIAL"
             android:layout_marginStart="16dp"/>
     </RadioGroup>
 

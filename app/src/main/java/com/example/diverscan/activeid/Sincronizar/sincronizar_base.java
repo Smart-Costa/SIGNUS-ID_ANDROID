@@ -491,7 +491,7 @@ public class sincronizar_base extends AppCompatActivity {
         int countTomasResumen = tomafisicatomasDao.getPendingResumen().size();
         int countTomasDetalle = tomafisicadetallesDao.getPendingDetalles().size();
 
-        String resumenMsg = "Resumen de datos enviados:\n\n" +
+        String resumenMsg = "4enviados:\n\n" +
                 "- Activos Creados/Modificados: " + activosCreados + "\n" +
                 "- Activos Dados de Baja: " + activosBajas + "\n" +
                 "- Subtomas de Inventario: " + countTomasResumen + "\n" +
@@ -536,7 +536,7 @@ public class sincronizar_base extends AppCompatActivity {
                             // Mostrar resumen en diálogo
                             new AlertDialog.Builder(_context)
                                     .setTitle("Sincronización Completada")
-                                    .setMessage(resumenMsg)
+                                    //.setMessage(resumenMsg)
                                     .setPositiveButton("Aceptar", null)
                                     .setIcon(R.drawable.ic_check_circle)
                                     .show();
