@@ -207,6 +207,27 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="Categoría"
+                        android:textColor="#808080"
+                        android:textSize="12sp"
+                        android:layout_marginTop="0dp"/>
+                    <Spinner
+                        android:id="@+id/spinnerCategoria"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginBottom="4dp" />
+                    <TextView
+                        android:id="@+id/txtCountCategoria"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Activos: 0"
+                        android:textColor="#606060"
+                        android:textSize="12sp" 
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="Ubicación A"
                         android:textColor="#808080"
                         android:textSize="12sp" />
@@ -304,7 +325,6 @@
                         android:textSize="12sp" />
 
                 </LinearLayout>
-
             </LinearLayout>
         </ScrollView>
 

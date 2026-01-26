@@ -60,6 +60,16 @@ public class InventoryDBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i2) {
         if (i2 > i) {
+             // Upgrade logic for version 10
+             if (i < 10) {
+                 // Add Estado column to TomasFisicasResumen if it exists
+                 try {
+                     db.execSQL("ALTER TABLE TomasFisicasResumen ADD COLUMN Estado TEXT DEFAULT 'ABIERTA'");
+                 } catch (Exception e) {
+                     Log.e("DBHelper", "Error altering table TomasFisicasResumen", e);
+                 }
+             }
+
              db.execSQL("CREATE TABLE if not exists TipoTomaInventario (_id Text PRIMARY KEY, " +
                 "Nombre Text, Descripcion Text, fechaInicio Text, fechaFinal Text, estado Text)");
              
@@ -72,7 +82,8 @@ public class InventoryDBHelper extends SQLiteOpenHelper {
                 "ActivosLeidos TEXT, " +
                 "Sobrantes TEXT, " +
                 "Faltantes TEXT, " +
-                "TotalActivos TEXT)");
+                "TotalActivos TEXT, " +
+                "Estado TEXT)");
 
              db.execSQL("CREATE TABLE IF NOT EXISTS TomasFisicas (" +
                 "tomaFisicaId TEXT PRIMARY KEY, " +

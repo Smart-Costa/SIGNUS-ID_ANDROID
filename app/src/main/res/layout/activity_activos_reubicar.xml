@@ -50,25 +50,6 @@
             android:orientation="vertical"
             android:layout_marginBottom="16dp"/>
 
-        <TextView
-            android:id="@+id/tv_header_cambio_ubicacion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="CAMBIO DE UBICACIÓN"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:background="#DDDDDD"
-            android:padding="8dp"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Container for items with destination -->
-        <LinearLayout
-            android:id="@+id/ll_list_cambio_ubicacion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="16dp"/>
-
         <Button
             android:id="@+id/btn_refresh"
             android:layout_width="match_parent"

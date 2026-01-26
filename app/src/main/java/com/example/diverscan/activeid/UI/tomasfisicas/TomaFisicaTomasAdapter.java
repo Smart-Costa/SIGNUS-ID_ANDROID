@@ -100,8 +100,23 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
         // If needed, check a specific field. For now, always visible if item exists.
         // holder.imgUploaded.setVisibility(View.VISIBLE);
         
-        // Checkbox logic (if needed, currently just visual)
-        holder.chkSeleccion.setChecked(false); 
+        // Checkbox visual logic (left side)
+        holder.imgCheckbox.setImageResource(R.drawable.ic_checkbox_unchecked); // Default
+
+        // Check closed status
+        boolean isCerrada = "CERRADA".equalsIgnoreCase(item.getEstado());
+        if (!isCerrada && item.getEstado() != null) {
+            String s = item.getEstado().trim().toUpperCase();
+            if (s.equals("COMPLETADA") || s.equals("FINALIZADA")) isCerrada = true;
+        }
+
+        if (isCerrada) {
+            holder.imgEstado.setVisibility(View.VISIBLE);
+            // Optional: If closed, maybe show the left checkbox as 'checked' or colored if that was the intent of the 'Orange Square'
+            // For now, keeping it standard unchecked as per basic requirement "checkbox then name then icon"
+        } else {
+            holder.imgEstado.setVisibility(View.INVISIBLE);
+        } 
         
         /*
         holder.btnGoToCounts.setOnClickListener(new View.OnClickListener() {
@@ -140,7 +155,8 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtNumeroToma, txtFecha;
-        android.widget.CheckBox chkSeleccion;
+        android.widget.ImageView imgEstado;
+        android.widget.ImageView imgCheckbox;
         // android.widget.ImageView imgUploaded;
         // android.widget.ImageView btnGoToCounts;
         android.widget.ImageView btnDelete;
@@ -149,7 +165,8 @@ public class TomaFisicaTomasAdapter extends RecyclerView.Adapter<TomaFisicaTomas
             super(itemView);
             txtNumeroToma = itemView.findViewById(R.id.txtNumeroToma);
             txtFecha = itemView.findViewById(R.id.txtFecha);
-            chkSeleccion = itemView.findViewById(R.id.chkSeleccion);
+            imgEstado = itemView.findViewById(R.id.imgEstado);
+            imgCheckbox = itemView.findViewById(R.id.imgCheckbox);
             // imgUploaded = itemView.findViewById(R.id.imgUploaded);
             // btnGoToCounts = itemView.findViewById(R.id.btnGoToCounts);
             btnDelete = itemView.findViewById(R.id.btnDelete);

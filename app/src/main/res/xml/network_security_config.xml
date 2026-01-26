@@ -14,6 +14,14 @@
         <domain includeSubdomains="true">192.168.1.10</domain>
         <domain includeSubdomains="true">192.168.1.13</domain>
         <domain includeSubdomains="true">44.193.11.135</domain>
+        <!-- IP Local actual -->
+        <domain includeSubdomains="true">192.168.137.15</domain>
+        <!-- IP Produccion -->
+        <domain includeSubdomains="true">10.200.201.98</domain>
+        <!-- Localhost para emulador -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">100.31.144.26</domain>
+        <domain includeSubdomains="true">0.200.201.98</domain>
     </domain-config>
 
 </network-security-config>

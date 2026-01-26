@@ -46,6 +46,7 @@ public class TomaFisicaTomasDao {
         v.put("Sobrantes", a.getSobrantes());
         v.put("Faltantes", a.getFaltantes());
         v.put("TotalActivos", a.getTotalActivos());
+        v.put("Estado", a.getEstado());
         // Default SYNC_STATUS is 0 (Pending) if not explicitly set via logic, but helper handles default.
         // However, if we are updating, we might want to set it to 0.
         // For simple entityToValues, we leave it out or handle it in specific methods.
@@ -64,6 +65,30 @@ public class TomaFisicaTomasDao {
         db.beginTransaction();
         try {
             for (TomaFisicaTomasEntity a : data) {
+                // Fix: Preservar estado local (CERRADA/ABIERTA) ya que es un campo LOCAL SQLITE
+                // La API no retorna este campo (o retorna null), por lo que debemos mantener el valor que tenga la BD local.
+                // EXCEPCIÓN: Si viene de la API, se asume que es una toma histórica YA PROCESADA, por lo tanto debe estar CERRADA.
+                // El usuario indica: "se supone que estan cerradas ya que cada toma que se sube debe estar cerrada".
+                
+                String localState = null;
+                try (Cursor c = db.rawQuery("SELECT Estado FROM TomasFisicasResumen WHERE LOWER(IdToma) = LOWER(?)", new String[]{a.getIdToma()})) {
+                    if (c.moveToFirst()) {
+                        localState = c.getString(0);
+                    }
+                } catch (Exception ignored) {}
+
+                if (localState != null && !localState.trim().isEmpty()) {
+                    a.setEstado(localState);
+                } else {
+                    // Si no existe localmente (es nueva descarga), ASUMIR CERRADA por regla de negocio
+                    // Las tomas que vienen del servidor son históricas/finalizadas.
+                    a.setEstado("CERRADA");
+                }
+                
+                // Doble check: Si por alguna razón la API enviara "ABIERTA" explícitamente (poco probable según regla),
+                // esto lo sobrescribiría si no validamos a.getEstado() antes.
+                // Pero como a.getEstado() suele ser null desde API, la lógica de arriba aplica.
+
                 ContentValues values = entityToValues(a);
                 values.put("SYNC_STATUS", 1); // From API -> Synced
                 Log.d(TAG, "VALUES → " + values.toString());
@@ -75,7 +100,7 @@ public class TomaFisicaTomasDao {
             Log.e(TAG, "Error sincronizando resumen", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // Removed db.close()
         }
     }
 
@@ -98,7 +123,7 @@ public class TomaFisicaTomasDao {
             Log.e(TAG, "Error guardando resumen local", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // Removed db.close()
         }
     }
 
@@ -138,68 +163,43 @@ public class TomaFisicaTomasDao {
                             }
                             filtered.add(item);
                         }
+
+                        // Limpieza PREVIA: Eliminar datos sincronizados antiguos para asegurar limpieza total
+                        // Mantiene los pendientes (SYNC_STATUS = 0)
+                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                        try {
+                            if (tomaFisicaId != null && !tomaFisicaId.trim().isEmpty()) {
+                                db.delete("TomasFisicasResumen", "LOWER(TomaFisicaId) = LOWER(?) AND SYNC_STATUS = 1", new String[]{tomaFisicaId.trim()});
+                            } else {
+                                db.delete("TomasFisicasResumen", "SYNC_STATUS = 1", null);
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error limpiando datos sincronizados previos", e);
+                        }
+
                         syncResumen(filtered);
                         
-                        // Limpieza de huérfanos: Eliminar registros locales que no vinieron del servidor
-                        // AHORA: Soportar tanto limpieza por Toma específica como GLOBAL
+                        // La lógica de huérfanos ya no es estrictamente necesaria si borramos todo lo sincronizado antes,
+                        // pero se mantiene para casos bordes o consistencia si la estrategia cambia.
+                        // Sin embargo, con el borrado previo, 'localItems' solo tendrá pendientes.
+                        // Si dejamos la lógica de huérfanos, debemos asegurar que proteja los pendientes (lo cual ya hacía).
+                        // Para evitar doble trabajo y logs confusos, podemos simplificar o remover.
+                        // Dado que el usuario pidió "limpiar tablas locales", el borrado explícito arriba es lo más seguro.
                         
-                        List<TomaFisicaTomasEntity> localItems;
-                        if (tomaFisicaId != null && !tomaFisicaId.trim().isEmpty()) {
-                             localItems = getByTomaFisicaId(tomaFisicaId);
-                        } else {
-                             // Si es null, obtenemos TODOS los locales para validar contra la lista completa del servidor
-                             localItems = getAll();
-                        }
-
-                        List<String> remoteIds = new ArrayList<>();
-                        for(TomaFisicaTomasEntity rem : filtered) {
-                             if(rem.getIdToma() != null) remoteIds.add(rem.getIdToma().trim().toLowerCase());
-                        }
-                             
-                        for(TomaFisicaTomasEntity loc : localItems) {
-                             // Solo eliminar si NO está pendiente de sincronizar (SYNC_STATUS != 0)
-                             // Si SYNC_STATUS es 0, es una toma local nueva que aún no está en el servidor, no debemos borrarla.
-                             // Nota: getByTomaFisicaId/getAll no devuelven SYNC_STATUS por defecto en el objeto Entity simple
-                             // Necesitamos verificarlo.
-                             // Opción A: Cargar SYNC_STATUS en la entidad.
-                             // Opción B: Verificar el estado antes de borrar.
-                             
-                             if(loc.getIdToma() != null && !remoteIds.contains(loc.getIdToma().trim().toLowerCase())) {
-                                 if (getPendienteStatus(loc.getIdToma()) == 0) { // 0 = Pending
-                                     Log.d(TAG, "Protegiendo huérfano local pendiente: " + loc.getIdToma());
-                                     continue;
-                                 }
-                                 Log.d(TAG, "Eliminando huérfano local sincronizado: " + loc.getIdToma());
-                                 deleteToma(loc.getIdToma());
-                             }
-                        }
-
                     } else {
-                        syncResumen(response.data);
-                        
-                        // Limpieza de huérfanos (Duplicada lógica para caso sin deletes pendientes)
-                        List<TomaFisicaTomasEntity> localItems;
-                        if (tomaFisicaId != null && !tomaFisicaId.trim().isEmpty()) {
-                             localItems = getByTomaFisicaId(tomaFisicaId);
-                        } else {
-                             localItems = getAll();
+                        // Limpieza PREVIA (Caso sin deletes pendientes)
+                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                        try {
+                            if (tomaFisicaId != null && !tomaFisicaId.trim().isEmpty()) {
+                                db.delete("TomasFisicasResumen", "LOWER(TomaFisicaId) = LOWER(?) AND SYNC_STATUS = 1", new String[]{tomaFisicaId.trim()});
+                            } else {
+                                db.delete("TomasFisicasResumen", "SYNC_STATUS = 1", null);
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error limpiando datos sincronizados previos", e);
                         }
 
-                        List<String> remoteIds = new ArrayList<>();
-                        for(TomaFisicaTomasEntity rem : response.data) {
-                             if(rem.getIdToma() != null) remoteIds.add(rem.getIdToma().trim().toLowerCase());
-                        }
-                             
-                        for(TomaFisicaTomasEntity loc : localItems) {
-                             if(loc.getIdToma() != null && !remoteIds.contains(loc.getIdToma().trim().toLowerCase())) {
-                                 if (getPendienteStatus(loc.getIdToma()) == 0) {
-                                     Log.d(TAG, "Protegiendo huérfano local pendiente: " + loc.getIdToma());
-                                     continue;
-                                 }
-                                 Log.d(TAG, "Eliminando huérfano local sincronizado: " + loc.getIdToma());
-                                 deleteToma(loc.getIdToma());
-                             }
-                        }
+                        syncResumen(response.data);
                     }
                     Log.d(TAG, "Tomas Fisicas sincronizadas desde API: " + response.data.size());
                 } else {
@@ -263,6 +263,14 @@ public class TomaFisicaTomasDao {
                 entity.setSobrantes(cursor.getString(cursor.getColumnIndexOrThrow("Sobrantes")));
                 entity.setFaltantes(cursor.getString(cursor.getColumnIndexOrThrow("Faltantes")));
                 entity.setTotalActivos(cursor.getString(cursor.getColumnIndexOrThrow("TotalActivos")));
+
+                int idxEstado = cursor.getColumnIndex("Estado");
+                if (idxEstado != -1) {
+                    entity.setEstado(cursor.getString(idxEstado));
+                } else {
+                    entity.setEstado("ABIERTA");
+                }
+
                 list.add(entity);
             } while (cursor.moveToNext());
         }
@@ -288,13 +296,21 @@ public class TomaFisicaTomasDao {
             r.setSobrantes(c.getString(c.getColumnIndexOrThrow("Sobrantes")));
             r.setFaltantes(c.getString(c.getColumnIndexOrThrow("Faltantes")));
             r.setTotalActivos(c.getString(c.getColumnIndexOrThrow("TotalActivos")));
+            
+            // Handle new column gracefully for older DB versions or migrations
+            int idxEstado = c.getColumnIndex("Estado");
+            if (idxEstado != -1) {
+                r.setEstado(c.getString(idxEstado));
+            } else {
+                r.setEstado("ABIERTA");
+            }
+            
             return r;
         } catch (Exception e) {
             Log.e(TAG, "Error obteniendo TomasFisicasResumen por idToma", e);
             return null;
-        } finally {
-            db.close();
         }
+        // Removed db.close()
     }
 
     public int getPendienteStatus(String idToma) {
@@ -324,7 +340,7 @@ public class TomaFisicaTomasDao {
             Log.e(TAG, "Error deleting toma " + trimmed, e);
         } finally {
             db.endTransaction();
-            db.close();
+            // Removed db.close()
         }
     }
 
@@ -337,9 +353,8 @@ public class TomaFisicaTomasDao {
             }
         } catch (Exception e) {
             Log.e(TAG, "Error counting pendientes", e);
-        } finally {
-            db.close();
         }
+        // Removed db.close()
         return count;
     }
 
@@ -380,7 +395,11 @@ public class TomaFisicaTomasDao {
         List<TomaFisicaTomasEntity> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         // Check if SYNC_STATUS column exists first? AppDatabaseHelper ensures it.
-        try (Cursor c = db.rawQuery("SELECT * FROM TomasFisicasResumen WHERE SYNC_STATUS = 0", null)) {
+        // Se agrega filtro AND Estado = 'CERRADA' para subir solo tomas finalizadas
+        String sql = "SELECT * FROM TomasFisicasResumen WHERE SYNC_STATUS = 0 AND Estado = 'CERRADA'";
+        Log.d(TAG, "getPendingResumen: Consultando subtomas pendientes de envío (SYNC_STATUS=0, Estado=CERRADA). SQL: " + sql);
+        
+        try (Cursor c = db.rawQuery(sql, null)) {
             if (c.moveToFirst()) {
                 do {
                     TomaFisicaTomasEntity r = new TomaFisicaTomasEntity();
@@ -393,12 +412,21 @@ public class TomaFisicaTomasDao {
                     r.setSobrantes(c.getString(c.getColumnIndexOrThrow("Sobrantes")));
                     r.setFaltantes(c.getString(c.getColumnIndexOrThrow("Faltantes")));
                     r.setTotalActivos(c.getString(c.getColumnIndexOrThrow("TotalActivos")));
+                    
+                    int idxEstado = c.getColumnIndex("Estado");
+                    if (idxEstado != -1) {
+                        r.setEstado(c.getString(idxEstado));
+                    } else {
+                        r.setEstado("ABIERTA");
+                    }
+
                     list.add(r);
                 } while (c.moveToNext());
             }
         } catch (Exception e) {
             Log.e(TAG, "Error fetching pending resumen", e);
         }
+        Log.d(TAG, "getPendingResumen: Encontradas " + list.size() + " subtomas CERRADAS pendientes de envío.");
         return list;
     }
 
@@ -410,12 +438,27 @@ public class TomaFisicaTomasDao {
             db.update("TomasFisicasResumen", cv, "IdToma = ?", new String[]{idToma});
         } catch (Exception e) {
             Log.e(TAG, "Error marking resumen as synced", e);
-        } finally {
-            db.close();
+        }
+        // Removed db.close()
+    }
+
+    private void closeAllPendingTomas() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put("Estado", "CERRADA");
+            // Actualizar solo las que están ABIERTA y PENDIENTES DE ENVÍO
+            int rows = db.update("TomasFisicasResumen", cv, "SYNC_STATUS = 0 AND Estado = 'ABIERTA'", null);
+            if (rows > 0) {
+                Log.d(TAG, "Se cerraron automáticamente " + rows + " tomas abiertas para envío.");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error cerrando tomas pendientes", e);
         }
     }
 
     public void pushLocalChangesToApi(final Runnable onAllFinished) {
+        // closeAllPendingTomas(); // REMOVED: Do not auto-close pending tomas. Only 'CERRADA' should be sent.
         List<TomaFisicaTomasEntity> localData = getPendingResumen();
         Runnable pushDeletesThenFinish = () -> pushPendingDeletesToApi(onAllFinished);
 
@@ -558,6 +601,13 @@ public class TomaFisicaTomasDao {
                 r.setSobrantes(c.getString(c.getColumnIndexOrThrow("Sobrantes")));
                 r.setFaltantes(c.getString(c.getColumnIndexOrThrow("Faltantes")));
                 r.setTotalActivos(c.getString(c.getColumnIndexOrThrow("TotalActivos")));
+
+                int idxEstado = c.getColumnIndex("Estado");
+                if (idxEstado != -1) {
+                    r.setEstado(c.getString(idxEstado));
+                } else {
+                    r.setEstado("ABIERTA");
+                }
 
                 list.add(r);
             }

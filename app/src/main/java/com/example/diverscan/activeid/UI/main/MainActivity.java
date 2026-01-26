@@ -64,6 +64,8 @@ import android.os.Looper;
 import com.example.diverscan.activeid.data.remote.response.ApiCallback;
 import com.example.diverscan.activeid.data.remote.response.ApiResponse;
 import com.example.diverscan.activeid.data.remote.response.NovedadesResponse;
+import com.example.diverscan.activeid.data.remote.response.ActivoReubicacionDto;
+import com.example.diverscan.activeid.data.remote.response.TomaNovedadDto;
 
 public class MainActivity extends AppCompatActivity implements ResponseHandlerInterface {
     private ActivityMainBinding binding;
@@ -110,8 +112,13 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
         username = sessionManager.getUsername();
         userId = sessionManager.getUserId();
 
-        List<String> roles = rolDao.getRolesForUser(userId);
-        binding.navView.post(() -> applyUserPermissions(roles));
+        // Mover carga de roles a hilo secundario para evitar bloqueo del Main Thread
+        new Thread(() -> {
+            List<String> roles = rolDao.getRolesForUser(userId);
+            runOnUiThread(() -> {
+                applyUserPermissions(roles);
+            });
+        }).start();
     }
 
     @Override
@@ -159,10 +166,40 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
                     @Override
                     public void onComplete(ApiResponse<NovedadesResponse> response) {
                         if (response.success && response.data != null && response.data.ok && response.data.data != null) {
-                            updateBadge(response.data.data.cantidadTareasPendientes);
+                            // Recalculate count excluding "Cambio de Ubicacion" (web flow only)
+                            int count = calculateFilteredCount(response.data.data);
+                            updateBadge(count);
                         }
                     }
                 });
+    }
+
+    private int calculateFilteredCount(NovedadesResponse.NovedadesData data) {
+        int count = 0;
+
+        // Priority to Tomas list (matches UI logic)
+        if (data.tomas != null && !data.tomas.isEmpty()) {
+            for (TomaNovedadDto toma : data.tomas) {
+                if (toma.activos != null) {
+                    for (ActivoReubicacionDto dto : toma.activos) {
+                        boolean hasDestination = dto.ubicacionDestino != null && !dto.ubicacionDestino.isEmpty() && !dto.ubicacionDestino.equals("Sin Destino");
+                        if (!hasDestination) { // Only count if NO destination (Ubicacion HH)
+                            count++;
+                        }
+                    }
+                }
+            }
+        } else if (data.activosParaReubicar != null) {
+            // Fallback to legacy list
+            for (ActivoReubicacionDto dto : data.activosParaReubicar) {
+                boolean hasDestination = dto.ubicacionDestino != null && !dto.ubicacionDestino.isEmpty() && !dto.ubicacionDestino.equals("Sin Destino");
+                if (!hasDestination) { // Only count if NO destination (Ubicacion HH)
+                    count++;
+                }
+            }
+        }
+
+        return count;
     }
 
     private void updateBadge(int count) {

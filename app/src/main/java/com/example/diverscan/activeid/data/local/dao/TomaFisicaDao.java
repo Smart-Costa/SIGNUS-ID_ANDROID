@@ -73,9 +73,8 @@ public class TomaFisicaDao {
             }
         } catch (Exception e) {
             Log.e(TAG, "Error leyendo tomas fisicas locales", e);
-        } finally {
-            db.close();
         }
+        // Removed db.close() to avoid closing the shared connection managed by SQLiteOpenHelper
 
         return list;
     }
@@ -101,7 +100,7 @@ public class TomaFisicaDao {
         } catch (Exception e) {
             Log.e(TAG, "Error consultando por Nombre", e);
         } finally {
-            db.close();
+            // db.close(); // Evitar cierre prematuro de conexión compartida
         }
 
         return listbyName;
@@ -128,9 +127,9 @@ public class TomaFisicaDao {
             }
         } catch (Exception e) {
             Log.e(TAG, "Error obteniendo toma fisica por ID", e);
-        } finally {
-            db.close();
         }
+        // Removed db.close() to avoid closing the shared connection managed by SQLiteOpenHelper
+        
         return entity;
     }
 

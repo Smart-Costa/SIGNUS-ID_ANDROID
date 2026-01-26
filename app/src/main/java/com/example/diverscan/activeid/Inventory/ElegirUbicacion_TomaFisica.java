@@ -137,7 +137,7 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
         eventos();
         cargarTiposInventarios();
         // Cargar ubicaciones desde nueva estructura
-        cargarRazonesSocialesDesdeEntity();
+        // cargarRazonesSocialesDesdeEntity(); // COMENTADO: Logica HH desactivada
         
         RecibirTakesInfo();
         configurarSubTomas();
@@ -166,6 +166,21 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
         // OfficesDBHelper = new OfficesDBHelper(ElegirUbicacionView.getContext()); // Deprecated
         txtAjusteOficina = findViewById(R.id.txtSectorBusquedaAS);
         clsnackbar = findViewById(R.id.clActivosToma);
+        
+        // OCULTAR LOGICA HH (Paneles de ubicación manual)
+        int[] panelesOcultar = {
+            R.id.PanelTituloRazon, R.id.PanelRazonSpinner,
+            R.id.PanelTituloEdificio, R.id.PanelEdificioSpinner,
+            R.id.PanelTituloPiso, R.id.PanelPisoSpinner,
+            R.id.PanelTituloSector, R.id.PanelSectorSpinner,
+            R.id.Espacio4, R.id.Espacio5, R.id.Espacio6, R.id.Espacio7,
+            R.id.Espacio8, R.id.Espacio9, R.id.Espacio10, R.id.Espacio11
+        };
+        
+        for (int id : panelesOcultar) {
+            View v = findViewById(id);
+            if (v != null) v.setVisibility(View.GONE);
+        }
     }
 
     public void eventos() {

@@ -24,7 +24,32 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.diverscan.activeid.TomasFisicas.EntidadCategoriaActivos; // Ensure import
+import com.example.diverscan.activeid.TomasFisicas.EntidadUbicacionSecundaria;
+
 public class ActivoDao {
+    // ... existing code ...
+
+    public List<EntidadCategoriaActivos> getAllCategorias() {
+        List<EntidadCategoriaActivos> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        try (Cursor c = db.rawQuery("SELECT assetCategorySysId, name FROM categoriaActivos ORDER BY name", null)) {
+            if (c.moveToFirst()) {
+                do {
+                    // Constructor: sysId, name, description
+                    // We only fetch sysId and name, desc empty
+                    String sysId = c.getString(0);
+                    String name = c.getString(1);
+                    list.add(new EntidadCategoriaActivos(sysId, name, ""));
+                } while (c.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting categories", e);
+        }
+        return list;
+    }
+    
+    // ... existing code ...
     private static final String TAG = "DB_DAO_ACTIVO";
     private static final String TABLE_ACTIVOS = "ActivosApi";
     private final AppDatabaseHelper dbHelper;
@@ -61,7 +86,6 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e(TAG, "Error counting activos", e);
         }
-        db.close();
         return count;
     }
 
@@ -93,7 +117,6 @@ public class ActivoDao {
         v.put("CUENTA_CONTABLE_DEPRESIACION", a.getCuentaContableDepresiacion());
         v.put("CENTRO_COSTOS", a.getCentroCostos());
         v.put("DESCRIPCION_ESTADO_ULTIMO_INVENTARIO", a.getDescripcionEstadoUltimoInventario());
-        // v.put("TAG_EPC", "EPC Asignado"); // REMOVED: Do not write garbage value
         v.put("EMPLEADO", a.getEmpleado());
         v.put("UBICACION_A", a.getUbicacionA());
         v.put("UBICACION_B", a.getUbicacionB());
@@ -137,9 +160,7 @@ public class ActivoDao {
         ContentValues values = entityToContentValues(activo);
         values.put("SYNC_STATUS", 0); // 0 = Pendiente de sincronizar
 
-        long result = db.insertWithOnConflict(TABLE_ACTIVOS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-        db.close();
-        return result;
+        return db.insertWithOnConflict(TABLE_ACTIVOS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     public void syncActivos(List<ActivoEntity> activos) {
@@ -159,7 +180,7 @@ public class ActivoDao {
             Log.e(TAG, "Error sincronizando activos", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 
@@ -358,7 +379,7 @@ public class ActivoDao {
             Log.e(TAG, "Error marcando activos como sincronizados", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close(); // Evitar cierre prematuro de conexión compartida
         }
     }
 
@@ -492,7 +513,7 @@ public class ActivoDao {
              selection.append(" AND UNIDAD_ORGANIZATIVA = ?");
              args.add(uo);
         }
-        if (cat != null && !cat.isEmpty() && !cat.equals("00000000-0000-0000-0000-000000000000")) {
+        if (cat != null && !cat.isEmpty()) {
              selection.append(" AND CATEGORIA = ?");
              args.add(cat);
         }
@@ -564,7 +585,7 @@ public class ActivoDao {
             selection.append(" AND UNIDAD_ORGANIZATIVA = ?");
             args.add(uo);
         }
-        if (cat != null && !cat.isEmpty() && !cat.equals("00000000-0000-0000-0000-000000000000")) {
+        if (cat != null && !cat.isEmpty()) {
             selection.append(" AND CATEGORIA = ?");
             args.add(cat);
         }
@@ -590,6 +611,40 @@ public class ActivoDao {
             if (c != null) c.close();
             // db.close();
         }
+    }
+
+    public List<EntidadUbicacionSecundaria> getAllUbicacionesSecundarias(String ud) {
+        List<EntidadUbicacionSecundaria> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = null;
+        try {
+            String selection = "UBICACION_SECUNDARIA IS NOT NULL AND UBICACION_SECUNDARIA != ''";
+            List<String> args = new ArrayList<>();
+            if (ud != null && !ud.isEmpty() && !ud.equals("00000000-0000-0000-0000-000000000000")) {
+                selection += " AND UBICACION_D = ?";
+                args.add(ud);
+            }
+            
+            c = db.query(true, TABLE_ACTIVOS, new String[]{"UBICACION_SECUNDARIA"}, selection, args.toArray(new String[0]), null, null, "UBICACION_SECUNDARIA ASC", null);
+            if (c.moveToFirst()) {
+                do {
+                    String id = c.getString(0);
+                    String nombre = id;
+                    
+                    // Mapeo manual temporal de nombres conocidos
+                    if ("44444444-4444-4444-4444-444444444444".equalsIgnoreCase(id)) {
+                        nombre = "SEED-SECUNDARIA";
+                    }
+                    
+                    list.add(new EntidadUbicacionSecundaria(id, nombre));
+                } while (c.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getAllUbicacionesSecundarias", e);
+        } finally {
+            if (c != null) c.close();
+        }
+        return list;
     }
 
     public List<String> getDistinctUbicacionSecundaria(String ud) {
@@ -735,6 +790,47 @@ public class ActivoDao {
             // db.close();
         }
         return 0;
+    }
+
+    public List<ActivoEntity> getActivosByEpcs(List<String> epcs) {
+        List<ActivoEntity> list = new ArrayList<>();
+        if (epcs == null || epcs.isEmpty()) {
+            return list;
+        }
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        
+        // SQLite has a limit on variables, so we might need to batch if huge.
+        // For validation purposes, we assume reasonable size (<900).
+        StringBuilder selection = new StringBuilder("EPC IN (");
+        for (int i = 0; i < epcs.size(); i++) {
+            selection.append("?");
+            if (i < epcs.size() - 1) {
+                selection.append(",");
+            }
+        }
+        selection.append(")");
+
+        try (Cursor c = db.query(
+                TABLE_ACTIVOS,
+                null,
+                selection.toString(),
+                epcs.toArray(new String[0]),
+                null,
+                null,
+                null
+        )) {
+            if (c.moveToFirst()) {
+                do {
+                    list.add(cursorToEntity(c));
+                } while (c.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getActivosByEpcs", e);
+        } finally {
+            // db.close();
+        }
+        return list;
     }
 
     public List<ActivoEntity> getAllLocalActivos() {
@@ -970,7 +1066,7 @@ public class ActivoDao {
                     new String[]{activo.getIdActivo()}
             );
         } finally {
-            db.close();
+            // db.close();
         }
     }
 
@@ -992,12 +1088,25 @@ public class ActivoDao {
     //     api.get("ActivosDetail/Empresas", type, callback);
     // }
 
+    // Interface para reportar progreso de sincronización
+    public interface SyncProgressListener {
+        void onProgress(int page, int count);
+    }
+    
+    private SyncProgressListener progressListener;
+    
+    public void setSyncProgressListener(SyncProgressListener listener) {
+        this.progressListener = listener;
+    }
+
     public void fetchAndSyncFromApi(final Runnable onComplete) {
         // Start pagination with page 1 and size 5000
         fetchPage(1, 5000, onComplete);
     }
 
-    private void fetchPage(int page, int pageSize, final Runnable onComplete) {
+    // Removed overloaded method to simplify usage via setter
+
+    private void fetchPage(int page, int pageSize, final Runnable onComplete) { // Revert signature
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<List<ActivoEntity>>() {}.getType();
         
@@ -1005,6 +1114,12 @@ public class ActivoDao {
         // Dynamic company ID passed from UI/Logic
         String endpoint = "Activos?page=" + page + "&pageSize=" + pageSize;
         Log.d(TAG, "Requesting Activos page " + page + " (size=" + pageSize + ")");
+        
+        if (progressListener != null) {
+            try {
+                progressListener.onProgress(page, 0); // Notificar inicio de página
+            } catch (Exception e) { Log.e(TAG, "Error en progress listener", e); }
+        }
 
         api.<List<ActivoEntity>>get(endpoint, type, new ApiCallback<List<ActivoEntity>>() {
             @Override
@@ -1014,6 +1129,12 @@ public class ActivoDao {
                     if (count > 0) {
                         syncActivos(response.data);
                         Log.d(TAG, "Page " + page + " synced: " + count + " assets.");
+                        
+                        if (progressListener != null) {
+                            try {
+                                progressListener.onProgress(page, count);
+                            } catch (Exception e) { Log.e(TAG, "Error en progress listener", e); }
+                        }
                         
                         // Fetch next page recursively
                         fetchPage(page + 1, pageSize, onComplete);

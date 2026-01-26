@@ -78,11 +78,20 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "Sobrantes TEXT, " +
                 "Faltantes TEXT, " +
                 "TotalActivos TEXT, " +
+                "Estado TEXT, " +
                 "SYNC_STATUS INTEGER DEFAULT 0)");
 
         if (!checkColumnExists(db, "TomasFisicasResumen", "SYNC_STATUS")) {
             try {
                 db.execSQL("ALTER TABLE TomasFisicasResumen ADD COLUMN SYNC_STATUS INTEGER DEFAULT 0");
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+
+        if (!checkColumnExists(db, "TomasFisicasResumen", "Estado")) {
+            try {
+                db.execSQL("ALTER TABLE TomasFisicasResumen ADD COLUMN Estado TEXT");
             } catch (Exception e) {
                 // Ignore
             }

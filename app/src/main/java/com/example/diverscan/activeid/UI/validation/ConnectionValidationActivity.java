@@ -261,30 +261,49 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     }
 
     private void showMultiReadSummary() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Total Tags Únicos: ").append(multiReadTags.size()).append("\n\n");
-        
-        int encontrados = 0;
-        int desconocidos = 0;
-
-        for (String epc : multiReadTags.keySet()) {
-            ActivoEntity a = activoDao.getActivoByEpc(epc);
-            if (a != null) {
-                encontrados++;
-                sb.append("[OK] ").append(epc).append(" - ").append(a.getDescripcionCorta()).append("\n");
-            } else {
-                desconocidos++;
-                sb.append("[UNK] ").append(epc).append("\n");
+        // Ejecutar consultas de base de datos en hilo secundario para evitar congelar la UI
+        new Thread(() -> {
+            List<String> epcList = new ArrayList<>(multiReadTags.keySet());
+            // Uso de consulta masiva optimizada
+            List<ActivoEntity> foundAssets = activoDao.getActivosByEpcs(epcList);
+            
+            // Mapa para búsqueda rápida O(1)
+            Map<String, ActivoEntity> assetMap = new HashMap<>();
+            for (ActivoEntity a : foundAssets) {
+                if (a.getEpc() != null) {
+                    assetMap.put(a.getEpc(), a);
+                }
             }
-        }
-        
-        sb.insert(0, "Encontrados: " + encontrados + " | Desconocidos: " + desconocidos + "\n");
 
-        new AlertDialog.Builder(this)
-                .setTitle("Resumen Lectura Múltiple")
-                .setMessage(sb.toString())
-                .setPositiveButton("Cerrar", null)
-                .show();
+            StringBuilder sb = new StringBuilder();
+            sb.append("Total Tags Únicos: ").append(multiReadTags.size()).append("\n\n");
+            
+            int encontrados = 0;
+            int desconocidos = 0;
+
+            for (String epc : multiReadTags.keySet()) {
+                ActivoEntity a = assetMap.get(epc);
+                if (a != null) {
+                    encontrados++;
+                    sb.append("[OK] ").append(epc).append(" - ").append(a.getDescripcionCorta()).append("\n");
+                } else {
+                    desconocidos++;
+                    sb.append("[UNK] ").append(epc).append("\n");
+                }
+            }
+            
+            sb.insert(0, "Encontrados: " + encontrados + " | Desconocidos: " + desconocidos + "\n");
+            
+            // Actualizar UI en el hilo principal
+            String message = sb.toString();
+            runOnUiThread(() -> {
+                new AlertDialog.Builder(this)
+                        .setTitle("Resumen Lectura Múltiple")
+                        .setMessage(message)
+                        .setPositiveButton("Cerrar", null)
+                        .show();
+            });
+        }).start();
     }
 
     @Override

@@ -30,11 +30,15 @@ public class RegistroTomaFisicaViewModel extends AndroidViewModel {
         // Primero cargamos lo local
         tomasfisicas.setValue(repository.getTomaFisica());
         
+        // COMENTADO POR SOLICITUD: La sincronización automática en la vista está deshabilitada.
+        // Toda sincronización debe realizarse explícitamente a través del módulo de Sincronización.
+        /*
         // Intentamos sincronizar
         repository.sync(() -> {
             // Si hay éxito, recargamos
             tomasfisicas.postValue(repository.getTomaFisica());
         });
+        */
     }
 
     public void buscarTomasFisicasPorNombre(String nombre) {

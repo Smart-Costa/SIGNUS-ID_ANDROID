@@ -178,7 +178,8 @@ public class ChequearInventario {
                     
                     _activosSobrantes.put(epc, inventarioVisual); // Usamos EPC como Key si no hay AssetID
                     
-                    InsertarDetalleInventario(epc);
+                    // CORRECCION: No guardar en BD si no existe el activo (evitar saturacion)
+                    // InsertarDetalleInventario(epc);
                     iChequearInventario.RetornarActivo(inventarioVisual);
                     return true;
                 }

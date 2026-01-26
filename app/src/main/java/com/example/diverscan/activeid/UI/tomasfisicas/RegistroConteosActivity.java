@@ -30,6 +30,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.diverscan.activeid.FotoActivo.EFotoActivo;
 import com.example.diverscan.activeid.R;
+import com.example.diverscan.activeid.TomasFisicas.EntidadCategoriaActivos;
+import com.example.diverscan.activeid.TomasFisicas.EntidadUbicacionSecundaria;
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaDetallesDao;
 import com.example.diverscan.activeid.data.local.dao.TomaFisicaTomasDao;
@@ -99,6 +101,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
     private Spinner spinnerUbicacionC;
     private Spinner spinnerUbicacionD;
     private Spinner spinnerUbicacionSecundaria;
+    private Spinner spinnerCategoria;
 
     private TextView txtCountActivosFiltrados;
     private TextView txtCountUbicacionA;
@@ -106,18 +109,21 @@ public class RegistroConteosActivity extends AppCompatActivity {
     private TextView txtCountUbicacionC;
     private TextView txtCountUbicacionD;
     private TextView txtCountUbicacionSecundaria;
+    private TextView txtCountCategoria;
 
     private List<SpinnerItem> listUbicacionA = new ArrayList<>();
     private List<SpinnerItem> listUbicacionB = new ArrayList<>();
     private List<SpinnerItem> listUbicacionC = new ArrayList<>();
     private List<SpinnerItem> listUbicacionD = new ArrayList<>();
-    private List<String> listUbicacionSecundaria = new ArrayList<>();
+    private List<SpinnerItem> listUbicacionSecundaria = new ArrayList<>();
+    private List<SpinnerItem> listCategoria = new ArrayList<>();
 
     private String selectedUbicacionAId = null;
     private String selectedUbicacionBId = null;
     private String selectedUbicacionCId = null;
     private String selectedUbicacionDId = null;
     private String selectedUbicacionSecundariaId = null;
+    private String selectedCategoriaId = null;
 
     private String baseUbicacionAId = null;
     private String baseUbicacionBId = null;
@@ -127,6 +133,28 @@ public class RegistroConteosActivity extends AppCompatActivity {
     private String baseCategoriaId = null;
     
     private boolean isUpdatingSpinners = false;
+    private boolean isTomaCerrada = false;
+
+    private void checkEstadoToma() {
+        new Thread(() -> {
+            TomaFisicaTomasEntity toma = tomasDao.getByIdToma(idToma);
+            if (toma != null && "CERRADA".equalsIgnoreCase(toma.getEstado())) {
+                runOnUiThread(() -> {
+                    isTomaCerrada = true;
+                    if (btnAgregarLectura != null) btnAgregarLectura.setEnabled(false);
+                    if (spinnerActivos != null) spinnerActivos.setEnabled(false);
+                    // Show message
+                    // Toast.makeText(this, "Esta toma está CERRADA y no se puede editar.", Toast.LENGTH_LONG).show();
+                });
+            } else {
+                runOnUiThread(() -> {
+                    isTomaCerrada = false;
+                    if (btnAgregarLectura != null) btnAgregarLectura.setEnabled(true);
+                    if (spinnerActivos != null) spinnerActivos.setEnabled(true);
+                });
+            }
+        }).start();
+    }
 
     private static class SpinnerItem {
         String id;
@@ -212,6 +240,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
         spinnerUbicacionC = findViewById(R.id.spinnerUbicacionC);
         spinnerUbicacionD = findViewById(R.id.spinnerUbicacionD);
         spinnerUbicacionSecundaria = findViewById(R.id.spinnerUbicacionSecundaria);
+        spinnerCategoria = findViewById(R.id.spinnerCategoria);
 
         txtCountActivosFiltrados = findViewById(R.id.txtCountActivosFiltrados);
         txtCountUbicacionA = findViewById(R.id.txtCountUbicacionA);
@@ -219,6 +248,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
         txtCountUbicacionC = findViewById(R.id.txtCountUbicacionC);
         txtCountUbicacionD = findViewById(R.id.txtCountUbicacionD);
         txtCountUbicacionSecundaria = findViewById(R.id.txtCountUbicacionSecundaria);
+        txtCountCategoria = findViewById(R.id.txtCountCategoria);
 
         initFilters();
 
@@ -277,13 +307,17 @@ public class RegistroConteosActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        checkEstadoToma();
+        cargarDatos();checkEstadoToma();
         cargarDatos();
         cargarActivosSpinner();
         updateHeaderTitle();
         if (tomaFisicaId != null && !tomaFisicaId.trim().isEmpty()) {
-            tomasDao.fetchAndSyncFromApi(tomaFisicaId.trim(), () -> runOnUiThread(this::cargarDatos));
+            // COMENTADO POR SOLICITUD: La sincronización automática en la vista está deshabilitada.
+            // tomasDao.fetchAndSyncFromApi(tomaFisicaId.trim(), () -> runOnUiThread(this::cargarDatos));
         }
-        detallesDao.fetchAndSyncFromApi(idToma, () -> runOnUiThread(this::cargarDatos));
+        // COMENTADO POR SOLICITUD: La sincronización automática en la vista está deshabilitada.
+        // detallesDao.fetchAndSyncFromApi(idToma, () -> runOnUiThread(this::cargarDatos));
         updateTomasTabs();
     }
 
@@ -340,6 +374,54 @@ public class RegistroConteosActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
                 setupLocationSpinners();
+                loadCategoria();
+            });
+        }).start();
+    }
+
+    private void loadCategoria() {
+        new Thread(() -> {
+            listCategoria = new ArrayList<>();
+            if (baseCategoriaId != null) {
+                 List<EntidadCategoriaActivos> all = activoDao.getAllCategorias();
+                 String name = baseCategoriaId;
+                 for(EntidadCategoriaActivos c : all) {
+                     if(c.getAssetCategorySysId().equalsIgnoreCase(baseCategoriaId)) {
+                         name = c.getName();
+                         break;
+                     }
+                 }
+                 listCategoria.add(new SpinnerItem(baseCategoriaId, name));
+            } else {
+                List<EntidadCategoriaActivos> list = activoDao.getAllCategorias();
+                listCategoria.add(new SpinnerItem(null, "Todas"));
+                for (EntidadCategoriaActivos c : list) {
+                    listCategoria.add(new SpinnerItem(c.getAssetCategorySysId(), c.getName()));
+                }
+            }
+
+            runOnUiThread(() -> {
+                setSpinnerItems(spinnerCategoria, listCategoria);
+                if (baseCategoriaId != null) {
+                    spinnerCategoria.setEnabled(false);
+                    selectedCategoriaId = baseCategoriaId;
+                } else {
+                    spinnerCategoria.setEnabled(true);
+                    selectedCategoriaId = null;
+                }
+                
+                spinnerCategoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (isUpdatingSpinners) return;
+                        SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
+                        selectedCategoriaId = (item != null && item.id != null) ? item.id : null;
+                        refreshSummaryCounts();
+                    }
+                    @Override public void onNothingSelected(AdapterView<?> parent) {}
+                });
+                
+                refreshSummaryCounts();
             });
         }).start();
     }
@@ -382,7 +464,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
         setSoloTodasForSpinnerItem(spinnerUbicacionB);
         setSoloTodasForSpinnerItem(spinnerUbicacionC);
         setSoloTodasForSpinnerItem(spinnerUbicacionD);
-        setSoloTodasForString(spinnerUbicacionSecundaria);
+        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria);
 
         spinnerUbicacionA.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -403,7 +485,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                         setSoloTodasForSpinnerItem(spinnerUbicacionB);
                         setSoloTodasForSpinnerItem(spinnerUbicacionC);
                         setSoloTodasForSpinnerItem(spinnerUbicacionD);
-                        setSoloTodasForString(spinnerUbicacionSecundaria);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria);
                     });
                 }
                 refreshSummaryCounts();
@@ -428,7 +510,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         setSoloTodasForSpinnerItem(spinnerUbicacionC);
                         setSoloTodasForSpinnerItem(spinnerUbicacionD);
-                        setSoloTodasForString(spinnerUbicacionSecundaria);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria);
                     });
                 }
                 refreshSummaryCounts();
@@ -451,7 +533,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                 } else {
                     runOnUiThread(() -> {
                         setSoloTodasForSpinnerItem(spinnerUbicacionD);
-                        setSoloTodasForString(spinnerUbicacionSecundaria);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria);
                     });
                 }
                 refreshSummaryCounts();
@@ -471,7 +553,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                 if (selectedUbicacionDId != null) {
                     loadUbicacionSecundaria(selectedUbicacionDId);
                 } else {
-                    runOnUiThread(() -> setSoloTodasForString(spinnerUbicacionSecundaria));
+                    runOnUiThread(() -> setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria));
                 }
                 refreshSummaryCounts();
             }
@@ -482,8 +564,8 @@ public class RegistroConteosActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (isUpdatingSpinners) return;
-                String item = (String) parent.getItemAtPosition(position);
-                selectedUbicacionSecundariaId = (item != null && !item.equals("Todas")) ? item : null;
+                SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
+                selectedUbicacionSecundariaId = (item != null && item.id != null) ? item.id : null;
                 refreshSummaryCounts();
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
@@ -517,7 +599,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                     setSoloTodasForSpinnerItem(spinnerUbicacionB); spinnerUbicacionB.setEnabled(false);
                     setSoloTodasForSpinnerItem(spinnerUbicacionC); spinnerUbicacionC.setEnabled(false);
                     setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
-                    setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                    setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
                     refreshSummaryCounts();
                 }
             });
@@ -553,14 +635,14 @@ public class RegistroConteosActivity extends AppCompatActivity {
                         selectedUbicacionBId = null;
                         setSoloTodasForSpinnerItem(spinnerUbicacionC); spinnerUbicacionC.setEnabled(false);
                         setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
-                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
                         refreshSummaryCounts();
                     } else {
                         spinnerUbicacionB.setEnabled(true);
                         selectedUbicacionBId = null;
                         setSoloTodasForSpinnerItem(spinnerUbicacionC); spinnerUbicacionC.setEnabled(false);
                         setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
-                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
                         refreshSummaryCounts();
                     }
                 }
@@ -596,13 +678,13 @@ public class RegistroConteosActivity extends AppCompatActivity {
                         spinnerUbicacionC.setEnabled(false);
                         selectedUbicacionCId = null;
                         setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
-                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
                         refreshSummaryCounts();
                     } else {
                         spinnerUbicacionC.setEnabled(true);
                         selectedUbicacionCId = null;
                         setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
-                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
                         refreshSummaryCounts();
                     }
                 }
@@ -637,13 +719,13 @@ public class RegistroConteosActivity extends AppCompatActivity {
                     if (baseUbicacionCId != null) {
                         spinnerUbicacionD.setEnabled(false);
                         selectedUbicacionDId = null;
-                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
                         refreshSummaryCounts();
                     } else {
                         spinnerUbicacionD.setEnabled(true);
-                        selectedUbicacionDId = null;
-                        setSoloTodasForString(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
-                        refreshSummaryCounts();
+                    selectedUbicacionDId = null;
+                    setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                    refreshSummaryCounts();
                     }
                 }
             });
@@ -652,13 +734,15 @@ public class RegistroConteosActivity extends AppCompatActivity {
 
     private void loadUbicacionSecundaria(String parentId) {
         new Thread(() -> {
-            List<String> list = activoDao.getDistinctUbicacionSecundaria(parentId);
+            List<EntidadUbicacionSecundaria> list = activoDao.getAllUbicacionesSecundarias(parentId);
             listUbicacionSecundaria = new ArrayList<>();
-            listUbicacionSecundaria.add("Todas");
-            listUbicacionSecundaria.addAll(list);
+            listUbicacionSecundaria.add(new SpinnerItem(null, "Todas"));
+            for (EntidadUbicacionSecundaria u : list) {
+                listUbicacionSecundaria.add(new SpinnerItem(u.getId(), u.getNombre()));
+            }
 
             runOnUiThread(() -> {
-                setSpinnerStrings(spinnerUbicacionSecundaria, listUbicacionSecundaria);
+                setSpinnerItems(spinnerUbicacionSecundaria, listUbicacionSecundaria);
                 if (baseUbicacionDId != null) {
                      spinnerUbicacionSecundaria.setEnabled(false);
                 } else {
@@ -708,6 +792,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
         if (txtCountUbicacionC != null) txtCountUbicacionC.setText("Activos: " + countC);
         if (txtCountUbicacionD != null) txtCountUbicacionD.setText("Activos: " + countD);
         if (txtCountUbicacionSecundaria != null) txtCountUbicacionSecundaria.setText("Activos: " + countS);
+        if (txtCountCategoria != null) txtCountCategoria.setText("Activos: " + countFiltrados);
 
         // Update Main Summary (KPIs)
         cargarDatos();
@@ -869,6 +954,10 @@ public class RegistroConteosActivity extends AppCompatActivity {
     }
 
     private void agregarLecturaManual() {
+        if (isTomaCerrada) {
+            Toast.makeText(this, "La toma está cerrada", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (listaActivosSpinner == null || listaActivosSpinner.isEmpty()) {
              Toast.makeText(this, "No hay activos cargados", Toast.LENGTH_SHORT).show();
              return;

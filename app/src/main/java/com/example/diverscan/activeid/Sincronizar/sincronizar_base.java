@@ -380,8 +380,23 @@ public class sincronizar_base extends AppCompatActivity {
                     getCategoriaActivos(() -> {
 
                         // 4. Activos
+                        runOnUiThread(() -> Mensaje.setText("Iniciando descarga de Activos..."));
+                        
+                        activoDao.setSyncProgressListener((page, count) -> {
+                             runOnUiThread(() -> {
+                                 if (count == 0) {
+                                     Mensaje.setText("Descargando Activos: Solicitando página " + page + "...");
+                                 } else {
+                                     Mensaje.setText("Descargando Activos: Procesados " + count + " registros (Página " + page + ")...");
+                                 }
+                             });
+                        });
+
                         activoDao.fetchAndSyncFromApi(() -> {
-                            runOnUiThread(() -> actualizarBarraSegmentada(60));
+                            runOnUiThread(() -> {
+                                actualizarBarraSegmentada(60);
+                                Mensaje.setText("Sincronización de activos completada.");
+                            });
 
                         // 5. Tomas Fisicas (Encabezados)
                         tomafisicaDao.fetchAndSyncFromApi(() -> {
@@ -479,24 +494,13 @@ public class sincronizar_base extends AppCompatActivity {
 
         // Recopilar estadísticas ANTES de enviar (porque el envío limpia los pendientes)
         java.util.Map<String, Integer> activoStats = activoDao.getPendingSummary();
-        int activosCreados = 0;
-        int activosBajas = 0;
+        final int[] syncStats = new int[3]; // 0: Creados, 1: Bajas, 2: Tomas
+        
         if (activoStats != null) {
-            if (activoStats.containsKey("creados")) activosCreados = activoStats.get("creados");
-            if (activoStats.containsKey("bajas")) activosBajas = activoStats.get("bajas");
+            if (activoStats.containsKey("creados")) syncStats[0] = activoStats.get("creados");
+            if (activoStats.containsKey("bajas")) syncStats[1] = activoStats.get("bajas");
         }
         
-        // Para Tomas, al no tener flag de pendiente, reportamos el total local que se intentará enviar.
-        // Esto es consistente con la lógica de envío actual que envía todo lo local.
-        int countTomasResumen = tomafisicatomasDao.getPendingResumen().size();
-        int countTomasDetalle = tomafisicadetallesDao.getPendingDetalles().size();
-
-        String resumenMsg = "4enviados:\n\n" +
-                "- Activos Creados/Modificados: " + activosCreados + "\n" +
-                "- Activos Dados de Baja: " + activosBajas + "\n" +
-                "- Subtomas de Inventario: " + countTomasResumen + "\n" +
-                "- Detalles de Inventario: " + countTomasDetalle;
-
         // Reset progress
         resetBarraSegmentada();
         actualizarBarraSegmentada(10); // Start
@@ -510,12 +514,14 @@ public class sincronizar_base extends AppCompatActivity {
                 if (!response.success) {
                     runOnUiThread(() -> {
                         mostrarSnack("Error enviando Activos: " + response.errorMessage, Color.RED);
-                        // Don't stop, continue to next steps? Or stop? 
-                        // Usually better to continue to try sending other data.
                     });
                 } else {
                     Log.d("SYNC", "Activos enviados correctamente");
                 }
+
+                // Calcular pendientes de Tomas justo antes de enviar para mayor precisión
+                syncStats[2] = tomafisicatomasDao.getPendingResumen().size();
+                Log.d("SYNC", "Tomas pendientes detectadas para envio: " + syncStats[2]);
 
                 // Sincronizar Resumenes (Tomas)
                 tomafisicatomasDao.pushLocalChangesToApi(() -> {
@@ -533,10 +539,15 @@ public class sincronizar_base extends AppCompatActivity {
                             btn_enviar.setEnabled(true);
                             btn_obtener.setEnabled(true);
                             
+                            String finalMsg = "enviados:\n\n" +
+                                    "- Activos Creados/Modificados: " + syncStats[0] + "\n" +
+                                    "- Activos Dados de Baja: " + syncStats[1] + "\n" +
+                                    "- Subtomas de Inventario: " + syncStats[2] + "\n";
+
                             // Mostrar resumen en diálogo
                             new AlertDialog.Builder(_context)
                                     .setTitle("Sincronización Completada")
-                                    //.setMessage(resumenMsg)
+                                    .setMessage(finalMsg)
                                     .setPositiveButton("Aceptar", null)
                                     .setIcon(R.drawable.ic_check_circle)
                                     .show();
@@ -1825,6 +1836,12 @@ public class sincronizar_base extends AppCompatActivity {
             }
 
             for (int i = 0; i < listDetalleInventario.size(); i++) {
+                // VALIDACION: No subir activos que no existen en la base de datos ("No Inventariado")
+                String estado = listDetalleInventario.get(i).getEstado();
+                if (estado != null && "No Inventariado".equalsIgnoreCase(estado)) {
+                    continue;
+                }
+
                 JSONObject det = new JSONObject();
                 det.put("idInventoryDetails", listDetalleInventario.get(i).getId());
                 det.put("idInventory",        listDetalleInventario.get(i).getIdInventario());

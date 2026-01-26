@@ -1129,8 +1129,28 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
                             idTypeInventory
                     );
 
+            // Variables para recuento real a guardar (Excluyendo No Inventariado)
+            int saveEncontrados = 0;
+            int saveFaltantes = 0;
+            int saveSobrantes = 0;
+
             // DetalleInventario (uno por cada item visual leído)
             for (InventarioVisual item : inventarioVisuals) {
+                // FILTRO: No guardar activos desconocidos ("No Inventariado")
+                if ("No Inventariado".equalsIgnoreCase(item.getStatus())) {
+                    continue; 
+                }
+
+                // Recalcular contadores para lo que se va a guardar
+                String estado = item.getStatus();
+                if ("Encontrado".equalsIgnoreCase(estado)) {
+                    saveEncontrados++;
+                } else if ("Faltante".equalsIgnoreCase(estado)) {
+                    saveFaltantes++;
+                } else if ("No Pertenece".equalsIgnoreCase(estado) || "Sin Asignar".equalsIgnoreCase(estado) || "Sobrante".equalsIgnoreCase(estado)) {
+                    saveSobrantes++;
+                }
+
                 _detalleInventario.add(
                         new EntidadDetalleInventario(
                                 UUID.randomUUID().toString(), // IdDetalleInventario
@@ -1145,8 +1165,8 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
             }
 
             // Totales
-            int activosLeidos     = contadorActivosSobrantes + contActivosEncontrados;
-            int activosUbicacion  = contActivosEncontrados + contadorActivosFaltantes;
+            int activosLeidos     = saveSobrantes + saveEncontrados;
+            int activosUbicacion  = saveEncontrados + saveFaltantes;
 
             // Cabecera Inventario
             _inventario.add(
@@ -1156,9 +1176,9 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
                             "2",                       // Numero (como en tu código original)
                             String.valueOf(activosLeidos),
                             String.valueOf(activosUbicacion),
-                            String.valueOf(contActivosEncontrados),
-                            String.valueOf(contadorActivosFaltantes),
-                            String.valueOf(contadorActivosSobrantes),
+                            String.valueOf(saveEncontrados),
+                            String.valueOf(saveFaltantes),
+                            String.valueOf(saveSobrantes),
                             fechaIso                   // Fecha
                     )
             );
@@ -1170,9 +1190,9 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
                 // 1. Actualizar Resumen (Subtoma)
                 TomaFisicaTomasEntity subtoma = subTomasDao.getByIdToma(currentIdSubToma);
                 if (subtoma != null) {
-                    subtoma.setActivosLeidos(String.valueOf(contActivosEncontrados + contadorActivosSobrantes));
-                    subtoma.setFaltantes(String.valueOf(contadorActivosFaltantes));
-                    subtoma.setSobrantes(String.valueOf(contadorActivosSobrantes));
+                    subtoma.setActivosLeidos(String.valueOf(activosLeidos));
+                    subtoma.setFaltantes(String.valueOf(saveFaltantes));
+                    subtoma.setSobrantes(String.valueOf(saveSobrantes));
                     // Guardar localmente
                     subTomasDao.saveLocal(java.util.Collections.singletonList(subtoma));
                 }
@@ -1180,6 +1200,11 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
                 // 2. Guardar Detalles
                 ArrayList<TomaFisicaDetallesEntity> nuevosDetalles = new ArrayList<>();
                 for (InventarioVisual item : inventarioVisuals) {
+                    // FILTRO: No guardar activos desconocidos ("No Inventariado")
+                    if ("No Inventariado".equalsIgnoreCase(item.getStatus())) {
+                        continue;
+                    }
+
                     TomaFisicaDetallesEntity det = new TomaFisicaDetallesEntity();
                     // ID único para el detalle
                     det.setIdTakeDetail(UUID.randomUUID().toString());

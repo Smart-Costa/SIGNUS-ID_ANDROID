@@ -40,7 +40,7 @@ import java.util.Set;
 public class ActivosReubicarActivity extends AppCompatActivity {
 
     private TextView tvStatus, tvTomaId;
-    private LinearLayout llListUbicacionHh, llListCambioUbicacion;
+    private LinearLayout llListUbicacionHh;
     private Button btnRefresh;
     private SessionManager sessionManager;
     
@@ -61,7 +61,7 @@ public class ActivosReubicarActivity extends AppCompatActivity {
         tvStatus = findViewById(R.id.tv_status);
         // tvTomaId = findViewById(R.id.tv_toma_id); // Removed
         llListUbicacionHh = findViewById(R.id.ll_list_ubicacion_hh);
-        llListCambioUbicacion = findViewById(R.id.ll_list_cambio_ubicacion);
+        // llListCambioUbicacion = findViewById(R.id.ll_list_cambio_ubicacion); // Removed
         btnRefresh = findViewById(R.id.btn_refresh);
 
         sessionManager = new SessionManager(this);
@@ -138,8 +138,13 @@ public class ActivosReubicarActivity extends AppCompatActivity {
     private void actualizarUI(NovedadesResponse.NovedadesData data) {
         if (data == null) return;
 
+        android.util.Log.d("ActivosReubicar", "actualizarUI: data.cantidadTareasPendientes (API) = " + data.cantidadTareasPendientes);
+        
         mHasAssignment = data.tieneAsignacion;
-        mCurrentTaskCount = data.cantidadTareasPendientes;
+        // Recalculate count excluding "Cambio de Ubicacion"
+        mCurrentTaskCount = calculateFilteredCount(data);
+        android.util.Log.d("ActivosReubicar", "actualizarUI: mCurrentTaskCount (Calculated) = " + mCurrentTaskCount);
+
         mTomaHeaderTitle = ""; // Reset
         
         updateStatusHeader();
@@ -147,7 +152,7 @@ public class ActivosReubicarActivity extends AppCompatActivity {
         List<String> displayList = new ArrayList<>();
         
         llListUbicacionHh.removeAllViews();
-        llListCambioUbicacion.removeAllViews();
+        // llListCambioUbicacion.removeAllViews(); // Removed
 
         if (data.tomas != null && !data.tomas.isEmpty()) {
             boolean singleToma = data.tomas.size() == 1;
@@ -193,6 +198,8 @@ public class ActivosReubicarActivity extends AppCompatActivity {
                     }
                 }
 
+                // COMENTADO: CAMBIO DE UBICACION desactivado (flujo web)
+                /*
                 // Add header and items to CAMBIO DE UBICACION only if there are items
                 if (!itemsWithDest.isEmpty()) {
                     ViewGroup target = llListCambioUbicacion;
@@ -207,13 +214,20 @@ public class ActivosReubicarActivity extends AppCompatActivity {
                         processActivoItem(dto, target);
                     }
                 }
+                */
             }
         } else if (data.activosParaReubicar != null) {
             // Fallback to flat list if tomas is empty (legacy support)
             for (ActivoReubicacionDto dto : data.activosParaReubicar) {
                 // Determine category based on destination
                 boolean hasDestination = dto.ubicacionDestino != null && !dto.ubicacionDestino.isEmpty() && !dto.ubicacionDestino.equals("Sin Destino");
-                ViewGroup target = hasDestination ? llListCambioUbicacion : llListUbicacionHh;
+                
+                // COMENTADO: CAMBIO DE UBICACION desactivado (flujo web)
+                if (hasDestination) {
+                    continue; // Skip items with destination (Cambio de Ubicacion)
+                }
+                
+                ViewGroup target = llListUbicacionHh; // Always HH for now
                 processActivoItem(dto, target);
             }
         }
@@ -223,6 +237,40 @@ public class ActivosReubicarActivity extends AppCompatActivity {
         }
     }
     
+    private int calculateFilteredCount(NovedadesResponse.NovedadesData data) {
+        int count = 0;
+        android.util.Log.d("ActivosReubicar", "calculateFilteredCount: Starting calculation...");
+
+        // Priority to Tomas list (matches UI logic)
+        if (data.tomas != null && !data.tomas.isEmpty()) {
+            for (TomaNovedadDto toma : data.tomas) {
+                if (toma.activos != null) {
+                    for (ActivoReubicacionDto dto : toma.activos) {
+                        boolean hasDestination = dto.ubicacionDestino != null && !dto.ubicacionDestino.isEmpty() && !dto.ubicacionDestino.equals("Sin Destino");
+                        if (!hasDestination) { // Only count if NO destination (Ubicacion HH)
+                            count++;
+                        } else {
+                            android.util.Log.d("ActivosReubicar", "Skipping item (Toma " + toma.tomaFisicaId + "): " + dto.idActivo + " hasDestination=" + dto.ubicacionDestino);
+                        }
+                    }
+                }
+            }
+        } else if (data.activosParaReubicar != null) {
+            // Fallback to legacy list
+            for (ActivoReubicacionDto dto : data.activosParaReubicar) {
+                boolean hasDestination = dto.ubicacionDestino != null && !dto.ubicacionDestino.isEmpty() && !dto.ubicacionDestino.equals("Sin Destino");
+                if (!hasDestination) { // Only count if NO destination (Ubicacion HH)
+                    count++;
+                } else {
+                    android.util.Log.d("ActivosReubicar", "Skipping item (Legacy): " + dto.idActivo + " hasDestination=" + dto.ubicacionDestino);
+                }
+            }
+        }
+
+        android.util.Log.d("ActivosReubicar", "calculateFilteredCount: Final count = " + count);
+        return count;
+    }
+
     private void updateStatusHeader() {
         if (mHasAssignment) {
             tvStatus.setText("Asignación Activa\n(Tareas Pendientes: " + mCurrentTaskCount + ")" + mTomaHeaderTitle);
@@ -491,7 +539,7 @@ public class ActivosReubicarActivity extends AppCompatActivity {
                         
                         // Check if we need to clean up empty section (Header only)
                         // If parent is not the main container, it's a section wrapper
-                        if (parent != llListUbicacionHh && parent != llListCambioUbicacion) {
+                        if (parent != llListUbicacionHh) {
                             // It's a section wrapper. 
                             // If only header remains (1 child), remove the wrapper itself.
                             if (parent.getChildCount() == 1) {

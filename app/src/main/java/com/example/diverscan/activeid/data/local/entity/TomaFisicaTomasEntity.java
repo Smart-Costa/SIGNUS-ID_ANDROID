@@ -30,6 +30,9 @@ public class TomaFisicaTomasEntity {
     @SerializedName(value = "TotalActivos", alternate = {"totalActivos"})
     private String totalActivos;
 
+    @SerializedName(value = "Estado", alternate = {"estado", "Status", "status", "State", "state"})
+    private String estado;
+
     public String getTomaFisicaId() { return tomaFisicaId; }
     public void setTomaFisicaId(String tomaFisicaId) { this.tomaFisicaId = tomaFisicaId; }
 
@@ -56,4 +59,7 @@ public class TomaFisicaTomasEntity {
 
     public String getTotalActivos() { return totalActivos; }
     public void setTotalActivos(String totalActivos) { this.totalActivos = totalActivos; }
+
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 }

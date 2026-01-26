@@ -140,60 +140,41 @@ public class TomaFisicaDetallesDao {
                             }
                             filtered.add(item);
                         }
+
+                        // Limpieza PREVIA: Eliminar datos sincronizados antiguos
+                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                        try {
+                            String where = "SYNC_STATUS = 1";
+                            List<String> args = new ArrayList<>();
+                            if (idToma != null && !idToma.trim().isEmpty()) {
+                                where += " AND LOWER(IdToma) = LOWER(?)";
+                                args.add(idToma.trim());
+                            }
+                            db.delete("TomasFisicasDetalle", where, args.toArray(new String[0]));
+                            Log.d(TAG, "Limpiados detalles sincronizados previos. Filtro idToma=" + idToma);
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error limpiando detalles previos", e);
+                        }
+
                         syncDetalle(filtered);
                         
-                        // Limpieza de huérfanos para detalles
-                        List<TomaFisicaDetallesEntity> localItems;
-                        if (idToma != null && !idToma.trim().isEmpty()) {
-                            localItems = getByIdToma(idToma);
-                        } else {
-                            localItems = getAll();
-                        }
-
-                        List<String> remoteIds = new ArrayList<>();
-                        for(TomaFisicaDetallesEntity rem : filtered) {
-                            if(rem.getIdTakeDetail() != null) remoteIds.add(rem.getIdTakeDetail().trim().toLowerCase());
-                        }
-                        
-                        SQLiteDatabase db = dbHelper.getWritableDatabase();
-                        try {
-                            for(TomaFisicaDetallesEntity loc : localItems) {
-                                if(loc.getIdTakeDetail() != null && !remoteIds.contains(loc.getIdTakeDetail().trim().toLowerCase())) {
-                                    Log.d(TAG, "Eliminando detalle huérfano local: " + loc.getIdTakeDetail());
-                                    db.delete("TomasFisicasDetalle", "IdTakeDetail = ?", new String[]{loc.getIdTakeDetail()});
-                                }
-                            }
-                        } catch(Exception e) {
-                            Log.e(TAG, "Error limpiando huérfanos", e);
-                        }
-
                     } else {
-                        syncDetalle(response.data);
-                        
-                        // Limpieza de huérfanos
-                        List<TomaFisicaDetallesEntity> localItems;
-                        if (idToma != null && !idToma.trim().isEmpty()) {
-                            localItems = getByIdToma(idToma);
-                        } else {
-                            localItems = getAll();
-                        }
-
-                        List<String> remoteIds = new ArrayList<>();
-                        for(TomaFisicaDetallesEntity rem : response.data) {
-                            if(rem.getIdTakeDetail() != null) remoteIds.add(rem.getIdTakeDetail().trim().toLowerCase());
-                        }
-                        
+                        // Limpieza PREVIA (Caso sin deletes pendientes)
                         SQLiteDatabase db = dbHelper.getWritableDatabase();
                         try {
-                            for(TomaFisicaDetallesEntity loc : localItems) {
-                                if(loc.getIdTakeDetail() != null && !remoteIds.contains(loc.getIdTakeDetail().trim().toLowerCase())) {
-                                    Log.d(TAG, "Eliminando detalle huérfano local: " + loc.getIdTakeDetail());
-                                    db.delete("TomasFisicasDetalle", "IdTakeDetail = ?", new String[]{loc.getIdTakeDetail()});
-                                }
+                            String where = "SYNC_STATUS = 1";
+                            List<String> args = new ArrayList<>();
+                            if (idToma != null && !idToma.trim().isEmpty()) {
+                                where += " AND LOWER(IdToma) = LOWER(?)";
+                                args.add(idToma.trim());
                             }
-                        } catch(Exception e) {
-                            Log.e(TAG, "Error limpiando huérfanos", e);
+                            db.delete("TomasFisicasDetalle", where, args.toArray(new String[0]));
+                            Log.d(TAG, "Limpiados detalles sincronizados previos. Filtro idToma=" + idToma);
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error limpiando detalles previos", e);
                         }
+
+                        syncDetalle(response.data);
                     }
                     Log.d(TAG, "Tomas Fisicas sincronizadas desde API: " + response.data.size());
                 } else {
@@ -219,6 +200,10 @@ public class TomaFisicaDetallesDao {
         if (list != null) {
             for (TomaFisicaDetallesEntity d : list) {
                 if (d == null) continue;
+                // VALIDACION: No subir activos que no existen en la base de datos ("No Inventariado")
+                if ("No Inventariado".equalsIgnoreCase(d.getEstadoInventario())) {
+                    continue;
+                }
                 payload.add(toRequest(d));
             }
         }
@@ -534,6 +519,14 @@ public class TomaFisicaDetallesDao {
                 inc(skippedByReason, "null_detail");
                 continue;
             }
+            
+            // VALIDACION: No subir activos que no existen en la base de datos ("No Inventariado")
+            if ("No Inventariado".equalsIgnoreCase(d.getEstadoInventario())) {
+                inc(skippedByReason, "no_inventariado");
+                // Log.w(TAG, "Omitiendo detalle por ser 'No Inventariado': " + safe(d.getEpc()));
+                continue;
+            }
+
             String idToma = d.getIdToma() != null ? d.getIdToma().trim() : "";
             if (idToma.isEmpty()) {
                 inc(skippedByReason, "missing_idToma");

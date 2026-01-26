@@ -221,6 +221,84 @@
                         </LinearLayout>
                     </FrameLayout>
 
+                    <!-- Botones Sobrante/Faltante -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp">
+
+                        <!-- Botón Sobrantes (Izquierda) -->
+                        <LinearLayout
+                            android:id="@+id/btnSobrantesGauge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="8dp"
+                            android:layout_marginEnd="24dp">
+
+                            <TextView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:background="@drawable/circle_yellow"
+                                android:text="+"
+                                android:textColor="@android:color/white"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:gravity="center"
+                                android:layout_marginEnd="8dp"/>
+
+                            <TextView
+                                android:id="@+id/txtSobrantesGauge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="+0"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="#333"/>
+                        </LinearLayout>
+
+                        <!-- Botón Faltantes (Derecha) -->
+                        <LinearLayout
+                            android:id="@+id/btnFaltantesGauge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="8dp"
+                            android:layout_marginStart="24dp">
+
+                            <TextView
+                                android:id="@+id/txtFaltantesGauge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="-0"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="#333"
+                                android:layout_marginEnd="8dp"/>
+
+                            <TextView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:background="@drawable/circle_red"
+                                android:text="-"
+                                android:textColor="@android:color/white"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:gravity="center"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
                     <LinearLayout
                         android:id="@+id/lyFiltrosResumen"
                         android:layout_width="match_parent"
@@ -246,11 +324,32 @@
                             android:layout_marginBottom="12dp" />
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ubicación A"
-                            android:textColor="#808080"
-                            android:textSize="12sp" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Categoría"
+                        android:textColor="#808080"
+                        android:textSize="12sp"
+                        android:layout_marginTop="0dp"/>
+                    <Spinner
+                        android:id="@+id/spinnerCategoria"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginBottom="4dp" />
+                    <TextView
+                        android:id="@+id/txtCountCategoria"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Activos: 0"
+                        android:textColor="#606060"
+                        android:textSize="12sp" 
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ubicación A"
+                        android:textColor="#808080"
+                        android:textSize="12sp" />
                         <Spinner
                             android:id="@+id/spinnerUbicacionA"
                             android:layout_width="match_parent"
@@ -593,8 +692,7 @@
                     android:orientation="vertical"
                     android:background="@drawable/bg_bloque_tabla"
                     android:padding="12dp"
-                    android:layout_marginBottom="8dp"
-                    android:visibility="gone">
+                    android:layout_marginBottom="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -650,6 +748,40 @@
                         android:text="Añadir Lectura"
                         android:background="@drawable/btn_primary"
                         android:textColor="@android:color/white"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="O ingresar EPC/Placa manual"
+                        android:textStyle="bold"
+                        android:textColor="#606060"
+                        android:layout_marginBottom="8dp"/>
+
+                    <EditText
+                        android:id="@+id/etManualInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:hint="Ingrese EPC o Placa"
+                        android:background="@drawable/bg_bloque_tabla"
+                        android:padding="8dp"
+                        android:inputType="textCapCharacters"
+                        android:layout_marginBottom="8dp"/>
+
+                    <Button
+                        android:id="@+id/btnManualAdd"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Añadir por Texto"
+                        android:background="@drawable/btn_secondary_gray"
+                        android:textColor="#333"
                         android:textStyle="bold" />
                 </LinearLayout>
 

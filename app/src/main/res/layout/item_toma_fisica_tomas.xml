@@ -8,12 +8,11 @@
     android:gravity="center_vertical"
     android:background="?android:attr/selectableItemBackground">
 
-    <CheckBox
-        android:id="@+id/chkSeleccion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="false"
-        android:focusable="false"
+    <ImageView
+        android:id="@+id/imgCheckbox"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_checkbox_unchecked"
         android:layout_marginEnd="8dp"/>
 
     <TextView
@@ -33,6 +32,15 @@
         android:text="dd/mm/yyyy"
         android:textSize="14sp"
         android:textColor="#555555"/>
+
+    <ImageView
+        android:id="@+id/imgEstado"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_check_circle"
+        android:visibility="invisible"
+        android:layout_marginStart="8dp"
+        app:tint="#4CAF50"/>
 
     <ImageView
         android:id="@+id/btnDelete"
