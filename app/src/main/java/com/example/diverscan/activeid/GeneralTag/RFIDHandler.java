@@ -490,7 +490,18 @@ public class RFIDHandler implements Readers.RFIDReaderEventHandler  {
     private class AsyncDataUpdate extends AsyncTask<TagData[], Void, Void> {
         @Override
         protected Void doInBackground(TagData[]... params) {
-            responseHandlerInterface.handleTagdata(params[0]);
+            TagData[] zebraTags = params[0];
+            if (zebraTags != null) {
+                com.example.diverscan.activeid.DeviceInterface.ReaderTag[] genericTags = 
+                    new com.example.diverscan.activeid.DeviceInterface.ReaderTag[zebraTags.length];
+                
+                for(int i=0; i<zebraTags.length; i++) {
+                    String epc = zebraTags[i].getTagID();
+                    int rssi = zebraTags[i].getPeakRSSI();
+                    genericTags[i] = new com.example.diverscan.activeid.DeviceInterface.ReaderTag(epc, (short)rssi);
+                }
+                responseHandlerInterface.handleTagdata(genericTags);
+            }
             return null;
         }
     }

@@ -10,7 +10,7 @@ import com.example.diverscan.activeid.TomasFisicas.EntidadActivosInventarios;
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
 import com.example.diverscan.activeid.sqlite.InventoryDBHelper;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class ChequearInventario {
             iChequearInventario.RetornarCargaInicial(inventarioVisual);
         }
     }
-    public boolean CheckTagsInventario(TagData[] tagDatas, IChequearInventario iChequearInventario) {
+    public boolean CheckTagsInventario(ReaderTag[] tagDatas, IChequearInventario iChequearInventario) {
         try {
             if (tagDatas == null || tagDatas.length == 0) {
                 return false;
@@ -81,8 +81,8 @@ public class ChequearInventario {
 
             boolean isFound = false;
 
-            for (TagData tagData : tagDatas) {
-                String epc = tagData.getTagID();
+            for (ReaderTag tagData : tagDatas) {
+                String epc = tagData.getEpc();
                 if (epc.isEmpty()) {
                     continue;
                 }

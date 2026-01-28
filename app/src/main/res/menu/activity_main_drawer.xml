@@ -124,7 +124,13 @@
         <!-- SUBMENÚ CONFIGURACIÓN -->
         <item
             android:id="@+id/sub_configurar_antena"
-            android:title=" o Configurar Antena"
+            android:title=" o Configurar Zebra RFID"
+            android:visible="false"
+            android:background="@color/blanco" />
+
+        <item
+            android:id="@+id/sub_configurar_scanner"
+            android:title=" o Configurar Lark 1 (iMin)"
             android:visible="false"
             android:background="@color/blanco" />
 

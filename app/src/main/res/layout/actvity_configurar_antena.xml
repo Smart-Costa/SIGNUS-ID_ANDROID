@@ -98,35 +98,115 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"/>
 
-        </LinearLayout>
-        <RelativeLayout
-            android:layout_height = "5dp"
-            android:layout_width  = "match_parent"
-            android:text          = "█ ■ █ ■ █"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp">
-        </RelativeLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:orientation="vertical">
             <TextView
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="23dp"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
                 android:layout_width="wrap_content"
-                android:text="Antenas Disponibles:"
-                />
+                android:layout_height="wrap_content"
+                android:text="Seleccionar Lector"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp" />
+
             <Spinner
                 android:id="@+id/spinnerLectores"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:minHeight="48dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
                 android:spinnerMode="dropdown" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tipo de Conexión"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="5dp" />
+
+            <Spinner
+                android:id="@+id/spinnerConexion"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:spinnerMode="dropdown" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Modo de Lectura"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="5dp" />
+
+            <RadioGroup
+                android:id="@+id/rgReadingMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="10dp">
+
+                <RadioButton
+                    android:id="@+id/rbMultiple"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Múltiple"
+                    android:checked="true"
+                    android:layout_marginEnd="20dp"/>
+
+                <RadioButton
+                    android:id="@+id/rbSingle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sencilla"/>
+            </RadioGroup>
+
+            <Button
+                android:id="@+id/btnTestLectura"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="Probar Lectura"
+                android:backgroundTint="@color/design_default_color_primary"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+                android:id="@+id/txtResultados"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tags leídos: 0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logs del Sistema"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_gravity="start"
+                android:layout_marginBottom="2dp"/>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="#F0F0F0"
+                android:padding="5dp"
+                android:scrollbars="vertical"
+                android:fadeScrollbars="false">
+                <TextView
+                    android:id="@+id/txtLogView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    android:textColor="#333333"
+                    android:text="Iniciando logs..."/>
+            </ScrollView>
 
         </LinearLayout>
 

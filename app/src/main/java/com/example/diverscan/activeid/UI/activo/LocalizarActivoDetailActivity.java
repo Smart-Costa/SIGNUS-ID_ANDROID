@@ -1,5 +1,6 @@
 package com.example.diverscan.activeid.UI.activo;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -9,15 +10,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.diverscan.activeid.R;
-import com.example.diverscan.activeid.RFID.RfidListener;
-import com.example.diverscan.activeid.RFID.RfidManager;
+import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
+import com.example.diverscan.activeid.GeneralTag.TagWriter;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import com.example.diverscan.activeid.databinding.ActivityLocalizarActivoDetailBinding;
 
-public class LocalizarActivoDetailActivity extends AppCompatActivity implements RfidListener {
+public class LocalizarActivoDetailActivity extends AppCompatActivity implements ResponseHandlerInterface {
     private ActivityLocalizarActivoDetailBinding binding;
-    private RfidManager rfidManager;
+    private TagWriter rfidHandler;
     private ActivoDao activoDAO;
     private ActivoEntity activoLeido;
     private String epcLeido;
@@ -29,37 +31,94 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         setContentView(binding.getRoot());
 
         activoDAO = new ActivoDao(this);
-        rfidManager = new RfidManager(this, this);
+        
+        initRFID();
 
-        binding.opcRFID.setOnClickListener(v -> rfidManager.connect());
-        //binding.btnStart.setOnClickListener(v -> rfidManager.startReading());
-        //binding.btnStop.setOnClickListener(v -> rfidManager.stopReading());
-
+        binding.opcRFID.setOnClickListener(v -> {
+            if (rfidHandler != null) {
+                // Si el handler ya está inicializado, aseguramos que esté en modo lectura o listo
+                if (!binding.opcRFID.isChecked()) {
+                   // Si era un toggle, aquí manejaríamos lógica, pero es un radiobutton/checkbox probablemente?
+                   // Asumimos que es para activar el modo
+                }
+                // Iniciar lectura si se selecciona
+                rfidHandler.startRead();
+            }
+        });
+        
         initEvents();
     }
 
-    public void onConnected() {
-        runOnUiThread(() -> Toast.makeText(this, "Lector conectado", Toast.LENGTH_SHORT).show());
-        rfidManager.startReading();
+    private void initRFID() {
+        try {
+            rfidHandler = TagWriter.getInstance();
+            if (!rfidHandler.isInitialized()) {
+                rfidHandler.onCreate(this);
+            } else {
+                rfidHandler.setResponseHandler(this);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error inicializando RFID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
-    public void onTagRead(String epc) {
-        runOnUiThread(() -> procesarLecturaRFID(epc));
+    protected void onResume() {
+        super.onResume();
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(this);
+        }
     }
 
     @Override
-    public void onError(String message) {
-        runOnUiThread(() ->
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-        );
+    protected void onPause() {
+        super.onPause();
+        if (rfidHandler != null) {
+            rfidHandler.stopRead();
+        }
     }
 
     @Override
-    public void onReaderDisconnected() {
-        runOnUiThread(() ->
-                Toast.makeText(this, "Lector desconectado", Toast.LENGTH_LONG).show()
-        );
+    public void handleTagdata(ReaderTag[] tagData) {
+        if (tagData == null || tagData.length == 0) return;
+
+        // Validar si vienen múltiples tags
+        if (tagData.length > 1) {
+            runOnUiThread(() -> {
+                if (rfidHandler != null) rfidHandler.stopRead();
+                Toast.makeText(this, "Múltiples etiquetas detectadas. Por favor acerque solo una.", Toast.LENGTH_LONG).show();
+            });
+            return;
+        }
+
+        String epc = tagData[0].getEpc();
+        if (epc != null && !epc.isEmpty()) {
+            runOnUiThread(() -> procesarLecturaRFID(epc));
+        }
+    }
+
+    @Override
+    public void handleTriggerPress(boolean pressed) {
+        if (pressed) {
+            if (rfidHandler != null) {
+                rfidHandler.startRead();
+                runOnUiThread(() -> Toast.makeText(this, "Leyendo...", Toast.LENGTH_SHORT).show());
+            }
+        } else {
+            if (rfidHandler != null) {
+                rfidHandler.stopRead();
+            }
+        }
+    }
+
+    @Override
+    public void SetMessage(String msg) {
+        runOnUiThread(() -> Toast.makeText(this, "Reader: " + msg, Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    public Context GetContext() {
+        return this;
     }
 
     private void procesarLecturaRFID(String epc) {
@@ -68,7 +127,7 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         }
         if (epcLeido != null) {
             if (!epc.equals(epcLeido)) {
-                rfidManager.stopReading();
+                if (rfidHandler != null) rfidHandler.stopRead();
                 Toast.makeText(this, "Se detectaron múltiples TAGs. Acerque solo 1 y reintente.", Toast.LENGTH_SHORT).show();
             }
             return;
@@ -82,7 +141,7 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
             binding.txtNumeroActivo.setText(activo.getNumeroActivo());
             binding.txtNumeroEtiqueta.setText(activo.getNumeroEtiqueta());
             binding.txtDescripcionCorta.setText(activo.getDescripcionCorta());
-            rfidManager.stopReading();
+            if (rfidHandler != null) rfidHandler.stopRead();
         } else {
             Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
         }
@@ -142,11 +201,5 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
                 Toast.makeText(this, "Activo no encontrado", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        rfidManager.stopReading();
     }
 }

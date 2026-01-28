@@ -1,0 +1,30 @@
+INTEGRACIÓN SDK iMin Lark 1 (Modelo I24P01)
+=============================================
+
+Se ha preparado la arquitectura de la aplicación para soportar el lector RFID del dispositivo iMin Lark 1.
+Debido a que el SDK de RFID de iMin no está disponible en repositorios públicos abiertos, se ha creado una implementación base (Skeleton) que debe ser completada con los archivos oficiales.
+
+Pasos para completar la integración:
+
+1. Conseguir el SDK:
+   - Contactar al proveedor o soporte de iMin (o verificar la caja del dispositivo).
+   - Buscar archivos .jar o .aar (ej: `iMinRFID.jar`, `UHFManager.jar`).
+   - Copiar estos archivos a la carpeta `app/libs` del proyecto.
+
+2. Configurar Dependencias:
+   - Abrir `app/build.gradle` y asegurar que incluya las librerías de `libs`:
+     `implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])`
+
+3. Implementar la Lógica en `IminReaderImpl.java`:
+   - Ubicación: `app/src/main/java/com/example/diverscan/activeid/DeviceInterface/Impl/IminReaderImpl.java`
+   - Descomentar y ajustar los métodos TODO basándose en la documentación del SDK recibido.
+   - Claves a implementar:
+     - `initialize()`: Inicializar el objeto manager del SDK.
+     - `startInventory()`: Configurar el callback para recibir tags.
+     - `setPower()`: Ajustar la potencia de la antena.
+
+4. Activar el Lector:
+   - En la configuración de la App, asegurar que se guarde el tipo de lector "IMIN" en las preferencias (`reader_type`).
+   - O modificar `TagWriter.java` para detectar automáticamente el dispositivo (por ejemplo comprobando `Build.MODEL`).
+
+Esta estructura permite que todas las actividades actuales (Inventario, Ubicación, etc.) funcionen con el iMin Lark 1 sin cambiar ni una sola línea de su código, una vez completado el paso 3.

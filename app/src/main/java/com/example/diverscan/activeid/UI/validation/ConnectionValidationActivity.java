@@ -9,7 +9,7 @@ import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.R;
 
 import java.text.SimpleDateFormat;
@@ -87,17 +87,28 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
             log("Reiniciando conexión...");
             
             // Set transport based on selection
-            ENUM_TRANSPORT transport = ENUM_TRANSPORT.BLUETOOTH;
             int checkedId = rgTransport.getCheckedRadioButtonId();
+            com.example.diverscan.activeid.DeviceInterface.ConnectionType connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.BLUETOOTH;
+            
             if (checkedId == R.id.rb_serial) {
-                transport = ENUM_TRANSPORT.SERVICE_SERIAL;
+                connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.SERIAL_USB;
             } else if (checkedId == R.id.rb_usb) {
-                transport = ENUM_TRANSPORT.SERVICE_USB;
+                connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.SERIAL_USB;
             }
             
-            rfidHandler.setTransport(transport);
-            rfidHandler.setAutoDetect(false); // Disable auto-detect for validation
-            rfidHandler.InitSDK();
+            rfidHandler.setAutoDetect(false); 
+            
+            // Detect reader type or default to iMin if on iMin device
+            com.example.diverscan.activeid.DeviceInterface.ReaderType type = rfidHandler.getCurrentReaderType();
+            // If currently Unknown or user wants to force re-init
+            if (Build.MODEL.contains("I24P01") || Build.MODEL.contains("Lark 1")) {
+                 type = com.example.diverscan.activeid.DeviceInterface.ReaderType.IMIN;
+            }
+            
+            log("Reconectando como: " + type + " via " + connType);
+            rfidHandler.setReaderType(type, connType);
+            // InitSDK not needed if setReaderType is called, but setReaderType handles disposal and creation.
+            // rfidHandler.InitSDK(); 
         });
 
         btnTestSingle.setOnClickListener(v -> startSingleRead());
@@ -174,10 +185,10 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
 
     // ResponseHandlerInterface implementation
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         if (tagData == null || tagData.length == 0) return;
 
-        final String epc = tagData[0].getTagID();
+        final String epc = tagData[0].getEpc();
 
         if (isSingleReading) {
             runOnUiThread(() -> {
@@ -187,8 +198,8 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
             });
         } else if (isMultiReading) {
             runOnUiThread(() -> {
-                for (TagData tag : tagData) {
-                    String id = tag.getTagID();
+                for (ReaderTag tag : tagData) {
+                    String id = tag.getEpc();
                     multiReadTags.put(id, multiReadTags.getOrDefault(id, 0) + 1);
                     log("Tag leído: " + id);
                 }

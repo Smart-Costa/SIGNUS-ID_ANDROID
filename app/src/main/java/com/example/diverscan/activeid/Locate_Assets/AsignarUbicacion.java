@@ -27,6 +27,7 @@ import com.example.diverscan.activeid.Edificio.EdificioDBHelper;
 import com.example.diverscan.activeid.Edificio.EdificioNuevo;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.Inventory.EntidadTomaFisicaEPC;
 import com.example.diverscan.activeid.Inventory.Entidad_TomaDetalle;
 import com.example.diverscan.activeid.Oficina.OficinaDBHelper;
@@ -39,7 +40,6 @@ import com.example.diverscan.activeid.RazonSocial.RazonSocialDBHelper;
 import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.InventoryDBHelper;
 import com.example.diverscan.activeid.sqlite.OfficesDBHelper;
-import com.zebra.rfid.api3.TagData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -430,11 +430,11 @@ public class AsignarUbicacion extends AppCompatActivity implements ResponseHandl
     //***************************************************************************************************************
 
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         final StringBuilder sb = new StringBuilder();
         for (int index = 0; index < tagData.length; index++) {
-            sb.append(tagData[index].getTagID() + "\n");
-            _lastTag = tagData[index].getTagID();
+            sb.append(tagData[index].getEpc() + "\n");
+            _lastTag = tagData[index].getEpc();
         }
         runOnUiThread(new Runnable() {
             @Override

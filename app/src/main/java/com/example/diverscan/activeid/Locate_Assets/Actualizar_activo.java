@@ -59,7 +59,7 @@ import com.example.diverscan.activeid.RazonSocial.RazonSocialRecord;
 import com.example.diverscan.activeid.Tags.EntidadTiposTags;
 import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
 import com.example.diverscan.activeid.sqlite.TagsDBHelper;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1580,18 +1580,18 @@ public class Actualizar_activo extends AppCompatActivity implements ResponseHand
      short _distance = 0;
      int quantityToSound = 10;
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         Log.d("RFID_SAMPLE", "handleTagdata invocado, cantidad de tags: " + tagData.length);
 
         if(!scannerActivate){
             final StringBuilder sb = new StringBuilder();
             for (int index = 0; index < tagData.length; index++) {
-                _lastTag = tagData[index].getTagID();
+                _lastTag = tagData[index].getEpc();
                 Log.d("RFID_SAMPLE", "Tag leído: " + _lastTag); // ← log por cada tag
 
                 if (tagData[index].isContainsLocationInfo()) {
                     int tag = index;
-                    short distance = tagData[tag].LocationInfo.getRelativeDistance();
+                    short distance = tagData[tag].getRelativeDistance();
                     Log.d("RFID_SAMPLE", "Distancia relativa: " + distance);
 
                     if (distance > 0) {
@@ -1625,7 +1625,7 @@ public class Actualizar_activo extends AppCompatActivity implements ResponseHand
                 }
             });
         } else {
-            Log.d("BARCODE-Actualizar_activo-handleTagdata", "Tag ID :" + tagData[0].getTagID());
+            Log.d("BARCODE-Actualizar_activo-handleTagdata", "Tag ID :" + tagData[0].getEpc());
         }
     }
     @Override

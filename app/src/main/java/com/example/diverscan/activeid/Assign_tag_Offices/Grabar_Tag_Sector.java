@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.Locate_Assets.Actualizar_activo;
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.Tags.EntidadTiposTags;
@@ -272,11 +273,11 @@ public class Grabar_Tag_Sector extends AppCompatActivity implements ResponseHand
         toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 24);
     }
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         final StringBuilder sb = new StringBuilder();
         for (int index = 0; index < tagData.length; index++) {
-            sb.append(tagData[index].getTagID() + "\n");
-            _lastTag = tagData[index].getTagID();
+            sb.append(tagData[index].getEpc() + "\n");
+            _lastTag = tagData[index].getEpc();
 
         }
         runOnUiThread(new Runnable() {

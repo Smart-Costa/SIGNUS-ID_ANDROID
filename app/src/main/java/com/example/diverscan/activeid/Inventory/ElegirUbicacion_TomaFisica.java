@@ -39,7 +39,7 @@ import com.example.diverscan.activeid.RazonSocial.RazonSocialDBHelper;
 import com.example.diverscan.activeid.Utilities.AlertasPersonalizadas;
 import com.example.diverscan.activeid.sqlite.InventoryDBHelper;
 import com.example.diverscan.activeid.sqlite.OfficesDBHelper;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -651,9 +651,9 @@ public class ElegirUbicacion_TomaFisica extends AppCompatActivity implements Res
     }
 
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         for (int index = 0; index < tagData.length; index++) {
-            _lastTag = tagData[index].getTagID();
+            _lastTag = tagData[index].getEpc();
         }
     }
 

@@ -52,7 +52,7 @@ import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
 import com.example.diverscan.activeid.sqlite.HHRolHelper;
 import com.example.diverscan.activeid.sqlite.TagsDBHelper;
 import com.google.android.material.snackbar.Snackbar;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 
 import org.json.JSONObject;
 
@@ -332,6 +332,8 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 //            intent = new Intent(this, Asignar_tag_sector.class);
         } else if (id == R.id.sub_configurar_antena) {
             intent = new Intent(this, ConfiguracionAntena.class);
+        } else if (id == R.id.sub_configurar_scanner) {
+            intent = new Intent(this, com.example.diverscan.activeid.GeneralTag.ConfiguracionLarkActivity.class);
         } else if (id == R.id.sub_validar_conexion) {
             intent = new Intent(this, ConnectionValidationActivity.class);
         } else if (id == R.id.sub_ver_activos_bd) {
@@ -412,6 +414,7 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
                 case R.id.menu_configuracion:
                     toggleGroup(menu,
                             R.id.sub_configurar_antena,
+                            R.id.sub_configurar_scanner,
                             R.id.sub_validar_conexion
                             //,R.id.sub_ver_activos_bd
                             //,R.id.sub_limpiar_bd
@@ -522,7 +525,7 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
     @Override
     public void handleTriggerPress(boolean pressed) {}
     @Override
-    public void handleTagdata(TagData[] tagData) {}
+    public void handleTagdata(ReaderTag[] tagData) {}
     @Override
     public Context GetContext() { return this; }
 

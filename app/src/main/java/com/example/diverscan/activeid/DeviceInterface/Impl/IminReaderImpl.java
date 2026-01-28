@@ -1,0 +1,258 @@
+package com.example.diverscan.activeid.DeviceInterface.Impl;
+
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+
+import com.example.diverscan.activeid.DeviceInterface.ConnectionType;
+import com.example.diverscan.activeid.DeviceInterface.IReaderDevice;
+import com.example.diverscan.activeid.DeviceInterface.IReaderListener;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
+
+import com.imin.rfid.RFIDManager;
+import com.imin.rfid.RFIDHelper;
+import com.imin.rfid.ReaderCall;
+import com.imin.rfid.entity.DataParameter;
+import com.imin.rfid.constant.ParamCts;
+import com.imin.rfid.constant.CMD;
+import com.google.gson.Gson;
+
+public class IminReaderImpl implements IReaderDevice {
+    private static final String TAG = "IminReaderImpl";
+    private Context context;
+    private IReaderListener listener;
+    private boolean isConnected = false;
+    private int currentPower = 30; // Default power
+    private ConnectionType connectionType = ConnectionType.AUTO;
+
+    @Override
+    public void setConnectionType(ConnectionType type) {
+        this.connectionType = type;
+        // iMin SDK mostly handles internal reader, but we might support external if SDK allows.
+        // For now, we store it. If connection logic changes based on type, we use it here.
+    }
+
+    private RFIDManager rfidManager;
+    private RFIDHelper rfidHelper;
+    private Handler uiHandler;
+
+    @Override
+    public void initialize(Context context) {
+        this.context = context;
+        this.uiHandler = new Handler(Looper.getMainLooper());
+        Log.d(TAG, "Initializing iMin Lark 1 Reader support...");
+
+        try {
+            rfidManager = RFIDManager.getInstance();
+            rfidManager.connect(context);
+            // Give it a moment to connect or check status
+            // The SDK seems to be service based, so connect() might be async or fast.
+            // We'll check helper availability in connect()
+            
+            // Auto-connect attempt
+            uiHandler.postDelayed(this::connect, 500);
+
+        } catch (Exception e) {
+            notifyError("Exception initializing iMin SDK: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean connect() {
+        Log.d(TAG, "Attempting to connect to iMin Reader...");
+        try {
+            if (rfidManager == null) {
+                rfidManager = RFIDManager.getInstance();
+                rfidManager.connect(context);
+            }
+            
+            rfidHelper = rfidManager.getHelper();
+            if (rfidHelper != null) {
+                registerReaderCall();
+                isConnected = true;
+                if (listener != null) {
+                    listener.onConnected("iMin Lark 1 (Internal)");
+                }
+                return true;
+            } else {
+                Log.e(TAG, "RFIDHelper is null, service might not be bound yet.");
+                return false;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error connecting", e);
+            notifyError("Connection failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void registerReaderCall() {
+        if (rfidHelper == null) return;
+        rfidHelper.registerReaderCall(new ReaderCall() {
+            @Override
+            public void onSuccess(byte cmd, DataParameter dataParameter) {
+                // Handle success responses (e.g. settings applied)
+            }
+
+            @Override
+            public void onTag(byte cmd, byte state, DataParameter dataParameter) {
+                // Log.v(TAG, "onTag callback received. cmd: " + cmd + " state: " + state);
+                if (dataParameter != null) {
+                    String epc = dataParameter.getString(ParamCts.TAG_EPC);
+                    String rssiStr = dataParameter.getString(ParamCts.TAG_RSSI);
+                    
+                    Log.v(TAG, "onTag Data - EPC: " + epc + " RSSI: " + rssiStr);
+
+                    if (epc != null) {
+                        short rssi = 0;
+                        try {
+                            if (rssiStr != null) rssi = Short.parseShort(rssiStr);
+                        } catch (NumberFormatException e) {
+                            // ignore
+                        }
+                        
+                        ReaderTag tag = new ReaderTag(epc, rssi);
+                        notifyTagsRead(new ReaderTag[]{tag});
+                    } else {
+                         Log.w(TAG, "onTag received null EPC");
+                    }
+                } else {
+                    Log.w(TAG, "onTag received null DataParameter");
+                }
+            }
+
+            @Override
+            public void onFiled(byte cmd, byte errorCode, String msg) {
+                // Handle failures
+                Log.w(TAG, "Reader operation failed: " + msg + " code: " + errorCode);
+            }
+        });
+    }
+
+    @Override
+    public boolean disconnect() {
+        Log.d(TAG, "Disconnecting iMin Reader...");
+        try {
+            if (rfidHelper != null) {
+                rfidHelper.unregisterReaderCall();
+                // Stop reading if active
+                rfidHelper.tagInventoryRawStopReading();
+            }
+            if (rfidManager != null) {
+                rfidManager.disconnect();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error disconnecting", e);
+        }
+        
+        isConnected = false;
+        if (listener != null) {
+            listener.onDisconnected();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    @Override
+    public boolean startInventory() {
+        if (!isConnected || rfidHelper == null) return false;
+        Log.d(TAG, "Starting Inventory...");
+        try {
+            rfidHelper.tagInventoryRawStartReading();
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "Error starting inventory", e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean stopInventory() {
+        if (!isConnected || rfidHelper == null) return false;
+        Log.d(TAG, "Stopping Inventory...");
+        try {
+            rfidHelper.tagInventoryRawStopReading();
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "Error stopping inventory", e);
+            return false;
+        }
+    }
+
+    @Override
+    public void setPower(int power) {
+        this.currentPower = power;
+        Log.d(TAG, "Setting power to: " + power);
+        
+        if (!isConnected || rfidHelper == null) {
+            Log.w(TAG, "Cannot set power: Reader not connected or helper null");
+            return;
+        }
+
+        try {
+            // Normalize power if it comes in Zebra format (e.g. 270 for 27dBm)
+            int p = power;
+            if (p > 33) {
+                p = p / 10;
+            }
+            
+            ReadWritePower readWritePower = new ReadWritePower();
+            readWritePower.readPower = p;
+            readWritePower.writePower = p;
+            String config = new Gson().toJson(readWritePower);
+            rfidHelper.extendOperation(CMD.SET_READ_WRITE_POWER, config);
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting power", e);
+            notifyError("Error setting power: " + e.getMessage());
+        }
+    }
+
+    private static class ReadWritePower {
+        public int readPower;
+        public int writePower;
+    }
+
+    @Override
+    public void setListener(IReaderListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public String getDeviceName() {
+        return "iMin Lark 1 I24P01";
+    }
+
+    @Override
+    public boolean writeTag(String sourceEpc, String newEpc, String password) {
+        Log.d(TAG, "Writing tag: " + sourceEpc + " -> " + newEpc);
+        if (!isConnected || rfidHelper == null) return false;
+        
+        // TODO: Implement write logic using rfidHelper.writeTag(...)
+        // rfidHelper.writeTag(...) requires bank, address, data, etc.
+        // This is complex and requires understanding the specific parameters
+        return false;
+    }
+
+    @Override
+    public void dispose() {
+        disconnect();
+    }
+    
+    private void notifyTagsRead(ReaderTag[] tags) {
+        if (listener != null) {
+            // Ensure this runs on UI thread
+            uiHandler.post(() -> listener.onTagRead(java.util.Arrays.asList(tags)));
+        }
+    }
+
+    private void notifyError(String msg) {
+        if (listener != null) {
+            uiHandler.post(() -> listener.onConnectionError(msg));
+        }
+    }
+}

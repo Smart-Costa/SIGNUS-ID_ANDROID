@@ -48,7 +48,7 @@ import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaDetallesEntity;
 import com.example.diverscan.activeid.data.local.entity.TomaFisicaTomasEntity;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 
 import com.example.diverscan.activeid.RazonSocial.RazonNuevo;
 import com.example.diverscan.activeid.RazonSocial.RazonSocialDBHelper;
@@ -1326,7 +1326,7 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
     //*************************************************************************************************************
 
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         if (!scannerActivate) {
             if (_chequearInventario.CheckTagsInventario(tagData, this)) {
                 runOnUiThread(new Runnable() {

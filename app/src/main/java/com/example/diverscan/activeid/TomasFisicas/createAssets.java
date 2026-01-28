@@ -42,7 +42,7 @@ import com.example.diverscan.activeid.RazonSocial.RazonNuevo;
 import com.example.diverscan.activeid.RazonSocial.RazonSocialDBHelper;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.sqlite.newAssets;
 
 import java.text.SimpleDateFormat;
@@ -166,7 +166,7 @@ public class createAssets extends AppCompatActivity implements ResponseHandlerIn
     // --- ResponseHandlerInterface Implementation ---
 
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         if (tagData == null || tagData.length == 0) return;
 
         // Validar si vienen múltiples tags (opcional, pero para creación suele ser uno a uno)
@@ -179,10 +179,10 @@ public class createAssets extends AppCompatActivity implements ResponseHandlerIn
         }
 
         runOnUiThread(() -> {
-            for (TagData tag : tagData) {
-                if (tag.getTagID() != null && !tag.getTagID().isEmpty()) {
+            for (ReaderTag tag : tagData) {
+                if (tag.getEpc() != null && !tag.getEpc().isEmpty()) {
                     // Lógica de lectura ÚNICA
-                    EPCView.setText(tag.getTagID());
+                    EPCView.setText(tag.getEpc());
                     rfidHandler.stopRead();
                     Toast.makeText(this, "Etiqueta leída correctamente", Toast.LENGTH_SHORT).show();
                     break;

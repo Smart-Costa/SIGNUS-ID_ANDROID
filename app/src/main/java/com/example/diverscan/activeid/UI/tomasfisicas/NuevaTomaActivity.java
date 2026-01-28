@@ -12,6 +12,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.SeekBar;
+import android.app.AlertDialog;
+import com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,7 +47,7 @@ import com.example.diverscan.activeid.data.remote.response.ApiResponse;
 import com.google.gson.JsonObject;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -126,6 +129,55 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     private ActivosAdapter adapter; // Changed type
     private List<ItemActivo> adapterList = new ArrayList<>();
+
+    private void showPowerDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(50, 40, 50, 10);
+        
+        final TextView txtVal = new TextView(this);
+        txtVal.setText("Potencia: 270");
+        layout.addView(txtVal);
+        
+        final SeekBar seek = new SeekBar(this);
+        seek.setMax(300);
+        seek.setProgress(270);
+        
+        String currentP = SharedPreferencesGetSet.leer_local("potenciaAntena", this);
+        if(currentP != null && !currentP.isEmpty()) {
+            try {
+                int p = Integer.parseInt(currentP);
+                seek.setProgress(p);
+                txtVal.setText("Potencia: " + p);
+            } catch(Exception e) {}
+        }
+        
+        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                txtVal.setText("Potencia: " + progress);
+            }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+        
+        layout.addView(seek);
+        
+        builder.setView(layout)
+               .setTitle("Configurar Potencia")
+               .setPositiveButton("Aplicar", (dialog, id) -> {
+                   int val = seek.getProgress();
+                   if(rfidHandler != null) {
+                       rfidHandler.setAntennaPower(val);
+                       SharedPreferencesGetSet.guardar_local("potenciaAntena", String.valueOf(val), this);
+                       Toast.makeText(this, "Potencia ajustada a " + val, Toast.LENGTH_SHORT).show();
+                   }
+               })
+               .setNegativeButton("Cancelar", (dialog, id) -> dialog.cancel());
+               
+        builder.create().show();
+    }
 
     private void updateSummaryCounts() {
         if (itemsList == null) return;
@@ -349,6 +401,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void loadExistingDetails(String idToma) {
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             List<TomaFisicaDetallesEntity> detalles = detallesDao.getByIdToma(idToma);
             if (detalles == null) return;
@@ -392,6 +445,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void validarBaseDeDatosLocal() {
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             int count = activoDao.getActivosCount();
             if (count == 0) {
@@ -451,16 +505,18 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         iconIniciar = findViewById(R.id.iconIniciar);
         btnBack = findViewById(R.id.btnBack);
 
+        /*
         spinnerActivos = findViewById(R.id.spinnerActivos);
+        */
         spinnerUbicacionA = findViewById(R.id.spinnerUbicacionA);
         spinnerUbicacionB = findViewById(R.id.spinnerUbicacionB);
         spinnerUbicacionC = findViewById(R.id.spinnerUbicacionC);
         spinnerUbicacionD = findViewById(R.id.spinnerUbicacionD);
         spinnerUbicacionSecundaria = findViewById(R.id.spinnerUbicacionSecundaria);
         spinnerCategoria = findViewById(R.id.spinnerCategoria);
+        /*
         chkIncluirExternos = findViewById(R.id.chkIncluirExternos);
 
-        /*
         progressCargaManual = findViewById(R.id.progressCargaManual);
         txtSinDatosManual = findViewById(R.id.txtSinDatosManual);
         btnAgregarLectura = findViewById(R.id.btnAgregarLectura);
@@ -477,13 +533,13 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         if (btnManualAdd != null) {
             btnManualAdd.setOnClickListener(v -> agregarLecturaManualTexto());
         }
-        */
 
         if (chkIncluirExternos != null) {
             chkIncluirExternos.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 refreshActivosList();
             });
         }
+        */
 
         // Setup List Adapter
         scannedTagsList = new ArrayList<>();
@@ -613,6 +669,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             gaugeResumen.setProgress(0);
         }
 
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             TomaFisicaEntity toma = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
             baseUbicacionAId = toma != null ? normalizeGuidFilter(toma.getUbicacionA()) : null;
@@ -708,6 +765,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private Set<String> currentFilterExpectedIds = new HashSet<>();
 
     private void updateExpectedCache() {
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             TomaFisicaEntity toma = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
             if (toma != null) {
@@ -743,6 +801,14 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
         updateExpectedCache(); // Trigger cache update
 
+        // Ocultar y deshabilitar B, C, D (Requerimiento: solo visibles A y Secundaria)
+        spinnerUbicacionB.setVisibility(View.GONE);
+        spinnerUbicacionB.setEnabled(false);
+        spinnerUbicacionC.setVisibility(View.GONE);
+        spinnerUbicacionC.setEnabled(false);
+        spinnerUbicacionD.setVisibility(View.GONE);
+        spinnerUbicacionD.setEnabled(false);
+
         setSoloTodasForSpinnerItem(spinnerUbicacionB);
         setSoloTodasForSpinnerItem(spinnerUbicacionC);
         setSoloTodasForSpinnerItem(spinnerUbicacionD);
@@ -757,9 +823,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
                 Log.d(TAG, "Filtro UbicacionA: id=" + selectedUbicacionAId + " text=" + (item != null ? item.text : ""));
                 
-                selectedUbicacionBId = null;
-                selectedUbicacionCId = null;
-                selectedUbicacionDId = null;
+                // Requerimiento: B, C, D deben tener su valor predeterminado (base)
+                selectedUbicacionBId = baseUbicacionBId;
+                selectedUbicacionCId = baseUbicacionCId;
+                selectedUbicacionDId = baseUbicacionDId;
                 selectedUbicacionSecundariaId = null;
                 
                 if (selectedUbicacionAId != null) {
@@ -777,78 +844,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        spinnerUbicacionB.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (isUpdatingSpinners) return;
-                SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
-                selectedUbicacionBId = (item != null && item.id != null) ? item.id : null;
-
-                Log.d(TAG, "Filtro UbicacionB: id=" + selectedUbicacionBId + " text=" + (item != null ? item.text : ""));
-                
-                selectedUbicacionCId = null;
-                selectedUbicacionDId = null;
-                selectedUbicacionSecundariaId = null;
-
-                if (selectedUbicacionBId != null) {
-                    loadUbicacionC(selectedUbicacionBId);
-                } else {
-                    runOnUiThread(() -> {
-                        setSoloTodasForSpinnerItem(spinnerUbicacionC);
-                        setSoloTodasForSpinnerItem(spinnerUbicacionD);
-                        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria);
-                    });
-                }
-                refreshActivosList();
-            }
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        spinnerUbicacionC.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (isUpdatingSpinners) return;
-                SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
-                selectedUbicacionCId = (item != null && item.id != null) ? item.id : null;
-
-                Log.d(TAG, "Filtro UbicacionC: id=" + selectedUbicacionCId + " text=" + (item != null ? item.text : ""));
-                
-                selectedUbicacionDId = null;
-                selectedUbicacionSecundariaId = null;
-
-                if (selectedUbicacionCId != null) {
-                    loadUbicacionD(selectedUbicacionCId);
-                } else {
-                    runOnUiThread(() -> {
-                        setSoloTodasForSpinnerItem(spinnerUbicacionD);
-                        setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria);
-                    });
-                }
-                refreshActivosList();
-            }
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        spinnerUbicacionD.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (isUpdatingSpinners) return;
-                SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
-                selectedUbicacionDId = (item != null && item.id != null) ? item.id : null;
-
-                Log.d(TAG, "Filtro UbicacionD: id=" + selectedUbicacionDId + " text=" + (item != null ? item.text : ""));
-                
-                selectedUbicacionSecundariaId = null;
-
-                if (selectedUbicacionDId != null) {
-                    loadUbicacionSecundaria(selectedUbicacionDId);
-                } else {
-                    runOnUiThread(() -> setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria));
-                }
-                refreshActivosList();
-            }
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
-        });
+        // Eliminar listeners de B, C, D para evitar interacción
+        spinnerUbicacionB.setOnItemSelectedListener(null);
+        spinnerUbicacionC.setOnItemSelectedListener(null);
+        spinnerUbicacionD.setOnItemSelectedListener(null);
         
         spinnerUbicacionSecundaria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -881,6 +880,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void loadCategoria() {
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             listCategoria = new ArrayList<>();
             if (baseCategoriaId != null) {
@@ -921,6 +921,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void loadUbicacionA() {
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             listUbicacionA = new ArrayList<>();
             if (baseUbicacionAId != null) {
@@ -953,6 +954,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void loadUbicacionB(String parentId) {
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             listUbicacionB = new ArrayList<>();
             if (baseUbicacionBId != null) {
@@ -960,19 +962,17 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 String label = (u != null && u.getUbicacionB() != null && !u.getUbicacionB().trim().isEmpty()) ? u.getUbicacionB().trim() : baseUbicacionBId;
                 listUbicacionB.add(new SpinnerItem(baseUbicacionBId, label));
             } else {
-                List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionB(parentId);
                 listUbicacionB.add(new SpinnerItem(null, "Todas"));
-                for (UbicacionEntity u : list) listUbicacionB.add(new SpinnerItem(u.getBSysId(), u.getUbicacionB()));
             }
 
             runOnUiThread(() -> {
                 setSpinnerItems(spinnerUbicacionB, listUbicacionB);
+                spinnerUbicacionB.setEnabled(false);
+                
                 if (baseUbicacionBId != null) {
-                    spinnerUbicacionB.setEnabled(false);
                     selectedUbicacionBId = baseUbicacionBId;
                     loadUbicacionC(baseUbicacionBId);
                 } else {
-                    spinnerUbicacionB.setEnabled(true);
                     selectedUbicacionBId = null;
                     setSoloTodasForSpinnerItem(spinnerUbicacionC); spinnerUbicacionC.setEnabled(false);
                     setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
@@ -984,6 +984,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void loadUbicacionC(String parentId) {
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             listUbicacionC = new ArrayList<>();
             if (baseUbicacionCId != null) {
@@ -991,19 +992,17 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 String label = (u != null && u.getUbicacionC() != null && !u.getUbicacionC().trim().isEmpty()) ? u.getUbicacionC().trim() : baseUbicacionCId;
                 listUbicacionC.add(new SpinnerItem(baseUbicacionCId, label));
             } else {
-                List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionC(parentId);
                 listUbicacionC.add(new SpinnerItem(null, "Todas"));
-                for (UbicacionEntity u : list) listUbicacionC.add(new SpinnerItem(u.getCSysId(), u.getUbicacionC()));
             }
 
             runOnUiThread(() -> {
                 setSpinnerItems(spinnerUbicacionC, listUbicacionC);
+                spinnerUbicacionC.setEnabled(false);
+                
                 if (baseUbicacionCId != null) {
-                    spinnerUbicacionC.setEnabled(false);
                     selectedUbicacionCId = baseUbicacionCId;
                     loadUbicacionD(baseUbicacionCId);
                 } else {
-                    spinnerUbicacionC.setEnabled(true);
                     selectedUbicacionCId = null;
                     setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
                     setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
@@ -1014,6 +1013,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void loadUbicacionD(String parentId) {
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             listUbicacionD = new ArrayList<>();
             if (baseUbicacionDId != null) {
@@ -1021,21 +1021,20 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 String label = (u != null && u.getUbicacionD() != null && !u.getUbicacionD().trim().isEmpty()) ? u.getUbicacionD().trim() : baseUbicacionDId;
                 listUbicacionD.add(new SpinnerItem(baseUbicacionDId, label));
             } else {
-                List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionD(parentId);
                 listUbicacionD.add(new SpinnerItem(null, "Todas"));
-                for (UbicacionEntity u : list) listUbicacionD.add(new SpinnerItem(u.getDSysId(), u.getUbicacionD()));
             }
 
             runOnUiThread(() -> {
                 setSpinnerItems(spinnerUbicacionD, listUbicacionD);
+                spinnerUbicacionD.setEnabled(false);
+                
                 if (baseUbicacionDId != null) {
-                    spinnerUbicacionD.setEnabled(false);
                     selectedUbicacionDId = baseUbicacionDId;
                     loadUbicacionSecundaria(baseUbicacionDId);
                 } else {
-                    spinnerUbicacionD.setEnabled(true);
                     selectedUbicacionDId = null;
-                    setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
+                    setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria);
+                    spinnerUbicacionSecundaria.setEnabled(false); // Mantener consistencia: si D es todas, Sec es todas y deshabilitado
                     refreshActivosList();
                 }
             });
@@ -1043,6 +1042,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void loadUbicacionSecundaria(String parentId) {
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             // NOTE: ActivoDao is used here because UbicacionSecundaria is in Activos table logic for now
             listUbicacionSecundaria = new ArrayList<>();
@@ -1101,6 +1101,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         String cat = selectedCategoriaId != null ? selectedCategoriaId : baseCategoriaId;
 
         // Perform calculation in background to avoid UI lag and ensure correct filtered count
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             // 1. Get expected assets for current filter
             List<ActivoEntity> expected = activoDao.getActivosByFiltros(ua, ub, uc, ud, us, uo, cat);
@@ -1219,28 +1220,28 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
             // 3. Load Spinner
             runOnUiThread(() -> {
-                /*
                 if (chkIncluirExternos != null && chkIncluirExternos.isChecked()) {
                     cargarActivosSpinner(null, null, null, null, null);
                 } else {
                     cargarActivosSpinner(ua, ub, uc, ud, us);
                 }
-                */
             });
             
         });
     }
     
     
-    /*
     private void cargarActivosSpinner(String ua, String ub, String uc, String ud, String us) {
         Log.d(TAG, "cargarActivosSpinner: Filtros -> A:" + ua + " B:" + ub + " C:" + uc + " D:" + ud + " Sec:" + us);
         
+        /*
         if (progressCargaManual != null) progressCargaManual.setVisibility(View.VISIBLE);
         if (spinnerActivos != null) spinnerActivos.setVisibility(View.GONE);
         if (txtSinDatosManual != null) txtSinDatosManual.setVisibility(View.GONE);
         if (btnAgregarLectura != null) btnAgregarLectura.setVisibility(View.GONE);
+        */
 
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             listaActivosSpinner = new ArrayList<>();
 
@@ -1250,6 +1251,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             listaActivosSpinner = activoDao.getActivosByFiltros(ua, ub, uc, ud, us);
             
             Log.d(TAG, "Total activos cargados para selector manual: " + listaActivosSpinner.size());
+            /*
             if (listaActivosSpinner != null) {
                 for (int i = 0; i < Math.min(3, listaActivosSpinner.size()); i++) {
                     ActivoEntity a = listaActivosSpinner.get(i);
@@ -1258,8 +1260,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                         + " desc=" + (a != null ? a.getDescripcionCorta() : ""));
                 }
             }
+            */
             
             runOnUiThread(() -> {
+                /*
                 if (progressCargaManual != null) progressCargaManual.setVisibility(View.GONE);
 
                 Log.d(TAG, "Actualizando UI spinner. Items: " + (listaActivosSpinner != null ? listaActivosSpinner.size() : "null"));
@@ -1295,10 +1299,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     
                     spinnerActivos.setAdapter(null);
                 }
+                */
             });
         });
     }
-    */
     
 
     private boolean isValidLocation(String loc) {
@@ -1364,6 +1368,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         }
 
         // Move DB operations to background thread to avoid ANR
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             Log.d(TAG, "Manual Input attempt: " + input);
 
@@ -1544,6 +1549,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
 
     private void updateTomasTabs() {
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             List<TomaFisicaTomasEntity> subtomas = tomasDao.getByTomaFisicaId(tomaFisicaId);
             if (subtomas == null) subtomas = new ArrayList<>();
@@ -1951,12 +1957,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             return;
         }
 
-        // new SaveLocalTask(true).execute();
-        // TomaFisicaTomasEntity header = calculateSummary(); // Moved to background
-        new SaveAndPushTask(new ArrayList<>()).execute();
+        new CloseAndSaveLocalTask(new ArrayList<>()).execute();
     }
 
-    private class SaveAndPushTask extends AsyncTask<Void, Void, Boolean> {
+    private class CloseAndSaveLocalTask extends AsyncTask<Void, Void, Boolean> {
         private TomaFisicaTomasEntity header;
         private List<TomaFisicaDetallesEntity> detalles;
         private Set<String> snapshotTags;
@@ -1964,7 +1968,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         private Set<String> snapshotExpectedEpcs;
         private Set<String> snapshotExpectedIds;
 
-        public SaveAndPushTask(List<TomaFisicaDetallesEntity> detalles) {
+        public CloseAndSaveLocalTask(List<TomaFisicaDetallesEntity> detalles) {
             this.detalles = detalles;
             this.snapshotTags = new HashSet<>(uniqueTags);
             this.snapshotMap = new HashMap<>(manualEpcToActivoId);
@@ -1975,11 +1979,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(NuevaTomaActivity.this, "Guardando y subiendo...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(NuevaTomaActivity.this, "Cerrando toma...", Toast.LENGTH_SHORT).show();
             btnSubir.setEnabled(false);
-            
-            // Mostrar loading si existe
-            // if (loadingView != null) loadingView.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -2102,18 +2103,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
-                // Now Push to API
-                // Usar la lista filtrada si es posible, pero aquí `detalles` es la original.
-                // Re-filtramos para el push
-                List<TomaFisicaDetallesEntity> detallesFiltrados = new ArrayList<>();
-                if (detalles != null) {
-                    for (TomaFisicaDetallesEntity d : detalles) {
-                        if (!"No Inventariado".equals(d.getEstadoInventario())) {
-                            detallesFiltrados.add(d);
-                        }
-                    }
-                }
-                pushToApi(header, detallesFiltrados);
+                Toast.makeText(NuevaTomaActivity.this, "Toma cerrada y guardada localmente. Vaya a Sincronizar para enviar.", Toast.LENGTH_LONG).show();
+                finish();
             } else {
                 Toast.makeText(NuevaTomaActivity.this, "Error al guardar localmente", Toast.LENGTH_SHORT).show();
                 btnSubir.setEnabled(true);
@@ -2121,85 +2112,16 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         }
     }
 
-    private void pushToApi(TomaFisicaTomasEntity header, List<TomaFisicaDetallesEntity> detalles) {
-        Log.d(TAG, "pushToApi: Iniciando subida. Header=" + header.getIdToma());
-        Log.d(TAG, "ENVIAR: Ejecutando pushToApi. Subiendo Header y " + (detalles != null ? detalles.size() : 0) + " detalles.");
-        // 1. Push Header
-        tomasDao.pushSubtoma(header, new ApiCallback<JsonObject>() {
-            @Override
-            public void onComplete(ApiResponse<JsonObject> response) {
-                Log.d(TAG, "pushToApi: Header response. Success=" + response.success + " Code=" + response.statusCode);
-                boolean apiSuccess = response.success
-                        && response.data != null
-                        && response.data.has("success")
-                        && response.data.get("success").getAsBoolean();
-
-                if (apiSuccess) {
-                    Log.d(TAG, "pushToApi: Header subido correctamente. Subiendo detalles...");
-                    tomasDao.markAsSynced(header.getIdToma());
-                    // 2. Push Details
-                    pushDetailsToApi(detalles);
-                } else {
-                    String errorMsg = response.errorMessage;
-                    if (response.success && response.data != null && response.data.has("message") && !response.data.get("message").isJsonNull()) {
-                        errorMsg = response.data.get("message").getAsString();
-                    }
-                    Log.e(TAG, "pushToApi: Error subiendo header: " + errorMsg);
-                    final String finalError = errorMsg;
-                    runOnUiThread(() -> {
-                        Toast.makeText(NuevaTomaActivity.this, "Error subiendo cabecera: " + finalError, Toast.LENGTH_LONG).show();
-                        btnSubir.setEnabled(true);
-                    });
-                }
-            }
-        });
-    }
-
-    private void pushDetailsToApi(List<TomaFisicaDetallesEntity> detalles) {
-        Log.d(TAG, "pushDetailsToApi: Iniciando subida detalles. Cantidad=" + (detalles != null ? detalles.size() : 0));
-        detallesDao.pushDetalle(detalles, new ApiCallback<JsonObject>() {
-            @Override
-            public void onComplete(ApiResponse<JsonObject> response) {
-                Log.d(TAG, "pushDetailsToApi: Response. Success=" + response.success + " Code=" + response.statusCode);
-                runOnUiThread(() -> {
-                    boolean apiSuccess = response.success
-                            && response.data != null
-                            && response.data.has("success")
-                            && response.data.get("success").getAsBoolean();
-
-                    if (apiSuccess) {
-                        Log.d(TAG, "pushDetailsToApi: Detalles subidos correctamente.");
-                        for (TomaFisicaDetallesEntity d : detalles) {
-                            if (d == null) continue;
-                            if (d.getIdTakeDetail() == null || d.getIdTakeDetail().trim().isEmpty()) continue;
-                            detallesDao.markAsSynced(d.getIdTakeDetail());
-                        }
-                        Toast.makeText(NuevaTomaActivity.this, "Subtoma subida exitosamente", Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else {
-                        String errorMsg = response.errorMessage;
-                        if (response.success && response.data != null && response.data.has("message") && !response.data.get("message").isJsonNull()) {
-                            errorMsg = response.data.get("message").getAsString();
-                        }
-                        Log.e(TAG, "pushDetailsToApi: Error subiendo detalles: " + errorMsg);
-                        Toast.makeText(NuevaTomaActivity.this, "Error subiendo detalles: " + errorMsg, Toast.LENGTH_LONG).show();
-                        btnSubir.setEnabled(true);
-                    }
-                });
-            }
-        });
-    }
-
     // ResponseHandlerInterface methods
 
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         if (tagData == null || tagData.length == 0) return;
 
         // Extract EPCs first to avoid multiple traversals
         Set<String> batchEpcs = new HashSet<>();
-        for (TagData tag : tagData) {
-            String epc = tag.getTagID();
+        for (ReaderTag tag : tagData) {
+            String epc = tag.getEpc();
             if (epc != null && !epc.isEmpty()) {
                 batchEpcs.add(epc);
             }
@@ -2208,6 +2130,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         if (batchEpcs.isEmpty()) return;
 
         // Process in background using Executor to avoid thread explosion and DB locking
+        if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
             // 1. Batch DB Lookup for ALL tags in this batch
             List<String> epcList = new ArrayList<>(batchEpcs);

@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import com.example.diverscan.activeid.databinding.ActivityDarBajaActivoDetailBinding;
@@ -62,7 +62,7 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
     // --- ResponseHandlerInterface Implementation ---
 
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         if (tagData == null || tagData.length == 0) return;
         
         // Si no está en modo RFID, ignorar lecturas
@@ -79,9 +79,9 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
 
         // Ejecutar en UI Thread porque TagWriter llama desde AsyncTask
         runOnUiThread(() -> {
-            for (TagData tag : tagData) {
-                if (tag.getTagID() != null) {
-                    procesarLecturaRFID(tag.getTagID());
+            for (ReaderTag tag : tagData) {
+                if (tag.getEpc() != null) {
+                    procesarLecturaRFID(tag.getEpc());
                     // Procesar solo el primero válido de este lote
                     break; 
                 }

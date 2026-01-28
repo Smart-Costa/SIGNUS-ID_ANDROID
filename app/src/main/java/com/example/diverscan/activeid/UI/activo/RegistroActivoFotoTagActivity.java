@@ -30,7 +30,7 @@ import com.example.diverscan.activeid.R;
 import android.content.Context;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 
 public class RegistroActivoFotoTagActivity extends AppCompatActivity implements ResponseHandlerInterface {
@@ -199,7 +199,7 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
     // --- Implementación de ResponseHandlerInterface ---
 
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         if (tagData == null || tagData.length == 0) {
             return;
         }
@@ -213,16 +213,16 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         if (tagData.length > 1) {
             runOnUiThread(() -> {
                 if (rfidHandler != null) rfidHandler.stopRead();
-                Toast.makeText(this, "Múltiples activos detectados. Por favor acerque solo uno.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Múltiples etiquetas detectadas. Por favor acerque solo una.", Toast.LENGTH_LONG).show();
             });
             return;
         }
 
         // Procesar el primer tag válido
         String epcLeido = null;
-        for (TagData t : tagData) {
-            if (t.getTagID() != null && !t.getTagID().trim().isEmpty()) {
-                epcLeido = t.getTagID();
+        for (ReaderTag t : tagData) {
+            if (t.getEpc() != null && !t.getEpc().trim().isEmpty()) {
+                epcLeido = t.getEpc();
                 break;
             }
         }

@@ -36,7 +36,7 @@ import com.example.diverscan.activeid.RazonSocial.RazonSocialDBHelper;
 import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.InventoryDBHelper;
 import com.example.diverscan.activeid.sqlite.OfficesDBHelper;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -110,6 +110,7 @@ public class ActivosPorSector  extends AppCompatActivity implements ResponseHand
         controles();
         eventos();
 
+        rfidHandler = new TagWriter();
         rfidHandler.onCreate(this);
         rfidHandler.Defaults();
 
@@ -626,11 +627,11 @@ public class ActivosPorSector  extends AppCompatActivity implements ResponseHand
     //************************************************************************************************************
 
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         final StringBuilder sb = new StringBuilder();
         for (int index = 0; index < tagData.length; index++) {
-            sb.append(tagData[index].getTagID() + "\n");
-            _lastTag = tagData[index].getTagID();
+            sb.append(tagData[index].getEpc() + "\n");
+            _lastTag = tagData[index].getEpc();
         }
         runOnUiThread(new Runnable() {
             @Override

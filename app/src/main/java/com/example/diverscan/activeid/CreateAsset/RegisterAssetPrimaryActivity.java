@@ -18,7 +18,13 @@ import com.example.diverscan.activeid.R;
 import java.util.Map;
 
 
-public class RegisterAssetPrimaryActivity extends AppCompatActivity{
+import android.content.Context;
+import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
+import com.example.diverscan.activeid.GeneralTag.TagWriter;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
+
+public class RegisterAssetPrimaryActivity extends AppCompatActivity implements ResponseHandlerInterface {
+    private TagWriter rfidHandler;
     private EditText numeroEtiquetaView, numeroActivoView, serieView, descripcionView, codigoResponsableView;
     private Spinner spResponsables;
     private String idCompania, nombreCompania, idEdificio, nombreEdificio, idPiso, nombrePiso, idOficina, nombreOficina;
@@ -64,6 +70,8 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity{
             }
         });
 
+        initRFID();
+
         findViewById(R.id.btn_siguiente_datos_secundarios).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,5 +106,81 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity{
                 !serieView.getText().toString().isEmpty() &&
                 !descripcionView.getText().toString().isEmpty() &&
                 spResponsables.getSelectedItem() != null;
+    }
+
+    private void initRFID() {
+        try {
+            if (rfidHandler == null) rfidHandler = TagWriter.getInstance();
+            if (!rfidHandler.isInitialized()) {
+                rfidHandler.onCreate(this);
+            } else {
+                rfidHandler.setResponseHandler(this);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error inicializando RFID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(this);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (rfidHandler != null) {
+            rfidHandler.stopRead();
+        }
+    }
+
+    @Override
+    public void handleTagdata(ReaderTag[] tagData) {
+        if (tagData == null || tagData.length == 0) return;
+
+        // Lectura simple: validar si hay multiples tags
+        if (tagData.length > 1) {
+            runOnUiThread(() -> {
+                if (rfidHandler != null) rfidHandler.stopRead();
+                Toast.makeText(this, "Múltiples etiquetas detectadas. Por favor acerque solo una.", Toast.LENGTH_LONG).show();
+            });
+            return;
+        }
+
+        String epc = tagData[0].getEpc();
+        if (epc != null && !epc.isEmpty()) {
+            runOnUiThread(() -> {
+                if (rfidHandler != null) rfidHandler.stopRead();
+                numeroEtiquetaView.setText(epc);
+                Toast.makeText(this, "Etiqueta leída: " + epc, Toast.LENGTH_SHORT).show();
+            });
+        }
+    }
+
+    @Override
+    public void handleTriggerPress(boolean pressed) {
+        if (pressed) {
+            if (rfidHandler != null) {
+                rfidHandler.startRead();
+                runOnUiThread(() -> Toast.makeText(this, "Leyendo...", Toast.LENGTH_SHORT).show());
+            }
+        } else {
+            if (rfidHandler != null) {
+                rfidHandler.stopRead();
+            }
+        }
+    }
+
+    @Override
+    public void SetMessage(String msg) {
+        runOnUiThread(() -> Toast.makeText(this, "Reader: " + msg, Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    public Context GetContext() {
+        return this;
     }
 }

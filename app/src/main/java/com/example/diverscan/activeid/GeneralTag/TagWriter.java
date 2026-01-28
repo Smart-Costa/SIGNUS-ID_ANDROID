@@ -1,59 +1,31 @@
 package com.example.diverscan.activeid.GeneralTag;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet;
-import com.zebra.rfid.api3.ACCESS_OPERATION_CODE;
-import com.zebra.rfid.api3.ACCESS_OPERATION_STATUS;
-import com.zebra.rfid.api3.Antennas;
-import com.zebra.rfid.api3.DYNAMIC_POWER_OPTIMIZATION;
-import com.zebra.rfid.api3.ENUM_TRANSPORT;
-import com.zebra.rfid.api3.ENUM_TRIGGER_MODE;
-import com.zebra.rfid.api3.HANDHELD_TRIGGER_EVENT_TYPE;
-import com.zebra.rfid.api3.INVENTORY_STATE;
-import com.zebra.rfid.api3.InvalidUsageException;
-import com.zebra.rfid.api3.MEMORY_BANK;
-import com.zebra.rfid.api3.OperationFailureException;
-import com.zebra.rfid.api3.RFIDReader;
-import com.zebra.rfid.api3.ReaderDevice;
-import com.zebra.rfid.api3.Readers;
-import com.zebra.rfid.api3.RfidEventsListener;
-import com.zebra.rfid.api3.RfidReadEvents;
-import com.zebra.rfid.api3.RfidStatusEvents;
-import com.zebra.rfid.api3.SESSION;
-import com.zebra.rfid.api3.SL_FLAG;
-import com.zebra.rfid.api3.START_TRIGGER_TYPE;
-import com.zebra.rfid.api3.STATUS_EVENT_TYPE;
-import com.zebra.rfid.api3.STOP_TRIGGER_TYPE;
-import com.zebra.rfid.api3.TagAccess;
-import com.zebra.rfid.api3.TagData;
-import com.zebra.rfid.api3.TriggerInfo;
+import com.example.diverscan.activeid.DeviceInterface.ConnectionType;
+import com.example.diverscan.activeid.DeviceInterface.IReaderDevice;
+import com.example.diverscan.activeid.DeviceInterface.IReaderListener;
+import com.example.diverscan.activeid.DeviceInterface.ReaderFactory;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
+import com.example.diverscan.activeid.DeviceInterface.ReaderType;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class TagWriter implements Readers.RFIDReaderEventHandler{
-    final static String TAG = "RFID_SAMPLE";
+public class TagWriter implements IReaderListener {
+    final static String TAG = "RFID_TAG_WRITER";
     Context context;
-    private static Readers readers;
-    private static ArrayList<ReaderDevice> availableRFIDReaderList;
-    private static ReaderDevice readerDevice;
-    private static RFIDReader reader;
-    private EventHandler eventHandler;
-    //*************************************************************
-    // handheld que usan en Fidelitas.
-    String readername = "MC3300x";
-    //String readername = "RFD8500123";
-    //String readername = "MC3300R";
-    //*************************************************************
+    
+    // Decoupled Device Interface
+    private IReaderDevice device;
+
     private int MAX_POWER = 0;
     private String Power;
     private static final String _PASSWORD = "00";
 
     ResponseHandlerInterface responseHandlerInterface;
 
-    //*******************************************************************************************
     private static TagWriter instance = null;
 
     public static synchronized TagWriter getInstance() {
@@ -68,13 +40,15 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
     public boolean isInitialized() {
         return initialized;
     }
+
     public void setResponseHandler(ResponseHandlerInterface handler) {
         this.responseHandlerInterface = handler;
+        // If device is already connected, we might want to notify the new handler?
+        // But for now, we just update the reference.
     }
-    public void onCreate(ResponseHandlerInterface activity)
-    {
+
+    public void onCreate(ResponseHandlerInterface activity) {
         responseHandlerInterface = activity;
-        // Use Activity Context directly as some SDK versions require it for UI/Service binding
         context = activity.GetContext();
         
         Power = SharedPreferencesGetSet.leer_local("potenciaAntena", context);
@@ -82,7 +56,7 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
             if (Power != null && !Power.isEmpty()) {
                 MAX_POWER = Integer.parseInt(Power);
             } else {
-                MAX_POWER = 270; // Valor por defecto seguro
+                MAX_POWER = 270;
                 Power = "270";
             }
         } catch (NumberFormatException e) {
@@ -94,809 +68,256 @@ public class TagWriter implements Readers.RFIDReaderEventHandler{
         initialized = true;
     }
 
-    //*******************************************************************************************
-
-    public String Test1() {
-        return "Antenna power Set to 220";
-    }
-
-    //*******************************************************************************************
-
-    public String Test2() {
-        return "Session set to S2";
-    }
-
-    //*******************************************************************************************
-
-    // Added for Connection Validation
-    public boolean isConnected() {
-        return reader != null && reader.isConnected();
-    }
-
-    public String getReaderName() {
-        if (reader != null && reader.isConnected()) {
-             try {
-                 return reader.getHostName();
-             } catch (Exception e) {
-                 return "Error";
-             }
-        }
-        return "Desconectado";
-    }
-
-    public String getReaderModel() {
-        if (reader != null && reader.isConnected()) {
-             try {
-                 return reader.ReaderCapabilities.getModelName();
-             } catch (Exception e) {
-                 return "Desconocido";
-             }
-        }
-        return "--";
-    }
-
-    public ArrayList<String> getFoundDevices() {
-        ArrayList<String> devices = new ArrayList<>();
-        if (availableRFIDReaderList != null) {
-            for (ReaderDevice device : availableRFIDReaderList) {
-                devices.add(device.getName() + " (" + device.getAddress() + ")");
-            }
-        }
-        return devices;
-    }
-
-    //*******************************************************************************************
-
-    // cambios realizados por andrey sanchez Zuñiga
-    public String Defaults()
-    {
-        String value ="";
-        // check reader connection
-        if (!isReaderConnected())
-        {
-            value="No ha conectado";
-            return value;
-        }
-
-        try
-        {
-            // Power to 270
-            Antennas.AntennaRfConfig config = null;
-            config = reader.Config.Antennas.getAntennaRfConfig(1);
-            config.setTransmitPowerIndex(MAX_POWER);
-            config.setrfModeTableIndex(0);
-            config.setTari(0);
-            reader.Config.Antennas.setAntennaRfConfig(1, config);
-            // singulation to S0
-            Antennas.SingulationControl s1_singulationControl = reader.Config.Antennas.getSingulationControl(1);
-            s1_singulationControl.setSession(SESSION.SESSION_S0);
-            s1_singulationControl.Action.setInventoryState(INVENTORY_STATE.INVENTORY_STATE_A);
-            s1_singulationControl.Action.setSLFlag(SL_FLAG.SL_ALL);
-            reader.Config.Antennas.setSingulationControl(1, s1_singulationControl);
-        }
-        catch (OperationFailureException e)
-        {
-            e.printStackTrace();
-            value ="No se ha conectado al lector o no hay lectores disponibles.";
-            return  value ;
-        }
-        catch (Throwable e)
-        {
-            e.printStackTrace();
-            // Defaults error
-        }
-        return value;
-    }
-
-    //*******************************************************************************************
-
-    public boolean setTriggerMode(String Val)
-    { //Se recomienda pasar a boolean para controlar la conexión correctamente
-        try
-        {
-            if(Val.equals("RFID"))
-            {
-                reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.BARCODE_MODE, false);
-                reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE,true);
-                if(connect() != "conectado"){
-                    return false;
-                }
-            }
-            else if(Val.equals("BARCODE"))
-            {
-
-                reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, false);
-                reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.BARCODE_MODE, true);
-                if(disconnect() != "desconectado"){
-                    return false;
-                }
-            }
-        }
-        catch(InvalidUsageException e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-        catch (OperationFailureException e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    //*******************************************************************************************
-
-    public void EncenderRFID()
-    {
-        try{
-            reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.BARCODE_MODE, false);
-            reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE,true); //comentado
-            connect();  //comentado
-        }catch(InvalidUsageException e){
-            e.printStackTrace();
-        }
-        catch (OperationFailureException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    //*******************************************************************************************
-
-    public void ApagarRFID()
-    {
-        try
-        {
-            reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, false);   //comentado
-            reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.BARCODE_MODE, true);
-        }
-        catch(InvalidUsageException e)
-        {
-            e.printStackTrace();
-        }
-        catch (OperationFailureException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    private boolean WriteTag(String sourceEPC, String Password, MEMORY_BANK memory_bank, String EPCToWrite, int offset) {
-        Log.d(TAG, "WriteTag " + EPCToWrite);
-        try {
-            TagAccess tagAccess = new TagAccess();
-            TagAccess.WriteAccessParams writeAccessParams = tagAccess.new WriteAccessParams();
-            writeAccessParams.setAccessPassword(Long.parseLong(Password,16));
-            writeAccessParams.setMemoryBank(memory_bank);
-            writeAccessParams.setOffset(offset); // start writing from word offset 0
-            writeAccessParams.setWriteData(EPCToWrite);
-            // set retries in case of partial write happens
-            writeAccessParams.setWriteRetries(5);
-            // data length in words
-            writeAccessParams.setWriteDataLength(EPCToWrite.length() / 4);
-            // 5th parameter bPrefilter flag is true which means API will apply pre filter internally
-            // 6th parameter should be true in case of changing EPC ID it self i.e. source and target both is EPC
-            boolean useTIDfilter = memory_bank == MEMORY_BANK.MEMORY_BANK_EPC;
-            reader.Actions.TagAccess.writeWait(sourceEPC, writeAccessParams, null, new TagData(), true, useTIDfilter);
-        } catch (OperationFailureException | InvalidUsageException e) {
-            e.printStackTrace();
-            Log.d(TAG, e.getMessage() + " TESTING " + e.getStackTrace());
-            return false;
-        }
-        return true;
-    }
-
-    //*******************************************************************************************
-
-    public boolean WriteTag(String SourceEPC, String EPCToWrite)
-    {
-        try
-        {
-            setAccessOperationConfiguration();
-            return WriteTag(SourceEPC, _PASSWORD, MEMORY_BANK.MEMORY_BANK_EPC, EPCToWrite, 2);
-        }
-        catch (Exception ex)
-        {
-            return false;
-        }
-    }
-
-    //*******************************************************************************************
-
-    public void setAntennaPower(int power) {
-        Log.d(TAG, "setAntennaPower " + power);
-        try {
-            // set antenna configurations
-            Antennas.AntennaRfConfig config = reader.Config.Antennas.getAntennaRfConfig(1);
-            config.setTransmitPowerIndex(power);
-            config.setrfModeTableIndex(0);
-            config.setTari(0);
-            reader.Config.Antennas.setAntennaRfConfig(1, config);
-        } catch (InvalidUsageException e) {
-            e.printStackTrace();
-        } catch (OperationFailureException e) {
-            e.printStackTrace();
-        }
-    }
-
-    //*******************************************************************************************
-
-    public void setDPO(boolean bEnable) {
-        Log.d(TAG, "setDPO " + bEnable);
-        try {
-            // control the DPO
-            reader.Config.setDPOState(bEnable ? DYNAMIC_POWER_OPTIMIZATION.ENABLE : DYNAMIC_POWER_OPTIMIZATION.DISABLE);
-        } catch (InvalidUsageException e) {
-            e.printStackTrace();
-        } catch (OperationFailureException e) {
-            e.printStackTrace();
-        }
-    }
-
-    //*******************************************************************************************
-
-    public void setAccessOperationConfiguration() {
-        // set required power and profile
-        setAntennaPower(MAX_POWER);
-        // in case of RFD8500 disable DPO
-        if (reader.getHostName().contains("RFD8500"))
-            setDPO(false);
-        //
-        try {
-            // set access operation time out value to 1 second, so reader will tries for a second
-            // to perform operation before timing out
-            reader.Config.setAccessOperationWaitTimeout(7000);
-        } catch (InvalidUsageException e) {
-            e.printStackTrace();
-        } catch (OperationFailureException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean isReaderConnected()
-    {
-        if(reader != null && reader.isConnected())
-            return true;
-        else
-        {
-            Log.d(TAG, "No se ha conectado al lector");
-            //responseHandlerInterface.SetMessage("No se ha conectado al lector o no hay lectores disponibles.");
-            return false;
-        }
-    }
-
-    //*******************************************************************************************
-
-    public String onResume() {
-        return connect();
-    }
-
-    public void onPause() {
-        // disconnect(); // Comentado para mantener conexión entre pantallas
-    }
-
-    //*******************************************************************************************
-
-    public void onDestroy() {
-        //dispose();
-    }
-
-    //*******************************************************************************************
-
-    private synchronized String connect() {
-        if (reader != null) {
-            Log.d(TAG, "conectar " + reader.getHostName());
-            try {
-                if (reader.isConnected()) {
-                    responseHandlerInterface.SetMessage("Ya conectado a " + reader.getHostName());
-                    return "Conectado";
-                }
-                
-                if (!reader.isConnected()) {
-                    // Establish connection to the RFID Reader
-                    reader.connect();
-                    ConfigureReader();
-                    responseHandlerInterface.SetMessage("Conectado");
-                    return "Conectado";
-                }
-            } catch (InvalidUsageException e) {
-                e.printStackTrace();
-                if(responseHandlerInterface != null)
-                    responseHandlerInterface.SetMessage("Error InvalidUsage: " + e.getVendorMessage());
-            } catch (OperationFailureException e) {
-                e.printStackTrace();
-
-                Log.d(TAG, "OperationFailureException " + e.getVendorMessage());
-                String des = e.getResults().toString();
-                if(responseHandlerInterface != null)
-                    responseHandlerInterface.SetMessage("Fallo Operación: " + e.getVendorMessage() + " " + des);
-                return "Connection failed" + e.getVendorMessage() + " " + des;
-            } catch (Throwable e) {
-                e.printStackTrace();
-                if(responseHandlerInterface != null)
-                    responseHandlerInterface.SetMessage("Error inesperado al conectar: " + e.toString());
-                return "Error: " + e.getMessage();
-            }
-        }
-        return "";
-    }
-
-    //*******************************************************************************************
-
-    private synchronized String disconnect(){
-        Log.d(TAG, "Desconectado" + reader);
-        try{
-            if (reader != null){
-                reader.Events.removeEventsListener(eventHandler);
-                reader.disconnect();
-                //responseHandlerInterface.SetMessage("Desconectado " + reader);
-            }
-        }catch (InvalidUsageException ex){
-            ex.printStackTrace();
-            return ex.getMessage();
-        }catch (OperationFailureException ex){
-            ex.printStackTrace();
-            return ex.getMessage();
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return ex.getMessage();
-        }
-        return "desconectado";
-    }
-
-    //*******************************************************************************************
-
-//    private synchronized void dispose(){
-//        try{
-//            if (readers != null){
-//                reader = null;
-//                readers.Dispose();
-//                readers = null;
-//            }
-//        }catch (Exception ex){
-//            ex.printStackTrace();
-//        }
-//    }
-
-    //*******************************************************************************************
-
-    private ENUM_TRANSPORT currentTransport = ENUM_TRANSPORT.BLUETOOTH; // Default
     private boolean autoDetect = true;
 
     public void setAutoDetect(boolean enable) {
         this.autoDetect = enable;
     }
 
-    public void setTransport(ENUM_TRANSPORT transport) {
-        this.currentTransport = transport;
+    public boolean isConnected() {
+        return device != null && device.isConnected();
     }
 
-    private boolean validationMode = false;
-
-    public void setValidationMode(boolean enabled) {
-        this.validationMode = enabled;
+    public String getReaderName() {
+        return device != null ? device.getDeviceName() : "No Device";
     }
 
-    private void log(String msg) {
-        Log.d(TAG, msg);
-        if (responseHandlerInterface != null && validationMode) {
-            // Send to UI (assuming SetMessage can handle it or we add a new method)
-            // For now, we prepend "LOG:" so the Activity knows it's a log entry
-            responseHandlerInterface.SetMessage("LOG: " + msg);
-        }
+    public String getReaderModel() {
+        return device != null ? device.getDeviceName() : "Unknown";
     }
 
-    public void InitSDK()
-    {
-        log("InitSDK - Iniciando SDK");
-        log("Configuración: AutoDetect=" + autoDetect + ", Transporte=" + currentTransport);
+    public List<String> getFoundDevices() {
+        return new java.util.ArrayList<>();
+    }
+
+    public void setTransport(Object transport) {
+        // Generic transport setter, implementation depends on specific device
+        Log.d(TAG, "setTransport called with: " + transport);
+    }
+
+    public boolean setTriggerMode(String mode) {
+        // Todo: Implement
+        return true;
+    }
+
+    public void LocateTag(String epc) {
+        // Todo: Implement
+    }
+
+    public void StopLocateTag() {
+        // Todo: Implement
+    }
+
+    public void InitSDK() {
+        Log.d(TAG, "InitSDK - Initializing via Factory");
+        if (responseHandlerInterface != null)
+            responseHandlerInterface.SetMessage("Iniciando servicio de lectura...");
+
+        // Load reader type from preferences
+        String typeStr = SharedPreferencesGetSet.leer_local("reader_type", context);
+        ReaderType type = ReaderType.ZEBRA; // Default
         
-        if(responseHandlerInterface != null)
-            responseHandlerInterface.SetMessage("Iniciando búsqueda de lectores (" + currentTransport.toString() + ")...");
+        // Load connection type from preferences
+        String connStr = SharedPreferencesGetSet.leer_local("connection_type", context);
+        ConnectionType connType = ConnectionType.AUTO;
 
-        // Forzar limpieza si cambiamos de transporte o queremos re-escanear
-        if (readers != null) {
+        if (connStr != null && !connStr.isEmpty()) {
             try {
-                log("Disposing previous readers instance...");
-                readers.Dispose();
+                connType = ConnectionType.valueOf(connStr);
             } catch (Exception e) {
-                e.printStackTrace();
-                log("Error disposing readers: " + e.getMessage());
+                connType = ConnectionType.AUTO;
+                Log.w(TAG, "Tipo de conexión inválido en preferencias, usando AUTO");
             }
-            readers = null;
         }
 
-        new CreateInstanceTask().execute();
+        if (typeStr != null && !typeStr.isEmpty()) {
+            try {
+                type = ReaderType.valueOf(typeStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Invalid reader type: " + typeStr + ", defaulting to ZEBRA");
+                type = ReaderType.ZEBRA;
+            }
+        } else if (autoDetect) {
+            // Auto-detect device model if no preference is set and autoDetect is true
+            String model = android.os.Build.MODEL;
+            Log.d(TAG, "Auto-detecting reader. Device Model: " + model);
+            if (model != null) {
+                if (model.contains("Lark 1")) {
+                     type = ReaderType.IMIN_SCANNER;
+                     Log.i(TAG, "Auto-detected iMin Lark 1 device (Scanner): " + model);
+                } else if (model.contains("I24P01")) {
+                    type = ReaderType.IMIN;
+                    Log.i(TAG, "Auto-detected iMin device (RFID): " + model);
+                }
+            }
+        }
+
+        Log.i(TAG, "Inicializando ReaderType: " + type + " ConnectionType: " + connType);
+        setReaderType(type, connType);
     }
 
-    //*******************************************************************************************
+    public void setReaderType(ReaderType type) {
+        setReaderType(type, ConnectionType.AUTO);
+    }
 
-    private class CreateInstanceTask extends AsyncTask<Void, Void, Void>{
-        @Override
-        protected Void doInBackground(Void... voids){
-            log("CreateInstanceTask running in background");
-            
-            if (readers == null) {
-                 try {
-                     if (autoDetect) {
-                         // Try Serial first
-                         log("AutoDetect: Trying SERVICE_SERIAL...");
-                         try {
-                             readers = new Readers(context, ENUM_TRANSPORT.SERVICE_SERIAL);
-                             log("Readers(SERIAL) instantiated");
-                             availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                             log("GetAvailableRFIDReaderList(SERIAL) called");
-                             
-                             if (isValidList(availableRFIDReaderList)) {
-                                 log("Found readers via SERIAL");
-                                 return null;
-                             }
-                         } catch (Exception e) {
-                             log("Serial check failed: " + e.getMessage());
-                         }
-                         
-                         // Try Bluetooth
-                         log("AutoDetect: Trying BLUETOOTH...");
-                         if (readers != null) { 
-                             try { readers.Dispose(); } catch (Exception e) {} 
-                             readers = null;
-                         }
-                         
-                         try {
-                             readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
-                             log("Readers(BLUETOOTH) instantiated");
-                             availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                             
-                             if (isValidList(availableRFIDReaderList)) {
-                                 log("Found readers via BLUETOOTH");
-                                 return null;
-                             }
-                         } catch (Exception e) {
-                             log("Bluetooth check failed: " + e.getMessage());
-                         }
+    public void setReaderType(ReaderType type, ConnectionType connType) {
+        String msg = "Configurando Lector: " + type + " (" + connType + ")";
+        Log.i(TAG, msg);
+        if (responseHandlerInterface != null) responseHandlerInterface.SetMessage(msg);
 
-                         // Try USB (Explicit)
-                         log("AutoDetect: Trying SERVICE_USB...");
-                         if (readers != null) { 
-                             try { readers.Dispose(); } catch (Exception e) {} 
-                             readers = null;
-                         }
-                         
-                         try {
-                             readers = new Readers(context, ENUM_TRANSPORT.SERVICE_USB);
-                             log("Readers(USB) instantiated");
-                             availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                             
-                             if (isValidList(availableRFIDReaderList)) {
-                                 log("Found readers via USB");
-                                 return null;
-                             }
-                         } catch (Exception e) {
-                             log("USB check failed: " + e.getMessage());
-                         }
-                         
-                     } else {
-                         // Specific transport
-                         log("Using specific transport: " + currentTransport);
-                         readers = new Readers(context, currentTransport);
-                         availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                         log("GetAvailableRFIDReaderList returned " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : "null") + " devices");
-                     }
-                 } catch (Exception e) {
-                     log("Error in CreateInstanceTask (General): " + e.getMessage());
-                     e.printStackTrace();
-                 }
+        // Dispose existing device if any
+        if (device != null) {
+            try {
+                Log.d(TAG, "Disposing previous device...");
+                device.dispose();
+            } catch (Exception e) {
+                Log.e(TAG, "Error disposing previous device", e);
             }
-            return null;
         }
+
+        // Use Factory to create new reader
+        Log.d(TAG, "Creating new reader instance...");
+        device = ReaderFactory.createReader(type, connType, context, this);
         
-        private boolean isValidList(ArrayList<ReaderDevice> list) {
-            return list != null && !list.isEmpty();
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            log("CreateInstanceTask finished");
-            
-            if (availableRFIDReaderList != null && !availableRFIDReaderList.isEmpty()) {
-                // get first reader from list
-                readerDevice = availableRFIDReaderList.get(0);
-                reader = readerDevice.getRFIDReader();
-                log("Selected reader: " + readerDevice.getName() + " (" + readerDevice.getAddress() + ")");
-                
-                if (reader != null) { 
-                    connect();
-                }
-            } else {
-                log("No se encontraron lectores disponibles.");
-                if (responseHandlerInterface != null)
-                    responseHandlerInterface.SetMessage("No se encontraron lectores. Verifique DataWedge o Bluetooth.");
-            }
-        }
+        // Persist preference
+        SharedPreferencesGetSet.guardar_local("reader_type", type.name(), context);
+        SharedPreferencesGetSet.guardar_local("connection_type", connType.name(), context);
     }
-
-    //*******************************************************************************************
-
-    private class ConnectionTask extends AsyncTask<Void, Void, String>{
-        @Override
-        protected String doInBackground(Void... voids){
-            Log.d(TAG, "ConnectionTask");
-            GetAvailableReader();
-            if(reader != null){
-                return connect();
-            }
-            return "No se pudo encontrar o conectar el lector";
+    
+    public ReaderType getCurrentReaderType() {
+        if (device != null) {
+             if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminScannerImpl) return ReaderType.IMIN_SCANNER;
+             if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) return ReaderType.IMIN;
+             if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.ZebraReaderImpl) return ReaderType.ZEBRA;
         }
-
-        @Override
-        protected void onPostExecute(String result){
-            super.onPostExecute(result);
-            if (result != null && !result.isEmpty() && !result.equals("Conectado")) {
-                if(responseHandlerInterface != null)
-                    responseHandlerInterface.SetMessage("Estado Conexión: " + result);
-            }
+        // Fallback to preference or detection
+        String typeStr = SharedPreferencesGetSet.leer_local("reader_type", context);
+        if (typeStr != null) {
+             try { return ReaderType.valueOf(typeStr); } catch (Exception e) {}
         }
+        return ReaderType.ZEBRA;
     }
-
-    //*******************************************************************************************
-
-    private synchronized void GetAvailableReader() {
-        Log.d(TAG, "GetAvailableReader");
-        try {
-            if (readers != null)
-            {
-                readers.attach( this);
-                if (readers.GetAvailableRFIDReaderList() != null) {
-                    availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                    if (availableRFIDReaderList.size() != 0) {
-                        // if single reader is available then connect it
-                        if (availableRFIDReaderList.size() == 1) {
-                            readerDevice = availableRFIDReaderList.get(0);
-                            reader = readerDevice.getRFIDReader();
-                        } else {
-                            // search reader specified by name
-                            boolean found = false;
-                            for (ReaderDevice device : availableRFIDReaderList) {
-                                if (device.getName().equals(readername))
-                                {
-                                    readerDevice = device;
-                                    reader = readerDevice.getRFIDReader();
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            // Fallback: if not found, use the first one
-                            if (!found) {
-                                readerDevice = availableRFIDReaderList.get(0);
-                                reader = readerDevice.getRFIDReader();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (Throwable e)
-        {
-            e.printStackTrace();
-            if (responseHandlerInterface != null) {
-                responseHandlerInterface.SetMessage("Error GetAvailableReader: " + e.toString());
-            }
-        }
+    
+    // IReaderListener Implementation
+    @Override
+    public void onConnected(String readerName) {
+        Log.d(TAG, "Connected to " + readerName);
+        if (responseHandlerInterface != null)
+            responseHandlerInterface.SetMessage("Conectado a " + readerName);
     }
-
-    //*******************************************************************************************
 
     @Override
-    public void RFIDReaderAppeared(ReaderDevice readerDevice) {
-        Log.d(TAG, "RFIDReaderAppeared " + readerDevice.getName());
-        new ConnectionTask().execute();
+    public void onDisconnected() {
+        Log.d(TAG, "Disconnected");
+        if (responseHandlerInterface != null)
+            responseHandlerInterface.SetMessage("Desconectado");
     }
-
-    //*******************************************************************************************
 
     @Override
-    public void RFIDReaderDisappeared(ReaderDevice readerDevice) {
-        Log.d(TAG, "RFIDReaderDisappeared " + readerDevice.getName());
-        if (reader != null && reader.getHostName() != null && readerDevice.getName().equals(reader.getHostName()))
-            disconnect();
+    public void onConnectionError(String message) {
+        Log.e(TAG, "Connection Error: " + message);
+        if (responseHandlerInterface != null)
+            responseHandlerInterface.SetMessage("Error: " + message);
     }
 
-    //*******************************************************************************************
-
-    private void ConfigureReader() {
-        Log.d(TAG,"ConfigureReader" + reader.getHostName());
-        if (reader.isConnected()) {
-            try{
-                if (eventHandler == null)
-                    eventHandler = new EventHandler();
-                reader.Events.addEventsListener(eventHandler);
-                reader.Events.setHandheldEvent(true);
-                reader.Events.setTagReadEvent(true);
-                reader.Events.setAttachTagDataWithReadEvent(false);
-                reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, true);
-                
-                // Configure default trigger (Handheld/Physical)
-                configureTrigger(true);
-
-                MAX_POWER =Integer.parseInt(Power);
-                Antennas.AntennaRfConfig config = reader.Config.Antennas.getAntennaRfConfig(1);
-                config.setTransmitPowerIndex(MAX_POWER);
-                config.setrfModeTableIndex(0);
-                config.setTari(0);
-                reader.Config.Antennas.setAntennaRfConfig(1, config);
-                // Set the singulation control
-                Antennas.SingulationControl s1_singulationControl = reader.Config.Antennas.getSingulationControl(1);
-                s1_singulationControl.setSession(SESSION.SESSION_S0);
-                s1_singulationControl.Action.setInventoryState(INVENTORY_STATE.INVENTORY_STATE_A);
-                s1_singulationControl.Action.setSLFlag(SL_FLAG.SL_ALL);
-                reader.Config.Antennas.setSingulationControl(1, s1_singulationControl);
-                // delete any prefilters
-                reader.Actions.PreFilters.deleteAll();
-
-            } catch (InvalidUsageException | OperationFailureException e) {
-                e.printStackTrace();
-            }
+    @Override
+    public void onTagRead(List<ReaderTag> tags) {
+        if (responseHandlerInterface != null && tags != null && !tags.isEmpty()) {
+            ReaderTag[] legacyTags = tags.toArray(new ReaderTag[0]);
+            responseHandlerInterface.handleTagdata(legacyTags);
         }
     }
 
-    public void configureTrigger(boolean isHandheld) {
-        if (!isReaderConnected()) return;
-        try {
-            TriggerInfo triggerInfo = new TriggerInfo();
-            if (isHandheld) {
-                // Handheld Trigger (Physical Button)
-                triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_HANDHELD);
-                triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_HANDHELD_WITH_TIMEOUT);
-                // triggerInfo.StopTrigger.setHandheldTriggerTimeout(0); // Removing causing error
-            } else {
-                // Immediate Trigger (Soft Button)
-                triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_IMMEDIATE);
-                triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_IMMEDIATE);
-            }
-            reader.Config.setStartTrigger(triggerInfo.StartTrigger);
-            reader.Config.setStopTrigger(triggerInfo.StopTrigger);
-        } catch (InvalidUsageException | OperationFailureException e) {
-            e.printStackTrace();
-            Log.e(TAG, "Error configuring trigger: " + e.getMessage());
-        }
+    @Override
+    public void onTrigger(boolean pressed) {
+        if (responseHandlerInterface != null)
+            responseHandlerInterface.handleTriggerPress(pressed);
     }
 
-    //*******************************************************************************************
-
-    public synchronized void performInventory(){
-        if(!isReaderConnected())
-            return;
-        try{
-            reader.Actions.Inventory.perform();
-        }catch (InvalidUsageException ex){
-            ex.printStackTrace();
-        }catch (OperationFailureException ex){
-            ex.printStackTrace();
-        }
+    @Override
+    public void onStatusMessage(String message) {
+        if (responseHandlerInterface != null)
+            responseHandlerInterface.SetMessage(message);
     }
 
-    //*******************************************************************************************
+    // Legacy Methods Mapped to New Interface
 
-    public synchronized void stopInventory(){
-        if (!isReaderConnected())
-            return;
-        try{
-            reader.Actions.Inventory.stop();
-        }catch (InvalidUsageException ex){
-            ex.printStackTrace();
-        }catch (OperationFailureException ex){
-            ex.printStackTrace();
-        }
+    public String onResume() {
+        return connect();
     }
 
-    //*******************************************************************************************
-
-    public class EventHandler implements RfidEventsListener {
-        // Read Event Notification
-        public void eventReadNotify(RfidReadEvents e) {
-            // Recommended to use new method getReadTagsEx for better performance in case of large tag population
-            TagData[] myTags = reader.Actions.getReadTags(100);
-            if (myTags != null) {
-                for (int index = 0; index < myTags.length; index++) {
-                    Log.d(TAG, "Tag ID " + myTags[index].getTagID());
-                    if (myTags[index].getOpCode() == ACCESS_OPERATION_CODE.ACCESS_OPERATION_READ &&
-                            myTags[index].getOpStatus() == ACCESS_OPERATION_STATUS.ACCESS_SUCCESS) {
-                        if (myTags[index].getMemoryBankData().length() > 0) {
-                            Log.d(TAG, " Mem Bank Data " + myTags[index].getMemoryBankData());
-                        }
-                    }
-                    if (myTags[index].isContainsLocationInfo()) {
-                        short dist = myTags[index].LocationInfo.getRelativeDistance();
-                        Log.d(TAG, "Tag relative distance " + dist);
-                    }
-                }
-                // possibly if operation was invoked from async task and still busy
-                // handle tag data responses on parallel thread thus THREAD_POOL_EXECUTOR
-                new AsyncDataUpdate().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, myTags);
-            }
-        }
-        public void eventStatusNotify(RfidStatusEvents rfidStatusEvents) {
-            Log.d(TAG, "Status Notification 1: " + rfidStatusEvents.StatusEventData.getStatusEventType());
-            if (rfidStatusEvents.StatusEventData.getStatusEventType() == STATUS_EVENT_TYPE.HANDHELD_TRIGGER_EVENT) {
-                if (rfidStatusEvents.StatusEventData.HandheldTriggerEventData.getHandheldEvent() == HANDHELD_TRIGGER_EVENT_TYPE.HANDHELD_TRIGGER_PRESSED) {
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            if (responseHandlerInterface != null)
-                                responseHandlerInterface.handleTriggerPress(true);
-                            return null;
-                        }
-                    }.execute();
-                }
-                if (rfidStatusEvents.StatusEventData.HandheldTriggerEventData.getHandheldEvent() == HANDHELD_TRIGGER_EVENT_TYPE.HANDHELD_TRIGGER_RELEASED) {
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            if (responseHandlerInterface != null)
-                                responseHandlerInterface.handleTriggerPress(false);
-                            return null;
-                        }
-                    }.execute();
-                }
-            }
-        }
+    public void onPause() {
+        // Typically we don't disconnect on pause to keep reader active, 
+        // but if required: disconnect();
     }
 
-    //*******************************************************************************************
-
-    private class AsyncDataUpdate extends AsyncTask<TagData[], Void, Void> {
-        @Override
-        protected Void doInBackground(TagData[]... params) {
-            if (responseHandlerInterface != null)
-                responseHandlerInterface.handleTagdata(params[0]);
-            return null;
-        }
+    public void onDestroy() {
+        if (device != null) device.dispose();
     }
 
-    //*******************************************************************************************
+    private synchronized String connect() {
+        if (device != null) {
+            if (device.isConnected()) return "Conectado";
+            device.connect();
+            return "Conectando..."; 
+        }
+        return "Error: No device";
+    }
 
-    public synchronized void startRead(){
-        // Switch to Immediate mode for soft-button read
-        configureTrigger(false);
+    private synchronized String disconnect() {
+        if (device != null) {
+            device.disconnect();
+            return "Desconectando...";
+        }
+        return "Error: No device";
+    }
+
+    public synchronized void startRead() {
         performInventory();
     }
 
-    public synchronized void stopRead(){
+    public synchronized void stopRead() {
         stopInventory();
-        // Switch back to Handheld mode for physical trigger
-        // We use a small delay or just execute, but better to ensure inventory stopped
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            configureTrigger(true);
-        }, 500);
     }
 
-    //*******************************************************************************************
+    public synchronized void performInventory() {
+        if (device != null) device.startInventory();
+    }
 
-    public void LocateTag(String tagId){
-        try {
-            if(isReaderConnected()){
-                reader.Actions.TagLocationing.Perform(tagId, null, null);
-            }else{
-                responseHandlerInterface.SetMessage("No hay lectores disponibles.");
-            }
-        } catch (InvalidUsageException e) {
-            e.printStackTrace();
-        } catch (OperationFailureException e) {
-            e.printStackTrace();
+    public synchronized void stopInventory() {
+        if (device != null) device.stopInventory();
+    }
+
+    public void setAntennaPower(int power) {
+        if (device != null) device.setPower(power);
+    }
+    
+    public boolean WriteTag(String SourceEPC, String EPCToWrite) {
+        if (device != null) {
+            return device.writeTag(SourceEPC, EPCToWrite, _PASSWORD);
         }
+        return false;
     }
 
-    //*******************************************************************************************
-
-    public void StopLocateTag(){
-        try {
-            reader.Actions.TagLocationing.Stop();
-        } catch (InvalidUsageException e) {
-            e.printStackTrace();
-        } catch (OperationFailureException e) {
-            e.printStackTrace();
-        }
+    // Stub methods for compatibility
+    public void setDPO(boolean bEnable) {
+        // TODO: Implement DPO in IReaderDevice if needed
     }
 
-    //*******************************************************************************************
+    public void setAccessOperationConfiguration() {
+        if (device != null) device.setPower(MAX_POWER);
+    }
+    
+    // public void setAutoDetect(boolean enable) {} // Removed duplicate
+    public void setTransport(String transport) {} 
+    public void setValidationMode(boolean enabled) {}    public boolean isReaderConnected() {
+        return device != null && device.isConnected();
+    }
+    
+    // Testing methods from original file
+    public void Test1() {}
+    public void Test2() {}
+    public void Defaults() {}
+    public void EncenderRFID() { performInventory(); }
+    public void ApagarRFID() { stopInventory(); }
 }

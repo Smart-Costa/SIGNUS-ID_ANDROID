@@ -48,7 +48,7 @@ import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
 import com.example.diverscan.activeid.sqlite.OfficesDBHelper;
-import com.zebra.rfid.api3.TagData;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1233,13 +1233,13 @@ public class AsignarUbicacionTodo extends AppCompatActivity implements ResponseH
     }
 
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
 
         if(!scannerActivate){
             ArrayList<String> tags = new ArrayList<String>();
             for (int index = 0; index < tagData.length; index++) {
-                _lastTag = tagData[index].getTagID();
-                tags.add(tagData[index].getTagID());
+                _lastTag = tagData[index].getEpc();
+                tags.add(tagData[index].getEpc());
 
             }
             if(_chequearUbicacion.CheckActivos(tags)){

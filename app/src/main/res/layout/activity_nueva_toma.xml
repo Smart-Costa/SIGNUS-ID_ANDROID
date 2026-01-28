@@ -685,6 +685,7 @@
                          android:textColor="#666"/>
                 </LinearLayout>
 
+                <!--
                 <LinearLayout
                     android:id="@+id/lyAgregarLecturaManual"
                     android:layout_width="match_parent"
@@ -784,6 +785,7 @@
                         android:textColor="#333"
                         android:textStyle="bold" />
                 </LinearLayout>
+                -->
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/listScannedTags"

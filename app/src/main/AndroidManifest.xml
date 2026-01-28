@@ -237,6 +237,12 @@
             android:screenOrientation="portrait"
             android:exported="false"/>
 
+        <activity android:name=".GeneralTag.ConfiguracionLarkActivity"
+            android:label="Configuración Lark 1"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
         <activity android:name=".UI.config.LimpiarBaseDatosActivity"
             android:label="Limpiar Base de Datos"
             android:parentActivityName=".UI.main.MainActivity"

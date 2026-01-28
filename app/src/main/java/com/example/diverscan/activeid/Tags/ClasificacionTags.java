@@ -22,10 +22,10 @@ import android.widget.Toast;
 
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
+import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.TagsDBHelper;
-import com.zebra.rfid.api3.TagData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -472,11 +472,11 @@ public class ClasificacionTags extends AppCompatActivity implements ResponseHand
     }
 
     @Override
-    public void handleTagdata(TagData[] tagData) {
+    public void handleTagdata(ReaderTag[] tagData) {
         ArrayList<String> tags = new ArrayList<String>();
         for (int index = 0; index < tagData.length; index++) {
             //_lastTag = tagData[index].getTagID();
-            tags.add(tagData[index].getTagID());
+            tags.add(tagData[index].getEpc());
 
         }
         if(_chequearTags.CheckActivos(tags)) {
