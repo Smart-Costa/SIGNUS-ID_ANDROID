@@ -382,12 +382,19 @@ public class sincronizar_base extends AppCompatActivity {
                         // 4. Activos
                         runOnUiThread(() -> Mensaje.setText("Iniciando descarga de Activos..."));
                         
-                        activoDao.setSyncProgressListener((page, count) -> {
+                        activoDao.setSyncProgressListener((page, count, totalPages) -> {
                              runOnUiThread(() -> {
-                                 if (count == 0) {
-                                     Mensaje.setText("Descargando Activos: Solicitando página " + page + "...");
+                                 String progressText;
+                                 if (totalPages > 0) {
+                                     progressText = "Página " + page + " de " + totalPages;
                                  } else {
-                                     Mensaje.setText("Descargando Activos: Procesados " + count + " registros (Página " + page + ")...");
+                                     progressText = "Página " + page;
+                                 }
+
+                                 if (count == 0) {
+                                     Mensaje.setText("Descargando Activos:\nSolicitando " + progressText + "...");
+                                 } else {
+                                     Mensaje.setText("Descargando Activos:\nProcesados " + count + " registros (" + progressText + ")...");
                                  }
                              });
                         });

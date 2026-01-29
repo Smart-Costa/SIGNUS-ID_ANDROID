@@ -516,6 +516,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         spinnerCategoria = findViewById(R.id.spinnerCategoria);
         /*
         chkIncluirExternos = findViewById(R.id.chkIncluirExternos);
+        */
 
         progressCargaManual = findViewById(R.id.progressCargaManual);
         txtSinDatosManual = findViewById(R.id.txtSinDatosManual);
@@ -534,6 +535,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             btnManualAdd.setOnClickListener(v -> agregarLecturaManualTexto());
         }
 
+        /*
         if (chkIncluirExternos != null) {
             chkIncluirExternos.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 refreshActivosList();

@@ -91,7 +91,19 @@ public class ApiClient {
                 try {
                     String resp = new String(responseBody, StandardCharsets.UTF_8);
                     T data = gson.fromJson(resp, typeOfT);
-                    callback.onComplete(ApiResponse.success(data, statusCode));
+
+                    int totalPages = 0;
+                    if (headers != null) {
+                        for (Header h : headers) {
+                            if ("X-Total-Pages".equalsIgnoreCase(h.getName())) {
+                                try {
+                                    totalPages = Integer.parseInt(h.getValue());
+                                } catch (Exception ignore) {}
+                            }
+                        }
+                    }
+
+                    callback.onComplete(ApiResponse.success(data, statusCode, totalPages));
                 } catch (Exception e) {
                     Log.e(TAG, "GET parse error", e);
                     callback.onComplete(ApiResponse.failure("Parse error: " + e.getMessage(), statusCode));

@@ -1090,7 +1090,7 @@ public class ActivoDao {
 
     // Interface para reportar progreso de sincronización
     public interface SyncProgressListener {
-        void onProgress(int page, int count);
+        void onProgress(int page, int count, int totalPages);
     }
     
     private SyncProgressListener progressListener;
@@ -1117,7 +1117,7 @@ public class ActivoDao {
         
         if (progressListener != null) {
             try {
-                progressListener.onProgress(page, 0); // Notificar inicio de página
+                progressListener.onProgress(page, 0, 0); // Notificar inicio de página
             } catch (Exception e) { Log.e(TAG, "Error en progress listener", e); }
         }
 
@@ -1126,13 +1126,15 @@ public class ActivoDao {
             public void onComplete(ApiResponse<List<ActivoEntity>> response) {
                 if (response.success && response.data != null) {
                     int count = response.data.size();
+                    int totalPages = response.totalPages;
+
                     if (count > 0) {
                         syncActivos(response.data);
-                        Log.d(TAG, "Page " + page + " synced: " + count + " assets.");
+                        Log.d(TAG, "Page " + page + " synced: " + count + " assets. TotalPages: " + totalPages);
                         
                         if (progressListener != null) {
                             try {
-                                progressListener.onProgress(page, count);
+                                progressListener.onProgress(page, count, totalPages);
                             } catch (Exception e) { Log.e(TAG, "Error en progress listener", e); }
                         }
                         
