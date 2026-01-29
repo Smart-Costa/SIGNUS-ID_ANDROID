@@ -518,6 +518,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         chkIncluirExternos = findViewById(R.id.chkIncluirExternos);
         */
 
+        /*
         progressCargaManual = findViewById(R.id.progressCargaManual);
         txtSinDatosManual = findViewById(R.id.txtSinDatosManual);
         btnAgregarLectura = findViewById(R.id.btnAgregarLectura);

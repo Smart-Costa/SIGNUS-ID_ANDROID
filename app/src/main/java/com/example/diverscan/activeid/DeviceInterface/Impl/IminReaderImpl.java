@@ -41,19 +41,26 @@ public class IminReaderImpl implements IReaderDevice {
     public void initialize(Context context) {
         this.context = context;
         this.uiHandler = new Handler(Looper.getMainLooper());
-        Log.d(TAG, "Initializing iMin Lark 1 Reader support...");
+        Log.i(TAG, "============================================");
+        Log.i(TAG, "Initializing iMin Lark 1 Reader support...");
+        Log.i(TAG, "Device Model: " + android.os.Build.MODEL);
+        Log.i(TAG, "============================================");
 
         try {
             rfidManager = RFIDManager.getInstance();
-            rfidManager.connect(context);
-            // Give it a moment to connect or check status
-            // The SDK seems to be service based, so connect() might be async or fast.
-            // We'll check helper availability in connect()
+            if (rfidManager != null) {
+                Log.d(TAG, "RFIDManager instance obtained successfully.");
+                rfidManager.connect(context);
+                Log.d(TAG, "rfidManager.connect() called.");
+            } else {
+                Log.e(TAG, "CRITICAL: RFIDManager.getInstance() returned null.");
+            }
             
             // Auto-connect attempt
             uiHandler.postDelayed(this::connect, 500);
 
         } catch (Exception e) {
+            Log.e(TAG, "CRITICAL EXCEPTION initializing iMin SDK", e);
             notifyError("Exception initializing iMin SDK: " + e.getMessage());
             e.printStackTrace();
         }
@@ -64,24 +71,27 @@ public class IminReaderImpl implements IReaderDevice {
         Log.d(TAG, "Attempting to connect to iMin Reader...");
         try {
             if (rfidManager == null) {
+                Log.w(TAG, "rfidManager was null during connect(), re-initializing...");
                 rfidManager = RFIDManager.getInstance();
                 rfidManager.connect(context);
             }
             
             rfidHelper = rfidManager.getHelper();
             if (rfidHelper != null) {
+                Log.i(TAG, "RFIDHelper obtained. Service is bound.");
                 registerReaderCall();
                 isConnected = true;
+                Log.i(TAG, "Connection State: CONNECTED");
                 if (listener != null) {
                     listener.onConnected("iMin Lark 1 (Internal)");
                 }
                 return true;
             } else {
-                Log.e(TAG, "RFIDHelper is null, service might not be bound yet.");
+                Log.e(TAG, "RFIDHelper is null. Service might not be bound yet or RFID module is unavailable.");
                 return false;
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error connecting", e);
+            Log.e(TAG, "Error connecting to iMin Reader", e);
             notifyError("Connection failed: " + e.getMessage());
             return false;
         }
@@ -89,20 +99,22 @@ public class IminReaderImpl implements IReaderDevice {
 
     private void registerReaderCall() {
         if (rfidHelper == null) return;
+        Log.d(TAG, "Registering ReaderCallback...");
         rfidHelper.registerReaderCall(new ReaderCall() {
             @Override
             public void onSuccess(byte cmd, DataParameter dataParameter) {
-                // Handle success responses (e.g. settings applied)
+                Log.d(TAG, "CMD Success: " + String.format("0x%02X", cmd));
             }
 
             @Override
             public void onTag(byte cmd, byte state, DataParameter dataParameter) {
+                // Verbose log for high frequency tag reads
                 // Log.v(TAG, "onTag callback received. cmd: " + cmd + " state: " + state);
                 if (dataParameter != null) {
                     String epc = dataParameter.getString(ParamCts.TAG_EPC);
                     String rssiStr = dataParameter.getString(ParamCts.TAG_RSSI);
                     
-                    Log.v(TAG, "onTag Data - EPC: " + epc + " RSSI: " + rssiStr);
+                    Log.v(TAG, "TAG READ -> EPC: " + epc + " | RSSI: " + rssiStr);
 
                     if (epc != null) {
                         short rssi = 0;
@@ -124,8 +136,7 @@ public class IminReaderImpl implements IReaderDevice {
 
             @Override
             public void onFiled(byte cmd, byte errorCode, String msg) {
-                // Handle failures
-                Log.w(TAG, "Reader operation failed: " + msg + " code: " + errorCode);
+                Log.w(TAG, "CMD Failed: " + String.format("0x%02X", cmd) + " | ErrorCode: " + errorCode + " | Msg: " + msg);
             }
         });
     }
@@ -187,7 +198,7 @@ public class IminReaderImpl implements IReaderDevice {
     @Override
     public void setPower(int power) {
         this.currentPower = power;
-        Log.d(TAG, "Setting power to: " + power);
+        Log.d(TAG, "setPower called with value: " + power);
         
         if (!isConnected || rfidHelper == null) {
             Log.w(TAG, "Cannot set power: Reader not connected or helper null");
@@ -200,11 +211,14 @@ public class IminReaderImpl implements IReaderDevice {
             if (p > 33) {
                 p = p / 10;
             }
+            Log.i(TAG, "Normalized Power: " + p + " dBm");
             
             ReadWritePower readWritePower = new ReadWritePower();
             readWritePower.readPower = p;
             readWritePower.writePower = p;
             String config = new Gson().toJson(readWritePower);
+            
+            Log.d(TAG, "Sending Power Config JSON: " + config);
             rfidHelper.extendOperation(CMD.SET_READ_WRITE_POWER, config);
         } catch (Exception e) {
             Log.e(TAG, "Error setting power", e);
