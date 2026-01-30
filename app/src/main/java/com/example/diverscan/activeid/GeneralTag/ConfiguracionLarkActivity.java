@@ -34,6 +34,7 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     private LinearLayout layoutPower;
     private SeekBar sbPower;
     private Button btnValidateConnection;
+    private Button btnDiagnostic;
     private Button btnSingleRead;
     private Button btnMultiRead;
     
@@ -75,6 +76,7 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
         layoutPower = findViewById(R.id.layoutPower);
         sbPower = findViewById(R.id.sbPower);
         btnValidateConnection = findViewById(R.id.btnValidateConnection);
+        btnDiagnostic = findViewById(R.id.btnDiagnostic);
         btnSingleRead = findViewById(R.id.btnSingleRead);
         btnMultiRead = findViewById(R.id.btnMultiRead);
         
@@ -88,6 +90,21 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
         btnValidateConnection.setOnClickListener(v -> {
             logToHistory("Validando Conexión...");
             initializeReader();
+        });
+
+        btnDiagnostic.setOnClickListener(v -> {
+             logToHistory("Ejecutando diagnóstico...");
+             if (tagWriter != null) {
+                 String diag = tagWriter.getDiagnosticInfo();
+                 logToHistory(diag);
+                 
+                 // Show in a dialog for better visibility
+                 new androidx.appcompat.app.AlertDialog.Builder(this)
+                     .setTitle("Diagnóstico de Conexión")
+                     .setMessage(diag)
+                     .setPositiveButton("OK", null)
+                     .show();
+             }
         });
 
         btnSingleRead.setOnClickListener(v -> {
@@ -370,6 +387,13 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
         if (event.getAction() == android.view.KeyEvent.ACTION_DOWN) {
             // Log key code for debugging
             Log.d(TAG, "Key Event received: Code=" + event.getKeyCode());
+            
+            // Handle iMin Scanner Trigger Key (often 170 or similar on rugged devices)
+            if (event.getKeyCode() == 170 || event.getKeyCode() == 139 || event.getKeyCode() == 289) {
+                 logToHistory("Gatillo Scanner Presionado (Code " + event.getKeyCode() + ")");
+                 // Optional: Visual feedback or manually trigger scan if SDK allows
+                 return super.dispatchKeyEvent(event);
+            }
 
             char pressedKey = (char) event.getUnicodeChar();
             

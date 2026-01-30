@@ -118,6 +118,16 @@ public class TagWriter implements IReaderListener {
         // Todo: Implement
     }
 
+    public String getDiagnosticInfo() {
+        if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) {
+            return ((com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) device).getDiagnosticInfo();
+        } else if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminScannerImpl) {
+             // Basic scanner diagnostic
+             return "Diagnóstico Scanner: Activo (Broadcast Mode)";
+        }
+        return "Diagnóstico no disponible para este dispositivo.";
+    }
+
     public void InitSDK() {
         Log.d(TAG, "InitSDK - Initializing via Factory");
         if (responseHandlerInterface != null)

@@ -129,6 +129,43 @@ public class IminReaderImpl implements IReaderDevice {
         }
     }
 
+    public boolean isServiceAvailable() {
+        return isServiceInstalled("com.imin.peripherservice");
+    }
+
+    public String getDiagnosticInfo() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== DIAGNÓSTICO RFID ===\n");
+        
+        boolean service = isServiceInstalled("com.imin.peripherservice");
+        sb.append("Servicio iMin: ").append(service ? "INSTALADO" : "NO INSTALADO").append("\n");
+        
+        if (!service) {
+            sb.append("CRÍTICO: El servicio 'com.imin.peripherservice' es requerido para el módulo RFID.\n");
+            return sb.toString();
+        }
+
+        sb.append("RFIDManager: ").append(rfidManager != null ? "OK" : "NULL").append("\n");
+        sb.append("RFIDHelper: ").append(rfidHelper != null ? "OK" : "NULL").append("\n");
+        sb.append("Conectado: ").append(isConnected).append("\n");
+        
+        if (isConnected && rfidHelper != null) {
+            sb.append("Tipo Conexión: INTERNA (API Service)\n");
+            try {
+                // Try to get version if method exists, strictly speculative based on common SDKs
+                // If it fails, we catch it.
+                // String fw = rfidHelper.getFirmwareVersion(); 
+                // sb.append("Firmware: ").append(fw).append("\n");
+            } catch (Exception e) {
+                sb.append("Firmware: N/A\n");
+            }
+        } else {
+            sb.append("Estado: Esperando conexión...\n");
+        }
+        
+        return sb.toString();
+    }
+
     private boolean isServiceInstalled(String packageName) {
         try {
             context.getPackageManager().getPackageInfo(packageName, 0);
