@@ -47,6 +47,12 @@ public class TagWriter implements IReaderListener {
         // But for now, we just update the reference.
     }
 
+    public void updateContext(ResponseHandlerInterface activity) {
+        this.responseHandlerInterface = activity;
+        this.context = activity.GetContext();
+        Log.d(TAG, "Context updated for TagWriter");
+    }
+
     public void onCreate(ResponseHandlerInterface activity) {
         responseHandlerInterface = activity;
         context = activity.GetContext();
@@ -64,6 +70,10 @@ public class TagWriter implements IReaderListener {
             Power = "270";
             Log.e(TAG, "Error parsing power preference", e);
         }
+        
+        // Only InitSDK if not initialized or if we want to force a refresh.
+        // But traditionally onCreate implies setup. 
+        // We'll keep InitSDK here for backward compatibility, but updateContext should be used for simple context switches.
         InitSDK();
         initialized = true;
     }

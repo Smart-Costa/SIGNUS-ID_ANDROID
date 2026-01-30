@@ -151,8 +151,12 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
         logToHistory("Inicializando Reader: " + targetType);
         
         try {
-            // Update TagWriter context to this activity
-            tagWriter.onCreate(this);
+            // Use updateContext if already initialized to avoid full re-init which might trigger auto-detect logic
+            if (tagWriter.isInitialized()) {
+                tagWriter.updateContext(this);
+            } else {
+                tagWriter.onCreate(this);
+            }
             
             // Force set type
             tagWriter.setReaderType(targetType, ConnectionType.AUTO);
@@ -161,12 +165,14 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
             String result = tagWriter.onResume(); // Calls connect()
             logToHistory("Resultado Conexión: " + result);
             
-            // For RFID, check if really connected
+            // Validation Logic
             if (targetType == ReaderType.IMIN) {
-                // If result indicates connection, good.
-                // We can add more checks if API allows.
                 if (result != null && result.toLowerCase().contains("conectado")) {
                      logToHistory("Verificación: Módulo RFID responde correctamente.");
+                }
+            } else if (targetType == ReaderType.IMIN_SCANNER) {
+                if (result != null && result.toLowerCase().contains("conectado")) {
+                     logToHistory("Verificación: Scanner activo y escuchando.");
                 }
             }
             

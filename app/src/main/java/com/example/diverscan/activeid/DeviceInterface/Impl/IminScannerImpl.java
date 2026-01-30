@@ -132,11 +132,21 @@ public class IminScannerImpl implements IReaderDevice {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            Log.d(TAG, "Broadcast Received Action: " + action);
+            
             if (RESULT_ACTION.equals(action)) {
+                // Log all extras for debugging
+                if (intent.getExtras() != null) {
+                    for (String key : intent.getExtras().keySet()) {
+                         Object value = intent.getExtras().get(key);
+                         Log.d(TAG, "Extra: " + key + " = " + value);
+                    }
+                }
+
                 String data = intent.getStringExtra(EXTRA_DECODE_DATA);
                 String dataStr = intent.getStringExtra(EXTRA_DECODE_DATA_STR);
                 
-                Log.d(TAG, "Scanner Broadcast Received. Data: " + data + ", DataStr: " + dataStr);
+                Log.d(TAG, "Scanner Data Decoded. Data: " + data + ", DataStr: " + dataStr);
 
                 String finalData = data;
                 if (finalData == null || finalData.isEmpty()) {
