@@ -258,8 +258,11 @@ public class TagWriter implements IReaderListener {
     private synchronized String connect() {
         if (device != null) {
             if (device.isConnected()) return "Conectado";
-            device.connect();
-            return "Conectando..."; 
+            if (device.connect()) {
+                return "Conectado";
+            } else {
+                return "Error: Fallo al conectar";
+            }
         }
         return "Error: No device";
     }

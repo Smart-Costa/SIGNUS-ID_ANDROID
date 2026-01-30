@@ -16,6 +16,9 @@ public class ReaderFactory {
             case IMIN:
                 device = new IminReaderImpl();
                 break;
+            case IMIN_SCANNER:
+                device = new IminScannerImpl();
+                break;
             // Future implementations
             // case CHAINWAY:
             //     device = new ChainwayReaderImpl();

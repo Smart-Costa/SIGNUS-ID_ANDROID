@@ -69,6 +69,15 @@ public class IminReaderImpl implements IReaderDevice {
     @Override
     public boolean connect() {
         Log.d(TAG, "Attempting to connect to iMin Reader...");
+        
+        // Check if iMin service package is installed
+        if (!isServiceInstalled("com.imin.peripherservice")) {
+             String msg = "iMin Peripheral Service (com.imin.peripherservice) not found. This device might not support iMin RFID.";
+             Log.e(TAG, msg);
+             notifyError(msg);
+             return false;
+        }
+
         try {
             if (rfidManager == null) {
                 Log.w(TAG, "rfidManager was null during connect(), re-initializing...");
@@ -79,20 +88,36 @@ public class IminReaderImpl implements IReaderDevice {
             rfidHelper = rfidManager.getHelper();
             if (rfidHelper != null) {
                 Log.i(TAG, "RFIDHelper obtained. Service is bound.");
-                registerReaderCall();
-                isConnected = true;
-                Log.i(TAG, "Connection State: CONNECTED");
-                if (listener != null) {
-                    listener.onConnected("iMin Lark 1 (Internal)");
+                try {
+                    registerReaderCall();
+                    isConnected = true;
+                    Log.i(TAG, "Connection State: CONNECTED");
+                    if (listener != null) {
+                        listener.onConnected("iMin Lark 1 (Internal)");
+                    }
+                    return true;
+                } catch (Exception e) {
+                    Log.e(TAG, "Error registering reader callback", e);
+                    notifyError("Error registering callback: " + e.getMessage());
+                    return false;
                 }
-                return true;
             } else {
                 Log.e(TAG, "RFIDHelper is null. Service might not be bound yet or RFID module is unavailable.");
+                notifyError("RFID Helper null - Service unavailable");
                 return false;
             }
         } catch (Exception e) {
             Log.e(TAG, "Error connecting to iMin Reader", e);
             notifyError("Connection failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean isServiceInstalled(String packageName) {
+        try {
+            context.getPackageManager().getPackageInfo(packageName, 0);
+            return true;
+        } catch (android.content.pm.PackageManager.NameNotFoundException e) {
             return false;
         }
     }
@@ -146,9 +171,15 @@ public class IminReaderImpl implements IReaderDevice {
         Log.d(TAG, "Disconnecting iMin Reader...");
         try {
             if (rfidHelper != null) {
-                rfidHelper.unregisterReaderCall();
-                // Stop reading if active
-                rfidHelper.tagInventoryRawStopReading();
+                // Check service before trying to unregister to avoid NameNotFoundException
+                if (isServiceInstalled("com.imin.peripherservice")) {
+                    try {
+                        rfidHelper.unregisterReaderCall();
+                        rfidHelper.tagInventoryRawStopReading();
+                    } catch (Exception e) {
+                        Log.w(TAG, "Error unregistering/stopping: " + e.getMessage());
+                    }
+                }
             }
             if (rfidManager != null) {
                 rfidManager.disconnect();
