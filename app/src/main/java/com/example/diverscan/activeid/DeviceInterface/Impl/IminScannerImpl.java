@@ -22,29 +22,61 @@ public class IminScannerImpl implements IReaderDevice {
 
     // Broadcast Actions
     private static final String RESULT_ACTION = "com.imin.scanner.api.RESULT_ACTION";
+    private static final String DEVICE_CONNECTION = "com.imin.scanner.api.DEVICE_CONNECTION";
+    private static final String DEVICE_DISCONNECTION = "com.imin.scanner.api.DEVICE_DISCONNECTION";
+    private static final String CONNECTION_STATUS_ACTION = "com.imin.scanner.api.DEVICE_IS_CONNECTION";
+    private static final String CONNECTION_BACK_ACTION = "com.imin.scanner.api.CONNECTION_RESULT";
+    private static final String GET_STATUS_PROP = "persist.sys.imin.scanner.status";
+    
     private static final String EXTRA_DECODE_DATA = "decode_data";
     private static final String EXTRA_DECODE_DATA_STR = "decode_data_str";
-
+    
     private ScannerReceiver scannerReceiver;
-
+    
     @Override
     public void initialize(Context context) {
         this.context = context;
         Log.d(TAG, "Initializing iMin Scanner (Broadcast Receiver mode)");
+        checkSystemPropertyStatus();
+    }
+
+    private void checkSystemPropertyStatus() {
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            java.lang.reflect.Method get = c.getMethod("get", String.class, String.class);
+            String connectStatus = (String) get.invoke(c, GET_STATUS_PROP, "0");
+            Log.d(TAG, "System Property Scanner Status: " + connectStatus + " (1=Connected, 0=Disconnected)");
+            if ("1".equals(connectStatus)) {
+                 isConnected = true;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking system property", e);
+        }
     }
 
     @Override
     public boolean connect() {
         if (isConnected) return true;
         
-        Log.d(TAG, "Connecting iMin Scanner (Registering Receiver for action: " + RESULT_ACTION + ")...");
+        Log.d(TAG, "Connecting iMin Scanner (Registering Receiver for actions)...");
         try {
             scannerReceiver = new ScannerReceiver();
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(RESULT_ACTION);
+            intentFilter.addAction(DEVICE_CONNECTION);
+            intentFilter.addAction(DEVICE_DISCONNECTION);
+            intentFilter.addAction(CONNECTION_BACK_ACTION);
             context.registerReceiver(scannerReceiver, intentFilter);
             
-            isConnected = true;
+            // Request status update via broadcast too
+            try {
+                Intent statusIntent = new Intent(CONNECTION_STATUS_ACTION);
+                context.sendBroadcast(statusIntent);
+            } catch (Exception e) {
+                Log.e(TAG, "Error sending status request broadcast", e);
+            }
+            
+            isConnected = true; // Assume connected until proven otherwise by callbacks
             if (listener != null) {
                 listener.onConnected("iMin Scanner (Internal)");
             }
@@ -134,7 +166,17 @@ public class IminScannerImpl implements IReaderDevice {
             String action = intent.getAction();
             Log.d(TAG, "Broadcast Received Action: " + action);
             
-            if (RESULT_ACTION.equals(action)) {
+            if (DEVICE_CONNECTION.equals(action)) {
+                 Log.i(TAG, "Scanner Device Connected");
+                 isConnected = true;
+            } else if (DEVICE_DISCONNECTION.equals(action)) {
+                 Log.i(TAG, "Scanner Device Disconnected");
+                 isConnected = false;
+            } else if (CONNECTION_BACK_ACTION.equals(action)) {
+                 int type = intent.getIntExtra("com.imin.scanner.api.status", 0);
+                 Log.i(TAG, "Scanner Status Callback: " + type + " (1=Connected)");
+                 isConnected = (type == 1);
+            } else if (RESULT_ACTION.equals(action)) {
                 // Log all extras for debugging
                 if (intent.getExtras() != null) {
                     for (String key : intent.getExtras().keySet()) {

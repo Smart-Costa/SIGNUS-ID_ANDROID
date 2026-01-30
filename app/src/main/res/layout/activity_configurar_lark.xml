@@ -14,6 +14,19 @@
         android:textSize="16sp"
         android:layout_marginBottom="8dp"/>
 
+    <!-- Hidden EditText to capture scanner keyboard input -->
+    <EditText
+        android:id="@+id/etScannerInput"
+        android:layout_width="1px"
+        android:layout_height="1px"
+        android:background="@null"
+        android:cursorVisible="false"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:inputType="textNoSuggestions"
+        android:importantForAutofill="no"
+        android:alpha="0"/>
+
     <RadioGroup
         android:id="@+id/rgReaderMode"
         android:layout_width="match_parent"

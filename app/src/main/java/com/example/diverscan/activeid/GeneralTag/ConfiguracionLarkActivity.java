@@ -27,6 +27,7 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     private TextView tvLastScanData;
     private TextView tvScanHistory;
     private TextView tvPowerValue;
+    private android.widget.EditText etScannerInput;
     private Button btnInitScanner;
     private Button btnClearHistory;
     private RadioGroup rgReaderMode;
@@ -42,6 +43,7 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     
     private boolean isScanning = false;
     private boolean isSingleRead = false;
+    private android.content.BroadcastReceiver keyEventReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +68,7 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
         tvLastScanData = findViewById(R.id.tvLastScanData);
         tvScanHistory = findViewById(R.id.tvScanHistory);
         tvPowerValue = findViewById(R.id.tvPowerValue);
+        etScannerInput = findViewById(R.id.etScannerInput);
         btnInitScanner = findViewById(R.id.btnInitScanner);
         btnClearHistory = findViewById(R.id.btnClearHistory);
         rgReaderMode = findViewById(R.id.rgReaderMode);
@@ -200,6 +203,10 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
             int selectedId = rgReaderMode.getCheckedRadioButtonId();
             if (selectedId == R.id.rbScanner) {
                 btnInitScanner.setText("Scanner Activo (Esperando...)");
+                // Request focus to capture keyboard input
+                if (etScannerInput != null) {
+                    etScannerInput.requestFocus();
+                }
             } else {
                 btnInitScanner.setText("Detener Inventario RFID");
             }
@@ -226,6 +233,10 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     @Override
     protected void onResume() {
         super.onResume();
+        
+        // Register iMin Key Event Receiver for side buttons
+        registerKeyReceiver();
+        
         // Avoid blind re-initialization which resets everything
         // Only initialize if TagWriter has no active reader or if context needs update
         if (tagWriter != null && tagWriter.isInitialized()) {
@@ -246,8 +257,39 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     protected void onPause() {
         super.onPause();
         stopReading();
-        // We don't necessarily disconnect here to avoid reconnection lag, 
-        // but if we switch activities we might want to.
+        if (keyEventReceiver != null) {
+            try {
+                unregisterReceiver(keyEventReceiver);
+                keyEventReceiver = null;
+            } catch (Exception e) {
+                Log.e(TAG, "Error unregistering key receiver", e);
+            }
+        }
+    }
+    
+    private void registerKeyReceiver() {
+        if (keyEventReceiver == null) {
+            keyEventReceiver = new android.content.BroadcastReceiver() {
+                @Override
+                public void onReceive(android.content.Context context, android.content.Intent intent) {
+                    if ("com.imin.keyevent".equals(intent.getAction())) {
+                        int keyCode = intent.getIntExtra("keycode", 0);
+                        boolean isDown = intent.getBooleanExtra("isDown", false); // Assuming boolean or int
+                        // If it doesn't have isDown, maybe check action?
+                        // Based on logs or docs, usually keycode is enough.
+                        // Let's log it.
+                        Log.d(TAG, "iMin Key Event: " + keyCode);
+                        logToHistory("Evento Tecla iMin: " + keyCode);
+                        
+                        // If this is a scan trigger (usually 139 or 289 or similar), we can simulate start
+                        // But usually the system handles it.
+                    }
+                }
+            };
+            android.content.IntentFilter filter = new android.content.IntentFilter();
+            filter.addAction("com.imin.keyevent");
+            registerReceiver(keyEventReceiver, filter);
+        }
     }
 
     // ResponseHandlerInterface Implementation
