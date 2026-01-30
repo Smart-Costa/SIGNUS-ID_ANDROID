@@ -37,7 +37,7 @@ public class IminScannerImpl implements IReaderDevice {
     public boolean connect() {
         if (isConnected) return true;
         
-        Log.d(TAG, "Connecting iMin Scanner (Registering Receiver)...");
+        Log.d(TAG, "Connecting iMin Scanner (Registering Receiver for action: " + RESULT_ACTION + ")...");
         try {
             scannerReceiver = new ScannerReceiver();
             IntentFilter intentFilter = new IntentFilter();

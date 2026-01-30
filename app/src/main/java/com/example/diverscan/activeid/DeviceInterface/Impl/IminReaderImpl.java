@@ -47,19 +47,35 @@ public class IminReaderImpl implements IReaderDevice {
         Log.i(TAG, "============================================");
 
         try {
+            // Check if iMin service package is installed BEFORE trying to get instance or connect
+            if (!isServiceInstalled("com.imin.peripherservice")) {
+                 String msg = "CRITICAL: iMin Peripheral Service (com.imin.peripherservice) not found.";
+                 Log.e(TAG, msg);
+                 notifyError(msg);
+                 return; // Stop initialization
+            }
+
             rfidManager = RFIDManager.getInstance();
             if (rfidManager != null) {
                 Log.d(TAG, "RFIDManager instance obtained successfully.");
-                rfidManager.connect(context);
-                Log.d(TAG, "rfidManager.connect() called.");
+                try {
+                    rfidManager.connect(context);
+                    Log.d(TAG, "rfidManager.connect() called.");
+                } catch (Exception e) {
+                    Log.e(TAG, "Error calling rfidManager.connect()", e);
+                    notifyError("Error connecting to RFID Manager: " + e.getMessage());
+                    return;
+                }
             } else {
                 Log.e(TAG, "CRITICAL: RFIDManager.getInstance() returned null.");
+                notifyError("RFIDManager instance is null");
+                return;
             }
             
             // Auto-connect attempt
             uiHandler.postDelayed(this::connect, 500);
 
-        } catch (Exception e) {
+        } catch (Throwable e) { // Catch Throwable to handle NoClassDefFoundError if SDK is missing classes
             Log.e(TAG, "CRITICAL EXCEPTION initializing iMin SDK", e);
             notifyError("Exception initializing iMin SDK: " + e.getMessage());
             e.printStackTrace();

@@ -226,7 +226,20 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     @Override
     protected void onResume() {
         super.onResume();
-        initializeReader();
+        // Avoid blind re-initialization which resets everything
+        // Only initialize if TagWriter has no active reader or if context needs update
+        if (tagWriter != null && tagWriter.isInitialized()) {
+             // Just update context
+             tagWriter.updateContext(this);
+             
+             // Check if we need to set specific type based on UI, 
+             // but only if it mismatches current state to avoid loop.
+             // For now, we trust user interaction to change type.
+             // Just refreshing status.
+             logToHistory("Retomando actividad...");
+        } else {
+             initializeReader();
+        }
     }
 
     @Override
@@ -244,22 +257,36 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
         logToHistory("INFO: " + message);
     }
 
+    // Helper to unify UI updates and show source
+    private void updateScanUI(String data, String source, String rssi) {
+        runOnUiThread(() -> {
+            String sourceLabel = (source != null && !source.isEmpty()) ? " [" + source + "]" : "";
+            tvLastScanData.setText(data + sourceLabel);
+            
+            String logEntry = data + sourceLabel + (rssi.isEmpty() ? "" : " (" + rssi + " dBm)");
+            logToHistory("Lectura: " + logEntry);
+            
+            if (isSingleRead) {
+                stopReading();
+                logToHistory("Lectura Sencilla completada.");
+            }
+        });
+    }
+
     @Override
     public void handleTagdata(ReaderTag[] tagData) {
         if (tagData != null && tagData.length > 0) {
             String data = tagData[0].getEpc();
             String rssi = (tagData[0].getRssi() != 0) ? String.valueOf(tagData[0].getRssi()) : "";
             
-            runOnUiThread(() -> {
-                tvLastScanData.setText(data);
-                String logEntry = data + (rssi.isEmpty() ? "" : " [" + rssi + " dBm]");
-                logToHistory("Lectura: " + logEntry);
-                
-                if (isSingleRead) {
-                    stopReading();
-                    logToHistory("Lectura Sencilla completada.");
-                }
-            });
+            // Determine source based on active mode
+            String source = "";
+            int selectedId = rgReaderMode.getCheckedRadioButtonId();
+            if (selectedId == R.id.rbScanner) {
+                source = "Botón/Broadcast";
+            }
+            
+            updateScanUI(data, source, rssi);
         }
     }
 
@@ -291,6 +318,39 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
             tvScanHistory.setText(historyLog.toString());
             Log.d(TAG, msg);
         });
+    }
+
+    // Keyboard Scan Buffer
+    private StringBuilder scanBuffer = new StringBuilder();
+
+    @Override
+    public boolean dispatchKeyEvent(android.view.KeyEvent event) {
+        if (event.getAction() == android.view.KeyEvent.ACTION_DOWN) {
+            // Log key code for debugging
+            Log.d(TAG, "Key Event received: Code=" + event.getKeyCode());
+
+            char pressedKey = (char) event.getUnicodeChar();
+            
+            // If it's Enter, we assume end of barcode
+            if (event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER) {
+                String scannedData = scanBuffer.toString().trim();
+                if (!scannedData.isEmpty()) {
+                    logToHistory("Barcode detected via Keyboard: " + scannedData);
+                    
+                    // Directly update UI with "Teclado" source
+                    updateScanUI(scannedData, "Teclado", "");
+                } else {
+                     Log.d(TAG, "Enter pressed but buffer empty");
+                }
+                scanBuffer.setLength(0); // Clear buffer
+            } else {
+                // Append printable characters
+                if (pressedKey != 0) {
+                    scanBuffer.append(pressedKey);
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     @Override
