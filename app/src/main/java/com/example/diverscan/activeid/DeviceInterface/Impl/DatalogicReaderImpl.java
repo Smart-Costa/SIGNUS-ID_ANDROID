@@ -114,45 +114,32 @@ public class DatalogicReaderImpl implements IReaderDevice {
 
     @Override
     public boolean startInventory() {
-        Log.d(TAG, "Starting Inventory (Scan)...");
-        if (!isConnected) {
-            if (!connect()) return false;
-        }
-        
-        try {
-            if (listener != null) {
-                listener.onStatusMessage("Escáner Activo. Use el gatillo físico.");
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error starting inventory", e);
-        }
+        Log.d(TAG, "startInventory called (Datalogic)");
+        // Datalogic usually relies on hardware trigger, but we can enable software trigger if needed
+        // For now, we just log.
         return true;
     }
 
     @Override
     public boolean stopInventory() {
-        Log.d(TAG, "Stopping Inventory...");
-        if (listener != null) {
-            listener.onStatusMessage("Escáner Detenido");
-        }
+        Log.d(TAG, "stopInventory called (Datalogic)");
         return true;
     }
 
     @Override
     public boolean startLocation(String epc) {
-        // Not applicable for Barcode
-        return true;
+        Log.w(TAG, "Location not implemented for Datalogic");
+        return false;
     }
 
     @Override
     public boolean stopLocation() {
-        return true;
+        return false;
     }
 
     @Override
     public void setPower(int power) {
-        // Not typically applicable for Barcode scanner power
-        Log.d(TAG, "Set Power ignored for Barcode Scanner");
+        Log.d(TAG, "setPower not applicable for Datalogic Scanner");
     }
 
     @Override

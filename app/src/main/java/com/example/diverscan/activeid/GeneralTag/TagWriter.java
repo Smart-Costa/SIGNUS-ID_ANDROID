@@ -308,11 +308,23 @@ public class TagWriter implements IReaderListener {
     }
 
     public synchronized void performInventory() {
-        if (device != null) device.startInventory();
+        Log.d(TAG, "performInventory called");
+        if (device != null) {
+            Log.d(TAG, "Delegating startInventory to device: " + device.getDeviceName());
+            device.startInventory();
+        } else {
+            Log.e(TAG, "performInventory failed: Device is null");
+        }
     }
 
     public synchronized void stopInventory() {
-        if (device != null) device.stopInventory();
+        Log.d(TAG, "stopInventory called");
+        if (device != null) {
+            Log.d(TAG, "Delegating stopInventory to device: " + device.getDeviceName());
+            device.stopInventory();
+        } else {
+             Log.e(TAG, "stopInventory failed: Device is null");
+        }
     }
 
     public void setAntennaPower(int power) {

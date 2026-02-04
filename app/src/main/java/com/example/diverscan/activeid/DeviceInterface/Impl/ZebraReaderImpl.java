@@ -136,49 +136,61 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         if (reader != null) {
             try {
                 if (!reader.isConnected()) {
+                    Log.d(TAG, "Connecting to reader: " + reader.getHostName());
                     reader.connect();
+                    Log.d(TAG, "Connected. Configuring reader...");
                     configureReader();
                     notifyConnected(reader.getHostName());
                     return true;
                 } else {
+                    Log.d(TAG, "Reader already connected: " + reader.getHostName());
                     notifyConnected(reader.getHostName()); // Already connected
                     return true;
                 }
             } catch (InvalidUsageException | OperationFailureException e) {
+                Log.e(TAG, "Error connecting/configuring reader", e);
                 notifyError("Error conectando: " + e.getMessage());
             }
+        } else {
+             Log.e(TAG, "Connect called but reader object is null");
         }
         return false;
     }
 
     private void configureReader() {
-        if (reader != null && reader.isConnected()) {
-            try {
-                if (eventHandler == null) {
-                    eventHandler = new EventHandler();
-                }
-                reader.Events.addEventsListener(eventHandler);
-                reader.Events.setHandheldEvent(true);
-                reader.Events.setTagReadEvent(true);
-                reader.Events.setAttachTagDataWithReadEvent(false);
-                reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, true);
-                
-                configureTrigger(true); // Default to handheld trigger
-                
-                setPower(maxPower);
-                
-                // Singulation
-                Antennas.SingulationControl s1_singulationControl = reader.Config.Antennas.getSingulationControl(1);
-                s1_singulationControl.setSession(SESSION.SESSION_S0);
-                s1_singulationControl.Action.setInventoryState(INVENTORY_STATE.INVENTORY_STATE_A);
-                s1_singulationControl.Action.setSLFlag(SL_FLAG.SL_ALL);
-                reader.Config.Antennas.setSingulationControl(1, s1_singulationControl);
-                
-                reader.Actions.PreFilters.deleteAll();
-                
-            } catch (InvalidUsageException | OperationFailureException e) {
-                e.printStackTrace();
-            }
+        if (reader.isConnected()) {
+             try {
+                 Log.d(TAG, "Setting Trigger Mode to RFID...");
+                 // Restore Trigger Mode configuration
+                 reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, true);
+
+                 TriggerInfo triggerInfo = new TriggerInfo();
+                 triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_IMMEDIATE);
+                 triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_IMMEDIATE);
+                 
+                 // Register events
+                 Log.d(TAG, "Registering Events...");
+                 if (eventHandler == null) {
+                     eventHandler = new EventHandler();
+                 }
+                 reader.Events.addEventsListener(eventHandler);
+                 
+                 reader.Events.setHandheldEvent(true);
+                 reader.Events.setTagReadEvent(true);
+                 reader.Events.setAttachTagDataWithReadEvent(false);
+                 // reader.Events.setStatusNotifyEvent(true); // Removed as it caused build error
+                 
+                 // Set Power
+                 Log.d(TAG, "Setting Antenna Power: " + maxPower);
+                 Antennas.AntennaRfConfig config = reader.Config.Antennas.getAntennaRfConfig(1);
+                 config.setTransmitPowerIndex(maxPower);
+                 config.setrfModeTableIndex(0);
+                 config.setTari(0);
+                 reader.Config.Antennas.setAntennaRfConfig(1, config);
+                 
+             } catch (InvalidUsageException | OperationFailureException e) {
+                 Log.e(TAG, "Error configuring reader", e);
+             }
         }
     }
     

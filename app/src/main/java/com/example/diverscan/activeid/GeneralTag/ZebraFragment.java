@@ -376,18 +376,25 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     }
 
     private void checkPermissions() {
+        Log.d(TAG, "Checking permissions...");
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             if (androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED ||
                 androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_SCAN) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 
+                Log.w(TAG, "Bluetooth permissions missing (Android 12+). Requesting...");
                 requestPermissions(new String[]{
                     android.Manifest.permission.BLUETOOTH_CONNECT,
                     android.Manifest.permission.BLUETOOTH_SCAN
                 }, 100);
+            } else {
+                Log.d(TAG, "Bluetooth permissions granted.");
             }
         } else {
              if (androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                 Log.w(TAG, "Location permission missing (Legacy Bluetooth). Requesting...");
                  requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+             } else {
+                 Log.d(TAG, "Location permission granted.");
              }
         }
     }
