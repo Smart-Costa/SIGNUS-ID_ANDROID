@@ -375,6 +375,29 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         return getActivity();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100) {
+            boolean allGranted = true;
+            for (int result : grantResults) {
+                if (result != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+            if (allGranted) {
+                Log.d(TAG, "Permissions granted. Retrying connection...");
+                logToView("Permisos otorgados. Reintentando conexión...");
+                conectarLector();
+            } else {
+                Log.w(TAG, "Permissions denied.");
+                logToView("Permisos denegados. No se puede conectar.");
+                Toast.makeText(getContext(), "Se requieren permisos para conectar el lector", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     private void checkPermissions() {
         Log.d(TAG, "Checking permissions...");
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
