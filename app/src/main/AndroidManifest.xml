@@ -231,6 +231,13 @@
             android:exported="false"/>
 
         <!-- ⚙️ Configuraciones -->
+        <activity android:name=".GeneralTag.ConfigurationReaderActivity"
+            android:label="Configuración Dispositivo"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
         <activity android:name=".GeneralTag.ConfiguracionAntena"
             android:label="@string/Configuraciones"
             android:parentActivityName=".UI.main.MainActivity"

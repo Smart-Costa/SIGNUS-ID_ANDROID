@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".GeneralTag.ZebraFragment">
+
+    <LinearLayout
+        android:id="@+id/FConfigurarAntena"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_marginLeft="15dp"
+            android:gravity="center"
+            android:layout_marginRight="15dp"
+            android:paddingTop="10dp">
+
+            <TextView
+                android:id="@+id/Titulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Potencia de Antena"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:textSize="17dp"
+                android:textStyle="bold"
+                />
+            <TextView
+                android:id="@+id/txtUltimaConfiguracion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                />
+
+            <TextView
+                android:id="@+id/txtPorcentaje"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="30sp"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                style="?android:progressBarStyleHorizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"/>
+
+            <SeekBar
+                android:id="@+id/skPotencia"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tipo de Conexión"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="5dp" />
+
+            <Spinner
+                android:id="@+id/spinnerConexion"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:spinnerMode="dropdown" />
+
+            <Button
+                android:id="@+id/btnConectar"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="Conectar"
+                android:backgroundTint="@android:color/black"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Modo de Lectura"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="5dp" />
+
+            <RadioGroup
+                android:id="@+id/rgReadingMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="10dp">
+
+                <RadioButton
+                    android:id="@+id/rbMultiple"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Múltiple"
+                    android:checked="true"
+                    android:layout_marginEnd="20dp"/>
+
+                <RadioButton
+                    android:id="@+id/rbSingle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sencilla"/>
+            </RadioGroup>
+
+            <Button
+                android:id="@+id/btnTestLectura"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="Probar Lectura"
+                android:backgroundTint="@color/design_default_color_primary"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+                android:id="@+id/txtResultados"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tags leídos: 0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logs del Sistema"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_gravity="start"
+                android:layout_marginBottom="2dp"/>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="#F0F0F0"
+                android:padding="5dp"
+                android:scrollbars="vertical"
+                android:fadeScrollbars="false">
+                <TextView
+                    android:id="@+id/txtLogView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    android:textColor="#333333"
+                    android:text="Iniciando logs..."/>
+            </ScrollView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:orientation="vertical"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:id="@+id/txtPotencia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text=""
+                android:textSize="13dp"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

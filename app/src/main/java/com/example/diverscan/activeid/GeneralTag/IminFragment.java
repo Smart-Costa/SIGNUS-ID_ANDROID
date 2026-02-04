@@ -1,16 +1,21 @@
 package com.example.diverscan.activeid.GeneralTag;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.example.diverscan.activeid.DeviceInterface.ConnectionType;
 import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
@@ -19,15 +24,24 @@ import com.example.diverscan.activeid.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
-public class ConfiguracionLarkActivity extends AppCompatActivity implements ResponseHandlerInterface {
-    private static final String TAG = "ConfigLarkActivity";
+import android.widget.Spinner;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import com.example.diverscan.activeid.DeviceInterface.ConnectionType;
+import com.example.diverscan.activeid.DeviceInterface.ReaderType;
+import com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet;
+import java.util.List;
+import java.util.ArrayList;
+
+public class IminFragment extends Fragment implements ResponseHandlerInterface, ConfigurationReaderActivity.KeyEventHandler {
+    private static final String TAG = "ConfigLarkFragment";
     private TextView tvLastScanData;
     private TextView tvScanHistory;
     private TextView tvPowerValue;
     private android.widget.EditText etScannerInput;
+    private android.widget.Spinner spConexion;
     private Button btnInitScanner;
     private Button btnClearHistory;
     private RadioGroup rgReaderMode;
@@ -45,18 +59,21 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     private boolean isScanning = false;
     private boolean isSingleRead = false;
     private android.content.BroadcastReceiver keyEventReceiver;
+    
+    // Keyboard Scan Buffer
+    private StringBuilder scanBuffer = new StringBuilder();
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_imin_config, container, false);
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_configurar_lark);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Configuración iMin Lark 1");
-        }
-
-        initViews();
+        initViews(view);
         setupListeners();
 
         tagWriter = TagWriter.getInstance();
@@ -65,23 +82,25 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
         updateUIBasedOnSelection();
     }
 
-    private void initViews() {
-        tvLastScanData = findViewById(R.id.tvLastScanData);
-        tvScanHistory = findViewById(R.id.tvScanHistory);
-        tvPowerValue = findViewById(R.id.tvPowerValue);
-        etScannerInput = findViewById(R.id.etScannerInput);
-        btnInitScanner = findViewById(R.id.btnInitScanner);
-        btnClearHistory = findViewById(R.id.btnClearHistory);
-        rgReaderMode = findViewById(R.id.rgReaderMode);
-        layoutPower = findViewById(R.id.layoutPower);
-        sbPower = findViewById(R.id.sbPower);
-        btnValidateConnection = findViewById(R.id.btnValidateConnection);
-        btnDiagnostic = findViewById(R.id.btnDiagnostic);
-        btnSingleRead = findViewById(R.id.btnSingleRead);
-        btnMultiRead = findViewById(R.id.btnMultiRead);
+    private void initViews(View view) {
+        tvLastScanData = view.findViewById(R.id.tvLastScanData);
+        tvScanHistory = view.findViewById(R.id.tvScanHistory);
+        etScannerInput = view.findViewById(R.id.etScannerInput);
+        btnInitScanner = view.findViewById(R.id.btnInitScanner);
+        btnClearHistory = view.findViewById(R.id.btnClearHistory);
+        rgReaderMode = view.findViewById(R.id.rgReaderMode);
+        layoutPower = view.findViewById(R.id.layoutPower);
+        sbPower = view.findViewById(R.id.sbPower);
+        tvPowerValue = view.findViewById(R.id.tvPowerValue);
+        btnValidateConnection = view.findViewById(R.id.btnValidateConnection);
+        btnDiagnostic = view.findViewById(R.id.btnDiagnostic);
+        btnSingleRead = view.findViewById(R.id.btnSingleRead);
+        btnMultiRead = view.findViewById(R.id.btnMultiRead);
+        spConexion = view.findViewById(R.id.spinnerConexion);
         
         // Scroll for history
-        tvScanHistory.setMovementMethod(new android.text.method.ScrollingMovementMethod());
+        if (tvScanHistory != null)
+            tvScanHistory.setMovementMethod(new android.text.method.ScrollingMovementMethod());
     }
 
     private void setupListeners() {
@@ -98,12 +117,13 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
                  String diag = tagWriter.getDiagnosticInfo();
                  logToHistory(diag);
                  
-                 // Show in a dialog for better visibility
-                 new androidx.appcompat.app.AlertDialog.Builder(this)
-                     .setTitle("Diagnóstico de Conexión")
-                     .setMessage(diag)
-                     .setPositiveButton("OK", null)
-                     .show();
+                 if (getContext() != null) {
+                     new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                         .setTitle("Diagnóstico de Conexión")
+                         .setMessage(diag)
+                         .setPositiveButton("OK", null)
+                         .show();
+                 }
              }
         });
 
@@ -149,17 +169,19 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     private void updateUIBasedOnSelection() {
         int selectedId = rgReaderMode.getCheckedRadioButtonId();
         if (selectedId == R.id.rbScanner) {
-            layoutPower.setVisibility(android.view.View.GONE);
+            layoutPower.setVisibility(View.GONE);
             btnInitScanner.setText("Activar Scanner");
             logToHistory("Modo seleccionado: Scanner (Barcode/QR)");
         } else {
-            layoutPower.setVisibility(android.view.View.VISIBLE);
+            layoutPower.setVisibility(View.VISIBLE);
             btnInitScanner.setText("Iniciar Inventario RFID");
             logToHistory("Modo seleccionado: RFID (UHF)");
         }
     }
 
     private void initializeReader() {
+        if (getActivity() == null) return;
+
         int selectedId = rgReaderMode.getCheckedRadioButtonId();
         ReaderType targetType;
         if (selectedId == R.id.rbScanner) {
@@ -171,7 +193,6 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
         logToHistory("Inicializando Reader: " + targetType);
         
         try {
-            // Use updateContext if already initialized to avoid full re-init which might trigger auto-detect logic
             if (tagWriter.isInitialized()) {
                 tagWriter.updateContext(this);
             } else {
@@ -179,7 +200,13 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
             }
             
             // Force set type
-            tagWriter.setReaderType(targetType, ConnectionType.AUTO);
+            ConnectionType selectedConn = ConnectionType.AUTO;
+            if (spConexion != null && spConexion.getSelectedItem() != null) {
+                try {
+                    selectedConn = ConnectionType.valueOf(spConexion.getSelectedItem().toString());
+                } catch (Exception e) {}
+            }
+            tagWriter.setReaderType(targetType, selectedConn);
             
             // Connect
             String result = tagWriter.onResume(); // Calls connect()
@@ -262,35 +289,31 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         
         // Register iMin Key Event Receiver for side buttons
         registerKeyReceiver();
         
-        // Avoid blind re-initialization which resets everything
-        // Only initialize if TagWriter has no active reader or if context needs update
         if (tagWriter != null && tagWriter.isInitialized()) {
-             // Just update context
              tagWriter.updateContext(this);
-             
-             // Check if we need to set specific type based on UI, 
-             // but only if it mismatches current state to avoid loop.
-             // For now, we trust user interaction to change type.
-             // Just refreshing status.
-             logToHistory("Retomando actividad...");
+             // Not forcing re-init to allow tab switching without breaking
+             // But if we are in this fragment, we probably want Imin active?
+             // Maybe wait for user action or check if current reader matches?
         } else {
              initializeReader();
         }
+        tagWriter.setResponseHandler(this);
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         stopReading();
         if (keyEventReceiver != null) {
             try {
-                unregisterReceiver(keyEventReceiver);
+                if (getActivity() != null)
+                    getActivity().unregisterReceiver(keyEventReceiver);
                 keyEventReceiver = null;
             } catch (Exception e) {
                 Log.e(TAG, "Error unregistering key receiver", e);
@@ -299,51 +322,43 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     }
     
     private void registerKeyReceiver() {
-        if (keyEventReceiver == null) {
+        if (keyEventReceiver == null && getActivity() != null) {
             keyEventReceiver = new android.content.BroadcastReceiver() {
                 @Override
-                public void onReceive(android.content.Context context, android.content.Intent intent) {
+                public void onReceive(Context context, android.content.Intent intent) {
                     if ("com.imin.keyevent".equals(intent.getAction())) {
                         int keyCode = intent.getIntExtra("keycode", 0);
-                        boolean isDown = intent.getBooleanExtra("isDown", false); // Assuming boolean or int
-                        // If it doesn't have isDown, maybe check action?
-                        // Based on logs or docs, usually keycode is enough.
-                        // Let's log it.
                         Log.d(TAG, "iMin Key Event: " + keyCode);
                         logToHistory("Evento Tecla iMin: " + keyCode);
-                        
-                        // If this is a scan trigger (usually 139 or 289 or similar), we can simulate start
-                        // But usually the system handles it.
                     }
                 }
             };
             android.content.IntentFilter filter = new android.content.IntentFilter();
             filter.addAction("com.imin.keyevent");
-            registerReceiver(keyEventReceiver, filter);
+            getActivity().registerReceiver(keyEventReceiver, filter);
         }
     }
-
-    // ResponseHandlerInterface Implementation
 
     @Override
     public void SetMessage(String message) {
         logToHistory("INFO: " + message);
     }
 
-    // Helper to unify UI updates and show source
     private void updateScanUI(String data, String source, String rssi) {
-        runOnUiThread(() -> {
-            String sourceLabel = (source != null && !source.isEmpty()) ? " [" + source + "]" : "";
-            tvLastScanData.setText(data + sourceLabel);
-            
-            String logEntry = data + sourceLabel + (rssi.isEmpty() ? "" : " (" + rssi + " dBm)");
-            logToHistory("Lectura: " + logEntry);
-            
-            if (isSingleRead) {
-                stopReading();
-                logToHistory("Lectura Sencilla completada.");
-            }
-        });
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                String sourceLabel = (source != null && !source.isEmpty()) ? " [" + source + "]" : "";
+                tvLastScanData.setText(data + sourceLabel);
+                
+                String logEntry = data + sourceLabel + (rssi.isEmpty() ? "" : " (" + rssi + " dBm)");
+                logToHistory("Lectura: " + logEntry);
+                
+                if (isSingleRead) {
+                    stopReading();
+                    logToHistory("Lectura Sencilla completada.");
+                }
+            });
+        }
     }
 
     @Override
@@ -369,8 +384,6 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
         if (pressed) {
             if (!isScanning) startReading();
         } else {
-            // For RFID usually hold-to-read, so stop when released?
-            // Depends on logic.
             int selectedId = rgReaderMode.getCheckedRadioButtonId();
             if (selectedId == R.id.rbRfid && isScanning) {
                  stopReading();
@@ -379,66 +392,48 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     }
 
     @Override
-    public android.content.Context GetContext() {
-        return this;
+    public Context GetContext() {
+        return getActivity();
     }
 
     private void logToHistory(String msg) {
+        if (getActivity() == null) return;
         String time = sdf.format(new Date());
         String line = time + " - " + msg + "\n";
-        runOnUiThread(() -> {
+        getActivity().runOnUiThread(() -> {
             historyLog.insert(0, line);
             tvScanHistory.setText(historyLog.toString());
             Log.d(TAG, msg);
         });
     }
 
-    // Keyboard Scan Buffer
-    private StringBuilder scanBuffer = new StringBuilder();
-
     @Override
-    public boolean dispatchKeyEvent(android.view.KeyEvent event) {
-        if (event.getAction() == android.view.KeyEvent.ACTION_DOWN) {
-            // Log key code for debugging
+    public boolean onDispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
             Log.d(TAG, "Key Event received: Code=" + event.getKeyCode());
             
-            // Handle iMin Scanner Trigger Key (often 170 or similar on rugged devices)
+            // Handle iMin Scanner Trigger Key
             if (event.getKeyCode() == 170 || event.getKeyCode() == 139 || event.getKeyCode() == 289) {
                  logToHistory("Gatillo Scanner Presionado (Code " + event.getKeyCode() + ")");
-                 // Optional: Visual feedback or manually trigger scan if SDK allows
-                 return super.dispatchKeyEvent(event);
+                 return true; // Consumed
             }
 
             char pressedKey = (char) event.getUnicodeChar();
             
-            // If it's Enter, we assume end of barcode
-            if (event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                 String scannedData = scanBuffer.toString().trim();
                 if (!scannedData.isEmpty()) {
                     logToHistory("Barcode detected via Keyboard: " + scannedData);
-                    
-                    // Directly update UI with "Teclado" source
                     updateScanUI(scannedData, "Teclado", "");
-                } else {
-                     Log.d(TAG, "Enter pressed but buffer empty");
                 }
-                scanBuffer.setLength(0); // Clear buffer
+                scanBuffer.setLength(0);
+                return true;
             } else {
-                // Append printable characters
                 if (pressedKey != 0) {
                     scanBuffer.append(pressedKey);
                 }
             }
         }
-        return super.dispatchKeyEvent(event);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 }

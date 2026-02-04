@@ -9,6 +9,8 @@ public interface IReaderDevice {
     boolean isConnected();
     boolean startInventory();
     boolean stopInventory();
+    boolean startLocation(String epc);
+    boolean stopLocation();
     void setPower(int power);
     void setListener(IReaderListener listener);
     void setConnectionType(ConnectionType type);

@@ -255,8 +255,11 @@ public class IminReaderImpl implements IReaderDevice {
 
     @Override
     public boolean startInventory() {
-        if (!isConnected || rfidHelper == null) return false;
-        Log.d(TAG, "Starting Inventory...");
+        if (!isConnected || rfidHelper == null) {
+            Log.e(TAG, "startInventory failed: Not connected or Helper null");
+            return false;
+        }
+        Log.d(TAG, "Starting Inventory (iMin)...");
         try {
             rfidHelper.tagInventoryRawStartReading();
             return true;
@@ -268,8 +271,11 @@ public class IminReaderImpl implements IReaderDevice {
 
     @Override
     public boolean stopInventory() {
-        if (!isConnected || rfidHelper == null) return false;
-        Log.d(TAG, "Stopping Inventory...");
+        if (!isConnected || rfidHelper == null) {
+            Log.e(TAG, "stopInventory failed: Not connected or Helper null");
+            return false;
+        }
+        Log.d(TAG, "Stopping Inventory (iMin)...");
         try {
             rfidHelper.tagInventoryRawStopReading();
             return true;
@@ -277,6 +283,17 @@ public class IminReaderImpl implements IReaderDevice {
             Log.e(TAG, "Error stopping inventory", e);
             return false;
         }
+    }
+
+    @Override
+    public boolean startLocation(String epc) {
+        Log.w(TAG, "Location not implemented for iMin");
+        return false;
+    }
+
+    @Override
+    public boolean stopLocation() {
+        return false;
     }
 
     @Override

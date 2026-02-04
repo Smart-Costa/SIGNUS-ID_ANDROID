@@ -131,6 +131,16 @@ public class IminScannerImpl implements IReaderDevice {
     }
 
     @Override
+    public boolean startLocation(String epc) {
+        return false;
+    }
+
+    @Override
+    public boolean stopLocation() {
+        return false;
+    }
+
+    @Override
     public void setPower(int power) {
         // No power setting for Scanner
     }

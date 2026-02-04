@@ -6,5 +6,6 @@ public enum ReaderType {
     HONEYWELL,
     IMIN, // Lark 1 (I24P01)
     IMIN_SCANNER, // Lark 1 Scanner (Barcode/QR)
+    DATALOGIC,
     MOCK // For testing
 }

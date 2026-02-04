@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#FAFAFA">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Modo de Lectura (iMin Lark 1)"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Hidden EditText to capture scanner keyboard input -->
+        <EditText
+            android:id="@+id/etScannerInput"
+            android:layout_width="1px"
+            android:layout_height="1px"
+            android:background="@null"
+            android:cursorVisible="false"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="textNoSuggestions"
+            android:importantForAutofill="no"
+            android:alpha="0"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo de Conexión"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp" />
+
+        <Spinner
+            android:id="@+id/spinnerConexion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:spinnerMode="dropdown" />
+
+        <RadioGroup
+            android:id="@+id/rgReaderMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/border_background"
+            android:padding="4dp">
+
+            <RadioButton
+                android:id="@+id/rbScanner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Scanner (QR/Barra)"
+                android:checked="true"/>
+
+            <RadioButton
+                android:id="@+id/rbRfid"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="RFID (UHF)"/>
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/layoutPower"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Potencia RFID (dBm)"
+                android:textSize="14sp"/>
+
+            <SeekBar
+                android:id="@+id/sbPower"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="30"
+                android:progress="30"/>
+
+            <TextView
+                android:id="@+id/tvPowerValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="30 dBm"
+                android:layout_gravity="end"/>
+
+            <!-- New Control Buttons for RFID -->
+            <Button
+                android:id="@+id/btnValidateConnection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Validar Conexión Antena"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#FF9800"/>
+
+            <Button
+                android:id="@+id/btnDiagnostic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Diagnóstico de Conexión"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#607D8B"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/btnSingleRead"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Lectura Sencilla"
+                    android:layout_marginEnd="4dp"/>
+
+                <Button
+                    android:id="@+id/btnMultiRead"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Lectura Múltiple"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnInitScanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Iniciar Lectura"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Último Dato Leído:"
+            android:textSize="14sp"
+            android:textColor="#666666"/>
+
+        <TextView
+            android:id="@+id/tvLastScanData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="---"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/holo_blue_dark"
+            android:padding="12dp"
+            android:background="#EEEEEE"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Log de Eventos / Historial"
+                android:textStyle="bold"/>
+            <Button
+                android:id="@+id/btnClearHistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Limpiar"
+                android:textSize="12sp"
+                style="@style/Widget.AppCompat.Button.Small"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvScanHistory"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:fontFamily="monospace"
+            android:textSize="11sp"
+            android:text="Esperando acciones..."
+            android:background="#F0F0F0"
+            android:padding="8dp"
+            android:scrollbars="vertical"
+            android:fadeScrollbars="false"/>
+
+    </LinearLayout>
+</ScrollView>

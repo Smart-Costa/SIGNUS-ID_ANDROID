@@ -1573,7 +1573,9 @@ public class Actualizar_activo extends AppCompatActivity implements ResponseHand
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        rfidHandler.onDestroy();
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(null);
+        }
     }
 
      int count = 0 ;

@@ -244,6 +244,30 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     }
 
     @Override
+    public boolean startLocation(String epc) {
+        if (!isConnected()) return false;
+        try {
+            reader.Actions.TagLocationing.Perform(epc, null, null);
+            return true;
+        } catch (InvalidUsageException | OperationFailureException e) {
+            notifyError("Error iniciando localización: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean stopLocation() {
+        if (!isConnected()) return false;
+        try {
+            reader.Actions.TagLocationing.Stop();
+            return true;
+        } catch (InvalidUsageException | OperationFailureException e) {
+            notifyError("Error deteniendo localización: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
     public void setPower(int power) {
         this.maxPower = power;
         if (isConnected()) {
@@ -326,18 +350,23 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         public void eventReadNotify(RfidReadEvents e) {
             TagData[] myTags = reader.Actions.getReadTags(100);
             if (myTags != null) {
+                Log.d(TAG, "Zebra EventReadNotify: " + myTags.length + " tags read.");
                 List<ReaderTag> convertedTags = new ArrayList<>();
                 for (TagData tag : myTags) {
+                    Log.d(TAG, "Tag ID: " + tag.getTagID() + " RSSI: " + tag.getPeakRSSI());
                     convertedTags.add(new ReaderTag(tag.getTagID(), tag.getPeakRSSI()));
                 }
                 if (listener != null) {
                     new Handler(Looper.getMainLooper()).post(() -> listener.onTagRead(convertedTags));
                 }
+            } else {
+                Log.d(TAG, "Zebra EventReadNotify: No tags in buffer.");
             }
         }
 
         @Override
         public void eventStatusNotify(RfidStatusEvents e) {
+            Log.d(TAG, "Zebra Status Event: " + e.StatusEventData.getStatusEventType());
             if (e.StatusEventData.getStatusEventType() == STATUS_EVENT_TYPE.HANDHELD_TRIGGER_EVENT) {
                 boolean pressed = e.StatusEventData.HandheldTriggerEventData.getHandheldEvent() == HANDHELD_TRIGGER_EVENT_TYPE.HANDHELD_TRIGGER_PRESSED;
                 if (listener != null) {
@@ -345,11 +374,11 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 }
                 
                 // Mimic original behavior: start/stop inventory on trigger
-                if (pressed) {
-                    startInventory();
-                } else {
-                    stopInventory();
-                }
+                // if (pressed) {
+                //    startInventory();
+                // } else {
+                //    stopInventory();
+                // }
             }
         }
     }

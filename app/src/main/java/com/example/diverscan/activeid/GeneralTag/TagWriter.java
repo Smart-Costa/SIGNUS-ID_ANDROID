@@ -111,11 +111,15 @@ public class TagWriter implements IReaderListener {
     }
 
     public void LocateTag(String epc) {
-        // Todo: Implement
+        if (device != null) {
+            device.startLocation(epc);
+        }
     }
 
     public void StopLocateTag() {
-        // Todo: Implement
+        if (device != null) {
+            device.stopLocation();
+        }
     }
 
     public String getDiagnosticInfo() {

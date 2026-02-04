@@ -85,6 +85,9 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.android.volley:volley:1.2.1'
 
+    // --- Datalogic SDK ---
+    implementation 'com.github.datalogic:datalogic-android-sdk:v1.45'
+
     // -- Custom --
 
     // --- Projects locales ---
