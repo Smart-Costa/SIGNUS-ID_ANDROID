@@ -317,7 +317,12 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     public void dispose() {
         disconnect();
         if (readers != null) {
-            readers.Dispose();
+            try {
+                readers.Dispose();
+            } catch (Exception e) {
+                // Ignore NPE inside Zebra SDK during disposal
+                Log.w(TAG, "Error disposing Zebra readers (safe to ignore): " + e.getMessage());
+            }
             readers = null;
         }
     }
