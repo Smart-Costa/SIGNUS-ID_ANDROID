@@ -14,6 +14,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Context;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
@@ -46,6 +50,13 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
     private List<String> foundEpcs;
     private ArrayAdapter<String> spinnerAdapter;
 
+    // Sound Feedback
+    private ToneGenerator toneGenerator;
+    private Handler soundHandler;
+    private Runnable soundRunnable;
+    private volatile int soundInterval = 1000;
+    private boolean isSoundRunning = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +64,23 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
 
         activoDao = new ActivoDao(this);
         foundEpcs = new ArrayList<>();
+
+        // Init Sound
+        try {
+            toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        soundHandler = new Handler(Looper.getMainLooper());
+        soundRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (isSoundRunning && toneGenerator != null) {
+                    toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 50);
+                    soundHandler.postDelayed(this, soundInterval);
+                }
+            }
+        };
 
         controles();
         eventos();
@@ -95,6 +123,7 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
     }
 
     private void stopOperations() {
+        stopSoundFeedback();
         if (rfidHandler != null) {
             if (isInventorying) {
                 rfidHandler.stopRead();
@@ -102,6 +131,28 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
                 btnScanRfid.setText("Escanear Alrededores");
             }
             rfidHandler.StopLocateTag();
+        }
+    }
+
+    private void startSoundFeedback() {
+        if (!isSoundRunning) {
+            isSoundRunning = true;
+            soundInterval = 1000; // Reset to slow
+            soundHandler.post(soundRunnable);
+        }
+    }
+
+    private void stopSoundFeedback() {
+        isSoundRunning = false;
+        soundHandler.removeCallbacks(soundRunnable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (toneGenerator != null) {
+            toneGenerator.release();
+            toneGenerator = null;
         }
     }
 
@@ -215,6 +266,7 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
                 }
                 
                 rfidHandler.LocateTag(targetEpc);
+                startSoundFeedback();
                 btnIniciar.setEnabled(false);
                 btnDetener.setEnabled(true);
                 Toast.makeText(this, "Localizando: " + targetEpc, Toast.LENGTH_SHORT).show();
@@ -224,6 +276,7 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
         btnDetener.setOnClickListener(v -> {
             if (rfidHandler != null) {
                 rfidHandler.StopLocateTag();
+                stopSoundFeedback();
                 btnIniciar.setEnabled(true);
                 btnDetener.setEnabled(false);
                 updateProximityUI(0, -999);
@@ -280,6 +333,12 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
                  else {
                      progress = (int) ((rssi + 90) * (100.0 / 60.0));
                  }
+                 
+                 // Update sound interval (Geiger effect)
+                 int newInterval = 1000 - (progress * 9);
+                 if (newInterval < 50) newInterval = 50;
+                 soundInterval = newInterval;
+
                  final int finalProgress = progress;
                  runOnUiThread(() -> updateProximityUI(finalProgress, rssi));
              }

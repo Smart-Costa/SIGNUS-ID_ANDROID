@@ -12,6 +12,7 @@ import com.example.diverscan.activeid.DeviceInterface.IReaderDevice;
 import com.example.diverscan.activeid.DeviceInterface.IReaderListener;
 import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.zebra.rfid.api3.Antennas;
+import com.zebra.rfid.api3.BEEPER_VOLUME;
 import com.zebra.rfid.api3.DYNAMIC_POWER_OPTIMIZATION;
 import com.zebra.rfid.api3.ENUM_TRANSPORT;
 import com.zebra.rfid.api3.ENUM_TRIGGER_MODE;
@@ -255,10 +256,16 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         }
     }
 
+    private String currentLocatingEpc = null;
+
     @Override
     public boolean startLocation(String epc) {
         if (!isConnected()) return false;
+        currentLocatingEpc = epc;
         try {
+            // Disable hardware beeper for software control
+            reader.Config.setBeeperVolume(BEEPER_VOLUME.QUIET_BEEP);
+            
             reader.Actions.TagLocationing.Perform(epc, null, null);
             return true;
         } catch (InvalidUsageException | OperationFailureException e) {
@@ -270,8 +277,13 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     @Override
     public boolean stopLocation() {
         if (!isConnected()) return false;
+        currentLocatingEpc = null;
         try {
             reader.Actions.TagLocationing.Stop();
+            
+            // Restore hardware beeper
+            reader.Config.setBeeperVolume(BEEPER_VOLUME.HIGH_BEEP);
+            
             return true;
         } catch (InvalidUsageException | OperationFailureException e) {
             notifyError("Error deteniendo localización: " + e.getMessage());
@@ -367,17 +379,43 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         public void eventReadNotify(RfidReadEvents e) {
             TagData[] myTags = reader.Actions.getReadTags(100);
             if (myTags != null) {
-                Log.d(TAG, "Zebra EventReadNotify: " + myTags.length + " tags read.");
+                // Log.d(TAG, "Zebra EventReadNotify: " + myTags.length + " tags read.");
                 List<ReaderTag> convertedTags = new ArrayList<>();
                 for (TagData tag : myTags) {
-                    Log.d(TAG, "Tag ID: " + tag.getTagID() + " RSSI: " + tag.getPeakRSSI());
-                    convertedTags.add(new ReaderTag(tag.getTagID(), tag.getPeakRSSI()));
+                    String id = tag.getTagID();
+                    int rssi = tag.getPeakRSSI();
+
+                    // Filter out invalid reads (Null ID and No Location Info)
+                    if (id == null && !tag.isContainsLocationInfo()) {
+                         // Log.w(TAG, "Ignored tag with null ID and no location info. RSSI: " + rssi);
+                         continue;
+                    }
+
+                    // Handle Locationing Data (Null ID fix)
+                    if (tag.isContainsLocationInfo()) {
+                        if (id == null && currentLocatingEpc != null) {
+                            id = currentLocatingEpc;
+                        }
+                        // Map Relative Distance (0-100) to RSSI (-90 to -30)
+                        // 0 (Far) -> -90
+                        // 100 (Close) -> -30
+                        short dist = tag.LocationInfo.getRelativeDistance();
+                        rssi = (int) ((dist * 0.6) - 90);
+                        // Log.d(TAG, "LocationInfo Dist: " + dist + " Mapped RSSI: " + rssi);
+                    }
+
+                    if (id != null) {
+                        // Log.d(TAG, "Tag ID: " + id + " RSSI: " + rssi);
+                        convertedTags.add(new ReaderTag(id, (short)rssi));
+                    } else {
+                        Log.w(TAG, "Tag read with null ID and no current target.");
+                    }
                 }
-                if (listener != null) {
+                if (listener != null && !convertedTags.isEmpty()) {
                     new Handler(Looper.getMainLooper()).post(() -> listener.onTagRead(convertedTags));
                 }
             } else {
-                Log.d(TAG, "Zebra EventReadNotify: No tags in buffer.");
+                // Log.d(TAG, "Zebra EventReadNotify: No tags in buffer.");
             }
         }
 
