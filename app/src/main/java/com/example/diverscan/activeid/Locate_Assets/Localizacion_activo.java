@@ -272,7 +272,7 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
         else {
              final ReaderTag tag = tagData[0];
              // Filter for target just in case, though reader should filter
-             if (targetEpc != null && tag.getEpc().equals(targetEpc)) {
+             if (targetEpc != null && tag != null && tag.getEpc() != null && tag.getEpc().equals(targetEpc)) {
                  final int rssi = tag.getPeakRSSI();
                  int progress = 0;
                  if (rssi >= -30) progress = 100;
