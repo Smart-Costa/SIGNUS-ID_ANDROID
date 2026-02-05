@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".Locate_Assets.Localizacion_activo">
 
-
     <ScrollView
         android:id="@+id/LocalizacionForm"
         android:layout_width="match_parent"
@@ -14,98 +13,168 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <!--EPC -->
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:orientation="vertical"></LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Mode Selection -->
+            <RadioGroup
+                android:id="@+id/rg_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingBottom="16dp">
+                
+                <RadioButton
+                    android:id="@+id/rb_manual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manual"
+                    android:checked="true"
+                    android:layout_marginEnd="16dp"/>
+                
+                <RadioButton
+                    android:id="@+id/rb_rfid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RFID"/>
+            </RadioGroup>
+
+            <!-- Manual Input Layout -->
             <LinearLayout
-                android:layout_width="17dp"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"></LinearLayout>
+                android:id="@+id/layout_manual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+                
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ingrese Placa o Número de Activo:"
+                    android:paddingBottom="8dp"/>
 
+                <EditText
+                    android:id="@+id/txt_input_manual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ej. 12345"
+                    android:inputType="text" 
+                    android:paddingBottom="16dp"/>
+                
+                <Button
+                    android:id="@+id/btn_buscar_manual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Buscar Datos"
+                    android:background="@color/colorPrimary"
+                    android:textColor="@android:color/background_light"/>
+            </LinearLayout>
+
+            <!-- RFID Search Layout -->
+            <LinearLayout
+                android:id="@+id/layout_rfid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+                
+                <Button
+                    android:id="@+id/btn_scan_rfid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Escanear Alrededores"
+                    android:background="@color/colorPrimary"
+                    android:textColor="@android:color/background_light"
+                    android:layout_marginBottom="16dp"/>
+                
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Activos Encontrados:"
+                    android:paddingBottom="8dp"/>
+
+                <Spinner
+                    android:id="@+id/sp_found_assets"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp" 
+                    android:background="@android:drawable/btn_dropdown"/>
+            </LinearLayout>
+
+            <!-- Separator -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Target Info -->
             <TextView
-                android:id="@+id/lbl_numero_epc"
-                android:layout_width="80dp"
+                android:id="@+id/lbl_target_info"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/epc" />
+                android:text="Objetivo: Ninguno seleccionado"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"/>
 
-            <EditText
-                android:id="@+id/txt_numero_epc"
-                android:layout_width="wrap_content"
+            <!-- Location Controls -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:text="" />
-            <LinearLayout
-                android:layout_width="14dp"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"></LinearLayout>
-        </LinearLayout>
+                android:orientation="horizontal"
+                android:gravity="center">
 
+                <Button
+                    android:id="@+id/btn_iniciar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/iniciar"
+                    android:background="@color/colorPrimary"
+                    android:textColor="@android:color/background_light"
+                    android:layout_marginEnd="8dp"
+                    android:enabled="false"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:orientation="vertical"></LinearLayout>
+                <Button
+                    android:id="@+id/btn_detener"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/detener"
+                    android:background="@color/colorPrimary"
+                    android:textColor="@android:color/background_light"
+                    android:layout_marginStart="8dp"
+                    android:enabled="false"/>
+            </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            <!-- Proximity -->
+            <TextView
+                android:id="@+id/lbl_proximity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Proximidad: 0%"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"/>
 
-            <LinearLayout
-                android:layout_width="15dp"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"></LinearLayout>
-
-            <Button
-                android:id="@+id/btn_iniciar"
-                android:layout_width="10dp"
+            <ProgressBar
+                android:id="@+id/progressBarProximity"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:layout_weight="1"
-                android:background="@color/colorPrimary"
-                android:text="@string/iniciar"
-                android:textColor="@android:color/background_light" />
-
-            <LinearLayout
-                android:layout_width="38dp"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"></LinearLayout>
-
-            <Button
-                android:id="@+id/btn_detener"
-                android:layout_width="10dp"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                android:background="@color/colorPrimary"
-                android:text="@string/detener"
-                android:textColor="@android:color/background_light" />
-
-            <LinearLayout
-                android:layout_width="14dp"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"></LinearLayout>
+                android:layout_marginTop="8dp"
+                android:max="100"
+                android:progress="0" />
 
         </LinearLayout>
-
-
-
-
-    </LinearLayout>
     </ScrollView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

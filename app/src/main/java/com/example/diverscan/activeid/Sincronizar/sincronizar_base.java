@@ -317,8 +317,11 @@ public class sincronizar_base extends AppCompatActivity {
     }
 
     private void actualizarBarraSegmentada(int progreso) {
-        int segmentoActual = (int) ((progreso / 100.0) * TOTAL_SEGMENTOS);
+        // Aseguramos que progreso 100 llene todo
+        int segmentoActual = (int) Math.ceil((progreso / 100.0) * TOTAL_SEGMENTOS);
+        
         for (int i = 0; i < TOTAL_SEGMENTOS; i++) {
+            // i va de 0 a 4. Si segmentoActual es 1, i=0 < 1 (true).
             int color = (i < segmentoActual) ? Color.parseColor("#FF5100") : Color.parseColor("#CCCCCC");
             cambiarColorSuave(pasos[i], color);
         }
@@ -366,15 +369,15 @@ public class sincronizar_base extends AppCompatActivity {
     private void startSyncSequence() {
         // 1. Usuarios
         userDao.fetchAndSyncFromApi(() -> {
-            runOnUiThread(() -> actualizarBarraSegmentada(15));
+            runOnUiThread(() -> actualizarBarraSegmentada(20));
             
             // 2. Roles
             rolDao.fetchAndSyncFromApi(() -> {
-                runOnUiThread(() -> actualizarBarraSegmentada(30));
+                runOnUiThread(() -> actualizarBarraSegmentada(40));
 
                 // 3. Ubicaciones
                 ubicacionDao.fetchAndSyncFromApi(() -> {
-                    runOnUiThread(() -> actualizarBarraSegmentada(45));
+                    runOnUiThread(() -> actualizarBarraSegmentada(60));
 
                     // 3.5 Categorias
                     getCategoriaActivos(() -> {
@@ -401,17 +404,17 @@ public class sincronizar_base extends AppCompatActivity {
 
                         activoDao.fetchAndSyncFromApi(() -> {
                             runOnUiThread(() -> {
-                                actualizarBarraSegmentada(60);
-                                Mensaje.setText("Sincronización de activos completada.");
+                                actualizarBarraSegmentada(80);
+                                Mensaje.setText("Activos sincronizados. Verificando tomas físicas...");
                             });
 
                         // 5. Tomas Fisicas (Encabezados)
                         tomafisicaDao.fetchAndSyncFromApi(() -> {
-                            runOnUiThread(() -> actualizarBarraSegmentada(75));
+                            runOnUiThread(() -> actualizarBarraSegmentada(90));
 
                             // 6. Tomas Fisicas (Resumen/Tomas)
                             tomafisicatomasDao.fetchAndSyncFromApi(() -> {
-                                runOnUiThread(() -> actualizarBarraSegmentada(90));
+                                runOnUiThread(() -> actualizarBarraSegmentada(95));
 
                                 // 7. Tomas Fisicas (Detalles)
                                 // Fetch details ONLY for the currently active/visible Tomas Fisicas

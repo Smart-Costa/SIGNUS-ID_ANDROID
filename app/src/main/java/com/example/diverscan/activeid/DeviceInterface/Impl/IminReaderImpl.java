@@ -25,6 +25,10 @@ public class IminReaderImpl implements IReaderDevice {
     private boolean isConnected = false;
     private int currentPower = 30; // Default power
     private ConnectionType connectionType = ConnectionType.AUTO;
+    
+    // Locationing variables
+    private boolean isLocationing = false;
+    private String targetLocationEpc = null;
 
     @Override
     public void setConnectionType(ConnectionType type) {
@@ -195,6 +199,14 @@ public class IminReaderImpl implements IReaderDevice {
                     Log.v(TAG, "TAG READ -> EPC: " + epc + " | RSSI: " + rssiStr);
 
                     if (epc != null) {
+                        // Locationing Filter
+                        if (isLocationing && targetLocationEpc != null) {
+                            if (!epc.equals(targetLocationEpc)) {
+                                // Ignore tags that don't match target
+                                return;
+                            }
+                        }
+
                         short rssi = 0;
                         try {
                             if (rssiStr != null) rssi = Short.parseShort(rssiStr);
@@ -287,13 +299,25 @@ public class IminReaderImpl implements IReaderDevice {
 
     @Override
     public boolean startLocation(String epc) {
-        Log.w(TAG, "Location not implemented for iMin");
-        return false;
+        if (!isConnected || rfidHelper == null) {
+             Log.e(TAG, "startLocation failed: Not connected");
+             return false;
+        }
+        
+        Log.d(TAG, "Starting Locationing for EPC: " + epc);
+        this.targetLocationEpc = epc;
+        this.isLocationing = true;
+        
+        // Use standard inventory but filter results in callback
+        return startInventory();
     }
 
     @Override
     public boolean stopLocation() {
-        return false;
+        Log.d(TAG, "Stopping Locationing");
+        this.isLocationing = false;
+        this.targetLocationEpc = null;
+        return stopInventory();
     }
 
     @Override
