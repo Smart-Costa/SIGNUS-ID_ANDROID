@@ -1045,7 +1045,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e(TAG, "Error fetching ActivoInventario by barcode", e);
         } finally {
-            db.close();
+            // db.close();
         }
         return result;
     }
@@ -1078,7 +1078,7 @@ public class ActivoDao {
         } catch (Exception e) {
             Log.e(TAG, "Error limpiando datos sincronizados", e);
         } finally {
-            db.close();
+            // db.close();
         }
     }
 

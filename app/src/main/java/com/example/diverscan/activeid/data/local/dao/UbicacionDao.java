@@ -329,10 +329,7 @@ public class UbicacionDao {
     }
 
     public void fetchAndSyncFromApi(final Runnable onSynced) {
-        // Lógica de Ubicación HH desactivada por solicitud del usuario (manejo en web)
-        if (onSynced != null) onSynced.run();
-        
-        /* CODIGO COMENTADO
+        Log.d(TAG, "Starting UbicacionHH sync...");
         ApiClient api = ApiClient.getInstance(context);
         
         api.<com.google.gson.JsonElement>get("GetUbicacionesHH", com.google.gson.JsonElement.class, new ApiCallback<com.google.gson.JsonElement>() {
@@ -346,8 +343,13 @@ public class UbicacionDao {
                         List<UbicacionEntity> lista = api.getGson().fromJson(response.data, type);
                         
                         if (lista != null) {
+                            Log.d(TAG, "Ubicaciones recibidas: " + lista.size());
+                            if (!lista.isEmpty()) {
+                                UbicacionEntity first = lista.get(0);
+                                Log.d(TAG, "First item sample: ASysId=" + first.getASysId() + ", UbicacionA=" + first.getUbicacionA());
+                            }
                             syncUbicaciones(lista);
-                            if (onSynced != null) onSynced.run();
+                            Log.d(TAG, "Ubicaciones sincronizadas en DB: " + lista.size());
                         } else {
                             Log.e(TAG, "Lista nula tras deserializar");
                         }
@@ -357,9 +359,10 @@ public class UbicacionDao {
                 } else {
                     Log.e(TAG, "Error al sincronizar ubicaciones: " + response.errorMessage);
                 }
+                
+                if (onSynced != null) onSynced.run();
             }
         });
-        */
     }
 }
 

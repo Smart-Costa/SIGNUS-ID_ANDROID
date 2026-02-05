@@ -274,7 +274,7 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 }

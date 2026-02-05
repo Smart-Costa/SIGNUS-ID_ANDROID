@@ -198,7 +198,7 @@ public class TomaFisicaDao {
             Log.e(TAG, "Error sincronizando tomas fisicas", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 
@@ -215,8 +215,17 @@ public class TomaFisicaDao {
                     if (onSuccess != null) {
                         onSuccess.run();
                     }
+                } else if (response.statusCode == 404) {
+                    Log.w(TAG, "API devolvió 404 (Not Found) para TomasFisicas. Se asume lista vacía.");
+                    syncTomasFisicas(new ArrayList<>());
+                    if (onSuccess != null) {
+                        onSuccess.run();
+                    }
                 } else {
                     Log.e(TAG, "Error al sincronizar tomas fisicas desde API: " + response.errorMessage);
+                    if (onSuccess != null) {
+                        onSuccess.run();
+                    }
                 }
             }
         });

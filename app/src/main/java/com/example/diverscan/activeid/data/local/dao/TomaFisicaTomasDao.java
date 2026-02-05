@@ -204,7 +204,17 @@ public class TomaFisicaTomasDao {
                     Log.d(TAG, "Tomas Fisicas sincronizadas desde API: " + response.data.size());
                 } else {
                     if (response.statusCode == 404) {
-                        Log.w(TAG, "API devolvió 404 para TFResumen. Posiblemente sin datos o ID no encontrado. Se ignora error.");
+                        Log.w(TAG, "API devolvió 404 para TFResumen. Posiblemente sin datos o ID no encontrado. Se asume vacío y limpia local.");
+                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                        try {
+                            if (tomaFisicaId != null && !tomaFisicaId.trim().isEmpty()) {
+                                db.delete("TomasFisicasResumen", "LOWER(TomaFisicaId) = LOWER(?) AND SYNC_STATUS = 1", new String[]{tomaFisicaId.trim()});
+                            } else {
+                                db.delete("TomasFisicasResumen", "SYNC_STATUS = 1", null);
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error limpiando datos sincronizados previos en 404", e);
+                        }
                     } else {
                         Log.e(TAG, "Error al sincronizar tomas fisicas desde API: " + response.errorMessage);
                     }
@@ -550,7 +560,7 @@ public class TomaFisicaTomasDao {
         } catch (Exception e) {
             Log.e(TAG, "Error leyendo PendingDeletes", e);
         } finally {
-            db.close();
+            // db.close();
         }
         return list;
     }
@@ -569,7 +579,7 @@ public class TomaFisicaTomasDao {
             Log.e(TAG, "Error eliminando PendingDeletes", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 
@@ -615,7 +625,7 @@ public class TomaFisicaTomasDao {
         } catch (Exception e) {
             Log.e(TAG, "Error obteniendo TomasFisicasResumen por tomaFisicaId", e);
         } finally {
-            db.close();
+            // db.close();
         }
 
         return list;

@@ -48,7 +48,7 @@ public class RolDao {
             Log.e(TAG, "Error sincronizando roles", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 

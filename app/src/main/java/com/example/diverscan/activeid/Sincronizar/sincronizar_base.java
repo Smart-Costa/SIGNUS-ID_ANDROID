@@ -414,21 +414,35 @@ public class sincronizar_base extends AppCompatActivity {
 
                             // 6. Tomas Fisicas (Resumen/Tomas)
                             tomafisicatomasDao.fetchAndSyncFromApi(() -> {
+                                Log.d("SYNC_DEBUG", "TomasFisicasTomas (Resumen) synced. Checking for details...");
                                 runOnUiThread(() -> actualizarBarraSegmentada(95));
 
                                 // 7. Tomas Fisicas (Detalles)
                                 // Fetch details ONLY for the currently active/visible Tomas Fisicas
-                                List<TomaFisicaEntity> activeTomas = tomafisicaDao.getAllTomasFisicas();
+                                List<TomaFisicaEntity> activeTomas = null;
+                                try {
+                                    activeTomas = tomafisicaDao.getAllTomasFisicas();
+                                } catch (Exception e) {
+                                    Log.e("SYNC_DEBUG", "Error getting active tomas", e);
+                                    activeTomas = new java.util.ArrayList<>();
+                                }
+                                
+                                Log.d("SYNC_DEBUG", "Active tomas count: " + (activeTomas != null ? activeTomas.size() : "null"));
+
                                 if (activeTomas != null && !activeTomas.isEmpty()) {
                                     final int[] processedCount = {0};
                                     final int totalTomas = activeTomas.size();
 
                                     for (TomaFisicaEntity toma : activeTomas) {
+                                        Log.d("SYNC_DEBUG", "Fetching details for toma: " + toma.getTomaFisicaId());
                                         tomafisicadetallesDao.fetchAndSyncFromApi(toma.getTomaFisicaId(), () -> {
                                             processedCount[0]++;
+                                            Log.d("SYNC_DEBUG", "Details processed: " + processedCount[0] + "/" + totalTomas);
                                             if (processedCount[0] >= totalTomas) {
                                                 runOnUiThread(() -> {
+                                                    Log.d("SYNC_DEBUG", "All details processed. Finishing sync.");
                                                     actualizarBarraSegmentada(100);
+                                                    Mensaje.setText("Sincronización Completada.");
                                                     updateDebugSummary();
                                                     
                                                     btn_enviar.setEnabled(true);
@@ -443,8 +457,10 @@ public class sincronizar_base extends AppCompatActivity {
                                     }
                                 } else {
                                     // Fallback if no active tomas found, or maybe just finish
+                                    Log.d("SYNC_DEBUG", "No active tomas. Finishing sync immediately.");
                                     runOnUiThread(() -> {
                                         actualizarBarraSegmentada(100);
+                                        Mensaje.setText("Sincronización Completada.");
                                         updateDebugSummary();
                                         btn_enviar.setEnabled(true);
                                         btn_obtener.setEnabled(true);

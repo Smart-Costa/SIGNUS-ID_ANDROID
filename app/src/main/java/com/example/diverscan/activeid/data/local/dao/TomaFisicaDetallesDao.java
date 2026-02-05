@@ -77,7 +77,7 @@ public class TomaFisicaDetallesDao {
             Log.e(TAG, "Error sincronizando detalle", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 
@@ -104,7 +104,7 @@ public class TomaFisicaDetallesDao {
             Log.e(TAG, "Error guardando detalle local", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 
@@ -177,6 +177,21 @@ public class TomaFisicaDetallesDao {
                         syncDetalle(response.data);
                     }
                     Log.d(TAG, "Tomas Fisicas sincronizadas desde API: " + response.data.size());
+                } else if (response.statusCode == 404) {
+                    Log.w(TAG, "API devolvió 404 (Not Found) para TFDetalle. Se asume lista vacía y se limpian locales.");
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    try {
+                        String where = "SYNC_STATUS = 1";
+                        List<String> args = new ArrayList<>();
+                        if (idToma != null && !idToma.trim().isEmpty()) {
+                            where += " AND LOWER(IdToma) = LOWER(?)";
+                            args.add(idToma.trim());
+                        }
+                        db.delete("TomasFisicasDetalle", where, args.toArray(new String[0]));
+                        Log.d(TAG, "Limpiados detalles sincronizados previos (por 404). Filtro idToma=" + idToma);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error limpiando detalles previos en 404", e);
+                    }
                 } else {
                     Log.e(TAG, "Error al sincronizar tomas fisicas desde API: " + response.errorMessage);
                 }
@@ -418,7 +433,7 @@ public class TomaFisicaDetallesDao {
             Log.e(TAG, "Error deleting details for toma " + trimmed, e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 
@@ -497,7 +512,7 @@ public class TomaFisicaDetallesDao {
         } catch (Exception e) {
             Log.e(TAG, "Error marking detail as synced", e);
         } finally {
-            db.close();
+            // db.close();
         }
     }
 
@@ -648,7 +663,7 @@ public class TomaFisicaDetallesDao {
         } catch (Exception e) {
             Log.e(TAG, "Error marcando header como pendiente para idToma=" + idToma, e);
         } finally {
-            db.close();
+            // db.close();
         }
     }
 
@@ -757,7 +772,7 @@ public class TomaFisicaDetallesDao {
         } catch (Exception e) {
             Log.e(TAG, "Error leyendo PendingDeletes", e);
         } finally {
-            db.close();
+            // db.close();
         }
         return list;
     }
@@ -776,7 +791,7 @@ public class TomaFisicaDetallesDao {
             Log.e(TAG, "Error eliminando PendingDeletes", e);
         } finally {
             db.endTransaction();
-            db.close();
+            // db.close();
         }
     }
 
