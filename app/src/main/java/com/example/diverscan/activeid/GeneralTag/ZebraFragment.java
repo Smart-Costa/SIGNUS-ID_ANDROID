@@ -49,6 +49,7 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     private Button btnTest;
     private TextView txtResultados;
     private boolean isScanning = false;
+    private boolean isRequestingPermissions = false;
     private java.util.Set<String> uniqueTags = new java.util.HashSet<>();
     
     private TagWriter rfidHandler;
@@ -385,6 +386,7 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 100) {
+            isRequestingPermissions = false;
             boolean allGranted = true;
             for (int result : grantResults) {
                 if (result != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -406,12 +408,18 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
 
     private boolean checkPermissions() {
         Log.d(TAG, "Checking permissions...");
+        if (isRequestingPermissions) {
+            Log.w(TAG, "Permissions request already in progress.");
+            return false;
+        }
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             boolean missingConnect = androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED;
             boolean missingScan = androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_SCAN) != android.content.pm.PackageManager.PERMISSION_GRANTED;
 
             if (missingConnect || missingScan) {
                 Log.w(TAG, "Bluetooth permissions missing (Android 12+). Requesting...");
+                isRequestingPermissions = true;
                 requestPermissions(new String[]{
                     android.Manifest.permission.BLUETOOTH_CONNECT,
                     android.Manifest.permission.BLUETOOTH_SCAN
@@ -421,6 +429,7 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         } else {
              if (androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
                  Log.w(TAG, "Location permission missing (Legacy Bluetooth). Requesting...");
+                 isRequestingPermissions = true;
                  requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
                  return false;
              }
