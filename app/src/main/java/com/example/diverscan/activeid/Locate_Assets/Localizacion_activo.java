@@ -1,6 +1,11 @@
 package com.example.diverscan.activeid.Locate_Assets;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,6 +34,9 @@ import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.diverscan.activeid.Locate_Assets.feedback.FeedbackFactory;
+import com.example.diverscan.activeid.Locate_Assets.feedback.FeedbackStrategy;
+
 public class Localizacion_activo extends AppCompatActivity implements ResponseHandlerInterface {
 
     // UI Components
@@ -50,12 +58,13 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
     private List<String> foundEpcs;
     private ArrayAdapter<String> spinnerAdapter;
 
-    // Sound Feedback
-    private ToneGenerator toneGenerator;
-    private Handler soundHandler;
-    private Runnable soundRunnable;
-    private volatile int soundInterval = 1000;
-    private boolean isSoundRunning = false;
+    // Feedback Logic (Factory Pattern)
+    private FeedbackStrategy feedbackStrategy;
+
+    
+    // Permissions
+    private boolean isRequestingPermissions = false;
+    private static final int PERMISSION_REQUEST_CODE = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,22 +74,8 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
         activoDao = new ActivoDao(this);
         foundEpcs = new ArrayList<>();
 
-        // Init Sound
-        try {
-            toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        soundHandler = new Handler(Looper.getMainLooper());
-        soundRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (isSoundRunning && toneGenerator != null) {
-                    toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 50);
-                    soundHandler.postDelayed(this, soundInterval);
-                }
-            }
-        };
+        // Init Feedback (Factory)
+        feedbackStrategy = FeedbackFactory.getFeedback(FeedbackFactory.FeedbackType.GEIGER_SOUND, this);
 
         controles();
         eventos();
@@ -107,9 +102,57 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
         }
     }
 
+    private boolean checkPermissions() {
+        if (isRequestingPermissions) return false;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            boolean missingConnect = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED;
+            boolean missingScan = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED;
+
+            if (missingConnect || missingScan) {
+                isRequestingPermissions = true;
+                ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_SCAN
+                }, PERMISSION_REQUEST_CODE);
+                return false;
+            }
+        } else {
+             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                 isRequestingPermissions = true;
+                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+                 return false;
+             }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            isRequestingPermissions = false;
+            boolean allGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+            if (allGranted) {
+                initRFID();
+            } else {
+                Toast.makeText(this, "Permisos necesarios para Bluetooth", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        
+        isRequestingPermissions = false; // Reset flag to allow retries
+        
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
             rfidHandler.updateContext(this);
@@ -135,24 +178,22 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
     }
 
     private void startSoundFeedback() {
-        if (!isSoundRunning) {
-            isSoundRunning = true;
-            soundInterval = 1000; // Reset to slow
-            soundHandler.post(soundRunnable);
+        if (feedbackStrategy != null) {
+            feedbackStrategy.start();
         }
     }
 
     private void stopSoundFeedback() {
-        isSoundRunning = false;
-        soundHandler.removeCallbacks(soundRunnable);
+        if (feedbackStrategy != null) {
+            feedbackStrategy.stop();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (toneGenerator != null) {
-            toneGenerator.release();
-            toneGenerator = null;
+        if (feedbackStrategy != null) {
+            feedbackStrategy.destroy();
         }
     }
 
@@ -334,10 +375,10 @@ public class Localizacion_activo extends AppCompatActivity implements ResponseHa
                      progress = (int) ((rssi + 90) * (100.0 / 60.0));
                  }
                  
-                 // Update sound interval (Geiger effect)
-                 int newInterval = 1000 - (progress * 9);
-                 if (newInterval < 50) newInterval = 50;
-                 soundInterval = newInterval;
+                 // Update feedback (Factory Strategy)
+                 if (feedbackStrategy != null) {
+                     feedbackStrategy.update(progress);
+                 }
 
                  final int finalProgress = progress;
                  runOnUiThread(() -> updateProximityUI(finalProgress, rssi));

@@ -116,6 +116,9 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     public void onResume() {
         super.onResume();
         
+        // Reset permission request flag to allow retries if user returns to this screen
+        isRequestingPermissions = false;
+        
         if (!checkPermissions()) {
             Log.w(TAG, "onResume: Permissions missing, skipping initialization.");
             return;

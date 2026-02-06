@@ -32,6 +32,12 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.example.diverscan.activeid.TomasFisicas.TomasFisias;
 import com.example.diverscan.activeid.TomasFisicas.EntidadActivos;
 import com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet;
@@ -141,6 +147,10 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
     private boolean _itemSelectedUserEdificio = false;
     private boolean _itemSelectedUserPiso = false;
     
+    // Permission handling
+    private boolean isRequestingPermissions = false;
+    private static final int PERMISSION_REQUEST_CODE = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -639,6 +649,18 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
     //*************************************************************************************************************
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        
+        isRequestingPermissions = false; // Reset flag to allow retries
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(this);
+            rfidHandler.updateContext(this);
+            rfidHandler.onResume();
+        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         if (rfidHandler != null) {
@@ -1038,6 +1060,50 @@ public class Lectura_Inventario extends AppCompatActivity implements ResponseHan
     }
 
     //*************************************************************************************************************
+
+    private boolean checkPermissions() {
+        if (isRequestingPermissions) return false;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            boolean missingConnect = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED;
+            boolean missingScan = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED;
+
+            if (missingConnect || missingScan) {
+                isRequestingPermissions = true;
+                ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_SCAN
+                }, PERMISSION_REQUEST_CODE);
+                return false;
+            }
+        } else {
+             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                 isRequestingPermissions = true;
+                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+                 return false;
+             }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            isRequestingPermissions = false;
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                 // Retry init
+                 try {
+                    rfidHandler = TagWriter.getInstance();
+                    rfidHandler.onCreate(this);
+                 } catch (Exception e) {
+                     Log.e("Lectura_Inventario", "Error initializing RFID after permission grant", e);
+                 }
+            } else {
+                 Toast.makeText(this, "Permisos necesarios para usar el lector RFID", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 
     public void RecibirTakesInfo() {
         try {

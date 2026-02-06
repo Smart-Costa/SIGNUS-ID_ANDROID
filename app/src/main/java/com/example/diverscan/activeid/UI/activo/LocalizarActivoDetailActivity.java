@@ -6,6 +6,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +38,8 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
     private List<String> foundEpcs;
     private android.widget.ArrayAdapter<String> spinnerAdapter;
     private boolean isScanning = false;
+    private boolean isRequestingPermissions = false;
+    private static final int PERMISSION_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +78,11 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
     }
 
     private void initRFID() {
+        if (!checkPermissions()) {
+            return;
+        }
         try {
-            rfidHandler = TagWriter.getInstance();
+            if (rfidHandler == null) rfidHandler = TagWriter.getInstance();
             if (!rfidHandler.isInitialized()) {
                 rfidHandler.onCreate(this);
             } else {
@@ -82,11 +93,55 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         }
     }
 
+    private boolean checkPermissions() {
+        if (isRequestingPermissions) return false;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                
+                isRequestingPermissions = true;
+                ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN},
+                    PERMISSION_REQUEST_CODE);
+                return false;
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                isRequestingPermissions = true;
+                ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_REQUEST_CODE);
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        isRequestingPermissions = false;
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
+        } else {
+            // Re-attempt init if we came back from permissions
+            if (checkPermissions()) {
+                initRFID();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            isRequestingPermissions = false;
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initRFID();
+            } else {
+                Toast.makeText(this, "Permisos necesarios para usar el lector RFID", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

@@ -36,6 +36,7 @@ import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 public class RegistroActivoFotoTagActivity extends AppCompatActivity implements ResponseHandlerInterface {
 
     private static final int PERMISSION_REQUEST_CODE = 101;
+    private boolean isRequestingPermissions = false;
     private TagWriter rfidHandler;
     private ImageView imgFoto1, imgFoto2, imgFoto3, imgFoto4, imgFoto5;
     private AutoCompleteTextView spUbicacionSecundaria;
@@ -127,6 +128,8 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
     }
 
     private void checkAndRequestPermissions() {
+        if (isRequestingPermissions) return;
+
         String[] permissions;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             permissions = new String[]{
@@ -149,6 +152,7 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         }
 
         if (!listPermissionsNeeded.isEmpty()) {
+            isRequestingPermissions = true;
             androidx.core.app.ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), PERMISSION_REQUEST_CODE);
         } else {
             initRFID();
@@ -159,6 +163,7 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
     public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions, @androidx.annotation.NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_CODE) {
+            isRequestingPermissions = false;
             boolean allGranted = true;
             for (int result : grantResults) {
                 if (result != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -177,11 +182,15 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
     @Override
     protected void onResume() {
         super.onResume();
+        
+        isRequestingPermissions = false; // Reset to allow retry
+
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    checkAndRequestPermissions(); // Try again if missing
                     return; 
                 }
             }

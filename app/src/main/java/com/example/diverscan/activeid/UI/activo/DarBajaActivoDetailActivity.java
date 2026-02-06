@@ -11,6 +11,18 @@ import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
 import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
+import android.content.pm.PackageManager;
+import android.Manifest;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.util.Log;
+import android.os.Build;
+import android.content.pm.PackageManager;
+import android.Manifest;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.util.Log;
+import android.os.Build;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import com.example.diverscan.activeid.databinding.ActivityDarBajaActivoDetailBinding;
 
@@ -19,6 +31,10 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
     private TagWriter rfidHandler;
     private ActivoDao activoDAO;
     private ActivoEntity activoLeido;
+
+    // Permission handling
+    private boolean isRequestingPermissions = false;
+    private static final int PERMISSION_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +45,13 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         activoDAO = new ActivoDao(this);
         
         // Usar TagWriter (Singleton) en lugar de RfidManager para mantener conexión global
-        rfidHandler = TagWriter.getInstance();
-        if (!rfidHandler.isInitialized()) {
-            rfidHandler.onCreate(this);
-        } else {
-            rfidHandler.setResponseHandler(this);
+        if (checkPermissions()) {
+            rfidHandler = TagWriter.getInstance();
+            if (!rfidHandler.isInitialized()) {
+                rfidHandler.onCreate(this);
+            } else {
+                rfidHandler.setResponseHandler(this);
+            }
         }
 
         initEvents();
@@ -44,6 +62,9 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
     @Override
     protected void onResume() {
         super.onResume();
+        
+        isRequestingPermissions = false; // Reset flag to allow retries
+        
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
             // Si ya está conectado, asegurar que el gatillo esté configurado o listo
@@ -60,6 +81,54 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
     }
 
     // --- ResponseHandlerInterface Implementation ---
+    
+    private boolean checkPermissions() {
+        if (isRequestingPermissions) return false;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            boolean missingConnect = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED;
+            boolean missingScan = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED;
+
+            if (missingConnect || missingScan) {
+                isRequestingPermissions = true;
+                ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_SCAN
+                }, PERMISSION_REQUEST_CODE);
+                return false;
+            }
+        } else {
+             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                 isRequestingPermissions = true;
+                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+                 return false;
+             }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            isRequestingPermissions = false;
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                 // Retry init
+                 try {
+                    rfidHandler = TagWriter.getInstance();
+                    if (!rfidHandler.isInitialized()) {
+                        rfidHandler.onCreate(this);
+                    } else {
+                        rfidHandler.setResponseHandler(this);
+                    }
+                 } catch (Exception e) {
+                     Log.e("DarBaja", "Error initializing RFID after permission grant", e);
+                 }
+            } else {
+                 Toast.makeText(this, "Permisos necesarios para usar el lector RFID", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 
     @Override
     public void handleTagdata(ReaderTag[] tagData) {

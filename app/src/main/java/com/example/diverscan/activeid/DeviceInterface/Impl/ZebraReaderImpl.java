@@ -1,7 +1,11 @@
 package com.example.diverscan.activeid.DeviceInterface.Impl;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
+import androidx.core.content.ContextCompat;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -74,6 +78,15 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         initSDK();
     }
 
+    private boolean hasPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
+                   ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        }
+    }
+
     private void initSDK() {
         new Thread(() -> {
             if (readers != null) {
@@ -102,17 +115,24 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                     }
                 }
                 
-                if ((availableRFIDReaderList == null || availableRFIDReaderList.isEmpty()) && 
+                if ((availableRFIDReaderList == null || availableRFIDReaderList.isEmpty()) &&
                     (connectionType == ConnectionType.BLUETOOTH || connectionType == ConnectionType.AUTO)) {
-                    
-                    if (readers != null) {
-                        try { readers.Dispose(); } catch (Exception e) {}
+
+                    if (!hasPermissions()) {
+                        Log.w(TAG, "Missing Bluetooth permissions. Skipping Bluetooth reader search.");
+                        if (connectionType == ConnectionType.BLUETOOTH) {
+                            notifyError("Faltan permisos de Bluetooth.");
+                        }
+                    } else {
+                        if (readers != null) {
+                            try { readers.Dispose(); } catch (Exception e) {}
+                        }
+                        // Try Bluetooth
+                        Log.d(TAG, "Searching for BLUETOOTH readers...");
+                        readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
+                        availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
+                        Log.d(TAG, "Bluetooth readers found: " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
                     }
-                    // Try Bluetooth
-                    Log.d(TAG, "Searching for BLUETOOTH readers...");
-                    readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
-                    availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                    Log.d(TAG, "Bluetooth readers found: " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
                 }
 
                 if (availableRFIDReaderList != null && !availableRFIDReaderList.isEmpty()) {

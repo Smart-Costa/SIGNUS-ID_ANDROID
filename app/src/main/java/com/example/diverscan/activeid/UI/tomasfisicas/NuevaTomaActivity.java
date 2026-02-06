@@ -48,6 +48,10 @@ import com.google.gson.JsonObject;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
+import android.content.pm.PackageManager;
+import android.Manifest;
+import androidx.core.app.ActivityCompat;
+import android.os.Build;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -325,6 +329,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private static final int PERMISSION_REQUEST_CODE = 100;
+    private boolean isRequestingPermissions = false;
 
 
     @Override
@@ -384,13 +389,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
             initUI();
             
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                if (checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, PERMISSION_REQUEST_CODE);
-                } else {
-                    initRFID();
-                }
-            } else {
+            if (checkPermissions()) {
                 initRFID();
             }
         } catch (Exception e) {
@@ -436,12 +435,47 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+             boolean allGranted = true;
+             for (int result : grantResults) {
+                 if (result != PackageManager.PERMISSION_GRANTED) {
+                     allGranted = false;
+                     break;
+                 }
+             }
+
+            if (allGranted) {
                 initRFID();
             } else {
                 Toast.makeText(this, "Permiso Bluetooth necesario para RFID", Toast.LENGTH_LONG).show();
             }
+            // Reset flag is handled in onResume, but we can also do it here if we want immediate retry capability?
+            // Usually onResume is safer for system dialog interactions.
         }
+    }
+
+    private boolean checkPermissions() {
+        if (isRequestingPermissions) return false;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            boolean missingConnect = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED;
+            boolean missingScan = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED;
+
+            if (missingConnect || missingScan) {
+                isRequestingPermissions = true;
+                ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_SCAN
+                }, PERMISSION_REQUEST_CODE);
+                return false;
+            }
+        } else {
+             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                 isRequestingPermissions = true;
+                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+                 return false;
+             }
+        }
+        return true;
     }
 
     private void validarBaseDeDatosLocal() {
@@ -1863,21 +1897,21 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     private void initRFID() {
         try {
-            rfidHandler = TagWriter.getInstance();
+            if (rfidHandler == null) rfidHandler = TagWriter.getInstance();
             if (!rfidHandler.isInitialized()) {
                 rfidHandler.onCreate(this);
             } else {
                 rfidHandler.setResponseHandler(this);
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error initializing RFID", e);
-            Toast.makeText(this, "Error RFID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error inicializando RFID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        isRequestingPermissions = false;
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
         }
