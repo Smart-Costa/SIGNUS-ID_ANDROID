@@ -70,7 +70,7 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        checkPermissions();
+        // checkPermissions(); // Removed to avoid double check with onResume
         
         controles(view);
 

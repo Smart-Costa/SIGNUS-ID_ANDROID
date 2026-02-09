@@ -136,10 +136,46 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 }
 
                 if (availableRFIDReaderList != null && !availableRFIDReaderList.isEmpty()) {
-                    readerDevice = availableRFIDReaderList.get(0);
-                    reader = readerDevice.getRFIDReader();
-                    Log.d(TAG, "Reader selected: " + readerDevice.getName() + " Address: " + readerDevice.getAddress());
-                    connect();
+                    boolean connected = false;
+                    for (int i = 0; i < availableRFIDReaderList.size(); i++) {
+                        ReaderDevice device = availableRFIDReaderList.get(i);
+                        readerDevice = device;
+                        reader = readerDevice.getRFIDReader();
+                        Log.d(TAG, "Attempting connection to: " + readerDevice.getName() + " Address: " + readerDevice.getAddress());
+                        
+                        boolean deviceConnected = false;
+                        int maxRetries = 3;
+                        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+                             if (attempt > 1) Log.d(TAG, "Retrying connection... Attempt " + attempt);
+                             
+                             // Try to pause briefly to let BT stack settle
+                             try { Thread.sleep(1500); } catch (InterruptedException e) {}
+
+                             // Suppress error unless it's the last retry of the last device
+                             boolean isLastDevice = (i == availableRFIDReaderList.size() - 1);
+                             boolean isLastRetry = (attempt == maxRetries);
+                             boolean suppressError = !(isLastDevice && isLastRetry);
+
+                             if (connect(suppressError)) { 
+                                 deviceConnected = true;
+                                 break;
+                             } else {
+                                 Log.w(TAG, "Failed to connect to: " + readerDevice.getName() + " (Attempt " + attempt + ")");
+                                 try {
+                                     if (reader != null) reader.disconnect();
+                                 } catch (Exception e) {}
+                             }
+                        }
+
+                        if (deviceConnected) {
+                            connected = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!connected) {
+                        Log.e(TAG, "All connection attempts failed.");
+                    }
                 } else {
                     String msg = "No se encontraron lectores Zebra (" + connectionType + ").";
                     Log.w(TAG, msg);
@@ -154,10 +190,15 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public boolean connect() {
+        return connect(false);
+    }
+
+    private boolean connect(boolean suppressError) {
         if (reader != null) {
             try {
                 if (!reader.isConnected()) {
                     Log.d(TAG, "Connecting to reader: " + reader.getHostName());
+                    try { reader.disconnect(); } catch (Exception e) {} // Safety disconnect
                     reader.connect();
                     Log.d(TAG, "Connected. Configuring reader...");
                     configureReader();
@@ -169,8 +210,18 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                     return true;
                 }
             } catch (InvalidUsageException | OperationFailureException e) {
-                Log.e(TAG, "Error connecting/configuring reader", e);
-                notifyError("Error conectando: " + e.getMessage());
+                Log.e(TAG, "Error connecting/configuring reader: " + e.getMessage(), e);
+                try { reader.disconnect(); } catch (Exception ex) {}
+                
+                // If this is a fatal error, we might need to invalidate the readers instance
+                // But we can't do it easily here without affecting the caller loop.
+                // The caller loop (initSDK) handles retries.
+                
+                if (!suppressError) {
+                    String errorMsg = e.getMessage();
+                    if (errorMsg == null) errorMsg = e.toString();
+                    notifyError("Error conectando: " + errorMsg);
+                }
             }
         } else {
              Log.e(TAG, "Connect called but reader object is null");
