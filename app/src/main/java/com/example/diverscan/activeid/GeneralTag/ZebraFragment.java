@@ -58,6 +58,7 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     private RadioButton rbMultiple;
     private TextView txtLogView;
     private StringBuilder logBuilder = new StringBuilder();
+    private boolean isSpinnerInitial = true;
 
     @Nullable
     @Override
@@ -189,6 +190,10 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         spConexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (isSpinnerInitial) {
+                    isSpinnerInitial = false;
+                    return;
+                }
                 String selected = connectionTypes.get(position);
                 Log.d(TAG, "Selección de tipo de conexión cambiada a: " + selected);
                 ConnectionType connType = ConnectionType.valueOf(selected);
