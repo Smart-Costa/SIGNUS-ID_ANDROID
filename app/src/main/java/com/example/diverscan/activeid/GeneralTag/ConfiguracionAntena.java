@@ -152,7 +152,10 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
 
         final List<String> connectionTypes = new java.util.ArrayList<>();
         for (ConnectionType type : ConnectionType.values()) {
-            connectionTypes.add(type.name());
+            // Exclude AUTO to avoid connection errors and force explicit selection
+            if (type != ConnectionType.AUTO) {
+                connectionTypes.add(type.name());
+            }
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(_context,
@@ -162,9 +165,17 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
 
         // Set selection
         String savedConn = SharedPreferencesGetSet.leer_local("connection_type", _context);
-        if (savedConn != null) {
-            int index = connectionTypes.indexOf(savedConn);
-            if (index >= 0) spConexion.setSelection(index);
+        
+        // Default to SERIAL_USB if AUTO or null
+        if (savedConn == null || savedConn.equals(ConnectionType.AUTO.name())) {
+            savedConn = ConnectionType.SERIAL_USB.name();
+        }
+
+        int index = connectionTypes.indexOf(savedConn);
+        if (index >= 0) {
+            spConexion.setSelection(index);
+        } else {
+             spConexion.setSelection(connectionTypes.indexOf(ConnectionType.SERIAL_USB.name()));
         }
 
         spConexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

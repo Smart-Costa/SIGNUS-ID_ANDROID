@@ -133,21 +133,37 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
             }
             rfidHandler.setResponseHandler(this);
             
-            // Force set reader type to ZEBRA when on this tab
-            try {
-                if (rfidHandler.getCurrentReaderType() != com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA) {
-                    String savedConn = SharedPreferencesGetSet.leer_local("connection_type", requireContext());
-                    ConnectionType type = ConnectionType.AUTO;
-                    if (savedConn != null) {
+            // Enforce SERIAL_USB if preference is AUTO or missing
+            String savedConn = SharedPreferencesGetSet.leer_local("connection_type", requireContext());
+            if (savedConn == null || savedConn.equals("AUTO") || savedConn.equals(ConnectionType.AUTO.name())) {
+                 Log.d(TAG, "Enforcing SERIAL_USB default instead of AUTO");
+                 SharedPreferencesGetSet.guardar_local("connection_type", ConnectionType.SERIAL_USB.name(), requireContext());
+                 // Update handler immediately
+                 rfidHandler.setReaderType(com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA, ConnectionType.SERIAL_USB);
+                 
+                 // Update spinner if visible
+                 if (spConexion != null) {
+                     // Re-select SERIAL_USB
+                     for (int i=0; i<spConexion.getAdapter().getCount(); i++) {
+                         if (spConexion.getAdapter().getItem(i).toString().equals(ConnectionType.SERIAL_USB.name())) {
+                             spConexion.setSelection(i);
+                             break;
+                         }
+                     }
+                 }
+            } else {
+                // Force set reader type to ZEBRA when on this tab if different
+                try {
+                    if (rfidHandler.getCurrentReaderType() != com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA) {
+                        ConnectionType type = ConnectionType.SERIAL_USB; 
                         try {
                             type = ConnectionType.valueOf(savedConn);
-                        } catch (IllegalArgumentException e) {
-                            type = ConnectionType.AUTO;
-                        }
+                            if (type == ConnectionType.AUTO) type = ConnectionType.SERIAL_USB;
+                        } catch (IllegalArgumentException e) {}
+                        rfidHandler.setReaderType(com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA, type);
                     }
-                    rfidHandler.setReaderType(com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA, type);
-                }
-            } catch (Exception e) {}
+                } catch (Exception e) {}
+            }
         }
         
         // Attempt connection if needed
@@ -172,7 +188,10 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
 
         final List<String> connectionTypes = new java.util.ArrayList<>();
         for (ConnectionType type : ConnectionType.values()) {
-            connectionTypes.add(type.name());
+            // Exclude AUTO to avoid connection errors and force explicit selection
+            if (type != ConnectionType.AUTO) {
+                connectionTypes.add(type.name());
+            }
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
@@ -182,9 +201,18 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
 
         // Set selection
         String savedConn = SharedPreferencesGetSet.leer_local("connection_type", requireContext());
-        if (savedConn != null) {
-            int index = connectionTypes.indexOf(savedConn);
-            if (index >= 0) spConexion.setSelection(index);
+        
+        // Default to SERIAL_USB if AUTO or null
+        if (savedConn == null || savedConn.equals(ConnectionType.AUTO.name())) {
+            savedConn = ConnectionType.SERIAL_USB.name();
+        }
+
+        int index = connectionTypes.indexOf(savedConn);
+        if (index >= 0) {
+            spConexion.setSelection(index);
+        } else {
+            // Fallback if saved type is invalid or not in list
+            spConexion.setSelection(connectionTypes.indexOf(ConnectionType.SERIAL_USB.name()));
         }
 
         spConexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

@@ -210,7 +210,16 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                     return true;
                 }
             } catch (InvalidUsageException | OperationFailureException e) {
-                Log.e(TAG, "Error connecting/configuring reader: " + e.getMessage(), e);
+                String vendorMsg = "";
+                String results = "";
+                if (e instanceof OperationFailureException) {
+                    vendorMsg = ((OperationFailureException) e).getVendorMessage();
+                    results = ((OperationFailureException) e).getResults().toString();
+                } else if (e instanceof InvalidUsageException) {
+                     vendorMsg = ((InvalidUsageException) e).getVendorMessage();
+                     results = ((InvalidUsageException) e).getInfo();
+                }
+                Log.e(TAG, "Error connecting/configuring reader: " + e.getMessage() + " Vendor: " + vendorMsg + " Results: " + results, e);
                 try { reader.disconnect(); } catch (Exception ex) {}
                 
                 // If this is a fatal error, we might need to invalidate the readers instance
@@ -220,7 +229,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 if (!suppressError) {
                     String errorMsg = e.getMessage();
                     if (errorMsg == null) errorMsg = e.toString();
-                    notifyError("Error conectando: " + errorMsg);
+                    notifyError("Error conectando: " + errorMsg + (vendorMsg != null ? " " + vendorMsg : ""));
                 }
             }
         } else {
