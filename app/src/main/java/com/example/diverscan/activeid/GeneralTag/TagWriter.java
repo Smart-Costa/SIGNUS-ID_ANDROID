@@ -16,7 +16,7 @@ import java.util.List;
 public class TagWriter implements IReaderListener {
     final static String TAG = "RFID_TAG_WRITER";
     Context context;
-    
+
     // Decoupled Device Interface
     private IReaderDevice device;
 
@@ -56,7 +56,7 @@ public class TagWriter implements IReaderListener {
     public void onCreate(ResponseHandlerInterface activity) {
         responseHandlerInterface = activity;
         context = activity.GetContext();
-        
+
         Power = SharedPreferencesGetSet.leer_local("potenciaAntena", context);
         try {
             if (Power != null && !Power.isEmpty()) {
@@ -70,10 +70,11 @@ public class TagWriter implements IReaderListener {
             Power = "270";
             Log.e(TAG, "Error parsing power preference", e);
         }
-        
+
         // Only InitSDK if not initialized or if we want to force a refresh.
-        // But traditionally onCreate implies setup. 
-        // We'll keep InitSDK here for backward compatibility, but updateContext should be used for simple context switches.
+        // But traditionally onCreate implies setup.
+        // We'll keep InitSDK here for backward compatibility, but updateContext should
+        // be used for simple context switches.
         InitSDK();
         initialized = true;
     }
@@ -126,8 +127,8 @@ public class TagWriter implements IReaderListener {
         if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) {
             return ((com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) device).getDiagnosticInfo();
         } else if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminScannerImpl) {
-             // Basic scanner diagnostic
-             return "Diagnóstico Scanner: Activo (Broadcast Mode)";
+            // Basic scanner diagnostic
+            return "Diagnóstico Scanner: Activo (Broadcast Mode)";
         }
         return "Diagnóstico no disponible para este dispositivo.";
     }
@@ -140,7 +141,7 @@ public class TagWriter implements IReaderListener {
         // Load reader type from preferences
         String typeStr = SharedPreferencesGetSet.leer_local("reader_type", context);
         ReaderType type = ReaderType.ZEBRA; // Default
-        
+
         // Load connection type from preferences
         String connStr = SharedPreferencesGetSet.leer_local("connection_type", context);
         ConnectionType connType = ConnectionType.AUTO;
@@ -167,8 +168,8 @@ public class TagWriter implements IReaderListener {
             Log.d(TAG, "Auto-detecting reader. Device Model: " + model);
             if (model != null) {
                 if (model.contains("Lark 1")) {
-                     type = ReaderType.IMIN_SCANNER;
-                     Log.i(TAG, "Auto-detected iMin Lark 1 device (Scanner): " + model);
+                    type = ReaderType.IMIN_SCANNER;
+                    Log.i(TAG, "Auto-detected iMin Lark 1 device (Scanner): " + model);
                 } else if (model.contains("I24P01")) {
                     type = ReaderType.IMIN;
                     Log.i(TAG, "Auto-detected iMin device (RFID): " + model);
@@ -187,7 +188,8 @@ public class TagWriter implements IReaderListener {
     public void setReaderType(ReaderType type, ConnectionType connType) {
         String msg = "Configurando Lector: " + type + " (" + connType + ")";
         Log.i(TAG, msg);
-        if (responseHandlerInterface != null) responseHandlerInterface.SetMessage(msg);
+        if (responseHandlerInterface != null)
+            responseHandlerInterface.SetMessage(msg);
 
         // Dispose existing device if any
         if (device != null) {
@@ -202,26 +204,32 @@ public class TagWriter implements IReaderListener {
         // Use Factory to create new reader
         Log.d(TAG, "Creating new reader instance...");
         device = ReaderFactory.createReader(type, connType, context, this);
-        
+
         // Persist preference
         SharedPreferencesGetSet.guardar_local("reader_type", type.name(), context);
         SharedPreferencesGetSet.guardar_local("connection_type", connType.name(), context);
     }
-    
+
     public ReaderType getCurrentReaderType() {
         if (device != null) {
-             if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminScannerImpl) return ReaderType.IMIN_SCANNER;
-             if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) return ReaderType.IMIN;
-             if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.ZebraReaderImpl) return ReaderType.ZEBRA;
+            if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminScannerImpl)
+                return ReaderType.IMIN_SCANNER;
+            if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl)
+                return ReaderType.IMIN;
+            if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.ZebraReaderImpl)
+                return ReaderType.ZEBRA;
         }
         // Fallback to preference or detection
         String typeStr = SharedPreferencesGetSet.leer_local("reader_type", context);
         if (typeStr != null) {
-             try { return ReaderType.valueOf(typeStr); } catch (Exception e) {}
+            try {
+                return ReaderType.valueOf(typeStr);
+            } catch (Exception e) {
+            }
         }
         return ReaderType.ZEBRA;
     }
-    
+
     // IReaderListener Implementation
     @Override
     public void onConnected(String readerName) {
@@ -271,24 +279,54 @@ public class TagWriter implements IReaderListener {
     }
 
     public void onPause() {
-        // Typically we don't disconnect on pause to keep reader active, 
-        // but if required: disconnect();
+        // Typically don't disconnect on pause to keep reader active
     }
 
     public void onDestroy() {
-        if (device != null) device.dispose();
+        if (device != null)
+            device.dispose();
+    }
+
+    /**
+     * Reconnect: disposes stale device and re-initializes SDK before connecting.
+     * Use this when a previous connection failed and the reader may need
+     * re-discovery.
+     */
+    public synchronized String reconnect() {
+        Log.d(TAG, "reconnect() called - disposing stale device and re-initializing");
+        if (device != null && device.isConnected()) {
+            return "Conectado";
+        }
+        // Dispose stale device and re-initialize
+        if (device != null) {
+            try {
+                device.dispose();
+            } catch (Exception e) {
+                Log.w(TAG, "Error disposing stale device: " + e.getMessage());
+            }
+            device = null;
+        }
+        InitSDK();
+        // Give async init time to discover and connect
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+        }
+        return connect();
     }
 
     private synchronized String connect() {
         if (device != null) {
-            if (device.isConnected()) return "Conectado";
-            if (device.connect()) {
+            if (device.isConnected())
+                return "Conectado";
+            boolean result = device.connect();
+            if (result) {
                 return "Conectado";
             } else {
-                return "Error: Fallo al conectar";
+                return "Error: Fallo al conectar. Reintente o revise el lector.";
             }
         }
-        return "Error: No device";
+        return "Error: No device. Inicializando...";
     }
 
     private synchronized String disconnect() {
@@ -323,14 +361,15 @@ public class TagWriter implements IReaderListener {
             Log.d(TAG, "Delegating stopInventory to device: " + device.getDeviceName());
             device.stopInventory();
         } else {
-             Log.e(TAG, "stopInventory failed: Device is null");
+            Log.e(TAG, "stopInventory failed: Device is null");
         }
     }
 
     public void setAntennaPower(int power) {
-        if (device != null) device.setPower(power);
+        if (device != null)
+            device.setPower(power);
     }
-    
+
     public boolean WriteTag(String SourceEPC, String EPCToWrite) {
         if (device != null) {
             return device.writeTag(SourceEPC, EPCToWrite, _PASSWORD);
@@ -344,19 +383,36 @@ public class TagWriter implements IReaderListener {
     }
 
     public void setAccessOperationConfiguration() {
-        if (device != null) device.setPower(MAX_POWER);
+        if (device != null)
+            device.setPower(MAX_POWER);
     }
-    
+
     // public void setAutoDetect(boolean enable) {} // Removed duplicate
-    public void setTransport(String transport) {} 
-    public void setValidationMode(boolean enabled) {}    public boolean isReaderConnected() {
+    public void setTransport(String transport) {
+    }
+
+    public void setValidationMode(boolean enabled) {
+    }
+
+    public boolean isReaderConnected() {
         return device != null && device.isConnected();
     }
-    
+
     // Testing methods from original file
-    public void Test1() {}
-    public void Test2() {}
-    public void Defaults() {}
-    public void EncenderRFID() { performInventory(); }
-    public void ApagarRFID() { stopInventory(); }
+    public void Test1() {
+    }
+
+    public void Test2() {
+    }
+
+    public void Defaults() {
+    }
+
+    public void EncenderRFID() {
+        performInventory();
+    }
+
+    public void ApagarRFID() {
+        stopInventory();
+    }
 }

@@ -50,8 +50,9 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     private TextView txtResultados;
     private boolean isScanning = false;
     private boolean isRequestingPermissions = false;
+    private android.widget.Toast activeToast = null;
     private java.util.Set<String> uniqueTags = new java.util.HashSet<>();
-    
+
     private TagWriter rfidHandler;
     private RadioGroup rgReadingMode;
     private RadioButton rbSingle;
@@ -62,16 +63,17 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_zebra_config, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
+
         // checkPermissions(); // Removed to avoid double check with onResume
-        
+
         controles(view);
 
         // UI Initialization
@@ -80,7 +82,7 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         }
 
         eventos();
-        
+
         try {
             Power = SharedPreferencesGetSet.leer_local("potenciaAntena", requireContext());
             txtCnfActual.setText("Potencia actual: " + Power);
@@ -109,17 +111,17 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
 
         // Inicializar TagWriter (Singleton)
         rfidHandler = TagWriter.getInstance();
-        
+
         configurarSpinnerConexion();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        
+
         // Reset permission request flag to allow retries if user returns to this screen
         isRequestingPermissions = false;
-        
+
         if (!checkPermissions()) {
             Log.w(TAG, "onResume: Permissions missing, skipping initialization.");
             return;
@@ -127,49 +129,32 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
 
         if (rfidHandler != null) {
             if (!rfidHandler.isInitialized()) {
+                // First-time initialization — use saved preference or default to SERIAL_USB
+                String savedConn = SharedPreferencesGetSet.leer_local("connection_type", requireContext());
+                if (savedConn == null || savedConn.equals(ConnectionType.AUTO.name())) {
+                    savedConn = ConnectionType.SERIAL_USB.name();
+                    SharedPreferencesGetSet.guardar_local("connection_type", savedConn, requireContext());
+                }
                 rfidHandler.onCreate(this);
             } else {
+                // Already initialized — just update the context reference, do NOT re-create
+                // reader
                 rfidHandler.updateContext(this);
             }
             rfidHandler.setResponseHandler(this);
-            
-            // Enforce SERIAL_USB if preference is AUTO or missing
-            String savedConn = SharedPreferencesGetSet.leer_local("connection_type", requireContext());
-            if (savedConn == null || savedConn.equals("AUTO") || savedConn.equals(ConnectionType.AUTO.name())) {
-                 Log.d(TAG, "Enforcing SERIAL_USB default instead of AUTO");
-                 SharedPreferencesGetSet.guardar_local("connection_type", ConnectionType.SERIAL_USB.name(), requireContext());
-                 // Update handler immediately
-                 rfidHandler.setReaderType(com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA, ConnectionType.SERIAL_USB);
-                 
-                 // Update spinner if visible
-                 if (spConexion != null) {
-                     // Re-select SERIAL_USB
-                     for (int i=0; i<spConexion.getAdapter().getCount(); i++) {
-                         if (spConexion.getAdapter().getItem(i).toString().equals(ConnectionType.SERIAL_USB.name())) {
-                             spConexion.setSelection(i);
-                             break;
-                         }
-                     }
-                 }
-            } else {
-                // Force set reader type to ZEBRA when on this tab if different
-                try {
-                    if (rfidHandler.getCurrentReaderType() != com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA) {
-                        ConnectionType type = ConnectionType.SERIAL_USB; 
-                        try {
-                            type = ConnectionType.valueOf(savedConn);
-                            if (type == ConnectionType.AUTO) type = ConnectionType.SERIAL_USB;
-                        } catch (IllegalArgumentException e) {}
-                        rfidHandler.setReaderType(com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA, type);
+
+            // Update spinner selection to match current preference (without triggering
+            // listener)
+            String currentConn = SharedPreferencesGetSet.leer_local("connection_type", requireContext());
+            if (currentConn != null && spConexion != null && spConexion.getAdapter() != null) {
+                isSpinnerInitial = true; // Prevent listener from firing
+                for (int i = 0; i < spConexion.getAdapter().getCount(); i++) {
+                    if (spConexion.getAdapter().getItem(i).toString().equals(currentConn)) {
+                        spConexion.setSelection(i);
+                        break;
                     }
-                } catch (Exception e) {}
+                }
             }
-        }
-        
-        // Attempt connection if needed
-        if (rfidHandler != null && !rfidHandler.isConnected()) {
-             // Optional: Auto-connect if preferred, or just let user click Connect
-             // conectarLector(); 
         }
     }
 
@@ -184,7 +169,8 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     }
 
     private void configurarSpinnerConexion() {
-        if (spConexion == null) return;
+        if (spConexion == null)
+            return;
 
         final List<String> connectionTypes = new java.util.ArrayList<>();
         for (ConnectionType type : ConnectionType.values()) {
@@ -201,7 +187,7 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
 
         // Set selection
         String savedConn = SharedPreferencesGetSet.leer_local("connection_type", requireContext());
-        
+
         // Default to SERIAL_USB if AUTO or null
         if (savedConn == null || savedConn.equals(ConnectionType.AUTO.name())) {
             savedConn = ConnectionType.SERIAL_USB.name();
@@ -225,18 +211,20 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
                 String selected = connectionTypes.get(position);
                 Log.d(TAG, "Selección de tipo de conexión cambiada a: " + selected);
                 ConnectionType connType = ConnectionType.valueOf(selected);
-                
+
                 // Save
                 SharedPreferencesGetSet.guardar_local("connection_type", selected, requireContext());
-                
+
                 // Re-configure TagWriter for ZEBRA
                 Log.d(TAG, "Configurando TagWriter para ZEBRA con Conexión: " + connType);
                 rfidHandler.setReaderType(com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA, connType);
-                // conectarLector(); // Removed auto-connect on spinner change to avoid loops. Use Connect button.
+                // conectarLector(); // Removed auto-connect on spinner change to avoid loops.
+                // Use Connect button.
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
     }
 
@@ -246,18 +234,18 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... voids) {
-                if (getActivity() == null) return "Error: Activity is null";
+                if (getActivity() == null)
+                    return "Error: Activity is null";
                 rfidHandler.updateContext(ZebraFragment.this);
-                return rfidHandler.onResume(); // Calls connect()
+                // Use reconnect() for proper re-initialization when reader is stale/null
+                return rfidHandler.reconnect();
             }
 
             @Override
             protected void onPostExecute(String result) {
                 Log.d(TAG, "Resultado conexión: " + result);
                 if (getContext() != null) {
-                    Toast.makeText(getContext(),
-                            result.isEmpty() ? "Lector ya conectado" : result,
-                            Toast.LENGTH_SHORT).show();
+                    showToast(result.isEmpty() ? "Lector ya conectado" : result);
                     if (result.contains("Conectado")) {
                         txtCnfActual.setText("Estado: " + result);
                     }
@@ -266,26 +254,26 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         }.execute();
     }
 
-    public void controles(View view){
-         txtPotencia = view.findViewById(R.id.txtPotencia);
-         skPotencia = view.findViewById(R.id.skPotencia);
-         pgPotencia = view.findViewById(R.id.progressBar);
-         txtPorcentaje = view.findViewById(R.id.txtPorcentaje);
-         txtCnfActual = view.findViewById(R.id.txtUltimaConfiguracion);
-         spConexion = view.findViewById(R.id.spinnerConexion);
-         btnConectar = view.findViewById(R.id.btnConectar);
-         btnTest = view.findViewById(R.id.btnTestLectura);
-         txtResultados = view.findViewById(R.id.txtResultados);
-         
-         txtLogView = view.findViewById(R.id.txtLogView);
-         rgReadingMode = view.findViewById(R.id.rgReadingMode);
-         rbSingle = view.findViewById(R.id.rbSingle);
-         rbMultiple = view.findViewById(R.id.rbMultiple);
+    public void controles(View view) {
+        txtPotencia = view.findViewById(R.id.txtPotencia);
+        skPotencia = view.findViewById(R.id.skPotencia);
+        pgPotencia = view.findViewById(R.id.progressBar);
+        txtPorcentaje = view.findViewById(R.id.txtPorcentaje);
+        txtCnfActual = view.findViewById(R.id.txtUltimaConfiguracion);
+        spConexion = view.findViewById(R.id.spinnerConexion);
+        btnConectar = view.findViewById(R.id.btnConectar);
+        btnTest = view.findViewById(R.id.btnTestLectura);
+        txtResultados = view.findViewById(R.id.txtResultados);
+
+        txtLogView = view.findViewById(R.id.txtLogView);
+        rgReadingMode = view.findViewById(R.id.rgReadingMode);
+        rbSingle = view.findViewById(R.id.rbSingle);
+        rbMultiple = view.findViewById(R.id.rbMultiple);
     }
 
-    public void eventos(){
+    public void eventos() {
         skPotencia.setOnSeekBarChangeListener(OnSeekPotencia);
-        
+
         btnConectar.setOnClickListener(v -> conectarLector());
 
         btnTest.setOnClickListener(new View.OnClickListener() {
@@ -307,9 +295,9 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         });
     }
 
-    public SeekBar.OnSeekBarChangeListener OnSeekPotencia = new SeekBar.OnSeekBarChangeListener(){
+    public SeekBar.OnSeekBarChangeListener OnSeekPotencia = new SeekBar.OnSeekBarChangeListener() {
         @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             txtPorcentaje.setText("" + progress);
             potenciaAntena = txtPorcentaje.getText().toString();
             if (getContext() != null) {
@@ -318,7 +306,8 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         }
 
         @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {}
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
@@ -330,12 +319,28 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     };
 
     private void logToView(String msg) {
-        if (getActivity() == null || txtLogView == null) return;
+        if (getActivity() == null || txtLogView == null)
+            return;
         getActivity().runOnUiThread(() -> {
-            String timestamp = new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(new java.util.Date());
+            String timestamp = new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                    .format(new java.util.Date());
             logBuilder.insert(0, timestamp + ": " + msg + "\n");
             txtLogView.setText(logBuilder.toString());
         });
+    }
+
+    /**
+     * Debounced Toast: cancels previous toast before showing a new one
+     * to prevent Android's 5-toast queue overflow.
+     */
+    private void showToast(String msg) {
+        if (getContext() == null)
+            return;
+        if (activeToast != null) {
+            activeToast.cancel();
+        }
+        activeToast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
+        activeToast.show();
     }
 
     @Override
@@ -343,10 +348,10 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         logToView(msg);
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
-                 Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-                 if (msg.startsWith("Conectado")) {
-                     txtCnfActual.setText("Estado: " + msg);
-                 }
+                showToast(msg);
+                if (msg.startsWith("Conectado")) {
+                    txtCnfActual.setText("Estado: " + msg);
+                }
             });
         }
     }
@@ -398,12 +403,12 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
 
                         // Handle Single Read Mode
                         if (rgReadingMode != null && rgReadingMode.getCheckedRadioButtonId() == R.id.rbSingle) {
-                             if (isScanning) {
-                                 Log.d(TAG, "Lectura Sencilla: Deteniendo inventario tras leer tags.");
-                                 rfidHandler.stopInventory();
-                                 isScanning = false;
-                                 btnTest.setText("Probar Lectura");
-                             }
+                            if (isScanning) {
+                                Log.d(TAG, "Lectura Sencilla: Deteniendo inventario tras leer tags.");
+                                rfidHandler.stopInventory();
+                                isScanning = false;
+                                btnTest.setText("Probar Lectura");
+                            }
                         }
                     }
                 });
@@ -419,7 +424,8 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 100) {
             isRequestingPermissions = false;
@@ -450,25 +456,28 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            boolean missingConnect = androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED;
-            boolean missingScan = androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_SCAN) != android.content.pm.PackageManager.PERMISSION_GRANTED;
+            boolean missingConnect = androidx.core.content.ContextCompat.checkSelfPermission(requireContext(),
+                    android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED;
+            boolean missingScan = androidx.core.content.ContextCompat.checkSelfPermission(requireContext(),
+                    android.Manifest.permission.BLUETOOTH_SCAN) != android.content.pm.PackageManager.PERMISSION_GRANTED;
 
             if (missingConnect || missingScan) {
                 Log.w(TAG, "Bluetooth permissions missing (Android 12+). Requesting...");
                 isRequestingPermissions = true;
-                requestPermissions(new String[]{
-                    android.Manifest.permission.BLUETOOTH_CONNECT,
-                    android.Manifest.permission.BLUETOOTH_SCAN
+                requestPermissions(new String[] {
+                        android.Manifest.permission.BLUETOOTH_CONNECT,
+                        android.Manifest.permission.BLUETOOTH_SCAN
                 }, 100);
                 return false;
             }
         } else {
-             if (androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                 Log.w(TAG, "Location permission missing (Legacy Bluetooth). Requesting...");
-                 isRequestingPermissions = true;
-                 requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
-                 return false;
-             }
+            if (androidx.core.content.ContextCompat.checkSelfPermission(requireContext(),
+                    android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                Log.w(TAG, "Location permission missing (Legacy Bluetooth). Requesting...");
+                isRequestingPermissions = true;
+                requestPermissions(new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION }, 100);
+                return false;
+            }
         }
         return true;
     }

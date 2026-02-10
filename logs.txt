@@ -1,77 +1,221 @@
-2026-01-16 10:23:41.445 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
-2026-01-16 10:23:41.446 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_USB
-2026-01-16 10:23:41.448 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
-2026-01-16 10:23:41.451 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
-2026-01-16 10:23:41.451 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_USB
-2026-01-16 10:23:41.454 25463-25532 protocol val is         com.example.diverscan.activeid       E  ASCII
-2026-01-16 10:23:41.454 25463-25532 IRFIDError              com.example.diverscan.activeid       D  RfidUsbMgr: connection failed: device not found
-2026-01-16 10:23:41.454 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  GetAvailableRFIDReaderList returned 0 devices
-2026-01-16 10:23:41.482 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
-2026-01-16 10:23:41.484 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.
-
---------- beginning of main
---------- beginning of system
-2026-01-16 10:26:20.883  1395-2566  ActivityTaskManager     system_server                        I  START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.example.diverscan.activeid/.UI.main.MainActivity} from uid 10264
-2026-01-16 10:26:20.917  2526-6856  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
-2026-01-16 10:26:20.918  1395-4088  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 25463
-2026-01-16 10:26:20.927  5650-6598  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
-2026-01-16 10:26:20.928  1395-4088  CoreBackPreview         system_server                        D  Window{7073de0 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback null
-2026-01-16 10:26:20.931  1395-4088  InputManager-JNI        system_server                        W  Input channel object '7073de0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity (client)' was disposed without first being removed with the input manager!
-2026-01-16 10:26:20.935  1395-1870  UsageStatsService       system_server                        W  Unexpected activity event reported! (com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity event : 23 instanceId : 195633162)
-2026-01-16 10:26:20.979  1395-9314  CoreBackPreview         system_server                        D  Window{561604e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@a17827c, mPriority=0}
-2026-01-16 10:26:20.987 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-01-16 10:26:21.015 25463-25494 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-01-16 10:26:21.017 25463-25463 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.193.11.135:70/ApiHH/Api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
-2026-01-16 10:26:21.021  1395-1850  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.main.MainActivity: +137ms
-2026-01-16 10:26:21.149 13178-13178 GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1349 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-01-16 10:26:21.520 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000072726c6e40 (RippleDrawable) with handle 0xb40000718266d460
-2026-01-16 10:26:21.530  1395-2905  CoreBackPreview         system_server                        D  Window{422e00f u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback null
-2026-01-16 10:26:21.531  1395-2905  InputManager-JNI        system_server                        W  Input channel object '422e00f com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity (client)' was disposed without first being removed with the input manager!
-2026-01-16 10:26:21.556 25463-25463 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 4789 (21%)
-2026-01-16 10:26:21.556 25463-25463 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 4789 from 4789 (100%)
-2026-01-16 10:26:28.455 25463-25463 OnBackInvokedCallback   com.example.diverscan.activeid       W  OnBackInvokedCallback is not enabled for the application.
+2026-02-10 08:59:28.800  1885-10072 ActivityManager         system_server                        W  Invalid packageName: com.example.diverscan.activeid
+2026-02-10 08:59:29.963  3737-3737  Finsky                  com.android.vending                  I  [2] VerifyApps: Install-time verification requested for package com.example.diverscan.activeid, PackageManager id = 3, Verifier id = f8fed2a6-4391-4b18-a3a2-5403d7e1856a
+2026-02-10 08:59:30.010  3737-11549 Finsky                  com.android.vending                  I  [258] VerifyApps: Anti-malware verification task started for package=com.example.diverscan.activeid
+2026-02-10 08:59:30.143  3737-11549 Finsky                  com.android.vending                  I  [258] VerifyApps: chooseScanResult for package=com.example.diverscan.activeid with timeout=15000ms
+2026-02-10 08:59:30.144  3737-4310  Finsky                  com.android.vending                  I  [64] VerifyApps: Starting APK Analysis scan for com.example.diverscan.activeid.
+2026-02-10 08:59:30.144  3737-4310  Finsky                  com.android.vending                  I  [64] Scanning package com.example.diverscan.activeid contents with client side protections. File: [a8o30sv23L7k0Y8MbPU7_7CHltesiJAAEMLdZYsiNsA]
+2026-02-10 08:59:30.752  3737-11550 Finsky                  com.android.vending                  I  [259] VerifyApps: Verification package=com.example.diverscan.activeid, id=3, response=0, upload_requested=false, enable_ecm=false
+2026-02-10 08:59:30.770  3737-11550 Finsky                  com.android.vending                  I  [259] VerifyApps: PAM result saving to datastore delayed for package: com.example.diverscan.activeid
+2026-02-10 08:59:31.601  3737-4258  Finsky                  com.android.vending                  I  [55] VerifyApps: APK Analysis scan finished for com.example.diverscan.activeid. Verdict: SAFE
+2026-02-10 08:59:31.604  3737-11549 Finsky                  com.android.vending                  I  [258] VerifyApps: ScanResultPicker returned for package=com.example.diverscan.activeid: SAFE
+2026-02-10 08:59:31.604  3737-11549 Finsky                  com.android.vending                  I  [258] VerifyApps: chooseScanResult returning verdict SAFE for package=com.example.diverscan.activeid
+2026-02-10 08:59:31.621  3737-3737  Finsky                  com.android.vending                  I  [2] VerifyApps: Install-time verification complete: id=3, package_name=com.example.diverscan.activeid
+2026-02-10 08:59:31.646  1885-1992  OsxLiteManager          system_server                        D  isAppWhiteList pkgName :: com.example.diverscan.activeid
+2026-02-10 08:59:31.646  1885-1992  OsxLiteManager          system_server                        D  isAppWhiteList pkgName :: com.example.diverscan.activeid
+2026-02-10 08:59:31.728  1885-1992  BackupManagerService    system_server                        V  [UserID:0] restoreAtInstall pkg=com.example.diverscan.activeid token=a restoreSet=0
+2026-02-10 08:59:31.729  1885-1992  OsxLiteManager          system_server                        D  isAppWhiteList pkgName :: com.example.diverscan.activeid
+2026-02-10 08:59:31.751  1885-2177  SdkSandboxManager       system_server                        I  No SDKs used. Skipping SDK data reconcilation for CallingInfo{mUid=10301, mPackageName='com.example.diverscan.activeid, mAppProcessToken='null'}
+2026-02-10 08:59:31.765  5368-5368  ApplicationReceiver     com.symbol.dataanalytics             I  Package name= com.example.diverscan.activeid
+2026-02-10 08:59:31.779  2640-2640  CarrierSvcBindHelper    com.android.phone                    D  onPackageAdded: com.example.diverscan.activeid
+2026-02-10 08:59:31.829  3737-4258  Finsky                  com.android.vending                  I  [55] AIM: AppInfoManager-Perf > OnDeviceAppInfo > cacheHitCount=0, cacheMissCount=1. Missed  in cache (limit 10) : [com.example.diverscan.activeid]
+2026-02-10 08:59:31.888  3602-7383  SQLiteLog               com.qualcomm.qti.workloadclassifier  W  (28) double-quoted string literal: "com.example.diverscan.activeid"
+2026-02-10 08:59:31.900  3120-3242  MPF_JobIntentService    com.symbol.mxmf.proxyframework       I  checkAndgrantPermission com.example.diverscan.activeid
+2026-02-10 08:59:31.929  1885-1989  VerityUtils             system_server                        E  Failed to measure fs-verity, errno 1: /data/app/~~Z7au15NTHFAIkgLjntAwvA==/com.example.diverscan.activeid-9hiKZK0G7U7L6XMgi7bHUA==/base.apk
+2026-02-10 08:59:31.936  2766-11692 ProximityAuth           com.google.android.gms.persistent    I  [RecentAppsMediator] Package added: (user=UserHandle{0}) com.example.diverscan.activeid
+2026-02-10 08:59:31.944  3737-4298  Finsky                  com.android.vending                  I  [61] AIM: AppInfoManager-Perf > ItemModel > CacheSize=0, cacheHitCount=0, cacheMissCount=1, total appsWithNoServerDataCount=0. Missed  in cache (limit 10) : [com.example.diverscan.activeid]
+2026-02-10 08:59:31.945  3737-4258  Finsky                  com.android.vending                  I  [55] ItemStore: Not cached: com.example.diverscan.activeid
+2026-02-10 08:59:32.042  1885-5209  ActivityManager         system_server                        I  Force stopping com.example.diverscan.activeid appid=10301 user=0: from pid 11730
+2026-02-10 08:59:32.048  2640-2640  CarrierSvcBindHelper    com.android.phone                    D  onHandleForceStop: [com.example.diverscan.activeid]
+2026-02-10 08:59:32.178  2640-2640  CarrierSvcBindHelper    com.android.phone                    D  onPackageModified: com.example.diverscan.activeid
+2026-02-10 08:59:32.179  1885-3308  BackupTransportManager  system_server                        W  Package com.example.diverscan.activeid enabled setting: 0
+2026-02-10 08:59:32.191  3737-4298  Finsky                  com.android.vending                  I  [61] AIM: AppInfoManager-Perf > OnDeviceAppInfo > cacheHitCount=0, cacheMissCount=1. Missed  in cache (limit 10) : [com.example.diverscan.activeid]
+2026-02-10 08:59:32.203  3737-4310  Finsky                  com.android.vending                  E  [64] ItemStore: getItems RPC failed for item com.example.diverscan.activeid
+2026-02-10 08:59:32.209  3120-3242  MPF_JobIntentService    com.symbol.mxmf.proxyframework       I  checkAndgrantPermission com.example.diverscan.activeid
+2026-02-10 08:59:32.240  3737-4258  Finsky                  com.android.vending                  I  [55] AIM: AppInfoManager-Perf > ItemModel > CacheSize=0, cacheHitCount=0, cacheMissCount=1, total appsWithNoServerDataCount=0. Missed  in cache (limit 10) : [com.example.diverscan.activeid]
+2026-02-10 08:59:32.243  3737-4316  Finsky                  com.android.vending                  I  [66] ItemStore: Not cached: com.example.diverscan.activeid
+2026-02-10 08:59:32.271  1885-1905  ActivityTaskManager     system_server                        I  START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 cmp=com.example.diverscan.activeid/.UI.splash.SplashActivity} from uid 2000
+2026-02-10 08:59:32.325  1885-10072 CoreBackPreview         system_server                        D  Window{526b7ed u0 Splash Screen com.example.diverscan.activeid}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@92f3e70, mPriority=0}
+2026-02-10 08:59:32.381  1885-1956  ActivityManager         system_server                        I  Start proc 11748:com.example.diverscan.activeid/u0a301 for next-top-activity {com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity}
+2026-02-10 08:59:32.403  3602-7383  SQLiteLog               com.qualcomm.qti.workloadclassifier  W  (28) double-quoted string literal: "com.example.diverscan.activeid"
+2026-02-10 08:59:32.502  2564-7648  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.splash.SplashActivity
+2026-02-10 08:59:32.505  3737-4316  Finsky                  com.android.vending                  E  [66] ItemStore: getItems RPC failed for item com.example.diverscan.activeid
+1969-12-31 18:00:00.000     0-0     <no-tag>                                                     I  ---------------------------- PROCESS STARTED (11748) for package com.example.diverscan.activeid ----------------------------
+2026-02-10 08:59:32.516  7546-7590  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.splash.SplashActivity
+2026-02-10 08:59:32.676 11748-11748 nativeloader            com.example.diverscan.activeid       D  Configuring clns-4 for other apk /data/app/~~Z7au15NTHFAIkgLjntAwvA==/com.example.diverscan.activeid-9hiKZK0G7U7L6XMgi7bHUA==/base.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~Z7au15NTHFAIkgLjntAwvA==/com.example.diverscan.activeid-9hiKZK0G7U7L6XMgi7bHUA==/lib/arm64, permitted_path=/data:/mnt/expand:/data/user/0/com.example.diverscan.activeid
+2026-02-10 08:59:32.682 11748-11748 nativeloader            com.example.diverscan.activeid       D  Load libframework-connectivity-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity.jar: ok
+2026-02-10 08:59:32.684 11748-11748 Perf                    com.example.diverscan.activeid       I  Connecting to perf service.
+2026-02-10 08:59:32.688 11748-11748 GraphicsEnvironment     com.example.diverscan.activeid       V  ANGLE Developer option for 'com.example.diverscan.activeid' set to: 'default'
+2026-02-10 08:59:32.689 11748-11748 GraphicsEnvironment     com.example.diverscan.activeid       V  ANGLE GameManagerService for com.example.diverscan.activeid: false
+2026-02-10 08:59:32.689 11748-11748 GraphicsEnvironment     com.example.diverscan.activeid       V  Updatable production driver is not supported on the device.
+2026-02-10 08:59:32.692 11748-11748 NetworkSecurityConfig   com.example.diverscan.activeid       D  Using Network Security Config from resource network_security_config debugBuild: true
+2026-02-10 08:59:32.694 11748-11748 NetworkSecurityConfig   com.example.diverscan.activeid       D  Using Network Security Config from resource network_security_config debugBuild: true
+2026-02-10 08:59:32.736 11748-11748 AppCompatDelegate       com.example.diverscan.activeid       D  Checking for metadata for AppLocalesMetadataHolderService : Service not found
+2026-02-10 08:59:32.797 11748-11748 erscan.activeid         com.example.diverscan.activeid       I  hiddenapi: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/appcompat/widget/ViewUtils; (domain=app, TargetSdkVersion=34) using reflection: allowed
+2026-02-10 08:59:32.819  1885-6117  CoreBackPreview         system_server                        D  Window{a55acec u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@5dfb4a, mPriority=0}
+2026-02-10 08:59:32.841 11748-11768 AdrenoGLES-0            com.example.diverscan.activeid       I  QUALCOMM build                   : a3cdec2236, Ief33eea0db
+                                                                                                    Build Date                       : 08/23/22
+                                                                                                    OpenGL ES Shader Compiler Version: EV031.35.01.12
+                                                                                                    Local Branch                     : 
+                                                                                                    Remote Branch                    : 
+                                                                                                    Remote Branch                    : 
+                                                                                                    Reconstruct Branch               : 
+2026-02-10 08:59:32.841 11748-11768 AdrenoGLES-0            com.example.diverscan.activeid       I  Build Config                     : S P 10.0.7 AArch64
+2026-02-10 08:59:32.841 11748-11768 AdrenoGLES-0            com.example.diverscan.activeid       I  Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+2026-02-10 08:59:32.848 11748-11768 AdrenoGLES-0            com.example.diverscan.activeid       I  PFP: 0x016dc094, ME: 0x00000000
+2026-02-10 08:59:32.864 11748-11768 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-02-10 08:59:32.901 11748-11768 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-02-10 08:59:32.917  1885-1945  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.splash.SplashActivity: +635ms
+2026-02-10 08:59:32.936  2894-2894  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1371 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-02-10 08:59:33.150 11748-11754 erscan.activeid         com.example.diverscan.activeid       I  Compiler allocated 4407KB to compile void android.view.ViewRootImpl.performTraversals()
+2026-02-10 08:59:33.269  1885-6117  CoreBackPreview         system_server                        D  Window{526b7ed u0 Splash Screen com.example.diverscan.activeid EXITING}: Setting back callback null
+2026-02-10 08:59:33.270  1885-10017 InputManager-JNI        system_server                        W  Input channel object '526b7ed Splash Screen com.example.diverscan.activeid (client)' was disposed without first being removed with the input manager!
+2026-02-10 08:59:34.824  1885-10072 ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.login.LoginActivity} from uid 10301
+2026-02-10 08:59:34.834  1885-10013 ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 11748
+2026-02-10 08:59:34.835  2564-7648  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.login.LoginActivity
+2026-02-10 08:59:34.843  7546-7590  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.login.LoginActivity
+2026-02-10 08:59:34.857 11748-11748 Compatibil...geReporter com.example.diverscan.activeid       D  Compat change id reported: 171228096; UID 10301; state: ENABLED
+2026-02-10 08:59:34.875 11748-11748 Compatibil...geReporter com.example.diverscan.activeid       D  Compat change id reported: 210923482; UID 10301; state: ENABLED
+2026-02-10 08:59:35.362  1885-1948  ActivityTaskManager     system_server                        W  Activity top resumed state loss timeout for ActivityRecord{2bf675f u0 com.example.diverscan.activeid/.UI.login.LoginActivity} t85}
+2026-02-10 08:59:35.444 11748-11748 OnBackInvokedCallback   com.example.diverscan.activeid       W  OnBackInvokedCallback is not enabled for the application.
                                                                                                     Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
-2026-01-16 10:26:30.052  1395-4088  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity} from uid 10264
-2026-01-16 10:26:30.090  1395-2905  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 25463
-2026-01-16 10:26:30.095  2526-6856  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
-2026-01-16 10:26:30.098  5650-6598  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
-2026-01-16 10:26:30.137  1395-2566  CoreBackPreview         system_server                        D  Window{acaf26a u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@20147f8, mPriority=0}
-2026-01-16 10:26:30.154 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-01-16 10:26:30.179 25463-25494 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-01-16 10:26:30.194  1395-1850  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity: +138ms
-2026-01-16 10:26:30.363 13178-13178 GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1349 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-01-16 10:26:30.729 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000072726f0bc0 (NavigationMenuItemView) with handle 0xb4000071826aee60
-2026-01-16 10:26:30.729 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000072726ecb60 (NavigationMenuItemView) with handle 0xb40000718267d6f0
-2026-01-16 10:26:35.142 25463-26877 protocol val is         com.example.diverscan.activeid       E  ASCII
-2026-01-16 10:26:35.147 25463-26877 UsbRequestJNI           com.example.diverscan.activeid       D  init
-2026-01-16 10:26:35.154 25463-26878 RFIDSerialIOMgr         com.example.diverscan.activeid       E  Run ending due to exception
-                                                                                                    java.io.IOException: Queueing USB request failed
-                                                                                                    	at com.zebra.rfid.api3.CommonUsbSerialPort.read(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:29)
-                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager.readData(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:12)
-                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager.run(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:49)
-                                                                                                    	at java.lang.Thread.run(Thread.java:1563)
-2026-01-16 10:26:35.803 25463-25463 UsbDeviceConnectionJNI  com.example.diverscan.activeid       D  close
-2026-01-16 10:26:35.809 25463-26879 RFIDSerialIOMgr         com.example.diverscan.activeid       E  Receive thread interrupted
-                                                                                                    java.lang.InterruptedException
-                                                                                                    	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727)
-                                                                                                    	at java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435)
-                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager$1.run(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:3)
-                                                                                                    	at java.lang.Thread.run(Thread.java:1563)
-2026-01-16 10:26:37.162 25463-26899 protocol val is         com.example.diverscan.activeid       E  ASCII
-2026-01-16 10:26:37.166 25463-26899 UsbRequestJNI           com.example.diverscan.activeid       D  init
-2026-01-16 10:26:43.576 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
-2026-01-16 10:26:43.578 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_SERIAL
-2026-01-16 10:26:43.583 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
-2026-01-16 10:26:43.587 25463-26901 RFIDSerialIOMgr         com.example.diverscan.activeid       E  Receive thread interrupted
-                                                                                                    java.lang.InterruptedException
-                                                                                                    	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727)
-                                                                                                    	at java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435)
-                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager$1.run(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:3)
-                                                                                                    	at java.lang.Thread.run(Thread.java:1563)
-2026-01-16 10:26:43.588 25463-26900 RFIDSerialIOMgr         com.example.diverscan.activeid       I  Recieving status mState=STOPPING
-2026-01-16 10:26:43.591 25463-25463 UsbDeviceConnectionJNI  com.example.diverscan.activeid       D  close
-2026-01-16 10:26:43.593 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
-2026-01-16 10:26:43.593 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_SERIAL
-2026-01-16 10:26:43.599 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  GetAvailableRFIDReaderList returned 0 devices
-2026-01-16 10:26:43.611 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
-2026-01-16 10:26:43.612 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.
+2026-02-10 08:59:35.459  1885-6117  CoreBackPreview         system_server                        D  Window{c540a90 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.login.LoginActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@7769ba8, mPriority=0}
+2026-02-10 08:59:35.526 11748-11768 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-02-10 08:59:35.550  1885-10339 ActivityTaskManager     system_server                        W  enqueueAssistContext failed: caller ActivityRecord{2bf675f u0 com.example.diverscan.activeid/.UI.login.LoginActivity} t85} is not current top ActivityRecord{1c992db u0 com.android.launcher3/.uioverrides.QuickstepLauncher} t80}
+2026-02-10 08:59:35.550  1885-10339 AutofillSession         system_server                        W  failed to request autofill data for Token{b86a3fe ActivityRecord{2bf675f u0 com.example.diverscan.activeid/.UI.login.LoginActivity} t85}}
+2026-02-10 08:59:35.721 11748-11768 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-02-10 08:59:35.749  1885-6117  CoreBackPreview         system_server                        D  Window{a55acec u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity}: Setting back callback null
+2026-02-10 08:59:35.752  1885-6117  InputManager-JNI        system_server                        W  Input channel object 'a55acec com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity (client)' was disposed without first being removed with the input manager!
+2026-02-10 08:59:36.181  1885-1992  AppsFilter              system_server                        I  interaction: PackageSetting{9855778 com.example.diverscan.activeid.test/10275} -> PackageSetting{da925fa com.google.android.apps.docs/10179} BLOCKED
+2026-02-10 08:59:36.181  1885-1992  AppsFilter              system_server                        I  interaction: PackageSetting{3f387ab com.example.diverscan.activeid/10301} -> PackageSetting{da925fa com.google.android.apps.docs/10179} BLOCKED
+2026-02-10 08:59:38.345 11748-11748 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 63 from 63 (100%)
+2026-02-10 08:59:38.773 11748-11917 ProfileInstaller        com.example.diverscan.activeid       D  Installing profile for com.example.diverscan.activeid
+2026-02-10 09:00:07.663 11748-11755 erscan.activeid         com.example.diverscan.activeid       W  Cleared Reference was only reachable from finalizer (only reported once)
+2026-02-10 09:01:14.709  1885-2116  CoreBackPreview         system_server                        D  Window{9fc85b9 u0 Splash Screen com.example.diverscan.activeid}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@5f2395f, mPriority=0}
+2026-02-10 09:01:14.735 11748-11748 OnBackInvokedCallback   com.example.diverscan.activeid       W  OnBackInvokedCallback is not enabled for the application.
+                                                                                                    Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+2026-02-10 09:01:14.768 11748-11768 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-02-10 09:01:14.806  2564-7648  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.login.LoginActivity
+2026-02-10 09:01:14.822  7546-7590  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.login.LoginActivity
+2026-02-10 09:01:15.138  1885-4326  CoreBackPreview         system_server                        D  Window{9fc85b9 u0 Splash Screen com.example.diverscan.activeid EXITING}: Setting back callback null
+2026-02-10 09:01:15.139  1885-10691 InputManager-JNI        system_server                        W  Input channel object '9fc85b9 Splash Screen com.example.diverscan.activeid (client)' was disposed without first being removed with the input manager!
+2026-02-10 09:01:15.271  2894-2894  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1371 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-02-10 09:01:15.623 11748-11748 Compatibil...geReporter com.example.diverscan.activeid       D  Compat change id reported: 163400105; UID 10301; state: ENABLED
+2026-02-10 09:01:15.624 11748-11748 InputMethodManager      com.example.diverscan.activeid       D  showSoftInput() view=com.google.android.material.textfield.TextInputEditText{4e6bc1a VFED..CL. .F.P..ID 0,0-864,120 #7f0a0488 app:id/user aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+2026-02-10 09:01:15.645  2894-2894  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1371 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=1, inputTypeString=Normal[], enableLearning=true, autoCorrection=true, autoComplete=true, imeOptions=8000005, privateImeOptions=null, actionName=NEXT, actionLabel=null, initialSelStart=0, initialSelEnd=0, initialCapsMode=0, label=null, fieldId=2131362952, fieldName=null, extras=Bundle[mParcelledData.dataSize=240], hintText=non-empty, hintLocales=[]}}, false)
+2026-02-10 09:01:15.649  2894-2894  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInputView():1459 onStartInputView(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=1, inputTypeString=Normal[], enableLearning=true, autoCorrection=true, autoComplete=true, imeOptions=8000005, privateImeOptions=null, actionName=NEXT, actionLabel=null, initialSelStart=0, initialSelEnd=0, initialCapsMode=0, label=null, fieldId=2131362952, fieldName=null, extras=Bundle[{android.support.text.emoji.emojiCompat_metadataVersion=11, android.support.text.emoji.emojiCompat_replaceAll=false}], hintText=non-empty, hintLocales=[]}}, false)
+2026-02-10 09:01:15.651  2894-2894  AndroidIME              com...gle.android.inputmethod.latin  I  AbstractIme.onActivate():95 LatinIme.onActivate() : EditorInfo = EditorInfo{packageName=com.example.diverscan.activeid, inputType=1, inputTypeString=Normal[], enableLearning=true, autoCorrection=true, autoComplete=true, imeOptions=8000005, privateImeOptions=null, actionName=NEXT, actionLabel=null, initialSelStart=0, initialSelEnd=0, initialCapsMode=0, label=null, fieldId=2131362952, fieldName=null, extras=Bundle[{android.support.text.emoji.emojiCompat_metadataVersion=11, android.support.text.emoji.emojiCompat_replaceAll=false}], hintText=non-empty, hintLocales=[]}, IncognitoMode = false, DeviceLocked = false
+2026-02-10 09:01:15.666 11748-11748 AssistStructure         com.example.diverscan.activeid       I  Flattened final assist data: 2952 bytes, containing 1 windows, 21 views
+2026-02-10 09:01:15.667  1885-10691 ContentCap...serService system_server                        D  Notified activity assist data for activity: Token{b86a3fe ActivityRecord{2bf675f u0 com.example.diverscan.activeid/.UI.login.LoginActivity} t85}} without a session Id
+2026-02-10 09:01:15.709 11748-11748 OnBackInvokedCallback   com.example.diverscan.activeid       W  OnBackInvokedCallback is not enabled for the application.
+                                                                                                    Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+2026-02-10 09:01:15.737 11748-11748 InsetsController        com.example.diverscan.activeid       D  show(ime(), fromIme=true)
+2026-02-10 09:01:17.225 11748-11748 InputMethodManager      com.example.diverscan.activeid       D  showSoftInput() view=com.google.android.material.textfield.TextInputEditText{4e6bc1a VFED..CL. .F.P..ID 0,0-864,120 #7f0a0488 app:id/user aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+2026-02-10 09:01:17.243 11748-11748 InsetsController        com.example.diverscan.activeid       D  show(ime(), fromIme=true)
+2026-02-10 09:01:17.253 11748-11748 AssistStructure         com.example.diverscan.activeid       I  Flattened final assist data: 2952 bytes, containing 1 windows, 21 views
+2026-02-10 09:01:17.254  1885-10072 ContentCap...serService system_server                        D  Notified activity assist data for activity: Token{b86a3fe ActivityRecord{2bf675f u0 com.example.diverscan.activeid/.UI.login.LoginActivity} t85}} without a session Id
+2026-02-10 09:01:20.392  2894-2894  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1371 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=1, inputTypeString=Normal[], enableLearning=true, autoCorrection=true, autoComplete=true, imeOptions=8000005, privateImeOptions=null, actionName=NEXT, actionLabel=null, initialSelStart=7, initialSelEnd=7, initialCapsMode=0, label=null, fieldId=2131362952, fieldName=null, extras=Bundle[mParcelledData.dataSize=240], hintText=non-empty, hintLocales=[]}}, true)
+2026-02-10 09:01:20.393  2894-2894  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInputView():1459 onStartInputView(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=1, inputTypeString=Normal[], enableLearning=true, autoCorrection=true, autoComplete=true, imeOptions=8000005, privateImeOptions=null, actionName=NEXT, actionLabel=null, initialSelStart=7, initialSelEnd=7, initialCapsMode=0, label=null, fieldId=2131362952, fieldName=null, extras=Bundle[{android.support.text.emoji.emojiCompat_metadataVersion=11, android.support.text.emoji.emojiCompat_replaceAll=false}], hintText=non-empty, hintLocales=[]}}, true)
+2026-02-10 09:01:20.410  2894-2894  AndroidIME              com...gle.android.inputmethod.latin  I  AbstractIme.onActivate():95 LatinIme.onActivate() : EditorInfo = EditorInfo{packageName=com.example.diverscan.activeid, inputType=1, inputTypeString=Normal[], enableLearning=true, autoCorrection=true, autoComplete=true, imeOptions=8000005, privateImeOptions=null, actionName=NEXT, actionLabel=null, initialSelStart=7, initialSelEnd=7, initialCapsMode=0, label=null, fieldId=2131362952, fieldName=null, extras=Bundle[{android.support.text.emoji.emojiCompat_metadataVersion=11, android.support.text.emoji.emojiCompat_replaceAll=false}], hintText=non-empty, hintLocales=[]}, IncognitoMode = false, DeviceLocked = false
+2026-02-10 09:01:20.468 11748-11748 InsetsController        com.example.diverscan.activeid       D  show(ime(), fromIme=true)
+2026-02-10 09:01:21.546 11748-11748 LOGIN_APICLIENT         com.example.diverscan.activeid       D  POST http://100.31.144.26:70/ApiHH/Api/auth/login -> {"password":"SmartCosta2026.","username":"Wilbert"}
+2026-02-10 09:01:23.780 11748-11748 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 385 from 385 (100%)
+2026-02-10 09:01:23.794 11748-11748 LOGIN_REPOSITORY        com.example.diverscan.activeid       D  Usuario autenticado: Wilbert ID: b7a40f2e-6623-41ab-be92-12e64845ef90
+2026-02-10 09:01:23.796 11748-11748 LOGIN_AUTHSERVICE       com.example.diverscan.activeid       D  Usuario autenticado: Wilbert ID: b7a40f2e-6623-41ab-be92-12e64845ef90
+2026-02-10 09:01:23.801 11748-11748 Compatibil...geReporter com.example.diverscan.activeid       D  Compat change id reported: 147798919; UID 10301; state: ENABLED
+2026-02-10 09:01:23.811  1885-10072 ActivityTaskManager     system_server                        I  START u0 {flg=0x10008000 cmp=com.example.diverscan.activeid/.UI.main.MainActivity} from uid 10301
+2026-02-10 09:01:23.842  2564-7648  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
+2026-02-10 09:01:23.843  1885-2116  ActivityTaskManager     system_server                        W  Duplicate finish request for r=ActivityRecord{2bf675f u0 com.example.diverscan.activeid/.UI.login.LoginActivity} t85 f}}
+2026-02-10 09:01:23.846  1885-10017 ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 11748
+2026-02-10 09:01:23.852  7546-7590  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
+2026-02-10 09:01:23.913  1885-2116  CoreBackPreview         system_server                        D  Window{6d85490 u0 Splash Screen com.example.diverscan.activeid}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@81629bc, mPriority=0}
+2026-02-10 09:01:23.973 11748-11748 erscan.activeid         com.example.diverscan.activeid       I  Waiting for a blocking GC ClassLinker
+2026-02-10 09:01:23.996 11748-11748 erscan.activeid         com.example.diverscan.activeid       I  WaitForGcToComplete blocked ClassLinker on Background for 22.790ms
+2026-02-10 09:01:24.015 11748-11748 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://100.31.144.26:70/ApiHH/Api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
+2026-02-10 09:01:24.018  1885-4326  CoreBackPreview         system_server                        D  Window{6ec4e3e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@11579ec, mPriority=0}
+2026-02-10 09:01:24.027 11748-11768 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-02-10 09:01:24.175 11748-11768 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-02-10 09:01:24.203  1885-1945  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.main.MainActivity: +373ms
+2026-02-10 09:01:24.249 11748-11748 OnBackInvokedCallback   com.example.diverscan.activeid       W  OnBackInvokedCallback is not enabled for the application.
+                                                                                                    Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+2026-02-10 09:01:24.354 11748-11748 RemoteInpu...ectionImpl com.example.diverscan.activeid       W  requestCursorAnchorInfo on inactive InputConnection
+2026-02-10 09:01:24.361  2894-2894  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1371 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-02-10 09:01:24.365 11748-11748 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 1649 (62%)
+2026-02-10 09:01:24.415 11748-11748 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
+2026-02-10 09:01:24.523  1885-1906  CoreBackPreview         system_server                        D  Window{c540a90 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.login.LoginActivity}: Setting back callback null
+2026-02-10 09:01:24.523  1885-4326  InputManager-JNI        system_server                        W  Input channel object 'c540a90 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.login.LoginActivity (client)' was disposed without first being removed with the input manager!
+2026-02-10 09:01:24.557  1885-10072 CoreBackPreview         system_server                        D  Window{6d85490 u0 Splash Screen com.example.diverscan.activeid EXITING}: Setting back callback null
+2026-02-10 09:01:24.558  1885-2116  InputManager-JNI        system_server                        W  Input channel object '6d85490 Splash Screen com.example.diverscan.activeid (client)' was disposed without first being removed with the input manager!
+2026-02-10 09:01:26.432  1885-10072 NotificationService     system_server                        W  Toast already killed. pkg=com.example.diverscan.activeid token=android.os.BinderProxy@ce63705
+2026-02-10 09:01:27.448 11748-11748 OnBackInvokedCallback   com.example.diverscan.activeid       W  OnBackInvokedCallback is not enabled for the application.
+                                                                                                    Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+2026-02-10 09:01:29.903 11748-11748 OnBackInvokedCallback   com.example.diverscan.activeid       W  OnBackInvokedCallback is not enabled for the application.
+                                                                                                    Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+2026-02-10 09:01:30.875  1885-4326  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.GeneralTag.ConfigurationReaderActivity} from uid 10301
+2026-02-10 09:01:30.911  2564-7648  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.GeneralTag.ConfigurationReaderActivity
+2026-02-10 09:01:30.915  7546-7590  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.GeneralTag.ConfigurationReaderActivity
+2026-02-10 09:01:30.942  1885-10072 ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 11748
+2026-02-10 09:01:31.009  1885-10072 CoreBackPreview         system_server                        D  Window{a26c3b2 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.GeneralTag.ConfigurationReaderActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@a1f6e80, mPriority=0}
+2026-02-10 09:01:31.027 11748-11768 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-02-10 09:01:31.117 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       D  Checking permissions...
+2026-02-10 09:01:31.118 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       W  Bluetooth permissions missing (Android 12+). Requesting...
+2026-02-10 09:01:31.142 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       W  onResume: Permissions missing, skipping initialization.
+2026-02-10 09:01:31.187 11748-11768 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-02-10 09:01:31.851 11748-11768 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb400007081ce06d0 (NavigationMenuItemView) with handle 0xb400006f91cfdb30
+2026-02-10 09:01:31.851 11748-11768 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb400007081cff010 (NavigationMenuItemView) with handle 0xb400006f91cfc3f0
+2026-02-10 09:01:32.602  2280-2280  GrantPermi...sViewModel com....android.permissioncontroller  I  Logged buttons presented and clicked permissionGroupName=android.permission-group.NEARBY_DEVICES uid=10301 package=com.example.diverscan.activeid presentedButtons=9 clickedButton=1 isPermissionRationaleShown=false sessionId=-3093369269992141213 targetSdk=34 prompt=BASIC initialLocationPrecision=0 selectedLocationPrecision=0 locationAccuracyButtonClicked= false
+2026-02-10 09:01:32.610  2280-2280  GrantPermi...sViewModel com....android.permissioncontroller  I  Permission grant result requestId=-3093369269992141213 callingUid=10301 callingPackage=com.example.diverscan.activeid permission=android.permission.BLUETOOTH_CONNECT isImplicit=false result=4 isPermissionRationaleShown=falseisPackageRestrictedByEnhancedConfirmation=false
+2026-02-10 09:01:32.610  2280-2280  GrantPermi...sViewModel com....android.permissioncontroller  I  Permission grant result requestId=-3093369269992141213 callingUid=10301 callingPackage=com.example.diverscan.activeid permission=android.permission.BLUETOOTH_SCAN isImplicit=false result=4 isPermissionRationaleShown=falseisPackageRestrictedByEnhancedConfirmation=false
+2026-02-10 09:01:32.647 11748-11748 Compatibil...geReporter com.example.diverscan.activeid       D  Compat change id reported: 78294732; UID 10301; state: ENABLED
+2026-02-10 09:01:32.650 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       D  Permissions granted. Retrying connection...
+2026-02-10 09:01:32.669 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       D  Iniciando tarea de conexión en segundo plano...
+2026-02-10 09:01:32.679 11748-11857 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Context updated for TagWriter
+2026-02-10 09:01:32.679 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       D  Checking permissions...
+2026-02-10 09:01:32.680 11748-11748 RFID_TAG_WRITER         com.example.diverscan.activeid       D  InitSDK - Initializing via Factory
+2026-02-10 09:01:32.684  2564-7648  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.GeneralTag.ConfigurationReaderActivity
+2026-02-10 09:01:32.685 11748-11748 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Auto-detecting reader. Device Model: TC22
+2026-02-10 09:01:32.685 11748-11748 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Inicializando ReaderType: ZEBRA ConnectionType: AUTO
+2026-02-10 09:01:32.685 11748-11748 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Configurando Lector: ZEBRA (AUTO)
+2026-02-10 09:01:32.690 11748-11748 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Creating new reader instance...
+2026-02-10 09:01:32.690 11748-11748 ReaderFactory           com.example.diverscan.activeid       D  createReader called with Type: ZEBRA, ConnectionType: AUTO
+2026-02-10 09:01:32.690 11748-11748 ReaderFactory           com.example.diverscan.activeid       D  Instantiating ZebraReaderImpl
+2026-02-10 09:01:32.693 11748-11748 ReaderFactory           com.example.diverscan.activeid       D  Initializing device: ZebraReaderImpl
+2026-02-10 09:01:32.694 11748-11748 ReaderFactory           com.example.diverscan.activeid       D  Device initialized successfully
+2026-02-10 09:01:32.694  7546-7590  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.GeneralTag.ConfigurationReaderActivity
+2026-02-10 09:01:32.694 11748-12922 ZebraReaderImpl         com.example.diverscan.activeid       D  Searching for SERIAL/USB readers...
+2026-02-10 09:01:32.697 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       D  Enforcing SERIAL_USB default instead of AUTO
+2026-02-10 09:01:32.699 11748-11748 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Configurando Lector: ZEBRA (SERIAL_USB)
+2026-02-10 09:01:32.704 11748-11748 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Disposing previous device...
+2026-02-10 09:01:32.704 11748-11748 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Creating new reader instance...
+2026-02-10 09:01:32.704 11748-11748 ReaderFactory           com.example.diverscan.activeid       D  createReader called with Type: ZEBRA, ConnectionType: SERIAL_USB
+2026-02-10 09:01:32.704 11748-11748 ReaderFactory           com.example.diverscan.activeid       D  Instantiating ZebraReaderImpl
+2026-02-10 09:01:32.704 11748-11748 ReaderFactory           com.example.diverscan.activeid       D  Initializing device: ZebraReaderImpl
+2026-02-10 09:01:32.705 11748-11748 ReaderFactory           com.example.diverscan.activeid       D  Device initialized successfully
+2026-02-10 09:01:32.707 11748-12923 ZebraReaderImpl         com.example.diverscan.activeid       D  Searching for SERIAL/USB readers...
+2026-02-10 09:01:32.710 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       D  Resultado conexión: Error: No device
+2026-02-10 09:01:32.725 11748-12923 ZebraReaderImpl         com.example.diverscan.activeid       D  Serial readers found: 0
+2026-02-10 09:01:32.725 11748-12923 ZebraReaderImpl         com.example.diverscan.activeid       W  No se encontraron lectores Zebra (SERIAL_USB).
+2026-02-10 09:01:32.731 11748-11748 RFID_TAG_WRITER         com.example.diverscan.activeid       E  Connection Error: No se encontraron lectores Zebra (SERIAL_USB).
+2026-02-10 09:01:32.735  2894-2894  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1371 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-02-10 09:01:32.771 11748-12922 ZebraReaderImpl         com.example.diverscan.activeid       D  Serial readers found: 0
+2026-02-10 09:01:32.772 11748-12922 ZebraReaderImpl         com.example.diverscan.activeid       D  Searching for BLUETOOTH readers...
+2026-02-10 09:01:32.805 11748-12922 ZebraReaderImpl         com.example.diverscan.activeid       D  Bluetooth readers found: 0
+2026-02-10 09:01:32.805 11748-12922 ZebraReaderImpl         com.example.diverscan.activeid       W  No se encontraron lectores Zebra (AUTO).
+2026-02-10 09:01:32.805 11748-11748 RFID_TAG_WRITER         com.example.diverscan.activeid       E  Connection Error: No se encontraron lectores Zebra (AUTO).
+2026-02-10 09:01:32.829  1885-10098 NotificationService     system_server                        E  Package has already queued 5 toasts. Not showing more. Package=com.example.diverscan.activeid
+2026-02-10 09:01:35.308  1885-10017 NotificationService     system_server                        W  Toast already killed. pkg=com.example.diverscan.activeid token=android.os.BinderProxy@14317ad
+2026-02-10 09:01:37.872  1885-10017 NotificationService     system_server                        W  Toast already killed. pkg=com.example.diverscan.activeid token=android.os.BinderProxy@47929bf
+2026-02-10 09:01:40.480  1885-2364  NotificationService     system_server                        W  Toast already killed. pkg=com.example.diverscan.activeid token=android.os.BinderProxy@879fd24
+2026-02-10 09:01:43.062  1885-6120  NotificationService     system_server                        W  Toast already killed. pkg=com.example.diverscan.activeid token=android.os.BinderProxy@ba53fc1
+2026-02-10 09:01:45.656  1885-6120  NotificationService     system_server                        W  Toast already killed. pkg=com.example.diverscan.activeid token=android.os.BinderProxy@bb528b5
+2026-02-10 09:01:55.429 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       D  Iniciando tarea de conexión en segundo plano...
+2026-02-10 09:01:55.445 11748-11857 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Context updated for TagWriter
+2026-02-10 09:01:55.445 11748-11857 ZebraReaderImpl         com.example.diverscan.activeid       E  Connect called but reader object is null
+2026-02-10 09:01:55.454 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       D  Resultado conexión: Error: Fallo al conectar
+2026-02-10 09:01:57.704 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       D  Iniciando tarea de conexión en segundo plano...
+2026-02-10 09:01:57.719 11748-11857 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Context updated for TagWriter
+2026-02-10 09:01:57.719 11748-11857 ZebraReaderImpl         com.example.diverscan.activeid       E  Connect called but reader object is null
+2026-02-10 09:01:57.721 11748-11748 RFID_CONFIG_ZEBRA       com.example.diverscan.activeid       D  Resultado conexión: Error: Fallo al conectar
+2026-02-10 09:01:58.060  1885-6120  NotificationService     system_server                        W  Toast already killed. pkg=com.example.diverscan.activeid token=android.os.BinderProxy@2806dee
+2026-02-10 09:01:58.146 11748-11768 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-02-10 09:01:58.165 11748-11768 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-02-10 09:02:00.656  1885-4326  NotificationService     system_server                        W  Toast already killed. pkg=com.example.diverscan.activeid token=android.os.BinderProxy@8a2229b

@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet;
 import com.example.diverscan.activeid.DeviceInterface.ConnectionType;
 import com.example.diverscan.activeid.DeviceInterface.IReaderDevice;
@@ -47,16 +49,17 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     private static final String TAG = "ZebraReaderImpl";
     private Context context;
     private IReaderListener listener;
-    
+
     private Readers readers;
     private ArrayList<ReaderDevice> availableRFIDReaderList;
     private ReaderDevice readerDevice;
     private RFIDReader reader;
     private EventHandler eventHandler;
-    
+
     private int maxPower = 270;
     private String readerNamePreference = null; // Can be set if we want to target a specific reader
     private ConnectionType connectionType = ConnectionType.AUTO;
+    private final AtomicBoolean isInitializing = new AtomicBoolean(false);
 
     @Override
     public void setConnectionType(ConnectionType type) {
@@ -74,49 +77,59 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         } catch (NumberFormatException e) {
             maxPower = 270;
         }
-        
+
         initSDK();
     }
 
     private boolean hasPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            return ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
-                   ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
+            return ContextCompat.checkSelfPermission(context,
+                    Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(context,
+                            Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
         } else {
-            return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            return ContextCompat.checkSelfPermission(context,
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         }
     }
 
     private void initSDK() {
+        if (!isInitializing.compareAndSet(false, true)) {
+            Log.w(TAG, "initSDK already in progress, skipping duplicate call.");
+            return;
+        }
         new Thread(() -> {
-            if (readers != null) {
-                try {
-                    Log.d(TAG, "Disposing previous readers instance...");
-                    readers.Dispose();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                readers = null;
-            }
-
             try {
+                if (readers != null) {
+                    try {
+                        Log.d(TAG, "Disposing previous readers instance...");
+                        readers.Dispose();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    readers = null;
+                }
+
                 availableRFIDReaderList = null;
+                reader = null;
+                readerDevice = null;
 
                 // Priority based on ConnectionType
                 if (connectionType == ConnectionType.SERIAL_USB || connectionType == ConnectionType.AUTO) {
-                     // Try Serial (eConnex)
+                    // Try Serial (eConnex)
                     try {
                         Log.d(TAG, "Searching for SERIAL/USB readers...");
                         readers = new Readers(context, ENUM_TRANSPORT.SERVICE_SERIAL);
                         availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                        Log.d(TAG, "Serial readers found: " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
+                        Log.d(TAG, "Serial readers found: "
+                                + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
                     } catch (Exception e) {
-                         Log.e(TAG, "Error checking Serial readers: " + e.getMessage());
+                        Log.e(TAG, "Error checking Serial readers: " + e.getMessage());
                     }
                 }
-                
+
                 if ((availableRFIDReaderList == null || availableRFIDReaderList.isEmpty()) &&
-                    (connectionType == ConnectionType.BLUETOOTH || connectionType == ConnectionType.AUTO)) {
+                        (connectionType == ConnectionType.BLUETOOTH || connectionType == ConnectionType.AUTO)) {
 
                     if (!hasPermissions()) {
                         Log.w(TAG, "Missing Bluetooth permissions. Skipping Bluetooth reader search.");
@@ -125,13 +138,17 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                         }
                     } else {
                         if (readers != null) {
-                            try { readers.Dispose(); } catch (Exception e) {}
+                            try {
+                                readers.Dispose();
+                            } catch (Exception e) {
+                            }
                         }
                         // Try Bluetooth
                         Log.d(TAG, "Searching for BLUETOOTH readers...");
                         readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
                         availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                        Log.d(TAG, "Bluetooth readers found: " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
+                        Log.d(TAG, "Bluetooth readers found: "
+                                + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
                     }
                 }
 
@@ -141,30 +158,38 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                         ReaderDevice device = availableRFIDReaderList.get(i);
                         readerDevice = device;
                         reader = readerDevice.getRFIDReader();
-                        Log.d(TAG, "Attempting connection to: " + readerDevice.getName() + " Address: " + readerDevice.getAddress());
-                        
+                        Log.d(TAG, "Attempting connection to: " + readerDevice.getName() + " Address: "
+                                + readerDevice.getAddress());
+
                         boolean deviceConnected = false;
                         int maxRetries = 3;
                         for (int attempt = 1; attempt <= maxRetries; attempt++) {
-                             if (attempt > 1) Log.d(TAG, "Retrying connection... Attempt " + attempt);
-                             
-                             // Try to pause briefly to let BT stack settle
-                             try { Thread.sleep(1500); } catch (InterruptedException e) {}
+                            if (attempt > 1)
+                                Log.d(TAG, "Retrying connection... Attempt " + attempt);
 
-                             // Suppress error unless it's the last retry of the last device
-                             boolean isLastDevice = (i == availableRFIDReaderList.size() - 1);
-                             boolean isLastRetry = (attempt == maxRetries);
-                             boolean suppressError = !(isLastDevice && isLastRetry);
+                            // Pause briefly to let BT stack settle
+                            try {
+                                Thread.sleep(1500);
+                            } catch (InterruptedException e) {
+                            }
 
-                             if (connect(suppressError)) { 
-                                 deviceConnected = true;
-                                 break;
-                             } else {
-                                 Log.w(TAG, "Failed to connect to: " + readerDevice.getName() + " (Attempt " + attempt + ")");
-                                 try {
-                                     if (reader != null) reader.disconnect();
-                                 } catch (Exception e) {}
-                             }
+                            // Suppress error unless it's the last retry of the last device
+                            boolean isLastDevice = (i == availableRFIDReaderList.size() - 1);
+                            boolean isLastRetry = (attempt == maxRetries);
+                            boolean suppressError = !(isLastDevice && isLastRetry);
+
+                            if (connectInternal(suppressError)) {
+                                deviceConnected = true;
+                                break;
+                            } else {
+                                Log.w(TAG, "Failed to connect to: " + readerDevice.getName() + " (Attempt " + attempt
+                                        + ")");
+                                try {
+                                    if (reader != null)
+                                        reader.disconnect();
+                                } catch (Exception e) {
+                                }
+                            }
                         }
 
                         if (deviceConnected) {
@@ -172,7 +197,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                             break;
                         }
                     }
-                    
+
                     if (!connected) {
                         Log.e(TAG, "All connection attempts failed.");
                     }
@@ -184,21 +209,32 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
             } catch (Exception e) {
                 Log.e(TAG, "Error inicializando SDK: " + e.getMessage(), e);
                 notifyError("Error inicializando SDK: " + e.getMessage());
+            } finally {
+                isInitializing.set(false);
             }
         }).start();
     }
 
     @Override
     public boolean connect() {
-        return connect(false);
+        if (reader == null) {
+            Log.w(TAG, "Reader is null. Attempting re-initialization...");
+            notifyError("Buscando lectores...");
+            initSDK(); // Re-discover devices asynchronously
+            return false; // Will connect via initSDK flow
+        }
+        return connectInternal(false);
     }
 
-    private boolean connect(boolean suppressError) {
+    private boolean connectInternal(boolean suppressError) {
         if (reader != null) {
             try {
                 if (!reader.isConnected()) {
                     Log.d(TAG, "Connecting to reader: " + reader.getHostName());
-                    try { reader.disconnect(); } catch (Exception e) {} // Safety disconnect
+                    try {
+                        reader.disconnect();
+                    } catch (Exception e) {
+                    } // Safety disconnect
                     reader.connect();
                     Log.d(TAG, "Connected. Configuring reader...");
                     configureReader();
@@ -206,7 +242,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                     return true;
                 } else {
                     Log.d(TAG, "Reader already connected: " + reader.getHostName());
-                    notifyConnected(reader.getHostName()); // Already connected
+                    notifyConnected(reader.getHostName());
                     return true;
                 }
             } catch (InvalidUsageException | OperationFailureException e) {
@@ -216,65 +252,67 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                     vendorMsg = ((OperationFailureException) e).getVendorMessage();
                     results = ((OperationFailureException) e).getResults().toString();
                 } else if (e instanceof InvalidUsageException) {
-                     vendorMsg = ((InvalidUsageException) e).getVendorMessage();
-                     results = ((InvalidUsageException) e).getInfo();
+                    vendorMsg = ((InvalidUsageException) e).getVendorMessage();
+                    results = ((InvalidUsageException) e).getInfo();
                 }
-                Log.e(TAG, "Error connecting/configuring reader: " + e.getMessage() + " Vendor: " + vendorMsg + " Results: " + results, e);
-                try { reader.disconnect(); } catch (Exception ex) {}
-                
-                // If this is a fatal error, we might need to invalidate the readers instance
-                // But we can't do it easily here without affecting the caller loop.
-                // The caller loop (initSDK) handles retries.
-                
+                Log.e(TAG, "Error connecting/configuring reader: " + e.getMessage() + " Vendor: " + vendorMsg
+                        + " Results: " + results, e);
+                try {
+                    reader.disconnect();
+                } catch (Exception ex) {
+                }
+
                 if (!suppressError) {
                     String errorMsg = e.getMessage();
-                    if (errorMsg == null) errorMsg = e.toString();
+                    if (errorMsg == null)
+                        errorMsg = e.toString();
                     notifyError("Error conectando: " + errorMsg + (vendorMsg != null ? " " + vendorMsg : ""));
                 }
             }
         } else {
-             Log.e(TAG, "Connect called but reader object is null");
+            Log.e(TAG, "Connect called but reader object is null. Re-initializing...");
+            initSDK();
         }
         return false;
     }
 
     private void configureReader() {
         if (reader.isConnected()) {
-             try {
-                 Log.d(TAG, "Setting Trigger Mode to RFID...");
-                 // Restore Trigger Mode configuration
-                 reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, true);
+            try {
+                Log.d(TAG, "Setting Trigger Mode to RFID...");
+                // Restore Trigger Mode configuration
+                reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, true);
 
-                 TriggerInfo triggerInfo = new TriggerInfo();
-                 triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_IMMEDIATE);
-                 triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_IMMEDIATE);
-                 
-                 // Register events
-                 Log.d(TAG, "Registering Events...");
-                 if (eventHandler == null) {
-                     eventHandler = new EventHandler();
-                 }
-                 reader.Events.addEventsListener(eventHandler);
-                 
-                 reader.Events.setHandheldEvent(true);
-                 reader.Events.setTagReadEvent(true);
-                 reader.Events.setAttachTagDataWithReadEvent(false);
-                 // reader.Events.setStatusNotifyEvent(true); // Removed as it caused build error
-                 
-                 // Set Power
-                 Log.d(TAG, "Setting Antenna Power: " + maxPower);
-                 Antennas.AntennaRfConfig config = reader.Config.Antennas.getAntennaRfConfig(1);
-                 config.setTransmitPowerIndex(maxPower);
-                 config.setrfModeTableIndex(0);
-                 config.setTari(0);
-                 reader.Config.Antennas.setAntennaRfConfig(1, config);
-                 
-             } catch (InvalidUsageException | OperationFailureException e) {
-                 Log.e(TAG, "Error configuring reader", e);
-             }
+                TriggerInfo triggerInfo = new TriggerInfo();
+                triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_IMMEDIATE);
+                triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_IMMEDIATE);
+
+                // Register events
+                Log.d(TAG, "Registering Events...");
+                if (eventHandler == null) {
+                    eventHandler = new EventHandler();
+                }
+                reader.Events.addEventsListener(eventHandler);
+
+                reader.Events.setHandheldEvent(true);
+                reader.Events.setTagReadEvent(true);
+                reader.Events.setAttachTagDataWithReadEvent(false);
+                // reader.Events.setStatusNotifyEvent(true); // Removed as it caused build error
+
+                // Set Power
+                Log.d(TAG, "Setting Antenna Power: " + maxPower);
+                Antennas.AntennaRfConfig config = reader.Config.Antennas.getAntennaRfConfig(1);
+                config.setTransmitPowerIndex(maxPower);
+                config.setrfModeTableIndex(0);
+                config.setTari(0);
+                reader.Config.Antennas.setAntennaRfConfig(1, config);
+
+            } catch (InvalidUsageException | OperationFailureException e) {
+                Log.e(TAG, "Error configuring reader", e);
+            }
         }
     }
-    
+
     private void configureTrigger(boolean isHandheld) {
         try {
             TriggerInfo triggerInfo = new TriggerInfo();
@@ -314,7 +352,8 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public boolean startInventory() {
-        if (!isConnected()) return false;
+        if (!isConnected())
+            return false;
         try {
             reader.Actions.Inventory.perform();
             return true;
@@ -326,7 +365,8 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public boolean stopInventory() {
-        if (!isConnected()) return false;
+        if (!isConnected())
+            return false;
         try {
             reader.Actions.Inventory.stop();
             return true;
@@ -340,12 +380,13 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public boolean startLocation(String epc) {
-        if (!isConnected()) return false;
+        if (!isConnected())
+            return false;
         currentLocatingEpc = epc;
         try {
             // Disable hardware beeper for software control
             reader.Config.setBeeperVolume(BEEPER_VOLUME.QUIET_BEEP);
-            
+
             reader.Actions.TagLocationing.Perform(epc, null, null);
             return true;
         } catch (InvalidUsageException | OperationFailureException e) {
@@ -356,14 +397,15 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public boolean stopLocation() {
-        if (!isConnected()) return false;
+        if (!isConnected())
+            return false;
         currentLocatingEpc = null;
         try {
             reader.Actions.TagLocationing.Stop();
-            
+
             // Restore hardware beeper
             reader.Config.setBeeperVolume(BEEPER_VOLUME.HIGH_BEEP);
-            
+
             return true;
         } catch (InvalidUsageException | OperationFailureException e) {
             notifyError("Error deteniendo localización: " + e.getMessage());
@@ -399,7 +441,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public boolean writeTag(String sourceEpc, String newEpc, String password) {
-         try {
+        try {
             TagAccess tagAccess = new TagAccess();
             TagAccess.WriteAccessParams writeAccessParams = tagAccess.new WriteAccessParams();
             writeAccessParams.setAccessPassword(Long.parseLong(password != null ? password : "0", 16));
@@ -432,17 +474,17 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     }
 
     // Event Handling
-    
+
     @Override
     public void RFIDReaderAppeared(ReaderDevice readerDevice) {
         // Handle new reader appearing
         // For simplicity, we might auto-connect if not connected
         if (!isConnected()) {
-             new Thread(() -> {
-                 this.readerDevice = readerDevice;
-                 this.reader = readerDevice.getRFIDReader();
-                 connect();
-             }).start();
+            new Thread(() -> {
+                this.readerDevice = readerDevice;
+                this.reader = readerDevice.getRFIDReader();
+                connect();
+            }).start();
         }
     }
 
@@ -467,8 +509,8 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
                     // Filter out invalid reads (Null ID and No Location Info)
                     if (id == null && !tag.isContainsLocationInfo()) {
-                         // Log.w(TAG, "Ignored tag with null ID and no location info. RSSI: " + rssi);
-                         continue;
+                        // Log.w(TAG, "Ignored tag with null ID and no location info. RSSI: " + rssi);
+                        continue;
                     }
 
                     // Handle Locationing Data (Null ID fix)
@@ -486,7 +528,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
                     if (id != null) {
                         // Log.d(TAG, "Tag ID: " + id + " RSSI: " + rssi);
-                        convertedTags.add(new ReaderTag(id, (short)rssi));
+                        convertedTags.add(new ReaderTag(id, (short) rssi));
                     } else {
                         Log.w(TAG, "Tag read with null ID and no current target.");
                     }
@@ -503,16 +545,17 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         public void eventStatusNotify(RfidStatusEvents e) {
             Log.d(TAG, "Zebra Status Event: " + e.StatusEventData.getStatusEventType());
             if (e.StatusEventData.getStatusEventType() == STATUS_EVENT_TYPE.HANDHELD_TRIGGER_EVENT) {
-                boolean pressed = e.StatusEventData.HandheldTriggerEventData.getHandheldEvent() == HANDHELD_TRIGGER_EVENT_TYPE.HANDHELD_TRIGGER_PRESSED;
+                boolean pressed = e.StatusEventData.HandheldTriggerEventData
+                        .getHandheldEvent() == HANDHELD_TRIGGER_EVENT_TYPE.HANDHELD_TRIGGER_PRESSED;
                 if (listener != null) {
-                     new Handler(Looper.getMainLooper()).post(() -> listener.onTrigger(pressed));
+                    new Handler(Looper.getMainLooper()).post(() -> listener.onTrigger(pressed));
                 }
-                
+
                 // Mimic original behavior: start/stop inventory on trigger
                 // if (pressed) {
-                //    startInventory();
+                // startInventory();
                 // } else {
-                //    stopInventory();
+                // stopInventory();
                 // }
             }
         }
@@ -520,14 +563,17 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     // Helpers to notify listener on main thread
     private void notifyConnected(String name) {
-        if (listener != null) new Handler(Looper.getMainLooper()).post(() -> listener.onConnected(name));
+        if (listener != null)
+            new Handler(Looper.getMainLooper()).post(() -> listener.onConnected(name));
     }
 
     private void notifyDisconnected() {
-        if (listener != null) new Handler(Looper.getMainLooper()).post(() -> listener.onDisconnected());
+        if (listener != null)
+            new Handler(Looper.getMainLooper()).post(() -> listener.onDisconnected());
     }
 
     private void notifyError(String msg) {
-        if (listener != null) new Handler(Looper.getMainLooper()).post(() -> listener.onConnectionError(msg));
+        if (listener != null)
+            new Handler(Looper.getMainLooper()).post(() -> listener.onConnectionError(msg));
     }
 }
