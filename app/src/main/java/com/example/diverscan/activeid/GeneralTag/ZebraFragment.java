@@ -342,13 +342,17 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
      * to prevent Android's 5-toast queue overflow.
      */
     private void showToast(String msg) {
-        if (getContext() == null)
-            return;
+        if (getContext() == null) return;
+        
         if (activeToast != null) {
             activeToast.cancel();
         }
-        activeToast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
-        activeToast.show();
+        try {
+            activeToast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
+            activeToast.show();
+        } catch (Exception e) {
+            Log.e(TAG, "Error showing toast: " + e.getMessage());
+        }
     }
 
     @Override
