@@ -105,7 +105,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                         Log.d(TAG, "Disposing previous readers instance...");
                         readers.Dispose();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Log.w(TAG, "Error disposing Zebra readers (safe to ignore): " + e.getMessage());
                     }
                     readers = null;
                 }

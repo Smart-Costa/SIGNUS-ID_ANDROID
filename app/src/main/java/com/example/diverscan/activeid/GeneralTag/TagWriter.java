@@ -12,6 +12,7 @@ import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.DeviceInterface.ReaderType;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TagWriter implements IReaderListener {
     final static String TAG = "RFID_TAG_WRITER";
@@ -19,6 +20,7 @@ public class TagWriter implements IReaderListener {
 
     // Decoupled Device Interface
     private IReaderDevice device;
+    private final AtomicBoolean isInitializing = new AtomicBoolean(false);
 
     private int MAX_POWER = 0;
     private String Power;
@@ -134,51 +136,64 @@ public class TagWriter implements IReaderListener {
     }
 
     public void InitSDK() {
+        if (!isInitializing.compareAndSet(false, true)) {
+            Log.w(TAG, "InitSDK already in progress, skipping duplicate call.");
+            return;
+        }
         Log.d(TAG, "InitSDK - Initializing via Factory");
         if (responseHandlerInterface != null)
             responseHandlerInterface.SetMessage("Iniciando servicio de lectura...");
 
-        // Load reader type from preferences
-        String typeStr = SharedPreferencesGetSet.leer_local("reader_type", context);
-        ReaderType type = ReaderType.ZEBRA; // Default
+        try {
+            // Load reader type from preferences
+            String typeStr = SharedPreferencesGetSet.leer_local("reader_type", context);
+            ReaderType type = ReaderType.ZEBRA; // Default
 
-        // Load connection type from preferences
-        String connStr = SharedPreferencesGetSet.leer_local("connection_type", context);
-        ConnectionType connType = ConnectionType.AUTO;
+            // Load connection type from preferences — default SERIAL_USB (not AUTO)
+            String connStr = SharedPreferencesGetSet.leer_local("connection_type", context);
+            ConnectionType connType = ConnectionType.SERIAL_USB;
 
-        if (connStr != null && !connStr.isEmpty()) {
-            try {
-                connType = ConnectionType.valueOf(connStr);
-            } catch (Exception e) {
-                connType = ConnectionType.AUTO;
-                Log.w(TAG, "Tipo de conexión inválido en preferencias, usando AUTO");
-            }
-        }
-
-        if (typeStr != null && !typeStr.isEmpty()) {
-            try {
-                type = ReaderType.valueOf(typeStr.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                Log.e(TAG, "Invalid reader type: " + typeStr + ", defaulting to ZEBRA");
-                type = ReaderType.ZEBRA;
-            }
-        } else if (autoDetect) {
-            // Auto-detect device model if no preference is set and autoDetect is true
-            String model = android.os.Build.MODEL;
-            Log.d(TAG, "Auto-detecting reader. Device Model: " + model);
-            if (model != null) {
-                if (model.contains("Lark 1")) {
-                    type = ReaderType.IMIN_SCANNER;
-                    Log.i(TAG, "Auto-detected iMin Lark 1 device (Scanner): " + model);
-                } else if (model.contains("I24P01")) {
-                    type = ReaderType.IMIN;
-                    Log.i(TAG, "Auto-detected iMin device (RFID): " + model);
+            if (connStr != null && !connStr.isEmpty()) {
+                try {
+                    connType = ConnectionType.valueOf(connStr);
+                    // Override AUTO with SERIAL_USB (AUTO removed from UI)
+                    if (connType == ConnectionType.AUTO) {
+                        connType = ConnectionType.SERIAL_USB;
+                        SharedPreferencesGetSet.guardar_local("connection_type", connType.name(), context);
+                    }
+                } catch (Exception e) {
+                    connType = ConnectionType.SERIAL_USB;
+                    Log.w(TAG, "Tipo de conexión inválido en preferencias, usando SERIAL_USB");
                 }
             }
-        }
 
-        Log.i(TAG, "Inicializando ReaderType: " + type + " ConnectionType: " + connType);
-        setReaderType(type, connType);
+            if (typeStr != null && !typeStr.isEmpty()) {
+                try {
+                    type = ReaderType.valueOf(typeStr.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    Log.e(TAG, "Invalid reader type: " + typeStr + ", defaulting to ZEBRA");
+                    type = ReaderType.ZEBRA;
+                }
+            } else if (autoDetect) {
+                // Auto-detect device model if no preference is set and autoDetect is true
+                String model = android.os.Build.MODEL;
+                Log.d(TAG, "Auto-detecting reader. Device Model: " + model);
+                if (model != null) {
+                    if (model.contains("Lark 1")) {
+                        type = ReaderType.IMIN_SCANNER;
+                        Log.i(TAG, "Auto-detected iMin Lark 1 device (Scanner): " + model);
+                    } else if (model.contains("I24P01")) {
+                        type = ReaderType.IMIN;
+                        Log.i(TAG, "Auto-detected iMin device (RFID): " + model);
+                    }
+                }
+            }
+
+            Log.i(TAG, "Inicializando ReaderType: " + type + " ConnectionType: " + connType);
+            setReaderType(type, connType);
+        } finally {
+            isInitializing.set(false);
+        }
     }
 
     public void setReaderType(ReaderType type) {
@@ -307,12 +322,17 @@ public class TagWriter implements IReaderListener {
             device = null;
         }
         InitSDK();
-        // Give async init time to discover and connect
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
+        // InitSDK creates device synchronously, initSDK() runs async inside device.
+        // Check if device was created and attempt connect.
+        if (device != null) {
+            if (device.isConnected())
+                return "Conectado";
+            boolean result = device.connect();
+            if (result)
+                return "Conectado";
+            return "Buscando lector... Reintente en unos segundos.";
         }
-        return connect();
+        return "Inicializando lector... Reintente en unos segundos.";
     }
 
     private synchronized String connect() {

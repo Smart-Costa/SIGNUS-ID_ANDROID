@@ -50,7 +50,10 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     private TextView txtResultados;
     private boolean isScanning = false;
     private boolean isRequestingPermissions = false;
+    private volatile boolean isConnecting = false;
     private android.widget.Toast activeToast = null;
+    private long lastErrorTime = 0;
+    private static final long ERROR_THROTTLE_MS = 2000;
     private java.util.Set<String> uniqueTags = new java.util.HashSet<>();
 
     private TagWriter rfidHandler;
@@ -128,7 +131,7 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
         }
 
         if (rfidHandler != null) {
-            if (!rfidHandler.isInitialized()) {
+            if (!rfidHandler.isInitialized() && !isConnecting) {
                 // First-time initialization — use saved preference or default to SERIAL_USB
                 String savedConn = SharedPreferencesGetSet.leer_local("connection_type", requireContext());
                 if (savedConn == null || savedConn.equals(ConnectionType.AUTO.name())) {
@@ -137,8 +140,7 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
                 }
                 rfidHandler.onCreate(this);
             } else {
-                // Already initialized — just update the context reference, do NOT re-create
-                // reader
+                // Already initialized or connecting — just update the context reference
                 rfidHandler.updateContext(this);
             }
             rfidHandler.setResponseHandler(this);
@@ -229,6 +231,11 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
     }
 
     private void conectarLector() {
+        if (isConnecting) {
+            Log.w(TAG, "conectarLector: Already connecting, ignoring.");
+            return;
+        }
+        isConnecting = true;
         Log.d(TAG, "Iniciando tarea de conexión en segundo plano...");
         logToView("Intentando conectar...");
         new AsyncTask<Void, Void, String>() {
@@ -243,6 +250,7 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
 
             @Override
             protected void onPostExecute(String result) {
+                isConnecting = false;
                 Log.d(TAG, "Resultado conexión: " + result);
                 if (getContext() != null) {
                     showToast(result.isEmpty() ? "Lector ya conectado" : result);
@@ -345,6 +353,15 @@ public class ZebraFragment extends Fragment implements ResponseHandlerInterface 
 
     @Override
     public void SetMessage(String msg) {
+        // Rate-limit error messages to avoid Toast overflow from parallel callbacks
+        if (msg != null && (msg.startsWith("Error") || msg.startsWith("No se"))) {
+            long now = System.currentTimeMillis();
+            if (now - lastErrorTime < ERROR_THROTTLE_MS) {
+                Log.d(TAG, "SetMessage throttled: " + msg);
+                return;
+            }
+            lastErrorTime = now;
+        }
         logToView(msg);
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
