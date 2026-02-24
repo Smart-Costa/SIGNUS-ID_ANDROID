@@ -128,11 +128,23 @@ public class TomaFisicaDetallesDao {
         api.<List<TomaFisicaDetallesEntity>>get(endpoint, type, new ApiCallback<List<TomaFisicaDetallesEntity>>() {
             @Override
             public void onComplete(ApiResponse<List<TomaFisicaDetallesEntity>> response) {
-                if (response.success && response.data != null) {
+                boolean isSuccess = response.success;
+                List<TomaFisicaDetallesEntity> dataToProcess = response.data;
+
+                // Manejo especial para 404 "No se encontró detalle" -> Tratar como lista vacía exitosa
+                if (!isSuccess && response.errorMessage != null && 
+                    response.errorMessage.contains("404") && 
+                    (response.errorMessage.contains("No se encontró") || response.errorMessage.contains("No encontrado"))) {
+                    isSuccess = true;
+                    dataToProcess = new ArrayList<>();
+                    Log.w(TAG, "API retornó 404 (Sin detalles) para idToma=" + idToma + ". Se procesa como lista vacía.");
+                }
+
+                if (isSuccess && dataToProcess != null) {
                     List<String> deletedTomas = getPendingDeleteRefIds("TFDetalleByToma");
                     if (deletedTomas != null && !deletedTomas.isEmpty()) {
                         List<TomaFisicaDetallesEntity> filtered = new ArrayList<>();
-                        for (TomaFisicaDetallesEntity item : response.data) {
+                        for (TomaFisicaDetallesEntity item : dataToProcess) {
                             if (item == null) continue;
                             String t = item.getIdToma();
                             if (t != null && containsIgnoreCase(deletedTomas, t.trim())) {
@@ -174,9 +186,9 @@ public class TomaFisicaDetallesDao {
                             Log.e(TAG, "Error limpiando detalles previos", e);
                         }
 
-                        syncDetalle(response.data);
+                        syncDetalle(dataToProcess);
                     }
-                    Log.d(TAG, "Tomas Fisicas sincronizadas desde API: " + response.data.size());
+                    Log.d(TAG, "Tomas Fisicas sincronizadas desde API: " + dataToProcess.size());
                 } else {
                     Log.e(TAG, "Error al sincronizar tomas fisicas desde API: " + response.errorMessage);
                 }

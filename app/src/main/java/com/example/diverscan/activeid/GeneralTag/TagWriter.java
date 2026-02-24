@@ -278,11 +278,16 @@ public class TagWriter implements IReaderListener {
     private synchronized String connect() {
         if (device != null) {
             if (device.isConnected()) return "Conectado";
-            if (device.connect()) {
-                return "Conectado";
-            } else {
-                return "Error: Fallo al conectar";
-            }
+            
+            // Run connection in background to avoid ANR
+            new Thread(() -> {
+                if (!device.connect()) {
+                    // connect() in device should handle notification of error/success
+                    Log.w(TAG, "Background connection attempt failed or returned false");
+                }
+            }).start();
+            
+            return "Iniciando conexión...";
         }
         return "Error: No device";
     }

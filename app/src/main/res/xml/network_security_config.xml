@@ -20,6 +20,7 @@
         <domain includeSubdomains="true">10.200.201.98</domain>
         <!-- Localhost para emulador -->
         <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">srvapppro</domain>
         <domain includeSubdomains="true">100.31.144.26</domain>
         <domain includeSubdomains="true">0.200.201.98</domain>
     </domain-config>

@@ -365,18 +365,22 @@ public class sincronizar_base extends AppCompatActivity {
 
     private void startSyncSequence() {
         // 1. Usuarios
+        runOnUiThread(() -> Mensaje.setText("Descargando Usuarios..."));
         userDao.fetchAndSyncFromApi(() -> {
             runOnUiThread(() -> actualizarBarraSegmentada(15));
             
             // 2. Roles
+            runOnUiThread(() -> Mensaje.setText("Descargando Roles..."));
             rolDao.fetchAndSyncFromApi(() -> {
                 runOnUiThread(() -> actualizarBarraSegmentada(30));
 
                 // 3. Ubicaciones
+                runOnUiThread(() -> Mensaje.setText("Descargando Ubicaciones..."));
                 ubicacionDao.fetchAndSyncFromApi(() -> {
                     runOnUiThread(() -> actualizarBarraSegmentada(45));
 
                     // 3.5 Categorias
+                    runOnUiThread(() -> Mensaje.setText("Descargando Categorías..."));
                     getCategoriaActivos(() -> {
 
                         // 4. Activos
@@ -406,6 +410,7 @@ public class sincronizar_base extends AppCompatActivity {
                             });
 
                         // 5. Tomas Fisicas (Encabezados)
+                        runOnUiThread(() -> Mensaje.setText("Descargando Tomas Físicas..."));
                         tomafisicaDao.fetchAndSyncFromApi(() -> {
                             runOnUiThread(() -> actualizarBarraSegmentada(75));
 
@@ -414,6 +419,7 @@ public class sincronizar_base extends AppCompatActivity {
                                 runOnUiThread(() -> actualizarBarraSegmentada(90));
 
                                 // 7. Tomas Fisicas (Detalles)
+                                runOnUiThread(() -> Mensaje.setText("Descargando Detalles de Tomas..."));
                                 // Fetch details ONLY for the currently active/visible Tomas Fisicas
                                 List<TomaFisicaEntity> activeTomas = tomafisicaDao.getAllTomasFisicas();
                                 if (activeTomas != null && !activeTomas.isEmpty()) {
@@ -421,20 +427,26 @@ public class sincronizar_base extends AppCompatActivity {
                                     final int totalTomas = activeTomas.size();
 
                                     for (TomaFisicaEntity toma : activeTomas) {
+                                        Log.d("SYNC_DEBUG", "Solicitando detalles para toma: " + toma.getTomaFisicaId());
                                         tomafisicadetallesDao.fetchAndSyncFromApi(toma.getTomaFisicaId(), () -> {
-                                            processedCount[0]++;
-                                            if (processedCount[0] >= totalTomas) {
-                                                runOnUiThread(() -> {
-                                                    actualizarBarraSegmentada(100);
-                                                    updateDebugSummary();
-                                                    
-                                                    btn_enviar.setEnabled(true);
-                                                    btn_obtener.setEnabled(true);
-                                                    mostrarSnack("Sincronización completada con éxito.", Color.rgb(4, 165, 77));
-                                                    saveLastSyncDate();
-                                                    
-                                                    new Handler().postDelayed(() -> resetBarraSegmentada(), 2000);
-                                                });
+                                            synchronized (processedCount) {
+                                                processedCount[0]++;
+                                                Log.d("SYNC_DEBUG", "Detalles procesados. Progreso: " + processedCount[0] + "/" + totalTomas);
+                                                if (processedCount[0] >= totalTomas) {
+                                                    Log.d("SYNC_DEBUG", "Todas las tomas procesadas. Finalizando sincronización.");
+                                                    runOnUiThread(() -> {
+                                                        actualizarBarraSegmentada(100);
+                                                        Mensaje.setText("Sincronización completada.");
+                                                        updateDebugSummary();
+                                                        
+                                                        btn_enviar.setEnabled(true);
+                                                        btn_obtener.setEnabled(true);
+                                                        mostrarSnack("Sincronización completada con éxito.", Color.rgb(4, 165, 77));
+                                                        saveLastSyncDate();
+                                                        
+                                                        new Handler().postDelayed(() -> resetBarraSegmentada(), 2000);
+                                                    });
+                                                }
                                             }
                                         });
                                     }
@@ -442,6 +454,7 @@ public class sincronizar_base extends AppCompatActivity {
                                     // Fallback if no active tomas found, or maybe just finish
                                     runOnUiThread(() -> {
                                         actualizarBarraSegmentada(100);
+                                        Mensaje.setText("Sincronización completada.");
                                         updateDebugSummary();
                                         btn_enviar.setEnabled(true);
                                         btn_obtener.setEnabled(true);
@@ -2159,10 +2172,19 @@ public class sincronizar_base extends AppCompatActivity {
                 activeid_api.post(mSincronizarView.getContext().getApplicationContext(), "/NuevoActivo", entity, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        newAssets assetsDBHelper = new newAssets(mSincronizarView.getContext());
-                        assetsDBHelper.IngresarSync(listActivos);  //elimina los datos de la tabla "NewAssets"
-                        exitosEnviados++;
-                        enviados.add("Activos Nuevos");
+                        
+                        java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newSingleThreadExecutor();
+                        android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+                        
+                        executor.execute(() -> {
+                            newAssets assetsDBHelper = new newAssets(mSincronizarView.getContext());
+                            assetsDBHelper.IngresarSync(listActivos);  //elimina los datos de la tabla "NewAssets"
+                            
+                            handler.post(() -> {
+                                exitosEnviados++;
+                                enviados.add("Activos Nuevos");
+                            });
+                        });
                     }
 
                     @Override

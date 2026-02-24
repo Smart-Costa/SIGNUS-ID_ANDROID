@@ -330,9 +330,8 @@ public class UbicacionDao {
 
     public void fetchAndSyncFromApi(final Runnable onSynced) {
         // Lógica de Ubicación HH desactivada por solicitud del usuario (manejo en web)
-        if (onSynced != null) onSynced.run();
+        // RE-ACTIVATED FOR FIX
         
-        /* CODIGO COMENTADO
         ApiClient api = ApiClient.getInstance(context);
         
         api.<com.google.gson.JsonElement>get("GetUbicacionesHH", com.google.gson.JsonElement.class, new ApiCallback<com.google.gson.JsonElement>() {
@@ -359,7 +358,6 @@ public class UbicacionDao {
                 }
             }
         });
-        */
     }
 }
 

@@ -234,8 +234,6 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         
         if (binding.opcRFID.isChecked()) {
             binding.txtDescripcionRazon.setText("Lectura RFID exitosa");
-        } else if (binding.opcTeclado.isChecked()) {
-            binding.txtDescripcionRazon.requestFocus();
         }
     }
 

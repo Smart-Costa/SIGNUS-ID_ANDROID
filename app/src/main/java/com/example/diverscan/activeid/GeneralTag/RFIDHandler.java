@@ -33,6 +33,12 @@ import com.zebra.rfid.api3.TriggerInfo;
 
 import java.util.ArrayList;
 
+/**
+ * @deprecated This class appears to be unused and legacy code.
+ * The active RFID implementation is handled by {@link TagWriter} and {@link com.example.diverscan.activeid.DeviceInterface.Impl.ZebraReaderImpl}.
+ * Do not use this class for new development.
+ */
+@Deprecated
 public class RFIDHandler implements Readers.RFIDReaderEventHandler  {
     final static String TAG = "RFID_SAMPLE";
     // RFID Reader

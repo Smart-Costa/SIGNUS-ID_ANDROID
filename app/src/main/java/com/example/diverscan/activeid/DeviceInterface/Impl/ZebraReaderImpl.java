@@ -73,6 +73,8 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         initSDK();
     }
 
+    private boolean isDisposing = false;
+
     private void initSDK() {
         new Thread(() -> {
             if (readers != null) {
@@ -94,6 +96,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                     try {
                         Log.d(TAG, "Searching for SERIAL/USB readers...");
                         readers = new Readers(context, ENUM_TRANSPORT.SERVICE_SERIAL);
+                        readers.attach(this); // Attach for events
                         availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
                         Log.d(TAG, "Serial readers found: " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
                     } catch (Exception e) {
@@ -110,6 +113,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                     // Try Bluetooth
                     Log.d(TAG, "Searching for BLUETOOTH readers...");
                     readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
+                    readers.attach(this); // Attach for events
                     availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
                     Log.d(TAG, "Bluetooth readers found: " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
                 }
@@ -131,22 +135,58 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         }).start();
     }
 
+    private boolean isConnecting = false;
+    private boolean autoReconnect = true;
+    private Handler reconnectHandler = new Handler(Looper.getMainLooper());
+    private Runnable reconnectRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isDisposing || isConnected()) return;
+            Log.d(TAG, "Attempting auto-reconnect...");
+            new Thread(() -> {
+                 if (!connect()) {
+                     // If failed, schedule next attempt
+                     reconnectHandler.postDelayed(this, 5000);
+                 }
+            }).start();
+        }
+    };
+
     @Override
-    public boolean connect() {
-        if (reader != null) {
-            try {
-                if (!reader.isConnected()) {
-                    reader.connect();
-                    configureReader();
-                    notifyConnected(reader.getHostName());
-                    return true;
-                } else {
-                    notifyConnected(reader.getHostName()); // Already connected
-                    return true;
+    public synchronized boolean connect() {
+        if (isConnecting) return false;
+        isConnecting = true;
+        try {
+            if (reader != null) {
+                try {
+                    if (!reader.isConnected()) {
+                        // Retry logic for connection
+                        int retries = 3;
+                        while (retries > 0) {
+                            try {
+                                reader.connect();
+                                configureReader();
+                                notifyConnected(reader.getHostName());
+                                isConnecting = false;
+                                return true;
+                            } catch (OperationFailureException e) {
+                                retries--;
+                                Log.w(TAG, "Connection attempt failed, retries left: " + retries + " Error: " + e.getVendorMessage());
+                                if (retries == 0) throw e;
+                                try { Thread.sleep(500); } catch (InterruptedException ie) {}
+                            }
+                        }
+                    } else {
+                        notifyConnected(reader.getHostName()); // Already connected
+                        isConnecting = false;
+                        return true;
+                    }
+                } catch (InvalidUsageException | OperationFailureException e) {
+                    notifyError("Error conectando: " + e.getMessage());
                 }
-            } catch (InvalidUsageException | OperationFailureException e) {
-                notifyError("Error conectando: " + e.getMessage());
             }
+        } finally {
+            isConnecting = false;
         }
         return false;
     }
@@ -161,6 +201,11 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 reader.Events.setHandheldEvent(true);
                 reader.Events.setTagReadEvent(true);
                 reader.Events.setAttachTagDataWithReadEvent(false);
+                try {
+                    reader.Events.setReaderDisconnectEvent(true);
+                } catch (Exception e) {
+                    Log.w(TAG, "setReaderDisconnectEvent not supported or failed: " + e.getMessage());
+                }
                 reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, true);
                 
                 configureTrigger(true); // Default to handheld trigger
@@ -200,11 +245,22 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     }
 
     @Override
-    public boolean disconnect() {
+    public synchronized boolean disconnect() {
+        // Cancel any pending reconnect attempts
+        reconnectHandler.removeCallbacks(reconnectRunnable);
+        
         try {
             if (reader != null) {
-                reader.Events.removeEventsListener(eventHandler);
-                reader.disconnect();
+                try {
+                    reader.Events.removeEventsListener(eventHandler);
+                } catch (Exception e) { /* Ignore if not added */ }
+                
+                try {
+                    reader.disconnect();
+                } catch (Exception e) {
+                    Log.w(TAG, "Error during reader.disconnect(): " + e.getMessage());
+                }
+                
                 notifyDisconnected();
                 return true;
             }
@@ -291,6 +347,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public void dispose() {
+        isDisposing = true;
         disconnect();
         if (readers != null) {
             readers.Dispose();
@@ -316,7 +373,11 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     @Override
     public void RFIDReaderDisappeared(ReaderDevice readerDevice) {
         if (reader != null && reader.getHostName().equals(readerDevice.getName())) {
-            disconnect();
+            Log.w(TAG, "Reader Disappeared: " + readerDevice.getName());
+            notifyDisconnected();
+             if (!isDisposing && autoReconnect) {
+                 reconnectHandler.postDelayed(reconnectRunnable, 1000);
+             }
         }
     }
 
@@ -350,6 +411,9 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 } else {
                     stopInventory();
                 }
+            } else if (e.StatusEventData.getStatusEventType() == STATUS_EVENT_TYPE.DISCONNECTION_EVENT) {
+                Log.w(TAG, "Received DISCONNECTION_EVENT from reader");
+                disconnect();
             }
         }
     }

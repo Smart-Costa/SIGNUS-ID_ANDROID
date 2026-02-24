@@ -335,22 +335,48 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
         sessionActivate.cancel();
         sessionActivate.start();
     }
-    private void conectarLector() {
-        Log.d(TAG, "Iniciando tarea de conexión en segundo plano...");
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-                return rfidHandler.onResume(); // Llama connect()
-            }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (rfidHandler != null) {
+            rfidHandler.updateContext(this);
+            String status = rfidHandler.onResume(); // Check connection / Reconnect
+            txtCnfActual.setText("Estado: " + status);
+        }
+        
+        if (sessionActivate != null) {
+            sessionActivate.cancel();
+            sessionActivate.start();
+        }
+    }
 
-            @Override
-            protected void onPostExecute(String result) {
-                Log.d(TAG, "Resultado conexión: " + result);
-                Toast.makeText(_context,
-                        result.isEmpty() ? "Lector ya conectado" : result,
-                        Toast.LENGTH_SHORT).show();
-            }
-        }.execute();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (rfidHandler != null) {
+            rfidHandler.stopInventory(); // Stop scanning when backgrounded
+        }
+        
+        if (sessionActivate != null) {
+            sessionActivate.cancel();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (sessionActivate != null) {
+            sessionActivate.cancel();
+        }
+    }
+
+    private void conectarLector() {
+        Log.d(TAG, "Conectando lector...");
+        if (rfidHandler != null) {
+             String result = rfidHandler.onResume();
+             Toast.makeText(_context, result, Toast.LENGTH_SHORT).show();
+             txtCnfActual.setText("Estado: " + result);
+        }
     }
     public void controles(){
          mConfigurarAntena = findViewById(R.id.FConfigurarAntena);

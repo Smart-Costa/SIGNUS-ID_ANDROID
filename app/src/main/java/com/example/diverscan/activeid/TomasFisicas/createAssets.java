@@ -588,117 +588,129 @@ public class createAssets extends AppCompatActivity implements ResponseHandlerIn
 
     public void IngresarActivo (View view)
     {
-        numero= NumeroactivoView.getText().toString();
-        placa= PlacaView.getText().toString();
-        descripcion= DescripcionView.getText().toString();
-        //encargado = EncargadoView.getText().toString();
-        compania = CompaniaView.getSelectedItem().toString();
-        edificio = EdificioView.getSelectedItem().toString();
-        piso = PisoView.getSelectedItem().toString();
-        oficina = OficinaView.getSelectedItem().toString();//
-        marca = MarcaView.getText().toString();
-        modelo = ModeloView.getText().toString();
-        serie = SerieView.getText().toString();
-        epc = EPCView.getText().toString();
-        AnoFabricacion = text_anno.getText().toString();
-        Capacidad      = text_cap.getText().toString();
-        _detalleEstado = txtDetalleEstado.getText().toString();
-        _estadoConservacion = spEstadoConservacion.getSelectedItem().toString();
+        String numero = NumeroactivoView.getText().toString();
+        String placa = PlacaView.getText().toString();
+        String descripcion = DescripcionView.getText().toString();
+        String idCompania = "";
+        String compania = "";
+        String idEdificio = "";
+        String edificio = "";
+        String idPiso = "";
+        String piso = "";
+        String idOficina = "";
+        String oficina = "";
+        String marca = MarcaView.getText().toString();
+        String modelo = ModeloView.getText().toString();
+        String serie = SerieView.getText().toString();
+        String epc = EPCView.getText().toString();
+        String AnoFabricacion = text_anno.getText().toString();
+        String Capacidad = text_cap.getText().toString();
+        String _detalleEstado = txtDetalleEstado.getText().toString();
+        String _estadoConservacion = "";
+        
+        if (spEstadoConservacion.getSelectedItem() != null) {
+            _estadoConservacion = spEstadoConservacion.getSelectedItem().toString();
+        }
 
-        RazonNuevo razonSocialRecord= (RazonNuevo)CompaniaView.getSelectedItem();
-        idCompania = razonSocialRecord.getIdRazon();
-        compania = razonSocialRecord.getNombreRazon();
+        if(CompaniaView.getSelectedItem() != null) {
+            RazonNuevo razonSocialRecord = (RazonNuevo) CompaniaView.getSelectedItem();
+            idCompania = razonSocialRecord.getIdRazon();
+            compania = razonSocialRecord.getNombreRazon();
+        }
+        if(EdificioView.getSelectedItem() != null) {
+            EdificioNuevo edificioRecord = (EdificioNuevo) EdificioView.getSelectedItem();
+            idEdificio = edificioRecord.getIdEdificio();
+            edificio = edificioRecord.getNombreEdificio();
+        }
+        if(PisoView.getSelectedItem() != null) {
+            PisoNuevo pisoRecord = (PisoNuevo) PisoView.getSelectedItem();
+            idPiso = pisoRecord.getIdPiso();
+            piso = pisoRecord.getNombrePiso();
+        }
+        if(OficinaView.getSelectedItem() != null) {
+            oficinaNuevo oficinaRecord = (oficinaNuevo) OficinaView.getSelectedItem();
+            idOficina = oficinaRecord.getIdOficina();
+            oficina = oficinaRecord.getNombreOficina();
+        }
 
-        EdificioNuevo edificioRecord= (EdificioNuevo) EdificioView.getSelectedItem();
-        idEdificio = edificioRecord.getIdEdificio();
-        edificio = edificioRecord.getNombreEdificio();
-
-        PisoNuevo pisoRecord= (PisoNuevo) PisoView.getSelectedItem();
-        idPiso = pisoRecord.getIdPiso();
-        piso = pisoRecord.getNombrePiso();
-
-        oficinaNuevo oficinaRecord= (oficinaNuevo) OficinaView.getSelectedItem();
-        idOficina = oficinaRecord.getIdOficina();
-        oficina = oficinaRecord.getNombreOficina();
-
-        //EntidadEmployees employees = (EntidadEmployees)spEmpleados.getSelectedItem();
         String idEmployees = "0";
-        //String nameEmployees = employees.getName();
-
-
-
-        EntidadAssetStatus entidadAssetStatus = (EntidadAssetStatus)spAssetStatus.getSelectedItem();
-        String assetStatusSysId = entidadAssetStatus.getId();
+        String assetStatusSysId = "";
+        if (spAssetStatus.getSelectedItem() != null) {
+            EntidadAssetStatus entidadAssetStatus = (EntidadAssetStatus)spAssetStatus.getSelectedItem();
+            assetStatusSysId = entidadAssetStatus.getId();
+        }
 
         try {
             boolean respuestaPlaca = newAssets.VerificarPlaca(placa);
-            if(respuestaPlaca){
-                Message();
-                new AlertDialog.Builder(this)
-                        .setIcon(R.drawable.alertaicono)
-                        .setTitle("Advertencia")
-                        .setMessage("La placa ya ha sido ingresada, no se puede ingresar nuevamente. Proceda a realizar el cambio.")
-                        .setCancelable(false)
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                NumeroactivoView.setText("");
-                                PlacaView.setText("");
-                            }
-                        }).show();
-            }else if (PlacaView.getText().toString().isEmpty()) {
-                Toast.makeText(getApplicationContext(), "El campo placa no puede registrarse vacío", Toast.LENGTH_LONG).show();
-            } else if (CompaniaView.getSelectedItem().toString().isEmpty()) {
-                Toast.makeText(getApplicationContext(), "Debe seleccionar una razon social", Toast.LENGTH_LONG).show();
-            } else if (EdificioView.getSelectedItem().toString().isEmpty()) {
-                Toast.makeText(getApplicationContext(), "Debe seleccionar un edificio", Toast.LENGTH_LONG).show();
-            } else if (PisoView.getSelectedItem().toString().isEmpty()) {
-                Toast.makeText(getApplicationContext(), "Debe seleccionar un piso", Toast.LENGTH_LONG).show();
-            } else if (OficinaView.getSelectedItem().toString().isEmpty()) {
-                Toast.makeText(getApplicationContext(), "Debe seleccionar una oficina", Toast.LENGTH_LONG).show();
-            } else {
-                boolean respuesta = newAssets.InsertarActivo(numero, placa, descripcion, idCompania,
-                        compania, idEdificio, edificio, idPiso, piso, idOficina, oficina,"0",idEmployees,
-                        marca, modelo, serie, epc, assetStatusSysId, _detalleEstado, _estadoConservacion, AnoFabricacion, Capacidad);
-
-                if (respuesta) {
-                    Message();
-                    new AlertDialog.Builder(this)
-                            .setIcon(R.drawable.alertaicono)
-                            .setTitle("Activo ingresado correctamente!")
-                            .setMessage("¿Desea crear otro activo?")
-                            .setCancelable(false)
-                            .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    NumeroactivoView.setText("");
-                                    PlacaView.setText("");
-                                    DescripcionView.setText("");
-                                    //EncargadoView.setText("");
-                                    MarcaView.setText("");
-                                    ModeloView.setText("");
-                                    SerieView.setText("");
-                                    EPCView.setText("");
-
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    android.os.Process.killProcess(android.os.Process.myPid());
-                                }
-                            }).show();
-
-                } else {
-                    Toast.makeText(getApplicationContext(), "El Activo no se ha ingresado correctamente", Toast.LENGTH_LONG).show();
-                }
+            if(placa.isEmpty()){
+                Toast.makeText(getApplicationContext(), "Ingrese el número de placa", Toast.LENGTH_LONG).show();
             }
+            else if(respuestaPlaca){
+                Toast.makeText(getApplicationContext(), "El Activo ya existe", Toast.LENGTH_LONG).show();
+            }
+            else if(descripcion.isEmpty()){
+                Toast.makeText(getApplicationContext(), "Ingrese una descripción", Toast.LENGTH_LONG).show();
+            }
+            else if(idCompania.isEmpty()){
+                Toast.makeText(getApplicationContext(), "Seleccione una compañía", Toast.LENGTH_LONG).show();
+            }
+            else if(idEdificio.isEmpty()){
+                Toast.makeText(getApplicationContext(), "Seleccione un edificio", Toast.LENGTH_LONG).show();
+            }
+            else if(idPiso.isEmpty()){
+                Toast.makeText(getApplicationContext(), "Seleccione un piso", Toast.LENGTH_LONG).show();
+            }
+            else if(idOficina.isEmpty()){
+                Toast.makeText(getApplicationContext(), "Seleccione una oficina", Toast.LENGTH_LONG).show();
+            } else {
+                
+                android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+                progressDialog.setMessage("Guardando activo...");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
 
+                java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newSingleThreadExecutor();
+                android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+
+                String finalIdCompania = idCompania;
+                String finalCompania = compania;
+                String finalIdEdificio = idEdificio;
+                String finalEdificio = edificio;
+                String finalIdPiso = idPiso;
+                String finalPiso = piso;
+                String finalIdOficina = idOficina;
+                String finalOficina = oficina;
+                String finalAssetStatusSysId = assetStatusSysId;
+                String finalDetalleEstado = _detalleEstado;
+                String finalEstadoConservacion = _estadoConservacion;
+
+                executor.execute(() -> {
+                    boolean respuesta = newAssets.InsertarActivo(numero, placa, descripcion, finalIdCompania,
+                            finalCompania, finalIdEdificio, finalEdificio, finalIdPiso, finalPiso, finalIdOficina, finalOficina,"0",idEmployees,
+                            marca, modelo, serie, epc, finalAssetStatusSysId, finalDetalleEstado, finalEstadoConservacion, AnoFabricacion, Capacidad);
+
+                    handler.post(() -> {
+                        progressDialog.dismiss();
+                        if(respuesta){
+                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+                            builder.setTitle("Exito");
+                            builder.setMessage("Activo creado exitosamente");
+                            builder.setPositiveButton("Aceptar", new android.content.DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(android.content.DialogInterface dialog, int which) {
+                                    finish();
+                                }
+                            });
+                            builder.show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Error al guardar el activo", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                });
+            }
         }catch(Exception e){
             Toast.makeText(getApplicationContext(), "Ha ocurrido un error, intente nuevamente", Toast.LENGTH_LONG).show();
         }
-
-
     }
 
         private Button.OnClickListener OnClickListenerIngresar = new View.OnClickListener() {
