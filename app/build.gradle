@@ -33,17 +33,17 @@ android {
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // URL Base para Producción
-            buildConfigField "String", "BASE_URL", "\"http://srvapppro/ApiHH/api\""
+            buildConfigField "String", "BASE_URL", "\"http://10.200.201.98/ApiHH/api\""
         }
         debug {
             // URL Base para Debug (Ambiente de Pruebas)
             // buildConfigField "String", "BASE_URL", "\"http://100.31.144.26:70/ApiHH/\""
-            buildConfigField "String", "BASE_URL", "\"http://192.168.1.110:5200/api\""
+            buildConfigField "String", "BASE_URL", "\"http://192.168.137.15:5200/api\""
         }
         local {
             initWith debug
             // URL Base para Local (IP actual de la máquina)
-            buildConfigField "String", "BASE_URL", "\"http://192.168.1.110:5200/api\""
+            buildConfigField "String", "BASE_URL", "\"http://0.0.0.0:5200/api\""
             matchingFallbacks = ['debug']
         }
     }

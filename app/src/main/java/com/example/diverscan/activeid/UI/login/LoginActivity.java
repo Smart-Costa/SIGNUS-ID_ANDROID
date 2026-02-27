@@ -93,25 +93,46 @@ public class LoginActivity extends AppCompatActivity {
     private void checkServerHealth() {
         AsyncHttpClient client = new AsyncHttpClient();
         client.setTimeout(5000); // 5 segundos de timeout
-        String url = BuildConfig.BASE_URL + "/health";
+        String baseUrl = BuildConfig.BASE_URL;
+        String url = baseUrl + "/health";
 
-        binding.txtServerStatus.setText("Verificando servidor...");
+        if (binding == null) return;
+
+        binding.txtServerStatus.setText("Verificando servidor (" + baseUrl + ")...");
         binding.txtServerStatus.setTextColor(android.graphics.Color.GRAY);
 
         client.get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 if (binding != null) {
-                    binding.txtServerStatus.setText("Servidor Disponible");
-                    binding.txtServerStatus.setTextColor(android.graphics.Color.GREEN);
+                    try {
+                        String response = new String(responseBody, "UTF-8");
+                        if (response.contains("\"database\":\"Connected\"") || response.contains("\"database\": \"Connected\"")) {
+                            binding.txtServerStatus.setText("Servidor y Base de Datos Operativos (" + baseUrl + ")");
+                            binding.txtServerStatus.setTextColor(android.graphics.Color.GREEN);
+                        } else {
+                             // Case where API is up but returns different JSON or DB status is missing
+                            binding.txtServerStatus.setText("Servidor Accesible, Estado BD Desconocido (" + baseUrl + ")");
+                            binding.txtServerStatus.setTextColor(android.graphics.Color.YELLOW);
+                        }
+                    } catch (Exception e) {
+                        binding.txtServerStatus.setText("Servidor Accesible (Error parseo) (" + baseUrl + ")");
+                        binding.txtServerStatus.setTextColor(android.graphics.Color.YELLOW);
+                    }
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 if (binding != null) {
-                    binding.txtServerStatus.setText("Servidor No Disponible");
-                    binding.txtServerStatus.setTextColor(android.graphics.Color.RED);
+                    if (statusCode == 500) {
+                         // Likely DB connection failed if we implemented 500 return in API
+                        binding.txtServerStatus.setText("Servidor Accesible, pero SIN CONEXIÓN A BD (" + baseUrl + ")");
+                        binding.txtServerStatus.setTextColor(android.graphics.Color.parseColor("#FFA500")); // Orange
+                    } else {
+                        binding.txtServerStatus.setText("Servidor No Disponible (" + baseUrl + ")");
+                        binding.txtServerStatus.setTextColor(android.graphics.Color.RED);
+                    }
                 }
             }
         });

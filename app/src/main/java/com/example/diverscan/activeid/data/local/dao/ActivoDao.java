@@ -1101,12 +1101,10 @@ public class ActivoDao {
 
     public void fetchAndSyncFromApi(final Runnable onComplete) {
         // Start pagination with page 1 and size 5000
-        fetchPage(1, 5000, onComplete);
+        fetchPage(1, 5000, 0, onComplete);
     }
 
-    // Removed overloaded method to simplify usage via setter
-
-    private void fetchPage(int page, int pageSize, final Runnable onComplete) { // Revert signature
+    private void fetchPage(int page, int pageSize, int knownTotalPages, final Runnable onComplete) {
         ApiClient api = ApiClient.getInstance(context);
         Type type = new TypeToken<List<ActivoEntity>>() {}.getType();
         
@@ -1117,7 +1115,7 @@ public class ActivoDao {
         
         if (progressListener != null) {
             try {
-                progressListener.onProgress(page, 0, 0); // Notificar inicio de página
+                progressListener.onProgress(page, 0, knownTotalPages); // Notificar inicio de página con total conocido
             } catch (Exception e) { Log.e(TAG, "Error en progress listener", e); }
         }
 
@@ -1126,20 +1124,23 @@ public class ActivoDao {
             public void onComplete(ApiResponse<List<ActivoEntity>> response) {
                 if (response.success && response.data != null) {
                     int count = response.data.size();
-                    int totalPages = response.totalPages;
+                    int currentTotalPages = response.totalPages;
+                    
+                    // Si el API devuelve el total, actualizarlo. Si no (0), mantener el conocido.
+                    int finalTotalPages = (currentTotalPages > 0) ? currentTotalPages : knownTotalPages;
 
                     if (count > 0) {
                         syncActivos(response.data);
-                        Log.d(TAG, "Page " + page + " synced: " + count + " assets. TotalPages: " + totalPages);
+                        Log.d(TAG, "Page " + page + " synced: " + count + " assets. TotalPages: " + finalTotalPages);
                         
                         if (progressListener != null) {
                             try {
-                                progressListener.onProgress(page, count, totalPages);
+                                progressListener.onProgress(page, count, finalTotalPages);
                             } catch (Exception e) { Log.e(TAG, "Error en progress listener", e); }
                         }
                         
-                        // Fetch next page recursively
-                        fetchPage(page + 1, pageSize, onComplete);
+                        // Fetch next page recursively, passing the updated totalPages
+                        fetchPage(page + 1, pageSize, finalTotalPages, onComplete);
                     } else {
                         // Empty page means we are done
                         Log.d(TAG, "Finished syncing all pages.");

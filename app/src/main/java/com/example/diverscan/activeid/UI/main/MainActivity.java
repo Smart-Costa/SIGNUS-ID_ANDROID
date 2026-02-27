@@ -103,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
         _activity = this;
         _context = this;
 
+        // Force Zebra configuration as per requirement
+        com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet.guardar_local("reader_type", "ZEBRA", this);
+
         validateSession();
 
         setupToolbarAndDrawer();
@@ -328,12 +331,6 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 //            intent = new Intent(this, Actualizar_activo.class);
 //        } else if (id == R.id.sub_ajuste_ubicacion) {
 //            intent = new Intent(this, AsignarUbicacion.class);
-//        } else if (id == R.id.sub_asignar_tag_sector) {
-//            intent = new Intent(this, Asignar_tag_sector.class);
-        } else if (id == R.id.sub_configurar_antena) {
-            intent = new Intent(this, ConfiguracionAntena.class);
-        } else if (id == R.id.sub_configurar_scanner) {
-            intent = new Intent(this, com.example.diverscan.activeid.GeneralTag.ConfiguracionLarkActivity.class);
         } else if (id == R.id.sub_validar_conexion) {
             intent = new Intent(this, ConnectionValidationActivity.class);
         } else if (id == R.id.sub_ver_activos_bd) {
@@ -366,7 +363,6 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 //        menu.findItem(R.id.sub_registro_activos_sector).setVisible(false);
 //        menu.findItem(R.id.sub_asignar_tag_sector).setVisible(false);
 //        menu.findItem(R.id.sub_activos_sector).setVisible(false);
-        menu.findItem(R.id.sub_configurar_antena).setVisible(false);
         menu.findItem(R.id.sub_validar_conexion).setVisible(false);
         menu.findItem(R.id.sub_ver_activos_bd).setVisible(false);
         menu.findItem(R.id.sub_limpiar_bd).setVisible(false);
@@ -413,8 +409,6 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 
                 case R.id.menu_configuracion:
                     toggleGroup(menu,
-                            R.id.sub_configurar_antena,
-                            R.id.sub_configurar_scanner,
                             R.id.sub_validar_conexion
                             //,R.id.sub_ver_activos_bd
                             //,R.id.sub_limpiar_bd
