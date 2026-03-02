@@ -19,12 +19,11 @@ import java.util.Map;
 
 
 import android.content.Context;
-import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
-import com.example.diverscan.activeid.GeneralTag.TagWriter;
-import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
+import com.example.diverscan.activeid.Scanner.ScannerService;
+import com.example.diverscan.activeid.Scanner.ScannerFactory;
 
-public class RegisterAssetPrimaryActivity extends AppCompatActivity implements ResponseHandlerInterface {
-    private TagWriter rfidHandler;
+public class RegisterAssetPrimaryActivity extends AppCompatActivity {
+    private ScannerService scannerService;
     private EditText numeroEtiquetaView, numeroActivoView, serieView, descripcionView, codigoResponsableView;
     private Spinner spResponsables;
     private String idCompania, nombreCompania, idEdificio, nombreEdificio, idPiso, nombrePiso, idOficina, nombreOficina;
@@ -109,78 +108,42 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity implements R
     }
 
     private void initRFID() {
-        try {
-            if (rfidHandler == null) rfidHandler = TagWriter.getInstance();
-            if (!rfidHandler.isInitialized()) {
-                rfidHandler.onCreate(this);
-            } else {
-                rfidHandler.setResponseHandler(this);
+        // Inicializar el ScannerService usando la fábrica
+        // Esto automáticamente manejará si es Simulación o Físico según la configuración global/debug
+        scannerService = ScannerFactory.createScanner(this);
+        
+        scannerService.setListener(new ScannerService.ScannerListener() {
+            @Override
+            public void onScanResult(String data, String type) {
+                runOnUiThread(() -> {
+                    // Si es RFID o Barcode, lo ponemos en el campo de etiqueta
+                    // Opcionalmente podríamos diferenciar: si es Barcode -> Serie, si es RFID -> Etiqueta
+                    if (type.contains("RFID")) {
+                        numeroEtiquetaView.setText(data);
+                        Toast.makeText(RegisterAssetPrimaryActivity.this, "Etiqueta RFID: " + data, Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Asumimos que si es barcode puede ser la serie o el número de activo
+                        // Por ahora lo ponemos en etiqueta también o preguntamos
+                        numeroEtiquetaView.setText(data); 
+                        Toast.makeText(RegisterAssetPrimaryActivity.this, "Código: " + data, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-        } catch (Exception e) {
-            Toast.makeText(this, "Error inicializando RFID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (rfidHandler != null) {
-            rfidHandler.setResponseHandler(this);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (rfidHandler != null) {
-            rfidHandler.stopRead();
-        }
-    }
-
-    @Override
-    public void handleTagdata(ReaderTag[] tagData) {
-        if (tagData == null || tagData.length == 0) return;
-
-        // Lectura simple: validar si hay multiples tags
-        if (tagData.length > 1) {
-            runOnUiThread(() -> {
-                if (rfidHandler != null) rfidHandler.stopRead();
-                Toast.makeText(this, "Múltiples etiquetas detectadas. Por favor acerque solo una.", Toast.LENGTH_LONG).show();
-            });
-            return;
-        }
-
-        String epc = tagData[0].getEpc();
-        if (epc != null && !epc.isEmpty()) {
-            runOnUiThread(() -> {
-                if (rfidHandler != null) rfidHandler.stopRead();
-                numeroEtiquetaView.setText(epc);
-                Toast.makeText(this, "Etiqueta leída: " + epc, Toast.LENGTH_SHORT).show();
-            });
-        }
-    }
-
-    @Override
-    public void handleTriggerPress(boolean pressed) {
-        if (pressed) {
-            if (rfidHandler != null) {
-                rfidHandler.startRead();
-                runOnUiThread(() -> Toast.makeText(this, "Leyendo...", Toast.LENGTH_SHORT).show());
+            @Override
+            public void onStatusMessage(String message) {
+                // Logs opcionales
             }
-        } else {
-            if (rfidHandler != null) {
-                rfidHandler.stopRead();
-            }
+        });
+        
+        scannerService.connect();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (scannerService != null) {
+            scannerService.disconnect();
         }
-    }
-
-    @Override
-    public void SetMessage(String msg) {
-        runOnUiThread(() -> Toast.makeText(this, "Reader: " + msg, Toast.LENGTH_SHORT).show());
-    }
-
-    @Override
-    public Context GetContext() {
-        return this;
     }
 }

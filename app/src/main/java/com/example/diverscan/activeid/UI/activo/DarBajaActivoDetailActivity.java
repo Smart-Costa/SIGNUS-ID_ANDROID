@@ -1,40 +1,23 @@
 package com.example.diverscan.activeid.UI.activo;
 
-import android.content.Context;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
-import com.example.diverscan.activeid.GeneralTag.TagWriter;
-import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
+import com.example.diverscan.activeid.Scanner.ScannerFactory;
+import com.example.diverscan.activeid.Scanner.ScannerService;
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
-import android.content.pm.PackageManager;
-import android.Manifest;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import android.util.Log;
-import android.os.Build;
-import android.content.pm.PackageManager;
-import android.Manifest;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import android.util.Log;
-import android.os.Build;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import com.example.diverscan.activeid.databinding.ActivityDarBajaActivoDetailBinding;
 
-public class DarBajaActivoDetailActivity extends AppCompatActivity implements ResponseHandlerInterface {
+public class DarBajaActivoDetailActivity extends AppCompatActivity {
     private ActivityDarBajaActivoDetailBinding binding;
-    private TagWriter rfidHandler;
+    private ScannerService scannerService;
     private ActivoDao activoDAO;
     private ActivoEntity activoLeido;
-
-    // Permission handling
-    private boolean isRequestingPermissions = false;
-    private static final int PERMISSION_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,15 +27,26 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
 
         activoDAO = new ActivoDao(this);
         
-        // Usar TagWriter (Singleton) en lugar de RfidManager para mantener conexión global
-        if (checkPermissions()) {
-            rfidHandler = TagWriter.getInstance();
-            if (!rfidHandler.isInitialized()) {
-                rfidHandler.onCreate(this);
-            } else {
-                rfidHandler.setResponseHandler(this);
+        // Inicializar Scanner Service
+        scannerService = ScannerFactory.createScanner(this);
+        scannerService.setListener(new ScannerService.ScannerListener() {
+            @Override
+            public void onScanResult(String data, String type) {
+                runOnUiThread(() -> {
+                    // Si el modo seleccionado no es Scanner ni RFID (ej. Teclado), ignorar o preguntar
+                    if (binding.opcTeclado.isChecked()) return;
+
+                    procesarLectura(data);
+                    Toast.makeText(DarBajaActivoDetailActivity.this, "Leído: " + data, Toast.LENGTH_SHORT).show();
+                });
             }
-        }
+
+            @Override
+            public void onStatusMessage(String message) {
+                // Opcional: mostrar logs o estado en UI
+            }
+        });
+        scannerService.connect();
 
         initEvents();
         // Estado inicial: RFID seleccionado por defecto
@@ -60,173 +54,11 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        
-        isRequestingPermissions = false; // Reset flag to allow retries
-        
-        if (rfidHandler != null) {
-            rfidHandler.setResponseHandler(this);
-            // Si ya está conectado, asegurar que el gatillo esté configurado o listo
+    protected void onDestroy() {
+        super.onDestroy();
+        if (scannerService != null) {
+            scannerService.disconnect();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (rfidHandler != null) {
-            rfidHandler.stopRead();
-            // No desconectamos para mantener la sesión
-        }
-    }
-
-    // --- ResponseHandlerInterface Implementation ---
-    
-    private boolean checkPermissions() {
-        if (isRequestingPermissions) return false;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            boolean missingConnect = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED;
-            boolean missingScan = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED;
-
-            if (missingConnect || missingScan) {
-                isRequestingPermissions = true;
-                ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.BLUETOOTH_SCAN
-                }, PERMISSION_REQUEST_CODE);
-                return false;
-            }
-        } else {
-             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                 isRequestingPermissions = true;
-                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
-                 return false;
-             }
-        }
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            isRequestingPermissions = false;
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                 // Retry init
-                 try {
-                    rfidHandler = TagWriter.getInstance();
-                    if (!rfidHandler.isInitialized()) {
-                        rfidHandler.onCreate(this);
-                    } else {
-                        rfidHandler.setResponseHandler(this);
-                    }
-                 } catch (Exception e) {
-                     Log.e("DarBaja", "Error initializing RFID after permission grant", e);
-                 }
-            } else {
-                 Toast.makeText(this, "Permisos necesarios para usar el lector RFID", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    @Override
-    public void handleTagdata(ReaderTag[] tagData) {
-        if (tagData == null || tagData.length == 0) return;
-        
-        // Si no está en modo RFID, ignorar lecturas
-        if (!binding.opcRFID.isChecked()) return;
-
-        // Validar si vienen múltiples tags en la misma lectura
-        if (tagData.length > 1) {
-            runOnUiThread(() -> {
-                rfidHandler.stopRead();
-                Toast.makeText(this, "Múltiples activos detectados. Por favor acerque solo uno.", Toast.LENGTH_LONG).show();
-            });
-            return;
-        }
-
-        // Ejecutar en UI Thread porque TagWriter llama desde AsyncTask
-        runOnUiThread(() -> {
-            for (ReaderTag tag : tagData) {
-                if (tag.getEpc() != null) {
-                    procesarLecturaRFID(tag.getEpc());
-                    // Procesar solo el primero válido de este lote
-                    break; 
-                }
-            }
-        });
-    }
-
-    @Override
-    public void handleTriggerPress(boolean pressed) {
-        // Si no está en modo RFID, ignorar gatillo
-        if (!binding.opcRFID.isChecked()) return;
-
-        runOnUiThread(() -> {
-            if (pressed) {
-                rfidHandler.startRead();
-            } else {
-                rfidHandler.stopRead();
-            }
-        });
-    }
-
-    @Override
-    public void SetMessage(String message) {
-        runOnUiThread(() -> 
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        );
-    }
-
-    @Override
-    public Context GetContext() {
-        return this;
-    }
-
-    // --- Fin Interface ---
-
-    private void procesarLecturaRFID(String epc) {
-        if (epc == null || epc.trim().isEmpty()) {
-            return;
-        }
-        
-        // Validación adicional de modo
-        if (!binding.opcRFID.isChecked()) return;
-
-        if (activoLeido != null) {
-            // Verificar contra el EPC real, no contra el TAG_EPC que puede ser "EPC Asignado"
-            String storedEpc = activoLeido.getEpc();
-            if (storedEpc == null || !epc.equals(storedEpc)) {
-                rfidHandler.stopRead();
-                Toast.makeText(this, "Se detectaron múltiples TAGs. Acerque solo 1 y reintente.", Toast.LENGTH_SHORT).show();
-            }
-            return;
-        }
-
-        ActivoEntity activo = activoDAO.getActivoByEpc(epc);
-        if (activo != null) {
-            mostrarNotificacionActivo(epc, activo.getNumeroActivo(), activo.getDescripcionCorta(), true);
-            cargarDatosActivo(activo);
-            rfidHandler.stopRead();
-        } else {
-            rfidHandler.stopRead();
-            mostrarNotificacionActivo(epc, "Desconocido", "No encontrado", false);
-            Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void mostrarNotificacionActivo(String epc, String numeroActivo, String descripcion, boolean encontrado) {
-        String mensaje = "EPC: " + epc + "\n" +
-                "Número: " + numeroActivo + "\n" +
-                "Descripción: " + descripcion + "\n" +
-                "Estado en BD: " + (encontrado ? "ENCONTRADO" : "NO REGISTRADO");
-
-        new AlertDialog.Builder(this)
-                .setTitle("Activo Leído")
-                .setMessage(mensaje)
-                .setPositiveButton("OK", null)
-                .show();
     }
 
     private void initEvents() {
@@ -271,10 +103,24 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
             android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) imm.hideSoftInputFromWindow(binding.txtNumeroActivo.getWindowToken(), 0);
         }
+    }
 
-        // Si cambiamos de modo y no es RFID, paramos lectura
-        if (mode != 3 && rfidHandler != null) {
-            rfidHandler.stopRead();
+    private void procesarLectura(String data) {
+        if (data == null || data.trim().isEmpty()) return;
+
+        // Intentar buscar por EPC primero (RFID) o por Código (Scanner)
+        // Asumimos que 'data' puede ser cualquiera.
+        
+        // Estrategia: Buscar por EPC. Si no encuentra, buscar por ID/Número Activo.
+        ActivoEntity activo = activoDAO.getActivoByEpc(data);
+        if (activo == null) {
+            activo = activoDAO.getActivoById(data);
+        }
+
+        if (activo != null) {
+            cargarDatosActivo(activo);
+        } else {
+            mostrarNotificacionActivo(data, "Desconocido", "No encontrado", false);
         }
     }
 
@@ -302,7 +148,7 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         binding.txtDescripcionRazon.setText(""); 
         
         if (binding.opcRFID.isChecked()) {
-            binding.txtDescripcionRazon.setText("Lectura RFID exitosa");
+            binding.txtDescripcionRazon.setText("Lectura Exitosa");
         } else if (binding.opcTeclado.isChecked()) {
             binding.txtDescripcionRazon.requestFocus();
         }
@@ -336,9 +182,6 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         if (updated > 0) {
             Toast.makeText(this, "Activo dado de baja correctamente", Toast.LENGTH_SHORT).show();
             limpiarCampos(true);
-            if (binding.opcRFID.isChecked()) {
-                rfidHandler.startRead();
-            }
         } else {
             Toast.makeText(this, "Error al dar de baja el activo", Toast.LENGTH_SHORT).show();
         }
@@ -350,5 +193,18 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         binding.txtNumeroEtiqueta.setText("");
         binding.txtDescripcionCorta.setText("");
         binding.txtDescripcionRazon.setText("");
+    }
+
+    private void mostrarNotificacionActivo(String epc, String numeroActivo, String descripcion, boolean encontrado) {
+        String mensaje = "Datos: " + epc + "\n" +
+                "Número: " + numeroActivo + "\n" +
+                "Descripción: " + descripcion + "\n" +
+                "Estado en BD: " + (encontrado ? "ENCONTRADO" : "NO REGISTRADO");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Activo Leído")
+                .setMessage(mensaje)
+                .setPositiveButton("OK", null)
+                .show();
     }
 }

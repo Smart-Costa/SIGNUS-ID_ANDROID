@@ -18,6 +18,10 @@ import com.example.diverscan.activeid.data.local.entity.TomaFisicaEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.diverscan.activeid.Scanner.ScannerService;
+import com.example.diverscan.activeid.Scanner.ScannerFactory;
+import android.widget.Toast;
+
 public class RegistroTomaFisicaActivity extends AppCompatActivity {
 
     EditText txtBusquedaNombre;
@@ -37,10 +41,32 @@ public class RegistroTomaFisicaActivity extends AppCompatActivity {
     int tamanoPagina = 10;
     int totalPaginas = 1;
 
+    private ScannerService scannerService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro_toma_fisica);
+
+        // Inicializar Scanner
+        scannerService = ScannerFactory.createScanner(this);
+        scannerService.setListener(new ScannerService.ScannerListener() {
+            @Override
+            public void onScanResult(String data, String type) {
+                runOnUiThread(() -> {
+                    // Acción al escanear: por ejemplo, buscar en la lista
+                    txtBusquedaNombre.setText(data);
+                    buscar();
+                    Toast.makeText(RegistroTomaFisicaActivity.this, "Buscando: " + data, Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onStatusMessage(String message) {
+                // Logs
+            }
+        });
+        scannerService.connect();
 
         // UI
         txtBusquedaNombre = findViewById(R.id.txtBusquedaNombre);
@@ -108,44 +134,42 @@ public class RegistroTomaFisicaActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (viewModel != null) {
-            viewModel.cargarTomasFisicas();
-        }
-    }
-
     private void buscar() {
-        String nombre = txtBusquedaNombre.getText().toString().trim();
-
-        if (nombre.isEmpty()) {
+        String texto = txtBusquedaNombre.getText().toString().trim();
+        if (texto.isEmpty()) {
             viewModel.cargarTomasFisicas();
-            return;
+        } else {
+            viewModel.buscarTomasFisicasPorNombre(texto);
         }
-
-        viewModel.buscarTomasFisicasPorNombre(nombre);
+        paginaActual = 1;
     }
 
     private void cargarPagina() {
         if (listaCompleta == null || listaCompleta.isEmpty()) {
-            listaPagina = new ArrayList<>();
-            adapter.update(listaPagina);
-            txtPagina.setText("0/0");
+            listaPagina.clear();
+            txtPagina.setText("0 / 0");
+            adapter.notifyDataSetChanged();
             return;
         }
-
-        totalPaginas = (int) Math.ceil((double) listaCompleta.size() / tamanoPagina);
-        if (totalPaginas < 1) totalPaginas = 1;
-        if (paginaActual < 1) paginaActual = 1;
-        if (paginaActual > totalPaginas) paginaActual = totalPaginas;
 
         int inicio = (paginaActual - 1) * tamanoPagina;
         int fin = Math.min(inicio + tamanoPagina, listaCompleta.size());
 
-        listaPagina = new ArrayList<>(listaCompleta.subList(inicio, fin));
-        adapter.update(listaPagina);
+        listaPagina.clear();
+        if (inicio < listaCompleta.size()) {
+            listaPagina.addAll(listaCompleta.subList(inicio, fin));
+        }
+
         txtPagina.setText(paginaActual + " / " + totalPaginas);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (scannerService != null) {
+            scannerService.disconnect();
+        }
     }
 }
 

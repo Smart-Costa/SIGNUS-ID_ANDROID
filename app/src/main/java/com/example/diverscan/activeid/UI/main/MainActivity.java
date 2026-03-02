@@ -67,6 +67,10 @@ import com.example.diverscan.activeid.data.remote.response.ApiResponse;
 import com.example.diverscan.activeid.data.remote.response.NovedadesResponse;
 import com.example.diverscan.activeid.data.remote.response.ActivoReubicacionDto;
 import com.example.diverscan.activeid.data.remote.response.TomaNovedadDto;
+import com.example.diverscan.activeid.Scanner.ScannerService;
+import com.example.diverscan.activeid.Scanner.ScannerFactory;
+import com.example.diverscan.activeid.BuildConfig;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity implements ResponseHandlerInterface {
     private ActivityMainBinding binding;
@@ -74,6 +78,10 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
     private AssetsDBHelper assetsDB;
     private TagsDBHelper tagsDB;
     private SessionManager sessionManager;
+
+    private ScannerService scannerService;
+    private boolean isSimulationMode = false;
+    private FloatingActionButton fabDebugScanner;
 
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
@@ -95,6 +103,11 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Initialize Debug Scanner if in DEBUG mode
+        if (BuildConfig.DEBUG) {
+            setupDebugScanner();
+        }
 
         sessionManager = new SessionManager(this);
         rolDao = new RolDao(this);
@@ -514,6 +527,89 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
     @Override
     public void SetMessage(String msg) {
         runOnUiThread(() -> Toast.makeText(this, msg, Toast.LENGTH_SHORT).show());
+    }
+
+    private void setupDebugScanner() {
+        // Initialize scanner with default behavior (Simulation in Debug)
+        isSimulationMode = true; // Default to sim in Debug
+        initializeScanner();
+
+        // Setup FAB
+        // Note: Accessing fab_debug_scanner via binding.appBarMain
+        // We assume the ID in app_bar_main.xml is fab_debug_scanner
+        // Since we cannot compile, we rely on the resource modification we made.
+        
+        try {
+            // Using reflection or direct access if binding was updated.
+            // Since we cannot regenerate binding class here, we might need to find view by ID if binding fails.
+            // But let's assume binding works.
+            // binding.appBarMain.fabDebugScanner... 
+            
+            // For safety in this environment, let's look it up via findViewById if possible, 
+            // but binding is safer if generated. 
+            // We'll add the code assuming binding will be updated by the IDE/Build system.
+            
+            binding.appBarMain.fabDebugScanner.setVisibility(View.VISIBLE);
+            binding.appBarMain.fabDebugScanner.setOnClickListener(v -> {
+                if (scannerService != null) {
+                    scannerService.triggerScan();
+                    Toast.makeText(this, "Triggering Scan...", Toast.LENGTH_SHORT).show();
+                }
+            });
+            
+            binding.appBarMain.fabDebugScanner.setOnLongClickListener(v -> {
+                // Toggle Mode
+                isSimulationMode = !isSimulationMode;
+                initializeScanner();
+                String mode = isSimulationMode ? "SIMULATOR" : "PHYSICAL";
+                Toast.makeText(this, "Switched to: " + mode, Toast.LENGTH_SHORT).show();
+                
+                // Update Icon color or something to indicate state
+                int color = isSimulationMode ? Color.GREEN : Color.RED;
+                binding.appBarMain.fabDebugScanner.setColorFilter(color);
+                
+                return true;
+            });
+            
+            // Set initial color
+            binding.appBarMain.fabDebugScanner.setColorFilter(Color.GREEN);
+            
+        } catch (Exception e) {
+            Log.e("MainActivity", "Error setting up debug scanner FAB", e);
+        }
+    }
+
+    private void initializeScanner() {
+        if (scannerService != null) {
+            scannerService.disconnect();
+        }
+        
+        scannerService = ScannerFactory.createScanner(this, isSimulationMode);
+        scannerService.setListener(new ScannerService.ScannerListener() {
+            @Override
+            public void onScanResult(String data, String type) {
+                runOnUiThread(() -> {
+                    Toast.makeText(MainActivity.this, "Scan: " + data + " (" + type + ")", Toast.LENGTH_SHORT).show();
+                    // Here we can also forward to existing logic if needed
+                    // e.g., handleTagdata(...)
+                });
+            }
+
+            @Override
+            public void onStatusMessage(String message) {
+                Log.d("ScannerService", message);
+            }
+        });
+        
+        scannerService.connect();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (scannerService != null) {
+            scannerService.disconnect();
+        }
     }
 
     @Override
