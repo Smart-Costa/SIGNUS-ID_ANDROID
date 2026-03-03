@@ -9,17 +9,23 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <EditText
+        <TextView android:text="Marca"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <AutoCompleteTextView
             android:id="@+id/txt_marca"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Marca"/>
+            android:hint="Seleccione o escriba la marca"/>
 
-        <EditText
+        <TextView android:text="Modelo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <AutoCompleteTextView
             android:id="@+id/txt_modelo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Modelo" />
+            android:hint="Seleccione o escriba el modelo" />
 
         <EditText
             android:id="@+id/txt_anno"

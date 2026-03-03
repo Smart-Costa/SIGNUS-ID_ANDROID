@@ -4,22 +4,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.diverscan.activeid.AssetStatus.AssetStatusDBHerlper;
-import com.example.diverscan.activeid.AssetStatus.EntidadAssetStatus;
 import com.example.diverscan.activeid.R;
+import com.example.diverscan.activeid.UI.activo.RegistroActivoDetailViewModel;
 import com.example.diverscan.activeid.sqlite.newAssets;
 
 import java.util.Map;
 
 public class RegisterAssetSecondaryActivity extends AppCompatActivity{
-    private EditText marcaView, modeloView, annoView, capacidadView, detalleEstadoView;
+    private AutoCompleteTextView marcaView, modeloView;
+    private EditText annoView, capacidadView, detalleEstadoView;
     private Spinner estadoView, estadoConservacionView;
     private Button btnCrear;
     private String[] conservacion = {"Como nuevo", "Normal", "Requiere mantenimiento", "Obsoleto"};
@@ -27,8 +30,7 @@ public class RegisterAssetSecondaryActivity extends AppCompatActivity{
     private String idCompania, nombreCompania, idEdificio, nombreEdificio, idPiso, nombrePiso, idOficina, nombreOficina;
     private String numeroEtiqueta, numeroActivo, serie, descripcion, responsable;
 
-    private Map<Integer, EntidadAssetStatus> mapEstados;
-    private AssetStatusDBHerlper assetStatusDBHerlper;
+    private RegistroActivoDetailViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +46,11 @@ public class RegisterAssetSecondaryActivity extends AppCompatActivity{
         estadoConservacionView = findViewById(R.id.sp_estado_conservacion);
         btnCrear = findViewById(R.id.btn_crear_activo);
 
-        assetStatusDBHerlper = new AssetStatusDBHerlper(this);
-        cargarEstados();
+        viewModel = new ViewModelProvider(this).get(RegistroActivoDetailViewModel.class);
+        viewModel.cargarCatalogos(this);
+
+        configurarObservadores();
+
         estadoConservacionView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, conservacion));
 
         Bundle extras = getIntent().getExtras();
@@ -74,11 +79,24 @@ public class RegisterAssetSecondaryActivity extends AppCompatActivity{
         });*/
     }
 
-    private void cargarEstados() {
-        mapEstados = assetStatusDBHerlper.GetAssetStatus();
-        EntidadAssetStatus[] estados = mapEstados.values().toArray(new EntidadAssetStatus[0]);
-        estadoView.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_layaout, estados));
-        estadoView.requestFocus();
+    private void configurarObservadores() {
+        viewModel.getEstados().observe(this, estados -> {
+            ArrayAdapter<RegistroActivoDetailViewModel.ComboItem> adapter = 
+                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, estados);
+            estadoView.setAdapter(adapter);
+        });
+
+        viewModel.getMarcas().observe(this, marcas -> {
+            ArrayAdapter<RegistroActivoDetailViewModel.ComboItem> adapter = 
+                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, marcas);
+            marcaView.setAdapter(adapter);
+        });
+
+        viewModel.getModelos().observe(this, modelos -> {
+            ArrayAdapter<RegistroActivoDetailViewModel.ComboItem> adapter = 
+                new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, modelos);
+            modeloView.setAdapter(adapter);
+        });
     }
 
     /*private void crearActivo() {
