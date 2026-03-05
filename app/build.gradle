@@ -37,8 +37,8 @@ android {
         }
         debug {
             // URL Base para Debug (Ambiente de Pruebas)
-            // buildConfigField "String", "BASE_URL", "\"http://100.31.144.26:70/ApiHH/\""
-            buildConfigField "String", "BASE_URL", "\"http://192.168.137.15:5200/api\""
+            buildConfigField "String", "BASE_URL", "\"http://44.193.11.135:70/ApiHH/Api\""
+           /*  buildConfigField "String", "BASE_URL", "\"http://192.168.137.15:5200/api\"" */
         }
         local {
             initWith debug

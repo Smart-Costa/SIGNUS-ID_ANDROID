@@ -90,9 +90,7 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
             int checkedId = rgTransport.getCheckedRadioButtonId();
             com.example.diverscan.activeid.DeviceInterface.ConnectionType connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.BLUETOOTH;
             
-            if (checkedId == R.id.rb_serial) {
-                connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.SERIAL_USB;
-            } else if (checkedId == R.id.rb_usb) {
+            if (checkedId == R.id.rb_serial || checkedId == R.id.rb_usb) {
                 connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.SERIAL_USB;
             }
             
@@ -100,15 +98,24 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
             
             // Detect reader type or default to iMin if on iMin device
             com.example.diverscan.activeid.DeviceInterface.ReaderType type = rfidHandler.getCurrentReaderType();
-            // If currently Unknown or user wants to force re-init
+            
+            // Logic to determine reader type
             if (Build.MODEL.contains("I24P01") || Build.MODEL.contains("Lark 1")) {
+                 // Internal reader usually
                  type = com.example.diverscan.activeid.DeviceInterface.ReaderType.IMIN;
+            } else {
+                 // Default to Zebra for external readers if not set
+                 if (type == com.example.diverscan.activeid.DeviceInterface.ReaderType.UNKNOWN || type == null) {
+                     type = com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA;
+                 }
             }
             
             log("Reconectando como: " + type + " via " + connType);
+            
+            // If USB/Serial selected but type is iMin (internal), warn user or force type?
+            // Assuming iMin uses internal serial which is fine.
+            
             rfidHandler.setReaderType(type, connType);
-            // InitSDK not needed if setReaderType is called, but setReaderType handles disposal and creation.
-            // rfidHandler.InitSDK(); 
         });
 
         btnTestSingle.setOnClickListener(v -> startSingleRead());
@@ -253,22 +260,27 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     }
 
     private void showSingleTagDialog(String epc) {
-        ActivoEntity activo = activoDao.getActivoByEpc(epc);
-        String mensaje = "EPC: " + epc + "\n";
+        new Thread(() -> {
+            ActivoEntity activo = activoDao.getActivoByEpc(epc);
+            String mensaje = "EPC: " + epc + "\n";
 
-        if (activo != null) {
-            mensaje += "Estado: ENCONTRADO\n" +
-                       "Activo: " + activo.getNumeroActivo() + "\n" +
-                       "Desc: " + activo.getDescripcionCorta();
-        } else {
-            mensaje += "Estado: NO REGISTRADO EN BD LOCAL";
-        }
-
-        new AlertDialog.Builder(this)
-                .setTitle("Lectura Sencilla")
-                .setMessage(mensaje)
-                .setPositiveButton("OK", null)
-                .show();
+            if (activo != null) {
+                mensaje += "Estado: ENCONTRADO\n" +
+                           "Activo: " + activo.getNumeroActivo() + "\n" +
+                           "Desc: " + activo.getDescripcionCorta();
+            } else {
+                mensaje += "Estado: NO REGISTRADO EN BD LOCAL";
+            }
+            
+            final String finalMsg = mensaje;
+            runOnUiThread(() -> {
+                new AlertDialog.Builder(this)
+                        .setTitle("Lectura Sencilla")
+                        .setMessage(finalMsg)
+                        .setPositiveButton("OK", null)
+                        .show();
+            });
+        }).start();
     }
 
     private void showMultiReadSummary() {

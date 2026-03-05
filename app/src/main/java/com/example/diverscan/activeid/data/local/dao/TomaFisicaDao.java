@@ -212,11 +212,12 @@ public class TomaFisicaDao {
                 if (response.success && response.data != null) {
                     syncTomasFisicas(response.data);
                     Log.d(TAG, "Tomas Fisicas sincronizadas desde API: " + response.data.size());
-                    if (onSuccess != null) {
-                        onSuccess.run();
-                    }
                 } else {
                     Log.e(TAG, "Error al sincronizar tomas fisicas desde API: " + response.errorMessage);
+                }
+                
+                if (onSuccess != null) {
+                    onSuccess.run();
                 }
             }
         });
