@@ -1,0 +1,62 @@
+Release Notes
+-------------
+
+09/04/2024		A new sample project has been added that is specific to ASCII Protocol v3 Readers, such as the 3166.
+				The S3SensorTagReader project demonstrates the reading of temperature sensor tags using the Magnus S3 chip e.g. HID Sense Passive, Axzon.
+				
+				The previous LicenceKey project has now been split into two separate projects and converted to use an Elliptic Curve Digital Signature Algorithm (ECDSA) based licenceKey value.
+
+				The two new projects are:
+
+					- LicenceKey			This project will install and remove licence keys and show the status of connected Readers.
+											The LicenceKey is a signature of the Reader's Serial number and BT MAC address concatenated with '_'.
+											This ties the signature uniquely to the Reader - copying the licence key from one reader to another will not authorise the other reader!
+											A sample Private key is provided but see the warning below.
+
+					- LicenceKeyUserApp		This project shows the authorisation status of connected Readers and demonstrates how it is the App that chooses to ignore unauthorised readers.
+
+				Both projects have been built using the latest Android Studio (Iguana, 2023.2.1) Project Templates.
+
+				The Inventory project has been updated and will now show the Barcode symbology information, when available (ASCII Protocol v3 or greater Readers only, e.g. 3166)
+
+19/01/2023		The Inventory project has been updated to demonstrate the use of the new connection stateChanged events.
+				The stateChanged events are the replacement for the fully deprecated LocalBroadcastManager.
+                Note: LocalBroadcastManager support is retained in this release to allow users time to transition to the new approach.
+
+
+23/08/2021      The TagFinder sample project has been updated to demonstrate the new ISignalStrengthCountDelegate
+                property on the SignalStrengthResponder.
+
+13/07/2021      All projects have been updated to target API Level 30
+
+                The Inventory Sample project has been updated:
+                    Continuous inventory mode       - use the Start & Stop buttons to control the continuous inventory mode
+                    Optional "Uniques Only" mode    - Check this box to only respond to Unique tag EPCs
+                    Alert controlled by app         - to work with the unique tags only mode, the alert sound, for inventory
+                                                      rounds where tags are detected, is now controlled from the app
+
+15/01/2020      Three new sample projects have been provided:
+
+                    TagFinder       Basic tag finder implementation using either the InventoryCommand or the new FindTagCommand, if available.
+                                    A target tag EPC is entered and then the Reader's trigger is held down - the App then continuously updates the display
+                                    with the the relative signal strength (as a percentage) until the trigger is released.
+                                    When using a Reader that supports the new FindTag command (e.g. 2128) there will also be audio feedback while scanning.
+
+                    BlockPermalock  Demonstration of partial locking of Tag User memory (requires 1166 or 21xx UHF Reader and suitable UHF tags).
+                                    Note: this project will make permanent changes to the tags it modifies - use with care.
+
+                    HFLFSupport     A sample project using the new InventoryTagCommand (for HF/LF tags).
+                                    Connect an ASCII 2 HF/LF Reader (e.g. 2173) and single press the trigger with an HF or LF tag in range.
+                                    The identifier for the detected tag will be displayed along with the type of tag scanned.
+                                    Also included are some examples of the RfPassThroughCommand to control the HF/LF RF Module
+
+                Inventory Sample:
+
+                    The project has been updated to demonstrate how to prevent attempts to reconnect to a Reader that the User has chosen to disconnect.
+                    Note: Other sample projects have not had the update
+                    An issue has been fixed where the App would report it was still connected to a removed Reader.
+                    Bug fix: It is now possible to immediately reconnect to a Reader via Bluetooth after breaking the ePop-Loq connection
+
+                All Sample projects:
+
+                    AutoSelectReader() has been updated to use the Reader.isConnecting() method to avoid attempting to connect to a Reader that is part way through connecting.

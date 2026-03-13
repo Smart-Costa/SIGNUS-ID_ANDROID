@@ -6,30 +6,38 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
-    <!-- 📍 Permisos de ubicación (para RFID/Bluetooth que dependen de ubicación) -->
+    <!-- 📍 Permisos de ubicación (requeridos por BT scan en Android 6-11) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <!-- 📡 Permisos Bluetooth (Android 12+ requiere permisos individuales) -->
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <!-- 📡 Permisos Bluetooth completos (Legacy API ≤ 30 + Modern API 31+) -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
 
-    <!-- 💾 Permisos de almacenamient + compatibilidad -->
+    <!-- 🔌 USB Host — acceso a lectores RFID USB/Serial (eConnex, OTG) -->
+    <!-- NOTA: USB_PERMISSION NO es un permiso del sistema, se gestiona con
+         UsbManager.requestPermission() en tiempo de ejecución, NO aquí. -->
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
+    <uses-permission android:name="android.permission.USB_PERMISSION" />
+
+    <!-- ⚙️ Servicio en primer plano para lectura RFID en background -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- 💾 Almacenamiento con retrocompatibilidad -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-
-    <!-- 🔌 Permisos USB para lectores externos -->
-    <uses-feature android:name="android.hardware.usb.host" />
-    <uses-permission android:name="android.permission.USB_PERMISSION" />
-
-    <!-- Compatibilidad con Android <= 12 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- 📷 Cámara requerida para funcionalidades principales -->
@@ -61,6 +69,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 🔍 Diagnóstico RFID — Prueba de conexión con lectores Zebra / Datalogic / iMin -->
+        <activity
+            android:name=".RFIDDiagnosticActivity"
+            android:label="Diagnóstico RFID"
+            android:exported="true"
+            android:screenOrientation="portrait" />
 
         <!-- 🔐 Login -->
         <activity

@@ -1,6 +1,7 @@
 package com.example.diverscan.activeid.TomasFisicas;
 
 import android.app.Activity;
+import com.example.diverscan.activeid.Utilities.PermissionUtils;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.media.AudioManager;
@@ -127,6 +128,9 @@ public class createAssets extends AppCompatActivity implements ResponseHandlerIn
         super.onCreate(savedStateInstance);
         setContentView(R.layout.activity_nuevo_activo);
         _activity = this;
+        
+        PermissionUtils.requestPermissions(this);
+        
         controles();
         
         // Inicializar RFID

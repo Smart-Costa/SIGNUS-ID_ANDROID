@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Bulk EPC Encoding</string>
+
+    <string name="action_settings">Settings</string>
+
+
+
+    <string name="response_list_title">Responses</string>
+    <string name="source_data_list_title">Source Data (All Hex values)</string>
+    <string name="source_data_example_text">Identifier, New EPC, Password,\nUser Data, ...</string>
+
+    <string name="use_password_title">Use Passwords</string>
+    <string name="use_user_data_title">Use User Data</string>
+
+    <string name="match_section_title">Match by:</string>
+    <string name="match_offset_title">Offset:</string>
+
+    <string name="power_level_label_text">dBm</string>
+
+
+    <string name="encode_button_title">Encode</string>
+    <string name="retry_button_title">Retry</string>
+    <string name="data_button_title">Load</string>
+    <string name="clear_button_title">Clear</string>
+
+    <string name="connect_reader_menu_item_text">Connect Reader</string>
+    <string name="change_reader_menu_item_text">Change Reader</string>
+    <string name="disconnect_reader_menu_item_text">Disconnect Reader</string>
+    <string name="reset_reader_menu_item_text">Reset Reader</string>
+
+</resources>

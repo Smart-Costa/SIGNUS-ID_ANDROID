@@ -49,13 +49,17 @@ public class TagWriter implements IReaderListener {
 
     public void updateContext(ResponseHandlerInterface activity) {
         this.responseHandlerInterface = activity;
-        this.context = activity.GetContext();
-        Log.d(TAG, "Context updated for TagWriter");
+        if (activity.GetContext() != null) {
+            this.context = activity.GetContext().getApplicationContext();
+        }
+        Log.d(TAG, "Context updated for TagWriter (using ApplicationContext)");
     }
 
     public void onCreate(ResponseHandlerInterface activity) {
         responseHandlerInterface = activity;
-        context = activity.GetContext();
+        if (activity.GetContext() != null) {
+            context = activity.GetContext().getApplicationContext();
+        }
         
         Power = SharedPreferencesGetSet.leer_local("potenciaAntena", context);
         try {

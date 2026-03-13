@@ -1,5 +1,6 @@
 package com.example.diverscan.activeid.UI.validation;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -7,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.diverscan.activeid.RFIDDiagnosticActivity;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
 import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
@@ -35,7 +37,8 @@ import com.zebra.rfid.api3.ENUM_TRANSPORT;
 import android.widget.RadioGroup;
 import android.widget.RadioButton;
 
-public class ConnectionValidationActivity extends AppCompatActivity implements ResponseHandlerInterface, ActivoDao.LogListener {
+public class ConnectionValidationActivity extends AppCompatActivity
+        implements ResponseHandlerInterface, ActivoDao.LogListener {
 
     private static final int PERMISSION_REQUEST_CODE = 100;
     private TextView tvStatus;
@@ -45,11 +48,12 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     private Button btnReconnect;
     private Button btnTestSingle;
     private Button btnTestMulti;
+    private Button btnRfidDiagnostic;
     private RadioGroup rgTransport;
     private TagWriter rfidHandler;
     private Handler handler = new Handler(Looper.getMainLooper());
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-    
+
     private boolean isMultiReading = false;
     private boolean isSingleReading = false;
     private Map<String, Integer> multiReadTags = new HashMap<>();
@@ -74,6 +78,7 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
         btnReconnect = findViewById(R.id.btn_reconnect);
         btnTestSingle = findViewById(R.id.btn_test_single);
         btnTestMulti = findViewById(R.id.btn_test_multi);
+        btnRfidDiagnostic = findViewById(R.id.btn_rfid_diagnostic);
         rgTransport = findViewById(R.id.rg_transport);
 
         rfidHandler = TagWriter.getInstance();
@@ -85,44 +90,36 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
 
         btnReconnect.setOnClickListener(v -> {
             log("Reiniciando conexión...");
-            
+
             // Set transport based on selection
             int checkedId = rgTransport.getCheckedRadioButtonId();
             com.example.diverscan.activeid.DeviceInterface.ConnectionType connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.BLUETOOTH;
-            
+
             if (checkedId == R.id.rb_serial || checkedId == R.id.rb_usb) {
                 connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.SERIAL_USB;
             }
-            
-            rfidHandler.setAutoDetect(false); 
-            
-            // Detect reader type or default to iMin if on iMin device
-            com.example.diverscan.activeid.DeviceInterface.ReaderType type = rfidHandler.getCurrentReaderType();
-            
-            // Logic to determine reader type
-            if (Build.MODEL.contains("I24P01") || Build.MODEL.contains("Lark 1")) {
-                 // Internal reader usually
-                 type = com.example.diverscan.activeid.DeviceInterface.ReaderType.IMIN;
-            } else {
-                 // Default to Zebra for external readers if not set
-                 if (type == com.example.diverscan.activeid.DeviceInterface.ReaderType.UNKNOWN || type == null) {
-                     type = com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA;
-                 }
-            }
-            
+
+            rfidHandler.setAutoDetect(false);
+
+            // Force Zebra for external readers as requested
+            com.example.diverscan.activeid.DeviceInterface.ReaderType type = com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA;
+
             log("Reconectando como: " + type + " via " + connType);
-            
+
             // If USB/Serial selected but type is iMin (internal), warn user or force type?
             // Assuming iMin uses internal serial which is fine.
-            
+
             rfidHandler.setReaderType(type, connType);
         });
 
         btnTestSingle.setOnClickListener(v -> startSingleRead());
         btnTestMulti.setOnClickListener(v -> toggleMultiRead());
+        btnRfidDiagnostic.setOnClickListener(v -> {
+            startActivity(new Intent(this, RFIDDiagnosticActivity.class));
+        });
 
         updateUI();
-        
+
         log("INFO: Si usa DataWedge, asegúrese de que el perfil para esta app tenga el Plugin RFID DESHABILITADO para permitir conexión directa por SDK.");
     }
 
@@ -142,7 +139,7 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
         if (rfidHandler != null) {
             rfidHandler.setValidationMode(false);
         }
-        // Don't nullify handler here if we want background updates, 
+        // Don't nullify handler here if we want background updates,
         // but for safety in this app structure:
         // if (rfidHandler != null) rfidHandler.setResponseHandler(null);
     }
@@ -178,7 +175,8 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     }
 
     private void log(String msg) {
-        if (isFinishing() || isDestroyed()) return;
+        if (isFinishing() || isDestroyed())
+            return;
         String timestamp = timeFormat.format(new Date());
         runOnUiThread(() -> {
             tvLog.append("\n[" + timestamp + "] " + msg);
@@ -193,7 +191,8 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     // ResponseHandlerInterface implementation
     @Override
     public void handleTagdata(ReaderTag[] tagData) {
-        if (tagData == null || tagData.length == 0) return;
+        if (tagData == null || tagData.length == 0)
+            return;
 
         final String epc = tagData[0].getEpc();
 
@@ -214,7 +213,7 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
             });
         }
     }
-    
+
     private void startSingleRead() {
         if (!rfidHandler.isConnected()) {
             Toast.makeText(this, "Lector desconectado", Toast.LENGTH_SHORT).show();
@@ -266,12 +265,12 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
 
             if (activo != null) {
                 mensaje += "Estado: ENCONTRADO\n" +
-                           "Activo: " + activo.getNumeroActivo() + "\n" +
-                           "Desc: " + activo.getDescripcionCorta();
+                        "Activo: " + activo.getNumeroActivo() + "\n" +
+                        "Desc: " + activo.getDescripcionCorta();
             } else {
                 mensaje += "Estado: NO REGISTRADO EN BD LOCAL";
             }
-            
+
             final String finalMsg = mensaje;
             runOnUiThread(() -> {
                 new AlertDialog.Builder(this)
@@ -284,12 +283,13 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     }
 
     private void showMultiReadSummary() {
-        // Ejecutar consultas de base de datos en hilo secundario para evitar congelar la UI
+        // Ejecutar consultas de base de datos en hilo secundario para evitar congelar
+        // la UI
         new Thread(() -> {
             List<String> epcList = new ArrayList<>(multiReadTags.keySet());
             // Uso de consulta masiva optimizada
             List<ActivoEntity> foundAssets = activoDao.getActivosByEpcs(epcList);
-            
+
             // Mapa para búsqueda rápida O(1)
             Map<String, ActivoEntity> assetMap = new HashMap<>();
             for (ActivoEntity a : foundAssets) {
@@ -300,7 +300,7 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
 
             StringBuilder sb = new StringBuilder();
             sb.append("Total Tags Únicos: ").append(multiReadTags.size()).append("\n\n");
-            
+
             int encontrados = 0;
             int desconocidos = 0;
 
@@ -314,9 +314,9 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
                     sb.append("[UNK] ").append(epc).append("\n");
                 }
             }
-            
+
             sb.insert(0, "Encontrados: " + encontrados + " | Desconocidos: " + desconocidos + "\n");
-            
+
             // Actualizar UI en el hilo principal
             String message = sb.toString();
             runOnUiThread(() -> {
@@ -350,13 +350,13 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
     private void checkAndRequestPermissions() {
         String[] permissions;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            permissions = new String[]{
+            permissions = new String[] {
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_CONNECT,
                     Manifest.permission.ACCESS_FINE_LOCATION
             };
         } else {
-            permissions = new String[]{
+            permissions = new String[] {
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
             };
@@ -370,7 +370,8 @@ public class ConnectionValidationActivity extends AppCompatActivity implements R
         }
 
         if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]),
+                    PERMISSION_REQUEST_CODE);
         }
     }
 

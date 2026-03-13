@@ -1,0 +1,114 @@
+
+TSL Reader BLE Support
+======================
+
+Starting with Rfid.AsciiProtocol-3.8.0, the library supports BLE connections to BLE Capable TSL Readers e.g. 3166, 3138.
+
+By default, BLE connection support is OFF.
+
+Enabling BLE support also requires the addition of the Blessed BLE Library dependency to a project's build.gradle file:
+
+
+Existing Apps can use the latest library without adding the Blessed dependency if they do not require BLE support.
+
+Bluetooth Classic connections are still the recommended wireless connection type and will provide the best throughput,
+particularly when using the faster RF Modes available on the Series 3 Readers.
+
+
+Enabling BLE Support
+--------------------
+
+If BLE connection support is required, then:
+
+    - Add Blessed BLE Library dependency to the project's build.gradle file:
+
+        dependencies {
+            implementation project(':Rfid.AsciiProtocol-Library')
+            implementation 'com.github.weliem:blessed-android:2.5.0'
+            implementation project(':DeviceList')
+            .
+            .
+        }
+
+    - Enable BLE support on the ReaderManager (e.g. in your Activity's onCreate() method):
+
+        // Configure the ReaderManager
+        ReaderManager.create(getApplicationContext());
+
+        // BLE is disabled by default as it requires a dependency library (Blessed)
+        ReaderManager.sharedInstance().setBleSupportEnabled(true);
+
+
+ReaderManager now has two methods to control discovery of BLE devices:
+
+        ReaderManager.sharedInstance().startDiscovery();
+        ReaderManager.sharedInstance().stopDiscovery();
+
+The DeviceList Activity project has been updated to Start and Stop the discovery process so, new readers will appear in the Device List
+as they are discovered.
+Important: by default, TSL Readers in the BLE data mode (SOG) will have BT friendly names ending in "-LE". BT Friendly name changes must
+ensure that they include the "-LE" suffix to ensure correct operation.
+
+Manifest Permissions for BLE are as follows:
+
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30"/>
+
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:minSdkVersion="31"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" android:minSdkVersion="31"/>
+
+Actual permissions required varies by API level and should be requested at runtime.
+ See Sample Projects for an updated checkForBluetoothPermission() method e.g. Inventory sample
+
+Android 12 (API level 31) and above:
+    BLUETOOTH_SCAN: Required for scanning and discovering other devices.
+    BLUETOOTH_CONNECT: Required for connecting to discovered devices.
+
+Android 11 (API level 30) and below:
+    BLUETOOTH: Necessary for any Bluetooth communication.
+    BLUETOOTH_ADMIN: Required if your app needs to initiate device discovery or manipulate Bluetooth settings.
+    ACCESS_FINE_LOCATION: Required for Bluetooth discovery if targeting API 29 or 30.
+    ACCESS_COARSE_LOCATION if targeting API 28 or lower.
+
+
+Connections to BLE devices require pairing (bonding) so any attempt to connect to discovered devices may trigger the system pairing
+request dialogs. Users must select the 'Pair' option to enable the BLE connection. This pairing, like classic BT, needs to be performed
+once only (after each reset of the Reader's BT).
+
+
+TSL Readers connected over BLE appear as IAsciiTransports like the other connection types so the above steps should be all
+that is required to add BLE support to an App. However, the BLE implementation also brings stricter threading requirements as detailed below.
+
+
+BLE Threading Requirements
+--------------------------
+
+The BLE implementation REQUIRES that Synchronous Commands be run off the main UI thread.
+BT Classic connections were more tolerant so your code may need some modification.
+The Sample projects have added a new serialTaskRunner(Runnable task) method to the Model class for just this purpose and a further convenience method
+runOffUIThread(Runnable task) that uses the serialTaskRunner() only when necessary.
+
+
+Sample Projects with BLE support
+--------------------------------
+
+For this release, not all of the Sample Projects have BLE support enabled. This demonstrates that unless BLE is needed, no additional
+dependencies are required and the library functions as before.
+Projects with BLE support are functionally identical to earlier versions and demonstrate the minimal additional steps needed to offer
+BLE support in an App.
+
+The projects below demonstrate BLE support:
+
+    Device List
+    Inventory
+    ReadWrite
+
+
+Known Issues
+------------
+
+The ConfigureBarcode implementation currently has threading issues when used with BLE enabled.
+

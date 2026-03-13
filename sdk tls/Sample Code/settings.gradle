@@ -1,0 +1,18 @@
+//
+// The SDK modules
+//
+include ':Rfid.AsciiProtocol-Library'
+include ':Sample Code:BulkEncoding'
+include ':Sample Code:TagKill'
+include ':Sample Code:S3SensorTagReader'
+include ':Sample Code:LicenceKeyUserApp'
+include ':Sample Code:LicenceKey'
+include ':Sample Code:HFLFSupport'
+include ':Sample Code:TagFinder'
+include ':Sample Code:BlockPermalock'
+include ':Sample Code:ConfigureBarcode'
+include ':Sample Code:Trigger'
+include ':Sample Code:Inventory'
+include ':Sample Code:ReadWrite'
+include ':Sample Code:ReaderManager'
+include ':DeviceList'

@@ -1,0 +1,63 @@
+
+The New Licence Key Sample Projects
+===================================
+
+The previous LicenceKey project has now been split into two separate projects and converted to use an Elliptic Curve Digital Signature Algorithm (ECDSA) based licenceKey value.
+
+The two new projects are:
+
+	- LicenceKey			This project will install and remove licence keys and show the status of connected Readers.
+							The LicenceKey is a signature of the Reader's Serial number and BT MAC address concatenated with '_'.
+							This ties the signature uniquely to the Reader - copying the licence key from one reader to another will not authorise the other reader!
+							A sample Private key is provided but see the warning below.
+
+	- LicenceKeyUserApp		This project shows the authorisation status of connected Readers and demonstrates how it is the App that chooses to ignore unauthorised readers.
+
+
+
+!!! Warning !!!
+---------------
+
+To simplify the sample project, the Public/Private keys are loaded from the App's resources.
+
+The keys are ECDSA P-256 and encoded format is PEM PKCS#8.
+The keys were generated here: https://keytool.online/
+
+The public key can be freely distributed.
+
+In "Real World" use, consider carefully how you will securely distribute the private key.
+Each Android device that can "authorise" Readers will need to use the same private key.
+
+
+References
+----------
+The following links may be useful:
+
+	Welcome | Practical Cryptography for Developers
+	https://cryptobook.nakov.com/
+
+	The AndroidKeystore can import encrypted keys but demonstration of its use is outside the scope of these sample projects.
+	https://developer.android.com/privacy-and-security/keystore#ImportingEncryptedKeys
+
+
+
+
+Using the new LicenceKey Sample Projects
+----------------------------------------
+
+These new sample app implementations will be part of the next SDK release v2.7.0, targeting Android API level34.
+
+However, the projects can be used with the current stable release of the TSL Android SDK v2.6.0 as follows:
+
+	- Copy the two projects into the v2.6.0 SDK "Sample Code" folder - allow LicenceKey to replace the existing version.
+
+	- Add the LicenceKeyUserApp to the settings.gradle file:
+
+		include ':Sample Code:LicenceKeyUserApp'
+
+In LicenceKey/build.gradle and LicenceKeyUserApp/build.gradle:
+	- lower the targetSDK to 33
+
+Alternatively, the current beta versions of the Rfid.AsciiProtocol-Library and DeviceList projects are included for projects wishing to target API level 34.
+Note: The Rfid.AsciiProtocol-Library documentation has not yet been updated.
+

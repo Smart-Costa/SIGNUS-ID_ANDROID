@@ -23,7 +23,7 @@ android {
         
         // URL Base por defecto (Ambiente de Pruebas)
         // buildConfigField "String", "BASE_URL", "\"http://3.85.211.90:70/ApiHH/Api\""
-        buildConfigField "String", "BASE_URL", "\"http://192.168.1.110:5200/api\""
+        buildConfigField "String", "BASE_URL", "\"http://10.200.201.98/ApiHH/api\""
     }
     buildTypes {
         release {
@@ -63,7 +63,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 
     // --- AndroidX modern replacements ---
     implementation 'androidx.appcompat:appcompat:1.7.0'

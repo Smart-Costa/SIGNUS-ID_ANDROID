@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">BlockPermalock</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="target_epc_label">Tag (Hex)</string>
+    <string name="word_address_label">Block Pointer\n16 block units</string>
+    <string name="word_count_label">Block Range\n16 block units</string>
+    <string name="memory_bank_label">Memory Bank</string>
+    <string name="data_label">Permalock Mask (Hex)</string>
+    <string name="power_level_label_text">dBm</string>
+    <string name="write_button_text">Lock</string>
+    <string name="read_button_text">Read</string>
+    <string name="clear_button_text">Clear Results</string>
+    <string name="tag_info_text">Partial EPCs are matched from the start and actions will affect multiple tags. Lock action MUST have at least a partial EPC specified.</string>
+
+    <string name="connect_reader_menu_item_text">Connect Reader</string>
+    <string name="change_reader_menu_item_text">Change Reader</string>
+    <string name="disconnect_reader_menu_item_text">Disconnect Reader</string>
+</resources>

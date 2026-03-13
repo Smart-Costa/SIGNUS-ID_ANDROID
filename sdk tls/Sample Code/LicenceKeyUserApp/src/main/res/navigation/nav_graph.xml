@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/LicenceKeyUserAppFragment">
+
+    <fragment
+        android:id="@+id/LicenceKeyUserAppFragment"
+        android:name="com.uk.tsl.rfid.samples.licencekeyuserapp.LicenceKeyUserAppFragment"
+        android:label="@string/licencekeyuserapp_fragment_label"
+        tools:layout="@layout/fragment_licence_key_user_app">
+
+    </fragment>
+</navigation>

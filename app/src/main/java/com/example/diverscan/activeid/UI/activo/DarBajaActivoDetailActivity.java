@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.diverscan.activeid.Utilities.PermissionUtils;
 
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
@@ -25,6 +26,8 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         super.onCreate(savedInstanceState);
         binding = ActivityDarBajaActivoDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        PermissionUtils.requestPermissions(this);
 
         activoDAO = new ActivoDao(this);
         

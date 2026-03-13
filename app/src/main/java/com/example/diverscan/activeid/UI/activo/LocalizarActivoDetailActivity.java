@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.diverscan.activeid.Utilities.PermissionUtils;
 
 import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
@@ -29,6 +30,8 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         super.onCreate(savedInstanceState);
         binding = ActivityLocalizarActivoDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        
+        PermissionUtils.requestPermissions(this);
 
         activoDAO = new ActivoDao(this);
         

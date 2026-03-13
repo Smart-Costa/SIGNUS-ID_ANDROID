@@ -2,16 +2,21 @@ package com.example.diverscan.activeid.DeviceInterface;
 
 import android.content.Context;
 import com.example.diverscan.activeid.DeviceInterface.ConnectionType;
+import com.example.diverscan.activeid.DeviceInterface.Impl.DatalogicReaderImpl;
 import com.example.diverscan.activeid.DeviceInterface.Impl.ZebraReaderImpl;
 import com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl;
 import com.example.diverscan.activeid.DeviceInterface.Impl.IminScannerImpl;
 
 public class ReaderFactory {
-    public static IReaderDevice createReader(ReaderType type, ConnectionType connectionType, Context context, IReaderListener listener) {
+    public static IReaderDevice createReader(ReaderType type, ConnectionType connectionType, Context context,
+            IReaderListener listener) {
         IReaderDevice device = null;
         switch (type) {
             case ZEBRA:
                 device = new ZebraReaderImpl();
+                break;
+            case DATALOGIC:
+                device = new DatalogicReaderImpl();
                 break;
             case IMIN:
                 device = new IminReaderImpl();
@@ -21,18 +26,18 @@ public class ReaderFactory {
                 break;
             // Future implementations
             // case CHAINWAY:
-            //     device = new ChainwayReaderImpl();
-            //     break;
+            // device = new ChainwayReaderImpl();
+            // break;
             default:
                 throw new IllegalArgumentException("Unknown reader type: " + type);
         }
-        
+
         if (device != null) {
             device.setListener(listener);
             device.setConnectionType(connectionType);
             device.initialize(context);
         }
-        
+
         return device;
     }
 

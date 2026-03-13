@@ -101,6 +101,16 @@
             android:layout_marginStart="8dp"/>
     </LinearLayout>
 
+    <!-- Diagnóstico avanzado exclusivo Zebra -->
+    <Button
+        android:id="@+id/btn_rfid_diagnostic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🔍  Diagnóstico Zebra"
+        android:backgroundTint="#1565C0"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="8dp"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

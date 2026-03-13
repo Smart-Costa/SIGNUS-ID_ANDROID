@@ -182,7 +182,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                         return true;
                     }
                 } catch (InvalidUsageException | OperationFailureException e) {
-                    notifyError("Error conectando: " + e.getMessage());
+                    notifyError("Error conectando: " + e.getMessage() + (e instanceof OperationFailureException ? " [Info: " + ((OperationFailureException)e).getVendorMessage() + "]" : ""));
                 }
             }
         } finally {
@@ -277,24 +277,33 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public boolean startInventory() {
-        if (!isConnected()) return false;
+        if (reader == null) {
+            notifyError("Error: Lector no inicializado.");
+            return false;
+        }
         try {
             reader.Actions.Inventory.perform();
             return true;
         } catch (InvalidUsageException | OperationFailureException e) {
-            notifyError("Error iniciando inventario: " + e.getMessage());
+            String detail = (e instanceof OperationFailureException) ? " [Info: " + ((OperationFailureException)e).getVendorMessage() + "]" : "";
+            notifyError("Error iniciando inventario: " + e.getMessage() + detail);
             return false;
         }
     }
 
     @Override
     public boolean stopInventory() {
-        if (!isConnected()) return false;
+        if (!isConnected() || reader == null) return false;
         try {
             reader.Actions.Inventory.stop();
             return true;
-        } catch (InvalidUsageException | OperationFailureException e) {
-            notifyError("Error deteniendo inventario: " + e.getMessage());
+        } catch (InvalidUsageException e) {
+            // Already stopped or not running, ignore
+            return true;
+        } catch (OperationFailureException e) {
+            // If it's already stopped, it might throw here too. Check results if possible.
+            // For now, let's just log it instead of showing a scary error if it happens during stop.
+            Log.w(TAG, "Fallo al detener inventario: " + e.getVendorMessage());
             return false;
         }
     }
@@ -340,7 +349,8 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
             reader.Actions.TagAccess.writeWait(sourceEpc, writeAccessParams, null, new TagData(), true, true);
             return true;
         } catch (Exception e) {
-            notifyError("Error escribiendo tag: " + e.getMessage());
+            String detail = (e instanceof OperationFailureException) ? " [Info: " + ((OperationFailureException)e).getVendorMessage() + "]" : "";
+            notifyError("Error escribiendo tag: " + e.getMessage() + detail);
             return false;
         }
     }
@@ -405,12 +415,13 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                      new Handler(Looper.getMainLooper()).post(() -> listener.onTrigger(pressed));
                 }
                 
-                // Mimic original behavior: start/stop inventory on trigger
+                /* REMOVED redundant calls - they are handled by the Activity via onTrigger listener
                 if (pressed) {
                     startInventory();
                 } else {
                     stopInventory();
                 }
+                */
             } else if (e.StatusEventData.getStatusEventType() == STATUS_EVENT_TYPE.DISCONNECTION_EVENT) {
                 Log.w(TAG, "Received DISCONNECTION_EVENT from reader");
                 disconnect();

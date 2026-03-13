@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">S3SensorTagReader</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- Strings used for fragments for navigation -->
+    <string name="sensor_tag_fragment_label">S3 Sensor Tag Reader</string>
+    <string name="configure_fragment_label">Configuration</string>
+    <string name="not_compatible_fragment_label">Incompatible Reader</string>
+
+    <string name="not_compatible">
+        Temperature reading requires a TSL Reader that supports ASCII Protocol v3 or greater.
+    </string>
+    <string name="not_compatible2">
+        Please connect a Series 3 Reader e.g. 3166, 3138.
+    </string>
+    <string name="not_compatible3">
+        Or disable Temperature Reading on the Configuration page.
+    </string>
+    <string name="not_temperature_compatible">
+        Temperature Reading requires a Reader that supports ASCII Protocol v3 or greater.
+    </string>
+
+    <string name="placeholder_text"/>
+    <string name="power_level_label_text"> dBm</string>
+
+    <string name="scan_button_text">Scan</string>
+    <string name="scan_start_button_text">Start</string>
+    <string name="scan_stop_button_text">Stop</string>
+    <string name="clear_button_text">Clear</string>
+    <string name="configure_button_text">Configure</string>
+    <string name="home_button_text">Home</string>
+
+    <!-- Settings -->
+    <string name="setting_sensor_type_title_text">Enable Temperature Reading</string>
+
+    <string name="setting_2_digit_text">00</string>
+    <string name="setting_3_digit_text">000</string>
+    <string name="setting_warning_text">!!! Warning !!!</string>
+    <string name="setting_warning2_text">These values are not validated.\nEnsure Max >= Min and values are sensible.</string>
+
+    <string name="setting_rssi_title_text">Valid RSSI Range</string>
+    <string name="setting_rssi_min_text">Minimum RSSI</string>
+    <string name="setting_rssi_max_text">Maximum RSSI</string>
+    <string name="setting_rssi_explanatory_text">Only tags reporting RSSI between these (inclusive) limits will be used for temperature readings.</string>
+
+    <string name="setting_power_title_text">Power Sweep Limits</string>
+    <string name="setting_power_min_text">Minimum Power</string>
+    <string name="setting_power_max_text">Maximum Power</string>
+    <string name="setting_power_explanatory_text">The power sweeping will be restricted to these (inclusive) limits.</string>
+
+    <string name="setting_accuracy_title_text">Accuracy</string>
+    <string name="setting_accuracy_samples_text">Samples Per Reading</string>
+    <string name="setting_accuracy_explanatory_text">The tag temperature code will be sampled the specified number of times and the average used for calculating the temperature.</string>
+
+</resources>

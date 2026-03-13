@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">ConfigureBarcode</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="scan_button_text">Scan</string>
+    <string name="clear_button_text">Clear</string>
+    <string name="power_level_label_text">dBm</string>
+    <string name="use_fast_id_title">Fast Id</string>
+    <string name="tag_list_title">Transponders</string>
+    <string name="barcode_list_title">Barcodes</string>
+    <string name="placeholder">PLACEHOLDER</string>
+    <string name="code128">Code 128 Enabled</string>
+    <string name="lengthOne">Code 128\nLength One</string>
+    <string name="lengthTwo">Code 128\nLength Two</string>
+    <string name="persist_button_text">Persist</string>
+    <string name="default_button_text">Restore</string>
+
+    <string name="connect_reader_menu_item_text">Connect Reader</string>
+    <string name="change_reader_menu_item_text">Change Reader</string>
+    <string name="disconnect_reader_menu_item_text">Disconnect Reader</string>
+
+    <string name="reset_reader_menu_item_text">Reset Reader</string>
+
+</resources>

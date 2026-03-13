@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    DEBUG MANIFEST OVERLAY
+    Flujo normal: Splash → Login → App
+    El diagnóstico RFID está disponible desde Configuración → Validar Conexión.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- No overrides: el launcher es SplashActivity (definido en main/AndroidManifest.xml) -->
+</manifest>

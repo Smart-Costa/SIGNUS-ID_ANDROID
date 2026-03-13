@@ -2,6 +2,7 @@ package com.example.diverscan.activeid.DeviceInterface;
 
 public enum ReaderType {
     ZEBRA,
+    DATALOGIC, // Datalogic RFID readers (Bluetooth/Serial)
     CHAINWAY,
     HONEYWELL,
     IMIN, // Lark 1 (I24P01)
