@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Zebra/Symbol Vendor ID (0x05E0 = 1504) -->
+    <usb-device vendor-id="1504" product-id="1536" />
+    <usb-device vendor-id="1504" product-id="5889" />
+    <usb-device vendor-id="1504" product-id="6400" />
     <usb-device vendor-id="1504" />
 </resources>

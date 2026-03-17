@@ -43,6 +43,8 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
     private Button btnGuardar;
 
     private RegistroActivoFotoTagViewModel viewModel;
+    private boolean isScanning = false;
+    private long lastTriggerEventAt = 0L;
 
     private final List<Bitmap> fotosSeleccionadas = new ArrayList<>();
     private int fotoActual = -1;
@@ -194,6 +196,7 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         if (rfidHandler != null) {
             rfidHandler.stopRead();
         }
+        isScanning = false;
     }
 
     // --- Implementación de ResponseHandlerInterface ---
@@ -213,6 +216,7 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         if (tagData.length > 1) {
             runOnUiThread(() -> {
                 if (rfidHandler != null) rfidHandler.stopRead();
+                isScanning = false;
                 Toast.makeText(this, "Múltiples etiquetas detectadas. Por favor acerque solo una.", Toast.LENGTH_LONG).show();
             });
             return;
@@ -231,6 +235,7 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
             final String finalEpc = epcLeido;
             runOnUiThread(() -> {
                 if (rfidHandler != null) rfidHandler.stopRead();
+                isScanning = false;
                 etRfidTag.setText(finalEpc);
                 Toast.makeText(this, "TAG leído: " + finalEpc, Toast.LENGTH_SHORT).show();
             });
@@ -239,19 +244,29 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
 
     @Override
     public void handleTriggerPress(boolean pressed) {
+        long now = android.os.SystemClock.elapsedRealtime();
+        if (now - lastTriggerEventAt < 120L) {
+            return;
+        }
+        lastTriggerEventAt = now;
+
         if (pressed) {
-             runOnUiThread(() -> Toast.makeText(this, "Leyendo...", Toast.LENGTH_SHORT).show());
-             if (rfidHandler != null) {
-                 if (etRfidTag.getText() != null && !etRfidTag.getText().toString().trim().isEmpty()) {
-                     runOnUiThread(() -> Toast.makeText(this, "TAG ya asignado. Limpie el campo para leer otro.", Toast.LENGTH_SHORT).show());
-                     return;
-                 }
-                 rfidHandler.startRead();
-             }
+            runOnUiThread(() -> Toast.makeText(this, "Leyendo...", Toast.LENGTH_SHORT).show());
+            if (rfidHandler != null) {
+                if (etRfidTag.getText() != null && !etRfidTag.getText().toString().trim().isEmpty()) {
+                    runOnUiThread(() -> Toast.makeText(this, "TAG ya asignado. Limpie el campo para leer otro.", Toast.LENGTH_SHORT).show());
+                    return;
+                }
+                if (!isScanning) {
+                    rfidHandler.startRead();
+                    isScanning = true;
+                }
+            }
         } else {
-             if (rfidHandler != null) {
-                 rfidHandler.stopRead();
-             }
+            if (rfidHandler != null && isScanning) {
+                rfidHandler.stopRead();
+                isScanning = false;
+            }
         }
     }
 

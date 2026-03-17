@@ -27,6 +27,7 @@ import com.example.diverscan.activeid.R;
 import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.DeviceInterface.ConnectionType;
 import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
+import com.example.diverscan.activeid.Utilities.PermissionUtils;
 
 import java.util.List;
 
@@ -54,6 +55,7 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
     private final long interval = 1*1000;
     CountDownTimer sessionActivate;
     TagWriter rfidHandler;
+    private boolean setupCompleted = false;
 
     private RadioGroup rgReadingMode;
     private RadioButton rbSingle;
@@ -102,9 +104,11 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("Configuración Zebra RFID");
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle("Configuración Zebra RFID");
+        }
 
         sessionActivate = new CountDownTimer(startTime, interval){
 
@@ -121,22 +125,7 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
             }
         }.start();
 
-        // Inicializar TagWriter (Singleton)
-        rfidHandler = TagWriter.getInstance();
-        if (!rfidHandler.isInitialized()) {
-             rfidHandler.onCreate(this);
-        } else {
-             rfidHandler.setResponseHandler(this);
-             // Si ya estaba inicializado, aseguramos que tenga el contexto actualizado
-             // y re-conectamos si es necesario en onResume
-        }
-        
-        // Configurar Spinner de lectores
-        configurarSpinnerLectores();
-        configurarSpinnerConexion();
-
-        // Intentar conectar automáticamente (onResume lo hace también)
-        conectarLector();
+        initializeRfidSetupIfPermitted();
 
         /*new AsyncTask<Void, Void, List<String>>() {
             @Override
@@ -187,10 +176,7 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
 
                 // Save and update
                 SharedPreferencesGetSet.guardar_local("connection_type", selected, _context);
-                
-                // We avoid re-initializing if it's just the initial setup, but simplistic approach:
-                // Just let user trigger test or re-connect.
-                // But for immediate effect:
+
                 Log.d(TAG, "Actualizando ReaderType: " + readerType + " Conexión: " + connType);
                 rfidHandler.setReaderType(readerType, connType);
                 conectarLector();
@@ -338,6 +324,10 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
     @Override
     protected void onResume() {
         super.onResume();
+        initializeRfidSetupIfPermitted();
+        if (!PermissionUtils.checkPermissions(this)) {
+            return;
+        }
         if (rfidHandler != null) {
             rfidHandler.updateContext(this);
             String status = rfidHandler.onResume(); // Check connection / Reconnect
@@ -370,13 +360,58 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PermissionUtils.PERMISSION_REQUEST_CODE) {
+            boolean allGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+            if (allGranted) {
+                initializeRfidSetupIfPermitted();
+            } else {
+                txtCnfActual.setText("Estado: permisos denegados");
+                Toast.makeText(this, "Permisos Bluetooth/Ubicación denegados", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     private void conectarLector() {
+        if (!PermissionUtils.checkPermissions(this)) {
+            txtCnfActual.setText("Estado: permisos pendientes");
+            Toast.makeText(_context, "Permisos pendientes para conexión RFID", Toast.LENGTH_SHORT).show();
+            PermissionUtils.requestPermissions(this);
+            return;
+        }
         Log.d(TAG, "Conectando lector...");
         if (rfidHandler != null) {
              String result = rfidHandler.onResume();
              Toast.makeText(_context, result, Toast.LENGTH_SHORT).show();
              txtCnfActual.setText("Estado: " + result);
         }
+    }
+
+    private void initializeRfidSetupIfPermitted() {
+        if (!PermissionUtils.checkPermissions(this)) {
+            PermissionUtils.requestPermissions(this);
+            txtCnfActual.setText("Estado: permisos pendientes");
+            return;
+        }
+        if (setupCompleted) return;
+        rfidHandler = TagWriter.getInstance();
+        if (!rfidHandler.isInitialized()) {
+            rfidHandler.onCreate(this);
+        } else {
+            rfidHandler.setResponseHandler(this);
+        }
+        configurarSpinnerLectores();
+        configurarSpinnerConexion();
+        conectarLector();
+        setupCompleted = true;
     }
     public void controles(){
          mConfigurarAntena = findViewById(R.id.FConfigurarAntena);

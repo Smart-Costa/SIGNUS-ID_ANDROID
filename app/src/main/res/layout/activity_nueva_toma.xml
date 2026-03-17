@@ -457,202 +457,208 @@
             android:visibility="gone">
 
             <!-- SUMMARY CONTAINER -->
-            <LinearLayout
-                android:id="@+id/llSummaryContainer"
+            <ScrollView
+                android:id="@+id/scrollSummary"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
+                android:layout_height="match_parent"
                 android:visibility="visible">
 
-                <!-- Row Faltantes -->
                 <LinearLayout
-                    android:id="@+id/rowFaltantes"
+                    android:id="@+id/llSummaryContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="12dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/shape_circle"
-                        app:tint="#D32F2F"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
+                    <!-- Row Faltantes -->
+                    <LinearLayout
+                        android:id="@+id/rowFaltantes"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Faltantes"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
 
-                    <TextView
-                        android:id="@+id/txtFaltantesCount"
-                        android:layout_width="wrap_content"
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/shape_circle"
+                            app:tint="#D32F2F"
+                            android:layout_marginEnd="16dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Faltantes"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"/>
+
+                        <TextView
+                            android:id="@+id/txtFaltantesCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"
+                            android:layout_marginEnd="8dp"/>
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#757575"/>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
+
+                    <!-- Row Encontrados -->
+                    <LinearLayout
+                        android:id="@+id/rowEncontrados"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"
-                        android:layout_marginEnd="8dp"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:tint="#757575"/>
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/shape_circle"
+                            app:tint="#388E3C"
+                            android:layout_marginEnd="16dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Encontrados"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"/>
+
+                        <TextView
+                            android:id="@+id/txtEncontradosCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"
+                            android:layout_marginEnd="8dp"/>
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#757575"/>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
+
+                    <!-- Row Sobrantes -->
+                    <LinearLayout
+                        android:id="@+id/rowSobrantes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/shape_circle"
+                            app:tint="#FBC02D"
+                            android:layout_marginEnd="16dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Sobrantes"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"/>
+
+                        <TextView
+                            android:id="@+id/txtSobrantesCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"
+                            android:layout_marginEnd="8dp"/>
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#757575"/>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
+
+                    <!-- Row No Inventariados (Pending) -->
+                    <LinearLayout
+                        android:id="@+id/rowNoInventariados"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/shape_circle"
+                            app:tint="#9E9E9E"
+                            android:layout_marginEnd="16dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Aún no inventariados"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"/>
+
+                        <TextView
+                            android:id="@+id/txtNoInventariadosCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"
+                            android:layout_marginEnd="8dp"/>
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#757575"/>
+                    </LinearLayout>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
+
                 </LinearLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
-
-                <!-- Row Encontrados -->
-                <LinearLayout
-                    android:id="@+id/rowEncontrados"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="12dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/shape_circle"
-                        app:tint="#388E3C"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Encontrados"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"/>
-
-                    <TextView
-                        android:id="@+id/txtEncontradosCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"
-                        android:layout_marginEnd="8dp"/>
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:tint="#757575"/>
-                </LinearLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
-
-                <!-- Row Sobrantes -->
-                <LinearLayout
-                    android:id="@+id/rowSobrantes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="12dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/shape_circle"
-                        app:tint="#FBC02D"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Sobrantes"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"/>
-
-                    <TextView
-                        android:id="@+id/txtSobrantesCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"
-                        android:layout_marginEnd="8dp"/>
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:tint="#757575"/>
-                </LinearLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
-
-                 <!-- Row No Inventariados (Pending) -->
-                <LinearLayout
-                    android:id="@+id/rowNoInventariados"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="12dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/shape_circle"
-                        app:tint="#9E9E9E"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Aún no inventariados"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"/>
-
-                    <TextView
-                        android:id="@+id/txtNoInventariadosCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"
-                        android:layout_marginEnd="8dp"/>
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_arrow_forward"
-                        app:tint="#757575"/>
-                </LinearLayout>
-                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
-
-            </LinearLayout>
+            </ScrollView>
 
             <!-- LIST CONTAINER (Initially GONE) -->
             <LinearLayout

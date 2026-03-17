@@ -21,9 +21,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:layout_marginTop="320dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
             android:padding="36dp"
             android:contentDescription="@string/app_name"
+            android:alpha="0.3"
             android:src="@drawable/logo2" />
 
         <!-- Contenido con AppBar -->

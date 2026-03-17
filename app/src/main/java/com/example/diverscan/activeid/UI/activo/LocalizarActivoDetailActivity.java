@@ -24,6 +24,8 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
     private ActivoDao activoDAO;
     private ActivoEntity activoLeido;
     private String epcLeido;
+    private boolean isScanning = false;
+    private long lastTriggerEventAt = 0L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +81,7 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         if (rfidHandler != null) {
             rfidHandler.stopRead();
         }
+        isScanning = false;
     }
 
     @Override
@@ -89,6 +92,7 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         if (tagData.length > 1) {
             runOnUiThread(() -> {
                 if (rfidHandler != null) rfidHandler.stopRead();
+                isScanning = false;
                 Toast.makeText(this, "Múltiples etiquetas detectadas. Por favor acerque solo una.", Toast.LENGTH_LONG).show();
             });
             return;
@@ -102,14 +106,24 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
 
     @Override
     public void handleTriggerPress(boolean pressed) {
+        long now = android.os.SystemClock.elapsedRealtime();
+        if (now - lastTriggerEventAt < 120L) {
+            return;
+        }
+        lastTriggerEventAt = now;
+
         if (pressed) {
             if (rfidHandler != null) {
-                rfidHandler.startRead();
-                runOnUiThread(() -> Toast.makeText(this, "Leyendo...", Toast.LENGTH_SHORT).show());
+                if (!isScanning) {
+                    rfidHandler.startRead();
+                    isScanning = true;
+                    runOnUiThread(() -> Toast.makeText(this, "Leyendo...", Toast.LENGTH_SHORT).show());
+                }
             }
         } else {
-            if (rfidHandler != null) {
+            if (rfidHandler != null && isScanning) {
                 rfidHandler.stopRead();
+                isScanning = false;
             }
         }
     }
@@ -131,6 +145,7 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         if (epcLeido != null) {
             if (!epc.equals(epcLeido)) {
                 if (rfidHandler != null) rfidHandler.stopRead();
+                isScanning = false;
                 Toast.makeText(this, "Se detectaron múltiples TAGs. Acerque solo 1 y reintente.", Toast.LENGTH_SHORT).show();
             }
             return;
@@ -145,6 +160,7 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
             binding.txtNumeroEtiqueta.setText(activo.getNumeroEtiqueta());
             binding.txtDescripcionCorta.setText(activo.getDescripcionCorta());
             if (rfidHandler != null) rfidHandler.stopRead();
+            isScanning = false;
         } else {
             Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
         }

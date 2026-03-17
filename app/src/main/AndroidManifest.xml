@@ -25,8 +25,8 @@
     <!-- 🔌 USB Host — acceso a lectores RFID USB/Serial (eConnex, OTG) -->
     <!-- NOTA: USB_PERMISSION NO es un permiso del sistema, se gestiona con
          UsbManager.requestPermission() en tiempo de ejecución, NO aquí. -->
-    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
-    <uses-permission android:name="android.permission.USB_PERMISSION" />
+    <uses-feature android:name="android.hardware.usb.host" android:required="true" />
+    <uses-feature android:name="android.hardware.usb.accessory" android:required="false" />
 
     <!-- ⚙️ Servicio en primer plano para lectura RFID en background -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -89,7 +89,7 @@
             android:name=".UI.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />

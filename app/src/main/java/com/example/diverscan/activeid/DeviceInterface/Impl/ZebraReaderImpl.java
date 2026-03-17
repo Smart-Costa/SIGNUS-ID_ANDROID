@@ -82,16 +82,17 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                     Log.d(TAG, "Disposing previous readers instance...");
                     readers.Dispose();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.w(TAG, "Dispose previo falló, se continúa con reinicialización: " + e.getMessage());
                 }
                 readers = null;
             }
 
             try {
                 availableRFIDReaderList = null;
+                boolean notifiedNoReaderSpecific = false;
 
                 // Priority based on ConnectionType
-                if (connectionType == ConnectionType.SERIAL_USB || connectionType == ConnectionType.AUTO) {
+                if (connectionType == ConnectionType.SERIAL || connectionType == ConnectionType.USB || connectionType == ConnectionType.AUTO) {
                      // Try Serial (eConnex)
                     try {
                         Log.d(TAG, "Searching for SERIAL/USB readers...");
@@ -104,18 +105,24 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                     }
                 }
                 
-                if ((availableRFIDReaderList == null || availableRFIDReaderList.isEmpty()) && 
-                    (connectionType == ConnectionType.BLUETOOTH || connectionType == ConnectionType.AUTO)) {
+                if ((availableRFIDReaderList == null || availableRFIDReaderList.isEmpty()) &&
+                    (connectionType == ConnectionType.BLUETOOTH
+                        || connectionType == ConnectionType.AUTO)) {
                     
                     if (readers != null) {
                         try { readers.Dispose(); } catch (Exception e) {}
                     }
-                    // Try Bluetooth
                     Log.d(TAG, "Searching for BLUETOOTH readers...");
                     readers = new Readers(context, ENUM_TRANSPORT.BLUETOOTH);
                     readers.attach(this); // Attach for events
                     availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
                     Log.d(TAG, "Bluetooth readers found: " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
+                }
+
+                if ((availableRFIDReaderList == null || availableRFIDReaderList.isEmpty()) &&
+                    (connectionType == ConnectionType.SERIAL || connectionType == ConnectionType.USB)) {
+                    notifyError("No se encontraron lectores Zebra por " + connectionType + ".");
+                    notifiedNoReaderSpecific = true;
                 }
 
                 if (availableRFIDReaderList != null && !availableRFIDReaderList.isEmpty()) {
@@ -126,7 +133,9 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 } else {
                     String msg = "No se encontraron lectores Zebra (" + connectionType + ").";
                     Log.w(TAG, msg);
-                    notifyError(msg);
+                    if (!notifiedNoReaderSpecific) {
+                        notifyError(msg);
+                    }
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error inicializando SDK: " + e.getMessage(), e);
@@ -285,8 +294,16 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
             reader.Actions.Inventory.perform();
             return true;
         } catch (InvalidUsageException | OperationFailureException e) {
-            String detail = (e instanceof OperationFailureException) ? " [Info: " + ((OperationFailureException)e).getVendorMessage() + "]" : "";
-            notifyError("Error iniciando inventario: " + e.getMessage() + detail);
+            String msg = (e.getMessage() != null) ? e.getMessage() : "Error de operación";
+            String detail = (e instanceof OperationFailureException) ? ((OperationFailureException)e).getVendorMessage() : "";
+            
+            // Ignore "Operation In Progress" or "Command in progress" as they are redundant
+            if (detail.contains("Operation In Progress") || detail.contains("Command in progress")) {
+                Log.d(TAG, "Inventory already in progress, ignoring redundant start command.");
+                return true; 
+            }
+            
+            notifyError("Error iniciando inventario: " + msg + " [Info: " + detail + "]");
             return false;
         }
     }
@@ -349,8 +366,9 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
             reader.Actions.TagAccess.writeWait(sourceEpc, writeAccessParams, null, new TagData(), true, true);
             return true;
         } catch (Exception e) {
+            String msg = (e.getMessage() != null) ? e.getMessage() : "Error de operación (Sin mensaje)";
             String detail = (e instanceof OperationFailureException) ? " [Info: " + ((OperationFailureException)e).getVendorMessage() + "]" : "";
-            notifyError("Error escribiendo tag: " + e.getMessage() + detail);
+            notifyError("Error escribiendo tag: " + msg + detail);
             return false;
         }
     }
@@ -358,11 +376,25 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     @Override
     public void dispose() {
         isDisposing = true;
-        disconnect();
-        if (readers != null) {
-            readers.Dispose();
-            readers = null;
+        reconnectHandler.removeCallbacks(reconnectRunnable);
+        try {
+            disconnect();
+        } catch (Exception e) {
+            Log.w(TAG, "Error durante disconnect en dispose: " + e.getMessage());
         }
+        if (readers != null) {
+            try {
+                readers.Dispose();
+            } catch (Exception e) {
+                Log.w(TAG, "Error durante readers.Dispose(): " + e.getMessage());
+            } finally {
+                readers = null;
+            }
+        }
+        reader = null;
+        readerDevice = null;
+        availableRFIDReaderList = null;
+        isDisposing = false;
     }
 
     // Event Handling

@@ -40,6 +40,16 @@ public class RegistroActivoUbicacionActivity extends AppCompatActivity {
         spUbicacionC = findViewById(R.id.spUbicacionC);
         spUbicacionD = findViewById(R.id.spUbicacionD);
         btnGuardarUbicacion = findViewById(R.id.btnGuardar);
+        findViewById(R.id.btnRefreshUbicaciones).setOnClickListener(v -> {
+            Toast.makeText(this, "Actualizando ubicaciones...", Toast.LENGTH_SHORT).show();
+            viewModel.forzarSincronizacion();
+        });
+
+        // Asegurar que abran al hacer click (necesario para AutoCompleteTextView como Spinner)
+        spUbicacionA.setOnClickListener(v -> spUbicacionA.showDropDown());
+        spUbicacionB.setOnClickListener(v -> spUbicacionB.showDropDown());
+        spUbicacionC.setOnClickListener(v -> spUbicacionC.showDropDown());
+        spUbicacionD.setOnClickListener(v -> spUbicacionD.showDropDown());
 
         viewModel = new ViewModelProvider(this).get(RegistroActivoUbicacionViewModel.class);
 
@@ -104,9 +114,13 @@ public class RegistroActivoUbicacionActivity extends AppCompatActivity {
                     .edit()
                     .putString("idActivo", idActivo)
                     .putString("UbicacionA_ID", itemSeleccionA.getId())
+                    .putString("UbicacionA", itemSeleccionA.getNombre())
                     .putString("UbicacionB_ID", itemSeleccionB != null ? itemSeleccionB.getId() : null)
+                    .putString("UbicacionB", itemSeleccionB != null ? itemSeleccionB.getNombre() : null)
                     .putString("UbicacionC_ID", itemSeleccionC != null ? itemSeleccionC.getId() : null)
+                    .putString("UbicacionC", itemSeleccionC != null ? itemSeleccionC.getNombre() : null)
                     .putString("UbicacionD_ID", itemSeleccionD != null ? itemSeleccionD.getId() : null)
+                    .putString("UbicacionD", itemSeleccionD != null ? itemSeleccionD.getNombre() : null)
                     .apply();
             Intent intent = new Intent(this, RegistroActivoDetailActivity.class);
             startActivity(intent);
@@ -136,11 +150,13 @@ public class RegistroActivoUbicacionActivity extends AppCompatActivity {
     private void cargarUbicacionesA(List<UbicacionEntity> ubicaciones) {
         List<ComboItem> listaA = new ArrayList<>();
         Set<String> repetidos = new HashSet<>();
+        android.util.Log.d("RegistroActivoUbicacion", "Procesando " + ubicaciones.size() + " ubicaciones para Nivel A");
         for (UbicacionEntity item : ubicaciones) {
             if (item.getUbicacionA() != null && repetidos.add(item.getUbicacionA())) {
                 listaA.add(new ComboItem(item.getASysId(), item.getUbicacionA()));
             }
         }
+        android.util.Log.d("RegistroActivoUbicacion", "Elementos encontrados para Nivel A: " + listaA.size());
         spUbicacionA.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, listaA));
     }

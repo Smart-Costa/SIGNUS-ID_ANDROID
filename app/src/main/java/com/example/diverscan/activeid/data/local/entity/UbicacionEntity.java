@@ -3,28 +3,28 @@ package com.example.diverscan.activeid.data.local.entity;
 import com.google.gson.annotations.SerializedName;
 
 public class UbicacionEntity {
-    @SerializedName("aSysId")
+    @SerializedName(value = "aSysId", alternate = {"ASysId"})
     public String ASysId;
 
-    @SerializedName("ubicacionA")
+    @SerializedName(value = "ubicacionA", alternate = {"UbicacionA"})
     public String UbicacionA;
 
-    @SerializedName("bSysId")
+    @SerializedName(value = "bSysId", alternate = {"BSysId"})
     public String BSysId;
 
-    @SerializedName("ubicacionB")
+    @SerializedName(value = "ubicacionB", alternate = {"UbicacionB"})
     public String UbicacionB;
 
-    @SerializedName("cSysId")
+    @SerializedName(value = "cSysId", alternate = {"CSysId"})
     public String CSysId;
 
-    @SerializedName("ubicacionC")
+    @SerializedName(value = "ubicacionC", alternate = {"UbicacionC"})
     public String UbicacionC;
 
-    @SerializedName("dSysId")
+    @SerializedName(value = "dSysId", alternate = {"DSysId"})
     public String DSysId;
 
-    @SerializedName("ubicacionD")
+    @SerializedName(value = "ubicacionD", alternate = {"UbicacionD"})
     public String UbicacionD;
 
     public String getASysId() { return ASysId; }

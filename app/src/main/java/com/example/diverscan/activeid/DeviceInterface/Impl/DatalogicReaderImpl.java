@@ -243,8 +243,13 @@ public class DatalogicReaderImpl implements IReaderDevice {
         }
 
         // Estrategia según connectionType
-        if (connectionType == ConnectionType.SERIAL_USB && usbReader != null) {
+        if (connectionType == ConnectionType.USB && usbReader != null) {
             mReader = usbReader;
+        } else if (connectionType == ConnectionType.SERIAL) {
+            // For Datalogic, "Serial" might still be handled via ReaderManager
+            // but we can prioritize specific sleds if needed. For now, 
+            // fallback to auto behavior in the 'else' if SERIAL is not found.
+            if (usbReader != null) mReader = usbReader;
         } else if (mReader == null) {
             // Tomar el primero disponible en la lista (BT o USB)
             if (usbReader != null) {

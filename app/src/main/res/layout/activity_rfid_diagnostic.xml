@@ -59,11 +59,19 @@
             android:textColor="#333"/>
 
         <RadioButton
-            android:id="@+id/rb_serial_usb"
+            android:id="@+id/rb_usb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="USB/Serial"
+            android:text="USB"
+            android:textColor="#333"/>
+
+        <RadioButton
+            android:id="@+id/rb_serial"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Serial"
             android:textColor="#333"/>
 
     </RadioGroup>

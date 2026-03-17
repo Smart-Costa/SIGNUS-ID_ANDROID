@@ -16,6 +16,7 @@ import com.example.diverscan.activeid.DeviceInterface.ConnectionType;
 import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.DeviceInterface.ReaderType;
 import com.example.diverscan.activeid.R;
+import com.example.diverscan.activeid.Utilities.PermissionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,6 +64,10 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
         
         // Auto-select based on saved preference or default to Scanner
         updateUIBasedOnSelection();
+        if (!PermissionUtils.checkPermissions(this)) {
+            PermissionUtils.requestPermissions(this);
+            logToHistory("Permisos pendientes para Bluetooth/Ubicación.");
+        }
     }
 
     private void initViews() {
@@ -160,6 +165,11 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     }
 
     private void initializeReader() {
+        if (!PermissionUtils.checkPermissions(this)) {
+            PermissionUtils.requestPermissions(this);
+            logToHistory("No se puede inicializar lector sin permisos.");
+            return;
+        }
         int selectedId = rgReaderMode.getCheckedRadioButtonId();
         ReaderType targetType;
         if (selectedId == R.id.rbScanner) {
@@ -212,6 +222,11 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     }
 
     private void startReading() {
+        if (!PermissionUtils.checkPermissions(this)) {
+            PermissionUtils.requestPermissions(this);
+            logToHistory("No se puede iniciar lectura sin permisos.");
+            return;
+        }
         logToHistory("Iniciando lectura...");
         if (tagWriter != null) {
             tagWriter.startRead(); // Calls performInventory or equivalent
@@ -250,6 +265,11 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
     @Override
     protected void onResume() {
         super.onResume();
+        if (!PermissionUtils.checkPermissions(this)) {
+            PermissionUtils.requestPermissions(this);
+            logToHistory("Permisos pendientes al retomar actividad.");
+            return;
+        }
         
         // Register iMin Key Event Receiver for side buttons
         registerKeyReceiver();
@@ -280,6 +300,26 @@ public class ConfiguracionLarkActivity extends AppCompatActivity implements Resp
                 keyEventReceiver = null;
             } catch (Exception e) {
                 Log.e(TAG, "Error unregistering key receiver", e);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PermissionUtils.PERMISSION_REQUEST_CODE) {
+            boolean allGranted = true;
+            for (int result : grantResults) {
+                if (result != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+            if (allGranted) {
+                logToHistory("Permisos concedidos. Inicializando lector...");
+                initializeReader();
+            } else {
+                logToHistory("Permisos denegados. La lectura puede fallar.");
             }
         }
     }

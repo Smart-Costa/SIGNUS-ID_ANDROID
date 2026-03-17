@@ -279,6 +279,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     private TagWriter rfidHandler;
     private boolean isScanning = false;
+    private long lastTriggerEventAt = 0L;
     private java.util.Map<String, String> manualEpcToActivoId = new java.util.HashMap<>();
     private java.util.Map<String, String> epcToDisplayName = new java.util.HashMap<>();
 
@@ -1889,6 +1890,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         if (rfidHandler != null) {
             rfidHandler.stopRead();
         }
+        isScanning = false;
+        updateUIState();
     }
 
     @Override
@@ -1913,6 +1916,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void startScan() {
+        if (isScanning) {
+            Log.d(TAG, "startScan ignored: Already scanning");
+            return;
+        }
         if (rfidHandler != null) {
             try {
                 rfidHandler.startRead();
@@ -1920,12 +1927,18 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 updateUIState();
             } catch (Exception e) {
                 Log.e(TAG, "Error starting scan", e);
+                isScanning = false;
+                updateUIState();
                 Toast.makeText(this, "Error al iniciar lectura: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     private void stopScan() {
+        if (!isScanning) {
+            Log.d(TAG, "stopScan ignored: Not scanning");
+            return;
+        }
         if (rfidHandler != null) {
             try {
                 rfidHandler.stopRead();
@@ -1933,6 +1946,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 updateUIState();
             } catch (Exception e) {
                 Log.e(TAG, "Error stopping scan", e);
+                isScanning = false;
+                updateUIState();
             }
         }
     }
@@ -2218,6 +2233,11 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     @Override
     public void handleTriggerPress(boolean pressed) {
+        long now = android.os.SystemClock.elapsedRealtime();
+        if (now - lastTriggerEventAt < 120L) {
+            return;
+        }
+        lastTriggerEventAt = now;
         runOnUiThread(() -> {
             if (pressed) {
                 startScan();

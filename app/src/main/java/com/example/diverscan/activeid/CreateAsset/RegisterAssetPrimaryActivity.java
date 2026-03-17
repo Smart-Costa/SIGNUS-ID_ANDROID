@@ -30,6 +30,7 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity implements R
     private String idCompania, nombreCompania, idEdificio, nombreEdificio, idPiso, nombrePiso, idOficina, nombreOficina;
     private Map<Integer, EntidadEmployees> mapEmpleados;
     private EmployeesDBHelper employeesDBHelper;
+    private boolean isScanning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +145,10 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity implements R
         // Lectura simple: validar si hay multiples tags
         if (tagData.length > 1) {
             runOnUiThread(() -> {
-                if (rfidHandler != null) rfidHandler.stopRead();
+                if (rfidHandler != null) {
+                    rfidHandler.stopRead();
+                    isScanning = false;
+                }
                 Toast.makeText(this, "Múltiples etiquetas detectadas. Por favor acerque solo una.", Toast.LENGTH_LONG).show();
             });
             return;
@@ -153,7 +157,10 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity implements R
         String epc = tagData[0].getEpc();
         if (epc != null && !epc.isEmpty()) {
             runOnUiThread(() -> {
-                if (rfidHandler != null) rfidHandler.stopRead();
+                if (rfidHandler != null) {
+                    rfidHandler.stopRead();
+                    isScanning = false;
+                }
                 numeroEtiquetaView.setText(epc);
                 Toast.makeText(this, "Etiqueta leída: " + epc, Toast.LENGTH_SHORT).show();
             });
@@ -163,13 +170,15 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity implements R
     @Override
     public void handleTriggerPress(boolean pressed) {
         if (pressed) {
-            if (rfidHandler != null) {
+            if (rfidHandler != null && !isScanning) {
                 rfidHandler.startRead();
+                isScanning = true;
                 runOnUiThread(() -> Toast.makeText(this, "Leyendo...", Toast.LENGTH_SHORT).show());
             }
         } else {
-            if (rfidHandler != null) {
+            if (rfidHandler != null && isScanning) {
                 rfidHandler.stopRead();
+                isScanning = false;
             }
         }
     }
@@ -182,5 +191,13 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity implements R
     @Override
     public Context GetContext() {
         return this;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(null);
+        }
     }
 }

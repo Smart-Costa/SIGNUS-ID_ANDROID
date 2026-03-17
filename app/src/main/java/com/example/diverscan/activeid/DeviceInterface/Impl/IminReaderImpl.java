@@ -166,7 +166,7 @@ public class IminReaderImpl implements IReaderDevice {
         return sb.toString();
     }
 
-    private boolean isServiceInstalled(String packageName) {
+    public boolean isServiceInstalled(String packageName) {
         try {
             context.getPackageManager().getPackageInfo(packageName, 0);
             return true;

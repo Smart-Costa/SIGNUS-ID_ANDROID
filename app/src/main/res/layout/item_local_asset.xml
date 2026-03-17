@@ -69,4 +69,46 @@
             android:textColor="@android:color/holo_green_dark" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="4dp">
+
+        <TextView
+            android:id="@+id/tv_ubicacion_a"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ubicación A"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/tv_ubicacion_b"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ubicación B"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:paddingStart="8dp" />
+
+        <TextView
+            android:id="@+id/tv_ubicacion_c"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ubicación C"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:paddingStart="16dp" />
+
+        <TextView
+            android:id="@+id/tv_ubicacion_d"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ubicación D"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:paddingStart="24dp" />
+    </LinearLayout>
+
 </LinearLayout>

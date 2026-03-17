@@ -20,6 +20,8 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
     private TagWriter rfidHandler;
     private ActivoDao activoDAO;
     private ActivoEntity activoLeido;
+    private boolean isScanning = false;
+    private long lastTriggerEventAt = 0L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,7 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
             rfidHandler.stopRead();
             // No desconectamos para mantener la sesión
         }
+        isScanning = false;
     }
 
     // --- ResponseHandlerInterface Implementation ---
@@ -75,6 +78,7 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         if (tagData.length > 1) {
             runOnUiThread(() -> {
                 rfidHandler.stopRead();
+                isScanning = false;
                 Toast.makeText(this, "Múltiples activos detectados. Por favor acerque solo uno.", Toast.LENGTH_LONG).show();
             });
             return;
@@ -96,12 +100,23 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
     public void handleTriggerPress(boolean pressed) {
         // Si no está en modo RFID, ignorar gatillo
         if (!binding.opcRFID.isChecked()) return;
+        long now = android.os.SystemClock.elapsedRealtime();
+        if (now - lastTriggerEventAt < 120L) {
+            return;
+        }
+        lastTriggerEventAt = now;
 
         runOnUiThread(() -> {
             if (pressed) {
-                rfidHandler.startRead();
+                if (!isScanning) {
+                    rfidHandler.startRead();
+                    isScanning = true;
+                }
             } else {
-                rfidHandler.stopRead();
+                if (isScanning) {
+                    rfidHandler.stopRead();
+                    isScanning = false;
+                }
             }
         });
     }
@@ -118,7 +133,13 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         return this;
     }
 
-    // --- Fin Interface ---
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(null);
+        }
+    }
 
     private void procesarLecturaRFID(String epc) {
         if (epc == null || epc.trim().isEmpty()) {
@@ -143,8 +164,10 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
             mostrarNotificacionActivo(epc, activo.getNumeroActivo(), activo.getDescripcionCorta(), true);
             cargarDatosActivo(activo);
             rfidHandler.stopRead();
+            isScanning = false;
         } else {
             rfidHandler.stopRead();
+            isScanning = false;
             mostrarNotificacionActivo(epc, "Desconocido", "No encontrado", false);
             Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
         }
@@ -209,6 +232,7 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         // Si cambiamos de modo y no es RFID, paramos lectura
         if (mode != 3 && rfidHandler != null) {
             rfidHandler.stopRead();
+            isScanning = false;
         }
     }
 

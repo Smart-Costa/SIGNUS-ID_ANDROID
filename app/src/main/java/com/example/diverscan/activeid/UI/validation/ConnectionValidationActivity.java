@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.diverscan.activeid.RFIDDiagnosticActivity;
 import com.example.diverscan.activeid.GeneralTag.ResponseHandlerInterface;
 import com.example.diverscan.activeid.GeneralTag.TagWriter;
 import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
@@ -25,6 +24,8 @@ import android.os.Build;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.widget.Toast;
+import android.util.Log;
+import com.example.diverscan.activeid.ConfiguracionesGeneral.SharedPreferencesGetSet;
 import com.example.diverscan.activeid.data.local.dao.ActivoDao;
 import com.example.diverscan.activeid.data.local.entity.ActivoEntity;
 import android.app.AlertDialog;
@@ -33,14 +34,14 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zebra.rfid.api3.ENUM_TRANSPORT;
 import android.widget.RadioGroup;
-import android.widget.RadioButton;
 
 public class ConnectionValidationActivity extends AppCompatActivity
         implements ResponseHandlerInterface, ActivoDao.LogListener {
 
+    private static final String TAG = "ConnValidation";
     private static final int PERMISSION_REQUEST_CODE = 100;
+    private static final int MAX_LOG_LINES = 350;
     private TextView tvStatus;
     private TextView tvDevice;
     private TextView tvFoundDevices;
@@ -58,13 +59,15 @@ public class ConnectionValidationActivity extends AppCompatActivity
     private boolean isSingleReading = false;
     private Map<String, Integer> multiReadTags = new HashMap<>();
     private ActivoDao activoDao;
+    private int logLineCount = 0;
+    private int triggerPressedCount = 0;
+    private int triggerReleasedCount = 0;
+    private String lastDevicesSnapshot = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection_validation);
-
-        checkAndRequestPermissions();
 
         activoDao = new ActivoDao(this);
         activoDao.setLogListener(this);
@@ -80,6 +83,16 @@ public class ConnectionValidationActivity extends AppCompatActivity
         btnTestMulti = findViewById(R.id.btn_test_multi);
         btnRfidDiagnostic = findViewById(R.id.btn_rfid_diagnostic);
         rgTransport = findViewById(R.id.rg_transport);
+        String lastConn = SharedPreferencesGetSet.leer_local("zebra_connection_type_last_ok", this);
+        if ("USB".equalsIgnoreCase(lastConn)) {
+            rgTransport.check(R.id.rb_usb);
+        } else if ("SERIAL".equalsIgnoreCase(lastConn)) {
+            rgTransport.check(R.id.rb_serial);
+        } else if ("BLUETOOTH".equalsIgnoreCase(lastConn)) {
+            rgTransport.check(R.id.rb_bluetooth);
+        } else {
+            rgTransport.check(R.id.rb_serial);
+        }
 
         rfidHandler = TagWriter.getInstance();
         if (!rfidHandler.isInitialized()) {
@@ -88,39 +101,41 @@ public class ConnectionValidationActivity extends AppCompatActivity
             rfidHandler.setResponseHandler(this);
         }
 
+        logInfo("Sesión iniciada: modelo=" + Build.MODEL + " sdk=" + Build.VERSION.SDK_INT);
+
         btnReconnect.setOnClickListener(v -> {
-            log("Reiniciando conexión...");
+            logInfo("Reiniciando conexión...");
 
             // Set transport based on selection
             int checkedId = rgTransport.getCheckedRadioButtonId();
             com.example.diverscan.activeid.DeviceInterface.ConnectionType connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.BLUETOOTH;
 
-            if (checkedId == R.id.rb_serial || checkedId == R.id.rb_usb) {
-                connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.SERIAL_USB;
+            if (checkedId == R.id.rb_usb) {
+                connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.USB;
+            } else if (checkedId == R.id.rb_serial) {
+                connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.SERIAL;
             }
 
-            rfidHandler.setAutoDetect(false);
-
-            // Force Zebra for external readers as requested
             com.example.diverscan.activeid.DeviceInterface.ReaderType type = com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA;
 
-            log("Reconectando como: " + type + " via " + connType);
-
-            // If USB/Serial selected but type is iMin (internal), warn user or force type?
-            // Assuming iMin uses internal serial which is fine.
-
+            logInfo("Reconectando como: " + type + " via " + connType);
             rfidHandler.setReaderType(type, connType);
+            updateUI();
         });
 
         btnTestSingle.setOnClickListener(v -> startSingleRead());
         btnTestMulti.setOnClickListener(v -> toggleMultiRead());
-        btnRfidDiagnostic.setOnClickListener(v -> {
-            startActivity(new Intent(this, RFIDDiagnosticActivity.class));
-        });
+        btnRfidDiagnostic.setOnClickListener(v -> runInlineDiagnostic());
 
+        checkAndRequestPermissions();
         updateUI();
 
-        log("INFO: Si usa DataWedge, asegúrese de que el perfil para esta app tenga el Plugin RFID DESHABILITADO para permitir conexión directa por SDK.");
+        logWarn("Si usa DataWedge, deshabilite Plugin RFID para permitir conexión directa por SDK.");
+        if (lastConn != null && !lastConn.isEmpty()) {
+            logInfo("Conexión Zebra guardada: " + lastConn);
+        } else {
+            logInfo("Sin conexión Zebra guardada. Se usa SERIAL por defecto.");
+        }
     }
 
     @Override
@@ -130,6 +145,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
             rfidHandler.setResponseHandler(this);
             rfidHandler.setValidationMode(true);
         }
+        logInfo("Pantalla en primer plano. Modo validación activado.");
         updateUI();
     }
 
@@ -139,6 +155,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
         if (rfidHandler != null) {
             rfidHandler.setValidationMode(false);
         }
+        logInfo("Pantalla en segundo plano. Modo validación desactivado.");
         // Don't nullify handler here if we want background updates,
         // but for safety in this app structure:
         // if (rfidHandler != null) rfidHandler.setResponseHandler(null);
@@ -153,8 +170,10 @@ public class ConnectionValidationActivity extends AppCompatActivity
             String name = rfidHandler.getReaderName();
             String model = rfidHandler.getReaderModel();
             tvDevice.setText("Nombre: " + name + "\nModelo: " + model);
+            logInfo("Estado conexión: CONECTADO (" + name + " / " + model + ")");
         } else {
             tvDevice.setText("Dispositivo: --");
+            logWarn("Estado conexión: DESCONECTADO");
         }
         updateDeviceList();
     }
@@ -168,24 +187,93 @@ public class ConnectionValidationActivity extends AppCompatActivity
                     sb.append("• ").append(d).append("\n");
                 }
                 tvFoundDevices.setText(sb.toString());
+                if (!sb.toString().equals(lastDevicesSnapshot)) {
+                    lastDevicesSnapshot = sb.toString();
+                    logInfo("Dispositivos detectados: " + devices.size());
+                }
             } else {
                 tvFoundDevices.setText("Buscando... (0 encontrados)");
+                if (!"EMPTY".equals(lastDevicesSnapshot)) {
+                    lastDevicesSnapshot = "EMPTY";
+                    logWarn("No se detectan lectores en este momento.");
+                }
             }
         }
     }
 
-    private void log(String msg) {
+    private void logInfo(String msg) {
+        log("INFO", msg);
+    }
+
+    private void logWarn(String msg) {
+        log("WARN", msg);
+    }
+
+    private void logError(String msg) {
+        log("ERROR", msg);
+    }
+
+    private void log(String level, String msg) {
         if (isFinishing() || isDestroyed())
             return;
         String timestamp = timeFormat.format(new Date());
+        if ("ERROR".equals(level)) {
+            Log.e(TAG, msg);
+        } else if ("WARN".equals(level)) {
+            Log.w(TAG, msg);
+        } else {
+            Log.i(TAG, msg);
+        }
         runOnUiThread(() -> {
-            tvLog.append("\n[" + timestamp + "] " + msg);
+            if (tvLog == null) {
+                return;
+            }
+            tvLog.append("\n[" + timestamp + "][" + level + "] " + msg);
+            logLineCount++;
+            if (logLineCount > MAX_LOG_LINES) {
+                String text = tvLog.getText().toString();
+                int firstBreak = text.indexOf('\n');
+                if (firstBreak >= 0 && firstBreak + 1 < text.length()) {
+                    tvLog.setText(text.substring(firstBreak + 1));
+                    logLineCount = MAX_LOG_LINES;
+                }
+            }
             if (tvLog.getLayout() != null) {
                 final int scrollAmount = tvLog.getLayout().getLineTop(tvLog.getLineCount()) - tvLog.getHeight();
                 if (scrollAmount > 0)
                     tvLog.scrollTo(0, scrollAmount);
             }
         });
+    }
+
+    private void runInlineDiagnostic() {
+        StringBuilder diag = new StringBuilder();
+        diag.append("Modelo: ").append(Build.MODEL).append("\n");
+        diag.append("SDK: ").append(Build.VERSION.SDK_INT).append("\n");
+        String savedConn = SharedPreferencesGetSet.leer_local("zebra_connection_type_last_ok", this);
+        diag.append("Conexión guardada Zebra: ").append(savedConn == null || savedConn.isEmpty() ? "N/A" : savedConn).append("\n");
+        int checkedId = rgTransport.getCheckedRadioButtonId();
+        String selectedConn = "BLUETOOTH";
+        if (checkedId == R.id.rb_usb) {
+            selectedConn = "USB";
+        } else if (checkedId == R.id.rb_serial) {
+            selectedConn = "SERIAL";
+        }
+        diag.append("Conexión seleccionada UI: ").append(selectedConn).append("\n");
+        diag.append("Estado conexión: ").append(rfidHandler != null && rfidHandler.isConnected() ? "CONECTADO" : "DESCONECTADO").append("\n");
+        if (rfidHandler != null && rfidHandler.isConnected()) {
+            diag.append("Reader: ").append(rfidHandler.getReaderName()).append("\n");
+            diag.append("Modelo reader: ").append(rfidHandler.getReaderModel()).append("\n");
+        }
+        List<String> devices = rfidHandler != null ? rfidHandler.getFoundDevices() : null;
+        diag.append("Dispositivos detectados: ").append(devices == null ? 0 : devices.size()).append("\n");
+        logInfo("Diagnóstico ejecutado");
+        logInfo(diag.toString().replace("\n", " | "));
+        new AlertDialog.Builder(this)
+                .setTitle("Diagnóstico RFID")
+                .setMessage(diag.toString())
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     // ResponseHandlerInterface implementation
@@ -195,6 +283,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
             return;
 
         final String epc = tagData[0].getEpc();
+        logInfo("Tag recibido. cantidad=" + tagData.length + " epc=" + epc);
 
         if (isSingleReading) {
             runOnUiThread(() -> {
@@ -207,7 +296,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
                 for (ReaderTag tag : tagData) {
                     String id = tag.getEpc();
                     multiReadTags.put(id, multiReadTags.getOrDefault(id, 0) + 1);
-                    log("Tag leído: " + id);
+                    logInfo("Tag leído: " + id);
                 }
                 updateMultiReadButton();
             });
@@ -217,17 +306,19 @@ public class ConnectionValidationActivity extends AppCompatActivity
     private void startSingleRead() {
         if (!rfidHandler.isConnected()) {
             Toast.makeText(this, "Lector desconectado", Toast.LENGTH_SHORT).show();
+            logWarn("Lectura sencilla cancelada: lector desconectado.");
             return;
         }
         isSingleReading = true;
         isMultiReading = false;
         rfidHandler.startRead();
-        log("Esperando lectura sencilla...");
+        logInfo("Esperando lectura sencilla...");
     }
 
     private void toggleMultiRead() {
         if (!rfidHandler.isConnected()) {
             Toast.makeText(this, "Lector desconectado", Toast.LENGTH_SHORT).show();
+            logWarn("Lectura múltiple cancelada: lector desconectado.");
             return;
         }
 
@@ -236,13 +327,14 @@ public class ConnectionValidationActivity extends AppCompatActivity
             isMultiReading = false;
             showMultiReadSummary();
             btnTestMulti.setText("Lectura Múltiple");
+            logInfo("Lectura múltiple detenida. tags únicos=" + multiReadTags.size());
         } else {
             isMultiReading = true;
             isSingleReading = false;
             multiReadTags.clear();
             rfidHandler.startRead();
             btnTestMulti.setText("Detener (0)");
-            log("Iniciando lectura múltiple...");
+            logInfo("Iniciando lectura múltiple...");
         }
     }
 
@@ -250,7 +342,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
         try {
             rfidHandler.stopRead();
         } catch (Exception e) {
-            log("Error deteniendo lectura: " + e.getMessage());
+            logError("Error deteniendo lectura: " + e.getMessage());
         }
     }
 
@@ -319,19 +411,27 @@ public class ConnectionValidationActivity extends AppCompatActivity
 
             // Actualizar UI en el hilo principal
             String message = sb.toString();
+            int totalEncontrados = encontrados;
+            int totalDesconocidos = desconocidos;
             runOnUiThread(() -> {
                 new AlertDialog.Builder(this)
                         .setTitle("Resumen Lectura Múltiple")
                         .setMessage(message)
                         .setPositiveButton("Cerrar", null)
                         .show();
+                logInfo("Resumen múltiple: encontrados=" + totalEncontrados + " desconocidos=" + totalDesconocidos);
             });
         }).start();
     }
 
     @Override
     public void handleTriggerPress(boolean pressed) {
-        log("Gatillo: " + (pressed ? "Presionado" : "Liberado"));
+        if (pressed) {
+            triggerPressedCount++;
+        } else {
+            triggerReleasedCount++;
+        }
+        logInfo("Gatillo: " + (pressed ? "Presionado" : "Liberado") + " [P=" + triggerPressedCount + " R=" + triggerReleasedCount + "]");
     }
 
     @Override
@@ -340,9 +440,25 @@ public class ConnectionValidationActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(null);
+        }
+        logInfo("Pantalla destruida. Handler de respuesta liberado.");
+    }
+
+    @Override
     public void SetMessage(String Text) {
         if (!isFinishing() && !isDestroyed()) {
-            log(Text);
+            String normalized = Text == null ? "" : Text.toLowerCase(Locale.ROOT);
+            if (normalized.contains("error") || normalized.contains("fall")) {
+                logError(Text);
+            } else if (normalized.contains("warning") || normalized.contains("advert")) {
+                logWarn(Text);
+            } else {
+                logInfo(Text);
+            }
             runOnUiThread(this::updateDeviceList);
         }
     }
@@ -370,8 +486,11 @@ public class ConnectionValidationActivity extends AppCompatActivity
         }
 
         if (!listPermissionsNeeded.isEmpty()) {
+            logWarn("Solicitando permisos: " + listPermissionsNeeded);
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]),
                     PERMISSION_REQUEST_CODE);
+        } else {
+            logInfo("Permisos ya concedidos para conexión RFID.");
         }
     }
 
@@ -388,10 +507,10 @@ public class ConnectionValidationActivity extends AppCompatActivity
                 }
             }
             if (!allGranted) {
-                log("Advertencia: Permisos no concedidos. La conexión podría fallar.");
+                logWarn("Permisos no concedidos. La conexión podría fallar.");
                 Toast.makeText(this, "Permisos necesarios no concedidos", Toast.LENGTH_LONG).show();
             } else {
-                log("Permisos concedidos. Intentando conectar...");
+                logInfo("Permisos concedidos. Intentando conectar...");
                 if (!rfidHandler.isInitialized()) {
                     rfidHandler.onCreate(this);
                 } else {
@@ -404,6 +523,6 @@ public class ConnectionValidationActivity extends AppCompatActivity
     // Implementación de ActivoDao.LogListener
     @Override
     public void onLog(String message) {
-        log(message);
+        logInfo(message);
     }
 }

@@ -63,6 +63,18 @@ public class LocalAssetsAdapter extends RecyclerView.Adapter<LocalAssetsAdapter.
         // Estado Sync (no tenemos campo explicito visible en Entity facil, pero asumimos synced si esta aqui y no es nuevo)
         // Por ahora hardcodeamos o usamos logica simple
         holder.tvEstadoSync.setVisibility(View.GONE); 
+
+        // Bind Ubicaciones
+        holder.tvUbicacionA.setText(activo.getUbicacionA() != null ? activo.getUbicacionA() : "");
+        holder.tvUbicacionB.setText(activo.getUbicacionB() != null ? activo.getUbicacionB() : "");
+        holder.tvUbicacionC.setText(activo.getUbicacionC() != null ? activo.getUbicacionC() : "");
+        holder.tvUbicacionD.setText(activo.getUbicacionD() != null ? activo.getUbicacionD() : "");
+        
+        // Hide if empty
+        holder.tvUbicacionA.setVisibility(activo.getUbicacionA() != null && !activo.getUbicacionA().isEmpty() ? View.VISIBLE : View.GONE);
+        holder.tvUbicacionB.setVisibility(activo.getUbicacionB() != null && !activo.getUbicacionB().isEmpty() ? View.VISIBLE : View.GONE);
+        holder.tvUbicacionC.setVisibility(activo.getUbicacionC() != null && !activo.getUbicacionC().isEmpty() ? View.VISIBLE : View.GONE);
+        holder.tvUbicacionD.setVisibility(activo.getUbicacionD() != null && !activo.getUbicacionD().isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -72,6 +84,7 @@ public class LocalAssetsAdapter extends RecyclerView.Adapter<LocalAssetsAdapter.
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvDescripcion, tvEpc, tvPlaca, tvEstadoSync;
+        TextView tvUbicacionA, tvUbicacionB, tvUbicacionC, tvUbicacionD;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -79,6 +92,11 @@ public class LocalAssetsAdapter extends RecyclerView.Adapter<LocalAssetsAdapter.
             tvEpc = itemView.findViewById(R.id.tv_epc);
             tvPlaca = itemView.findViewById(R.id.tv_placa);
             tvEstadoSync = itemView.findViewById(R.id.tv_estado_sync);
+            
+            tvUbicacionA = itemView.findViewById(R.id.tv_ubicacion_a);
+            tvUbicacionB = itemView.findViewById(R.id.tv_ubicacion_b);
+            tvUbicacionC = itemView.findViewById(R.id.tv_ubicacion_c);
+            tvUbicacionD = itemView.findViewById(R.id.tv_ubicacion_d);
         }
     }
 }

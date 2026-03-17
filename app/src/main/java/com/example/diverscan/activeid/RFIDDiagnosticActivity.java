@@ -246,8 +246,10 @@ public class RFIDDiagnosticActivity extends AppCompatActivity implements IReader
         int id = rgConnectionType.getCheckedRadioButtonId();
         if (id == R.id.rb_bluetooth)
             return ConnectionType.BLUETOOTH;
-        if (id == R.id.rb_serial_usb)
-            return ConnectionType.SERIAL_USB;
+        if (id == R.id.rb_usb)
+            return ConnectionType.USB;
+        if (id == R.id.rb_serial)
+            return ConnectionType.SERIAL;
         return ConnectionType.AUTO;
     }
 

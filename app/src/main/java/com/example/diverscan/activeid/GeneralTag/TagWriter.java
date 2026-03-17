@@ -12,6 +12,7 @@ import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.DeviceInterface.ReaderType;
 
 import java.util.List;
+import java.lang.ref.WeakReference;
 
 public class TagWriter implements IReaderListener {
     final static String TAG = "RFID_TAG_WRITER";
@@ -19,12 +20,14 @@ public class TagWriter implements IReaderListener {
     
     // Decoupled Device Interface
     private IReaderDevice device;
+    private ReaderType currentReaderType = ReaderType.ZEBRA;
+    private ConnectionType currentConnectionType = ConnectionType.AUTO;
 
     private int MAX_POWER = 0;
     private String Power;
     private static final String _PASSWORD = "00";
 
-    ResponseHandlerInterface responseHandlerInterface;
+    private WeakReference<ResponseHandlerInterface> responseHandlerRef;
 
     private static TagWriter instance = null;
 
@@ -42,22 +45,20 @@ public class TagWriter implements IReaderListener {
     }
 
     public void setResponseHandler(ResponseHandlerInterface handler) {
-        this.responseHandlerInterface = handler;
-        // If device is already connected, we might want to notify the new handler?
-        // But for now, we just update the reference.
+        this.responseHandlerRef = (handler != null) ? new WeakReference<>(handler) : null;
     }
 
     public void updateContext(ResponseHandlerInterface activity) {
-        this.responseHandlerInterface = activity;
-        if (activity.GetContext() != null) {
+        setResponseHandler(activity);
+        if (activity != null && activity.GetContext() != null) {
             this.context = activity.GetContext().getApplicationContext();
         }
         Log.d(TAG, "Context updated for TagWriter (using ApplicationContext)");
     }
 
     public void onCreate(ResponseHandlerInterface activity) {
-        responseHandlerInterface = activity;
-        if (activity.GetContext() != null) {
+        setResponseHandler(activity);
+        if (activity != null && activity.GetContext() != null) {
             context = activity.GetContext().getApplicationContext();
         }
         
@@ -134,8 +135,9 @@ public class TagWriter implements IReaderListener {
 
     public void InitSDK() {
         Log.d(TAG, "InitSDK - Initializing via Factory");
-        if (responseHandlerInterface != null)
-            responseHandlerInterface.SetMessage("Iniciando servicio de lectura...");
+        ResponseHandlerInterface handler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
+        if (handler != null)
+            handler.SetMessage("Iniciando servicio de lectura...");
 
         // Load reader type from preferences
         String typeStr = SharedPreferencesGetSet.leer_local("reader_type", context);
@@ -143,7 +145,12 @@ public class TagWriter implements IReaderListener {
         
         // Load connection type from preferences
         String connStr = SharedPreferencesGetSet.leer_local("connection_type", context);
+        String connLastOk = SharedPreferencesGetSet.leer_local("connection_type_last_ok", context);
         ConnectionType connType = ConnectionType.AUTO;
+
+        if ((connStr == null || connStr.isEmpty()) && connLastOk != null && !connLastOk.isEmpty()) {
+            connStr = connLastOk;
+        }
 
         if (connStr != null && !connStr.isEmpty()) {
             try {
@@ -176,6 +183,21 @@ public class TagWriter implements IReaderListener {
             }
         }
 
+        if (type == ReaderType.ZEBRA && connType == ConnectionType.AUTO) {
+            String zebraConn = SharedPreferencesGetSet.leer_local("zebra_connection_type_last_ok", context);
+            if (zebraConn != null && !zebraConn.isEmpty()) {
+                try {
+                    ConnectionType restored = ConnectionType.valueOf(zebraConn);
+                    if (restored != ConnectionType.AUTO) {
+                        connType = restored;
+                    }
+                } catch (Exception ignored) {}
+            }
+            if (connType == ConnectionType.AUTO) {
+                connType = ConnectionType.SERIAL;
+            }
+        }
+
         Log.i(TAG, "Inicializando ReaderType: " + type + " ConnectionType: " + connType);
         setReaderType(type, connType);
     }
@@ -185,9 +207,27 @@ public class TagWriter implements IReaderListener {
     }
 
     public void setReaderType(ReaderType type, ConnectionType connType) {
+        if (device != null && currentReaderType == type && currentConnectionType == connType) {
+            String sameMsg = "Configuración sin cambios: " + type + " (" + connType + ")";
+            Log.i(TAG, sameMsg);
+            ResponseHandlerInterface sameHandler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
+            if (sameHandler != null) sameHandler.SetMessage(sameMsg);
+            if (!device.isConnected()) {
+                new Thread(() -> {
+                    try {
+                        device.connect();
+                    } catch (Exception e) {
+                        Log.w(TAG, "Error reconectando con configuración existente: " + e.getMessage());
+                    }
+                }).start();
+            }
+            return;
+        }
+
         String msg = "Configurando Lector: " + type + " (" + connType + ")";
         Log.i(TAG, msg);
-        if (responseHandlerInterface != null) responseHandlerInterface.SetMessage(msg);
+        ResponseHandlerInterface handler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
+        if (handler != null) handler.SetMessage(msg);
 
         // Dispose existing device if any
         if (device != null) {
@@ -202,6 +242,8 @@ public class TagWriter implements IReaderListener {
         // Use Factory to create new reader
         Log.d(TAG, "Creating new reader instance...");
         device = ReaderFactory.createReader(type, connType, context, this);
+        currentReaderType = type;
+        currentConnectionType = connType;
         
         // Persist preference
         SharedPreferencesGetSet.guardar_local("reader_type", type.name(), context);
@@ -226,42 +268,52 @@ public class TagWriter implements IReaderListener {
     @Override
     public void onConnected(String readerName) {
         Log.d(TAG, "Connected to " + readerName);
-        if (responseHandlerInterface != null)
-            responseHandlerInterface.SetMessage("Conectado a " + readerName);
+        if (currentReaderType == ReaderType.ZEBRA && currentConnectionType != ConnectionType.AUTO) {
+            SharedPreferencesGetSet.guardar_local("connection_type_last_ok", currentConnectionType.name(), context);
+            SharedPreferencesGetSet.guardar_local("zebra_connection_type_last_ok", currentConnectionType.name(), context);
+        }
+        ResponseHandlerInterface handler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
+        if (handler != null)
+            handler.SetMessage("Conectado a " + readerName);
     }
 
     @Override
     public void onDisconnected() {
         Log.d(TAG, "Disconnected");
-        if (responseHandlerInterface != null)
-            responseHandlerInterface.SetMessage("Desconectado");
+        ResponseHandlerInterface handler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
+        if (handler != null)
+            handler.SetMessage("Desconectado");
     }
 
     @Override
     public void onConnectionError(String message) {
         Log.e(TAG, "Connection Error: " + message);
-        if (responseHandlerInterface != null)
-            responseHandlerInterface.SetMessage("Error: " + message);
+        ResponseHandlerInterface handler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
+        if (handler != null)
+            handler.SetMessage("Error: " + message);
     }
 
     @Override
     public void onTagRead(List<ReaderTag> tags) {
-        if (responseHandlerInterface != null && tags != null && !tags.isEmpty()) {
+        ResponseHandlerInterface handler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
+        if (handler != null && tags != null && !tags.isEmpty()) {
             ReaderTag[] legacyTags = tags.toArray(new ReaderTag[0]);
-            responseHandlerInterface.handleTagdata(legacyTags);
+            handler.handleTagdata(legacyTags);
         }
     }
 
     @Override
     public void onTrigger(boolean pressed) {
-        if (responseHandlerInterface != null)
-            responseHandlerInterface.handleTriggerPress(pressed);
+        ResponseHandlerInterface handler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
+        if (handler != null)
+            handler.handleTriggerPress(pressed);
     }
 
     @Override
     public void onStatusMessage(String message) {
-        if (responseHandlerInterface != null)
-            responseHandlerInterface.SetMessage(message);
+        ResponseHandlerInterface handler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
+        if (handler != null)
+            handler.SetMessage(message);
     }
 
     // Legacy Methods Mapped to New Interface
