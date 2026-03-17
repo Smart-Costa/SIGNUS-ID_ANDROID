@@ -1,4 +1,4 @@
-﻿package com.example.diverscan.activeid.DeviceInterface.Impl;
+package com.example.diverscan.activeid.DeviceInterface.Impl;
 
 import android.content.Context;
 import android.os.AsyncTask;

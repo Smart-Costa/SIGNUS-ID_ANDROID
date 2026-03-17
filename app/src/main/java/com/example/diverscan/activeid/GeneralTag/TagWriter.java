@@ -1,4 +1,4 @@
-﻿package com.example.diverscan.activeid.GeneralTag;
+package com.example.diverscan.activeid.GeneralTag;
 
 import android.content.Context;
 import android.util.Log;
