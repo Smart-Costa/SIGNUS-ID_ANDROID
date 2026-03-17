@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Zebra vendor-id 1504 (0x05E0) — product-ids de lectores RFID USB -->
+    <!-- RFD8500 -->
     <usb-device vendor-id="1504" product-id="1536" />
+    <!-- RFD8500 variant -->
     <usb-device vendor-id="1504" product-id="5889" />
+    <!-- RFD40 / TC-series sled USB -->
     <usb-device vendor-id="1504" product-id="6400" />
+    <!-- RFD8500 USB (0x1800) -->
+    <usb-device vendor-id="1504" product-id="6144" />
+    <!-- RFD90 (0x1A00) -->
+    <usb-device vendor-id="1504" product-id="6656" />
+    <!-- Catch-all: cualquier dispositivo Zebra no listado arriba -->
     <usb-device vendor-id="1504" />
 </resources>

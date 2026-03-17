@@ -1,4 +1,4 @@
-package com.example.diverscan.activeid.GeneralTag;
+﻿package com.example.diverscan.activeid.GeneralTag;
 
 import android.content.Context;
 import android.util.Log;
@@ -208,20 +208,24 @@ public class TagWriter implements IReaderListener {
 
     public void setReaderType(ReaderType type, ConnectionType connType) {
         if (device != null && currentReaderType == type && currentConnectionType == connType) {
-            String sameMsg = "Configuración sin cambios: " + type + " (" + connType + ")";
-            Log.i(TAG, sameMsg);
-            ResponseHandlerInterface sameHandler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
-            if (sameHandler != null) sameHandler.SetMessage(sameMsg);
-            if (!device.isConnected()) {
-                new Thread(() -> {
-                    try {
-                        device.connect();
-                    } catch (Exception e) {
-                        Log.w(TAG, "Error reconectando con configuración existente: " + e.getMessage());
-                    }
-                }).start();
+            if (device.isConnected()) {
+                // Ya conectado con la misma configuracion, no hacer nada
+                String sameMsg = "Configuracion sin cambios (ya conectado): " + type + " (" + connType + ")";
+                Log.i(TAG, sameMsg);
+                ResponseHandlerInterface sameHandler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
+                if (sameHandler != null) sameHandler.SetMessage(sameMsg);
+                return;
+            } else {
+                // BUG #3 FIX: mismo type+conn pero device desconectado puede significar SDK roto.
+                // Forzar reinicializacion completa en lugar de solo llamar connect().
+                Log.w(TAG, "Misma config pero device desconectado. Forzando reinicializacion del SDK...");
+                try {
+                    device.dispose();
+                } catch (Exception e) {
+                    Log.w(TAG, "Error en dispose durante reinicializacion forzada: " + e.getMessage());
+                }
+                device = null; // Permite caer al bloque de creacion nueva abajo
             }
-            return;
         }
 
         String msg = "Configurando Lector: " + type + " (" + connType + ")";

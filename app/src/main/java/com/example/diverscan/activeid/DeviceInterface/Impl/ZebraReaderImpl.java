@@ -1,4 +1,4 @@
-package com.example.diverscan.activeid.DeviceInterface.Impl;
+﻿package com.example.diverscan.activeid.DeviceInterface.Impl;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -83,8 +83,10 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                     readers.Dispose();
                 } catch (Exception e) {
                     Log.w(TAG, "Dispose previo falló, se continúa con reinicialización: " + e.getMessage());
+                } finally {
+                    // BUG #2 FIX: siempre liberar la referencia incluso si Dispose() lanza NPE
+                    readers = null;
                 }
-                readers = null;
             }
 
             try {
@@ -93,15 +95,23 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
                 // Priority based on ConnectionType
                 if (connectionType == ConnectionType.SERIAL || connectionType == ConnectionType.USB || connectionType == ConnectionType.AUTO) {
-                     // Try Serial (eConnex)
+                        // BUG #1 FIX: SERVICE_USB para conexion USB directa (RFD40, RFD8500, etc.)
+                    // SERVICE_SERIAL es para cable COM/RS-232 (eConnex), NO para USB fisico
+                    ENUM_TRANSPORT transport;
+                    if (connectionType == ConnectionType.USB) {
+                        transport = ENUM_TRANSPORT.SERVICE_USB;
+                        Log.d(TAG, "Searching for USB readers (SERVICE_USB)...");
+                    } else {
+                        transport = ENUM_TRANSPORT.SERVICE_SERIAL;
+                        Log.d(TAG, "Searching for SERIAL readers (SERVICE_SERIAL)...");
+                    }
                     try {
-                        Log.d(TAG, "Searching for SERIAL/USB readers...");
-                        readers = new Readers(context, ENUM_TRANSPORT.SERVICE_SERIAL);
-                        readers.attach(this); // Attach for events
+                        readers = new Readers(context, transport);
+                        readers.attach(this);
                         availableRFIDReaderList = readers.GetAvailableRFIDReaderList();
-                        Log.d(TAG, "Serial readers found: " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
+                        Log.d(TAG, "Readers found [" + transport + "]: " + (availableRFIDReaderList != null ? availableRFIDReaderList.size() : 0));
                     } catch (Exception e) {
-                         Log.e(TAG, "Error checking Serial readers: " + e.getMessage());
+                        Log.e(TAG, "Error checking readers [" + transport + "]: " + e.getMessage());
                     }
                 }
                 
@@ -388,6 +398,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
             } catch (Exception e) {
                 Log.w(TAG, "Error durante readers.Dispose(): " + e.getMessage());
             } finally {
+                // BUG #2 FIX: always null-out to avoid stale reference causing NPE
                 readers = null;
             }
         }

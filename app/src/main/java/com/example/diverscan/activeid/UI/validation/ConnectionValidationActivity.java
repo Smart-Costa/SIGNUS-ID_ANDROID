@@ -1,6 +1,11 @@
 package com.example.diverscan.activeid.UI.validation;
 
 import android.content.Intent;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.app.PendingIntent;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -40,6 +45,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
         implements ResponseHandlerInterface, ActivoDao.LogListener {
 
     private static final String TAG = "ConnValidation";
+    private static final String ACTION_USB_PERMISSION = "com.example.diverscan.activeid.USB_PERMISSION";
     private static final int PERMISSION_REQUEST_CODE = 100;
     private static final int MAX_LOG_LINES = 350;
     private TextView tvStatus;
@@ -63,6 +69,24 @@ public class ConnectionValidationActivity extends AppCompatActivity
     private int triggerPressedCount = 0;
     private int triggerReleasedCount = 0;
     private String lastDevicesSnapshot = "";
+    private final BroadcastReceiver usbPermissionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ACTION_USB_PERMISSION.equals(intent.getAction())) {
+                UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                boolean granted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false);
+                if (device != null) {
+                    if (granted) {
+                        logInfo("Permiso USB concedido para: " + device.getDeviceName() + " (" + device.getVendorId() + ":" + device.getProductId() + ")");
+                    } else {
+                        logWarn("Permiso USB denegado para: " + device.getDeviceName() + " (" + device.getVendorId() + ":" + device.getProductId() + ")");
+                    }
+                } else {
+                    logWarn("Resultado de permiso USB sin dispositivo asociado.");
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +136,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
 
             if (checkedId == R.id.rb_usb) {
                 connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.USB;
+                inspectUsbState(true);
             } else if (checkedId == R.id.rb_serial) {
                 connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.SERIAL;
             }
@@ -126,6 +151,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
         btnTestSingle.setOnClickListener(v -> startSingleRead());
         btnTestMulti.setOnClickListener(v -> toggleMultiRead());
         btnRfidDiagnostic.setOnClickListener(v -> runInlineDiagnostic());
+        registerReceiver(usbPermissionReceiver, new IntentFilter(ACTION_USB_PERMISSION));
 
         checkAndRequestPermissions();
         updateUI();
@@ -267,6 +293,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
         }
         List<String> devices = rfidHandler != null ? rfidHandler.getFoundDevices() : null;
         diag.append("Dispositivos detectados: ").append(devices == null ? 0 : devices.size()).append("\n");
+        diag.append(inspectUsbState(false)).append("\n");
         logInfo("Diagnóstico ejecutado");
         logInfo(diag.toString().replace("\n", " | "));
         new AlertDialog.Builder(this)
@@ -274,6 +301,59 @@ public class ConnectionValidationActivity extends AppCompatActivity
                 .setMessage(diag.toString())
                 .setPositiveButton("OK", null)
                 .show();
+    }
+
+    private String inspectUsbState(boolean requestIfMissingPermission) {
+        UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        if (usbManager == null) {
+            String msg = "USB manager: no disponible";
+            logWarn(msg);
+            return msg;
+        }
+        Map<String, UsbDevice> usbDevices = usbManager.getDeviceList();
+        if (usbDevices == null || usbDevices.isEmpty()) {
+            String msg = "USB devices: 0";
+            logWarn(msg);
+            return msg;
+        }
+        int grantedCount = 0;
+        int zebraCount = 0;
+        StringBuilder sb = new StringBuilder();
+        sb.append("USB devices: ").append(usbDevices.size());
+        for (UsbDevice d : usbDevices.values()) {
+            boolean granted = usbManager.hasPermission(d);
+            if (granted) {
+                grantedCount++;
+            }
+            if (d.getVendorId() == 1504) {
+                zebraCount++;
+            }
+            sb.append(" | ")
+                    .append(d.getDeviceName())
+                    .append(" vid:pid=")
+                    .append(d.getVendorId())
+                    .append(":")
+                    .append(d.getProductId())
+                    .append(" perm=")
+                    .append(granted);
+            if (!granted && requestIfMissingPermission) {
+                PendingIntent permissionIntent = PendingIntent.getBroadcast(
+                        this,
+                        d.getDeviceId(),
+                        new Intent(ACTION_USB_PERMISSION),
+                        PendingIntent.FLAG_IMMUTABLE
+                );
+                try {
+                    usbManager.requestPermission(d, permissionIntent);
+                    logWarn("Solicitando permiso USB para " + d.getDeviceName() + " (" + d.getVendorId() + ":" + d.getProductId() + ")");
+                } catch (Exception e) {
+                    logError("Error solicitando permiso USB: " + e.getMessage());
+                }
+            }
+        }
+        String summary = sb.toString() + " | ZebraUSB=" + zebraCount + " | USBPermisos=" + grantedCount;
+        logInfo(summary);
+        return summary;
     }
 
     // ResponseHandlerInterface implementation
@@ -442,6 +522,9 @@ public class ConnectionValidationActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        try {
+            unregisterReceiver(usbPermissionReceiver);
+        } catch (Exception ignored) {}
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(null);
         }
@@ -466,15 +549,21 @@ public class ConnectionValidationActivity extends AppCompatActivity
     private void checkAndRequestPermissions() {
         String[] permissions;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Android 12+ (API 31+):
+            // BLUETOOTH_SCAN con neverForLocation en manifest → NO requiere ACCESS_FINE_LOCATION
+            // La ubicación SOLO es necesaria si el app la usa para inferirla vía BT/WiFi
             permissions = new String[] {
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.ACCESS_FINE_LOCATION
+                    Manifest.permission.CAMERA
+                    // ACCESS_FINE_LOCATION no requerida para BT en API 31+ con neverForLocation
             };
         } else {
+            // Android 6–11: ACCESS_FINE_LOCATION obligatoria para BT scanning
             permissions = new String[] {
                     Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.CAMERA
             };
         }
 
