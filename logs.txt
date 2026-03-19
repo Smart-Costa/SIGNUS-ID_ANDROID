@@ -1,77 +1,327 @@
-2026-01-16 10:23:41.445 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
-2026-01-16 10:23:41.446 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_USB
-2026-01-16 10:23:41.448 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
-2026-01-16 10:23:41.451 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
-2026-01-16 10:23:41.451 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_USB
-2026-01-16 10:23:41.454 25463-25532 protocol val is         com.example.diverscan.activeid       E  ASCII
-2026-01-16 10:23:41.454 25463-25532 IRFIDError              com.example.diverscan.activeid       D  RfidUsbMgr: connection failed: device not found
-2026-01-16 10:23:41.454 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  GetAvailableRFIDReaderList returned 0 devices
-2026-01-16 10:23:41.482 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
-2026-01-16 10:23:41.484 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.
-
---------- beginning of main
---------- beginning of system
-2026-01-16 10:26:20.883  1395-2566  ActivityTaskManager     system_server                        I  START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.example.diverscan.activeid/.UI.main.MainActivity} from uid 10264
-2026-01-16 10:26:20.917  2526-6856  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
-2026-01-16 10:26:20.918  1395-4088  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 25463
-2026-01-16 10:26:20.927  5650-6598  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
-2026-01-16 10:26:20.928  1395-4088  CoreBackPreview         system_server                        D  Window{7073de0 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback null
-2026-01-16 10:26:20.931  1395-4088  InputManager-JNI        system_server                        W  Input channel object '7073de0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity (client)' was disposed without first being removed with the input manager!
-2026-01-16 10:26:20.935  1395-1870  UsageStatsService       system_server                        W  Unexpected activity event reported! (com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity event : 23 instanceId : 195633162)
-2026-01-16 10:26:20.979  1395-9314  CoreBackPreview         system_server                        D  Window{561604e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@a17827c, mPriority=0}
-2026-01-16 10:26:20.987 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-01-16 10:26:21.015 25463-25494 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-01-16 10:26:21.017 25463-25463 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.193.11.135:70/ApiHH/Api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
-2026-01-16 10:26:21.021  1395-1850  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.main.MainActivity: +137ms
-2026-01-16 10:26:21.149 13178-13178 GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1349 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-01-16 10:26:21.520 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000072726c6e40 (RippleDrawable) with handle 0xb40000718266d460
-2026-01-16 10:26:21.530  1395-2905  CoreBackPreview         system_server                        D  Window{422e00f u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback null
-2026-01-16 10:26:21.531  1395-2905  InputManager-JNI        system_server                        W  Input channel object '422e00f com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity (client)' was disposed without first being removed with the input manager!
-2026-01-16 10:26:21.556 25463-25463 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 4789 (21%)
-2026-01-16 10:26:21.556 25463-25463 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 4789 from 4789 (100%)
-2026-01-16 10:26:28.455 25463-25463 OnBackInvokedCallback   com.example.diverscan.activeid       W  OnBackInvokedCallback is not enabled for the application.
-                                                                                                    Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
-2026-01-16 10:26:30.052  1395-4088  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity} from uid 10264
-2026-01-16 10:26:30.090  1395-2905  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 25463
-2026-01-16 10:26:30.095  2526-6856  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
-2026-01-16 10:26:30.098  5650-6598  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
-2026-01-16 10:26:30.137  1395-2566  CoreBackPreview         system_server                        D  Window{acaf26a u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@20147f8, mPriority=0}
-2026-01-16 10:26:30.154 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-01-16 10:26:30.179 25463-25494 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-01-16 10:26:30.194  1395-1850  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity: +138ms
-2026-01-16 10:26:30.363 13178-13178 GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1349 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-01-16 10:26:30.729 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000072726f0bc0 (NavigationMenuItemView) with handle 0xb4000071826aee60
-2026-01-16 10:26:30.729 25463-25494 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000072726ecb60 (NavigationMenuItemView) with handle 0xb40000718267d6f0
-2026-01-16 10:26:35.142 25463-26877 protocol val is         com.example.diverscan.activeid       E  ASCII
-2026-01-16 10:26:35.147 25463-26877 UsbRequestJNI           com.example.diverscan.activeid       D  init
-2026-01-16 10:26:35.154 25463-26878 RFIDSerialIOMgr         com.example.diverscan.activeid       E  Run ending due to exception
-                                                                                                    java.io.IOException: Queueing USB request failed
-                                                                                                    	at com.zebra.rfid.api3.CommonUsbSerialPort.read(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:29)
-                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager.readData(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:12)
-                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager.run(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:49)
-                                                                                                    	at java.lang.Thread.run(Thread.java:1563)
-2026-01-16 10:26:35.803 25463-25463 UsbDeviceConnectionJNI  com.example.diverscan.activeid       D  close
-2026-01-16 10:26:35.809 25463-26879 RFIDSerialIOMgr         com.example.diverscan.activeid       E  Receive thread interrupted
-                                                                                                    java.lang.InterruptedException
-                                                                                                    	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727)
-                                                                                                    	at java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435)
-                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager$1.run(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:3)
-                                                                                                    	at java.lang.Thread.run(Thread.java:1563)
-2026-01-16 10:26:37.162 25463-26899 protocol val is         com.example.diverscan.activeid       E  ASCII
-2026-01-16 10:26:37.166 25463-26899 UsbRequestJNI           com.example.diverscan.activeid       D  init
-2026-01-16 10:26:43.576 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  InitSDK - Iniciando SDK
-2026-01-16 10:26:43.578 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Configuración: AutoDetect=false, Transporte=SERVICE_SERIAL
-2026-01-16 10:26:43.583 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  Disposing previous readers instance...
-2026-01-16 10:26:43.587 25463-26901 RFIDSerialIOMgr         com.example.diverscan.activeid       E  Receive thread interrupted
-                                                                                                    java.lang.InterruptedException
-                                                                                                    	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1727)
-                                                                                                    	at java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:435)
-                                                                                                    	at com.zebra.rfid.api3.SerialInputOutputManager$1.run(r8-map-id-983a2706c9ea54adb1efe882cae7b5b1332e5da6e14a48b969c28a0659870f49:3)
-                                                                                                    	at java.lang.Thread.run(Thread.java:1563)
-2026-01-16 10:26:43.588 25463-26900 RFIDSerialIOMgr         com.example.diverscan.activeid       I  Recieving status mState=STOPPING
-2026-01-16 10:26:43.591 25463-25463 UsbDeviceConnectionJNI  com.example.diverscan.activeid       D  close
-2026-01-16 10:26:43.593 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask running in background
-2026-01-16 10:26:43.593 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  Using specific transport: SERVICE_SERIAL
-2026-01-16 10:26:43.599 25463-25532 RFID_SAMPLE             com.example.diverscan.activeid       D  GetAvailableRFIDReaderList returned 0 devices
-2026-01-16 10:26:43.611 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  CreateInstanceTask finished
-2026-01-16 10:26:43.612 25463-25463 RFID_SAMPLE             com.example.diverscan.activeid       D  No se encontraron lectores disponibles.
+2026-03-19 07:38:28.891 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-19 07:38:28.895 21148-21176 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-19 07:38:29.060  1492-11853 CoreBackPreview         system_server                        D  Window{ecbf47 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@7eaebcc, mPriority=1000000}
+2026-03-19 07:38:30.131  1492-1560  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.RegistroTomaFisicaActivity} from uid 10269
+2026-03-19 07:38:30.171  1492-1560  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 21148
+2026-03-19 07:38:30.184  2524-6052  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity
+2026-03-19 07:38:30.186  5291-5976  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity
+2026-03-19 07:38:30.223  1492-1560  CoreBackPreview         system_server                        D  Window{72de693 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@16a16c9, mPriority=-1}
+2026-03-19 07:38:30.238 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-19 07:38:30.259 21148-21176 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-19 07:38:30.270  1492-1916  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.RegistroTomaFisicaActivity: +132ms
+2026-03-19 07:38:30.412  8422-8422  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-19 07:38:30.574  1492-11853 CoreBackPreview         system_server                        D  Window{ecbf47 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@b924171, mPriority=-1}
+2026-03-19 07:38:30.772 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000070568a0dd0 (NavigationMenuItemView) with handle 0xb400006f668da2a0
+2026-03-19 07:38:36.503  1492-11853 ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity (has extras)} from uid 10269
+2026-03-19 07:38:36.520  1492-7981  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 21148
+2026-03-19 07:38:36.531  2524-6052  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-19 07:38:36.534  5291-5976  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-19 07:38:36.561 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Iniciando carga de datos y sincronización...
+2026-03-19 07:38:36.561 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Llamando a fetchAndSyncFromApi para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:38:36.571 21148-22699 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:38:36.571 21148-22700 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:38:36.582  1492-7981  CoreBackPreview         system_server                        D  Window{e737b65 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@95e74eb, mPriority=-1}
+2026-03-19 07:38:36.598 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-19 07:38:36.620 21148-21176 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-19 07:38:36.624 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-19 07:38:36.624 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-19 07:38:36.624 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-19 07:38:36.624 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-19 07:38:36.629  1492-1916  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity: +123ms
+2026-03-19 07:38:36.741  8422-8422  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-19 07:38:49.929 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  Click en Nueva Toma. Iniciando NuevaTomaActivity para tomaFisicaId: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:38:49.931  1492-7981  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity (has extras)} from uid 10269
+2026-03-19 07:38:49.955  1492-7981  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 21148
+2026-03-19 07:38:49.988  2524-6052  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-19 07:38:49.989  5291-5976  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-19 07:38:50.010 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Iniciando NuevaTomaActivity
+2026-03-19 07:38:50.010 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: tomaFisicaId recibido: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:38:50.016 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Creating NEW toma: f0b51c0c-7542-4131-92f9-1c26bd7a12ec Num: 1
+2026-03-19 07:38:50.016 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Configurado idToma=f0b51c0c-7542-4131-92f9-1c26bd7a12ec, numero=1
+2026-03-19 07:38:50.026  1492-7981  CoreBackPreview         system_server                        D  Window{2d35f66 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@e7d9354, mPriority=-1}
+2026-03-19 07:38:50.033 21148-22737 NuevaTomaActivity       com.example.diverscan.activeid       D  Inventario base: tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59 A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null UO=null Cat=null Est=e2b475fc-2d39-4633-951d-6b98144b033a totalActivosInventario=0
+2026-03-19 07:38:50.039 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-19 07:38:50.048 21148-21176 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-19 07:38:50.055  1492-1916  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity: +121ms
+2026-03-19 07:38:50.079 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-19 07:38:50.122 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionA: id=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 text=DIRECCION GENERAL
+2026-03-19 07:38:50.141 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro Categoria: id=null
+2026-03-19 07:38:50.178 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:38:50.193 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-19 07:38:50.203  8422-8422  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-19 07:38:50.244 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:38:50.262 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-19 07:38:50.306 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:38:50.369 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:38:50.389 21148-22737 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:38:50.455 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:38:50.515 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:38:50.535 21148-22737 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:38:50.566 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb400007056901060 (RippleDrawable) with handle 0xb400006f668e1440
+2026-03-19 07:38:50.600 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:38:50.662 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:38:50.682 21148-22737 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:38:50.703 21148-22737 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:38:50.725 21148-22737 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:38:50.746 21148-22737 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:38:50.768 21148-22737 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:38:50.790 21148-22737 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:12.149  2524-6052  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-19 07:40:12.152  5291-5976  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-19 07:40:12.195 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Iniciando carga de datos y sincronización...
+2026-03-19 07:40:12.196 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Llamando a fetchAndSyncFromApi para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:40:12.200 21148-23059 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:40:12.222 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-19 07:40:12.239 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-19 07:40:12.239 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-19 07:40:12.333  8422-8422  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-19 07:40:12.760  1492-8890  CoreBackPreview         system_server                        D  Window{2d35f66 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback null
+2026-03-19 07:40:12.761 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onDestroy: Recursos liberados.
+2026-03-19 07:40:12.767  1492-12526 InputManager-JNI        system_server                        W  Input channel object '2d35f66 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity (client)' was disposed without first being removed with the input manager!
+2026-03-19 07:40:13.835 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  Click en Nueva Toma. Iniciando NuevaTomaActivity para tomaFisicaId: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:40:13.838  1492-12526 ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity (has extras)} from uid 10269
+2026-03-19 07:40:13.859  1492-12526 ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 21148
+2026-03-19 07:40:13.886  2524-6052  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-19 07:40:13.888  5291-5976  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-19 07:40:13.908 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Iniciando NuevaTomaActivity
+2026-03-19 07:40:13.908 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: tomaFisicaId recibido: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:40:13.913 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Creating NEW toma: 32c7c4e5-6df3-4ddf-8216-47ea52f8b8de Num: 1
+2026-03-19 07:40:13.913 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Configurado idToma=32c7c4e5-6df3-4ddf-8216-47ea52f8b8de, numero=1
+2026-03-19 07:40:13.924  1492-12526 CoreBackPreview         system_server                        D  Window{5a05741 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@3efa27, mPriority=-1}
+2026-03-19 07:40:13.929 21148-23074 NuevaTomaActivity       com.example.diverscan.activeid       D  Inventario base: tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59 A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null UO=null Cat=null Est=e2b475fc-2d39-4633-951d-6b98144b033a totalActivosInventario=0
+2026-03-19 07:40:13.933 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-19 07:40:13.942 21148-21176 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-19 07:40:13.957  1492-1916  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity: +110ms
+2026-03-19 07:40:13.960 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-19 07:40:13.987 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionA: id=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 text=DIRECCION GENERAL
+2026-03-19 07:40:14.003 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro Categoria: id=null
+2026-03-19 07:40:14.042 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:14.055 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-19 07:40:14.071  8422-8422  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-19 07:40:14.106 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:14.123 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-19 07:40:14.169 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:14.232 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:14.252 21148-23074 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:14.316 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:14.378 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:14.398 21148-23074 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:14.448 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb400007056901060 (RippleDrawable) with handle 0xb400006f668eb220
+2026-03-19 07:40:14.466 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:14.525 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:14.544 21148-23074 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:14.567 21148-23074 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:14.590 21148-23074 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:14.597 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:14.599 21148-21162 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-19 07:40:14.599 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-19 07:40:14.599 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-19 07:40:14.599 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:14.599 21148-21162 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-19 07:40:14.599 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-19 07:40:14.599 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-19 07:40:14.599 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:14.599 21148-21162 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-19 07:40:14.599 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-19 07:40:14.599 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-19 07:40:14.600 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:14.600 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:14.600 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:14.600 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:14.600 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:14.600 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:14.600 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:14.611 21148-23074 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:14.632 21148-23074 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:14.653 21148-23074 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:16.709 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 635979370799370000525622
+2026-03-19 07:40:16.709 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025082
+2026-03-19 07:40:16.709 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025080
+2026-03-19 07:40:16.710 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID ACCEPTED: EPC found in DB: DE00000000000000DE005426
+2026-03-19 07:40:16.736 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:16.736 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.737 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:16.749 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID ACCEPTED: EPC found in DB: DE00000000000000DE004819
+2026-03-19 07:40:16.768 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:16.768 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:16.782 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:16.782 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.791 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:16.800 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:16.800 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:16.810 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.818 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:16.826 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 635979370799370000525622
+2026-03-19 07:40:16.826 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:16.843 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.852 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:16.852 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:16.852 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.861 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:16.861 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.870 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.878 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:16.886 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:16.887 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.897 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.906 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:16.914 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 635979370799370000525622
+2026-03-19 07:40:16.922 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:16.930 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:16.930 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.938 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:16.947 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:16.998 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025082
+2026-03-19 07:40:16.998 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:17.022 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:17.022 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:17.035 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:17.059 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:17.099 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:17.099 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:17.128 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:17.128 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:17.128 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025082
+2026-03-19 07:40:17.253 21148-22677 NuevaTomaActivity       com.example.diverscan.activeid       D  AUTO-SAVE: Iniciando guardado automático. Tags en memoria: 2
+2026-03-19 07:40:17.271 21148-22677 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Guardando header. ID=32c7c4e5-6df3-4ddf-8216-47ea52f8b8de Estado=ABIERTA TotalLecturas=2
+2026-03-19 07:40:17.271 21148-22677 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  SAVING LOCAL RESUMEN (Pending) → IdToma=32c7c4e5-6df3-4ddf-8216-47ea52f8b8de TotalLecturas=2 FechaCreacion=2026-03-19 07:40:17 SYNC_STATUS=0 ActivosLeidos=2 TotalActivos=227 Faltantes=227 NumeroToma=1 Sobrantes=2 TomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59 Estado=ABIERTA
+2026-03-19 07:40:17.274 21148-22677 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Guardando 2 detalles.
+2026-03-19 07:40:31.020  2524-6052  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-19 07:40:31.025  5291-5976  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-19 07:40:31.038 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Iniciando carga de datos y sincronización...
+2026-03-19 07:40:31.038 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Llamando a fetchAndSyncFromApi para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:40:31.040 21148-23131 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 1 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:40:31.062 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-19 07:40:31.082 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 1
+2026-03-19 07:40:31.082 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 1
+2026-03-19 07:40:31.184  8422-8422  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-19 07:40:31.626  1492-8890  CoreBackPreview         system_server                        D  Window{5a05741 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback null
+2026-03-19 07:40:31.627 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onDestroy: Recursos liberados.
+2026-03-19 07:40:31.632  1492-8890  InputManager-JNI        system_server                        W  Input channel object '5a05741 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity (client)' was disposed without first being removed with the input manager!
+2026-03-19 07:40:32.988 21148-21148 DetalleTomaFisica       com.example.diverscan.activeid       D  Click en Nueva Toma. Iniciando NuevaTomaActivity para tomaFisicaId: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:40:32.990  1492-8890  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity (has extras)} from uid 10269
+2026-03-19 07:40:33.011  1492-8890  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 21148
+2026-03-19 07:40:33.028  2524-6052  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-19 07:40:33.031  5291-5976  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-19 07:40:33.064 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Iniciando NuevaTomaActivity
+2026-03-19 07:40:33.064 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: tomaFisicaId recibido: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-19 07:40:33.070 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Creating NEW toma: 8134dd46-b960-487c-a0e9-0e6fa3bffccb Num: 2
+2026-03-19 07:40:33.070 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Configurado idToma=8134dd46-b960-487c-a0e9-0e6fa3bffccb, numero=2
+2026-03-19 07:40:33.077  1492-1560  CoreBackPreview         system_server                        D  Window{a43fb39 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@af06adf, mPriority=-1}
+2026-03-19 07:40:33.084 21148-23152 NuevaTomaActivity       com.example.diverscan.activeid       D  Inventario base: tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59 A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null UO=null Cat=null Est=e2b475fc-2d39-4633-951d-6b98144b033a totalActivosInventario=0
+2026-03-19 07:40:33.089 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-19 07:40:33.096 21148-21176 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-19 07:40:33.104  1492-1916  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity: +112ms
+2026-03-19 07:40:33.124 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-19 07:40:33.154 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro Categoria: id=null
+2026-03-19 07:40:33.155 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionA: id=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 text=DIRECCION GENERAL
+2026-03-19 07:40:33.210 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:33.222 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-19 07:40:33.237  8422-8422  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-19 07:40:33.270 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:33.334 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-19 07:40:33.335 21148-21162 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-19 07:40:33.335 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-19 07:40:33.335 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-19 07:40:33.335 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:33.335 21148-21162 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-19 07:40:33.335 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-19 07:40:33.335 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-19 07:40:33.335 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:33.335 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:33.335 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-19 07:40:33.336 21148-21162 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-19 07:40:33.336 21148-21162 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-19 07:40:33.338 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:33.362 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-19 07:40:33.401 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:33.419 21148-23152 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:33.482 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:33.545 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:33.564 21148-23152 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:33.587 21148-23152 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:33.633 21148-21176 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb400007056901060 (RippleDrawable) with handle 0xb400006f668c4af0
+2026-03-19 07:40:33.656 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:33.714 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-19 07:40:33.733 21148-23152 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:33.757 21148-23152 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:33.777 21148-23152 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:33.799 21148-23152 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:33.819 21148-23152 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-19 07:40:54.344 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025082
+2026-03-19 07:40:54.344 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:54.344 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID ACCEPTED: EPC found in DB: DE00000000000000DE005426
+2026-03-19 07:40:54.371 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.385 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:54.385 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:54.389 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:54.389 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID ACCEPTED: EPC found in DB: DE00000000000000DE004819
+2026-03-19 07:40:54.389 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:54.403 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.417 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 635979370799370000525622
+2026-03-19 07:40:54.417 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:54.421 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:54.421 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.430 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:54.439 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:54.456 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.465 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:54.473 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.482 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:54.490 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 301AD6AD014D3A400000007B
+2026-03-19 07:40:54.498 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025082
+2026-03-19 07:40:54.498 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:54.506 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 635979370799370000525622
+2026-03-19 07:40:54.506 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:54.514 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:54.522 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:54.530 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.540 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.540 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:54.549 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 635979370799370000525622
+2026-03-19 07:40:54.549 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.557 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:54.557 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:54.565 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:54.573 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025082
+2026-03-19 07:40:54.581 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025082
+2026-03-19 07:40:54.591 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.591 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:54.601 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:54.602 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.610 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:54.617 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:54.625 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 635979370799370000525622
+2026-03-19 07:40:54.641 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:54.641 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.650 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:54.668 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:54.680 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:54.680 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.725 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:54.725 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.743 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:54.743 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.757 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:54.757 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:54.757 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:54.768 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.777 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:54.787 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.799 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.817 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 635979370799370000525622
+2026-03-19 07:40:54.818 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:54.828 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:54.829 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:54.838 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453080000000000193
+2026-03-19 07:40:54.849 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 300833B2DDD9014000000000
+2026-03-19 07:40:54.849 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025082
+2026-03-19 07:40:54.849 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025081
+2026-03-19 07:40:54.891 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 635979370799370000525622
+2026-03-19 07:40:54.891 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025083
+2026-03-19 07:40:54.904 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 800474453240000000025079
+2026-03-19 07:40:54.905 21148-21148 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID IGNORED: EPC not in DB: 4E2019015FDDC00000000000
+2026-03-19 07:40:54.905 21148-22677 NuevaTomaActivity       com.example.diverscan.activeid       D  AUTO-SAVE: Iniciando guardado automático. Tags en memoria: 2
+2026-03-19 07:40:54.913 21148-22677 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Guardando header. ID=8134dd46-b960-487c-a0e9-0e6fa3bffccb Estado=ABIERTA TotalLecturas=2
+2026-03-19 07:40:54.913 21148-22677 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  SAVING LOCAL RESUMEN (Pending) → IdToma=8134dd46-b960-487c-a0e9-0e6fa3bffccb TotalLecturas=2 FechaCreacion=2026-03-19 07:40:54 SYNC_STATUS=0 ActivosLeidos=2 TotalActivos=227 Faltantes=227 NumeroToma=2 Sobrantes=2 TomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59 Estado=ABIERTA
+2026-03-19 07:40:54.916 21148-22677 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Guardando 2 detalles.

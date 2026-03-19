@@ -289,6 +289,12 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private TagWriter rfidHandler;
     private boolean isScanning = false;
     private long lastTriggerEventAt = 0L;
+    private boolean isRfidReady = false;
+    private boolean pendingScanRetry = false;
+    private long resumeTimestampMs = 0L;
+    private boolean firstTagAfterResumeLogged = false;
+    private final android.os.Handler rfidRetryHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable pendingStartScanRetry = null;
     private java.util.Map<String, String> manualEpcToActivoId = new java.util.HashMap<>();
     private java.util.Map<String, String> epcToDisplayName = new java.util.HashMap<>();
 
@@ -1881,11 +1887,16 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private void initRFID() {
         try {
             rfidHandler = TagWriter.getInstance();
+            Log.d(TAG, "initRFID: initialized=" + rfidHandler.isInitialized());
             if (!rfidHandler.isInitialized()) {
                 rfidHandler.onCreate(this);
             } else {
                 rfidHandler.setResponseHandler(this);
+                String status = rfidHandler.onResume();
+                Log.d(TAG, "initRFID/onResume status=" + status);
             }
+            isRfidReady = rfidHandler.isConnected();
+            Log.d(TAG, "initRFID: ready=" + isRfidReady);
         } catch (Exception e) {
             Log.e(TAG, "Error initializing RFID", e);
             Toast.makeText(this, "Error RFID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1895,18 +1906,45 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     @Override
     protected void onResume() {
         super.onResume();
+        resumeTimestampMs = android.os.SystemClock.elapsedRealtime();
+        firstTagAfterResumeLogged = false;
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
+            try {
+                String status = rfidHandler.onResume();
+                Log.d(TAG, "onResume RFID status=" + status);
+            } catch (Exception e) {
+                Log.e(TAG, "onResume RFID error", e);
+            }
+            isRfidReady = rfidHandler.isConnected();
+            Log.d(TAG, "onResume RFID ready=" + isRfidReady + " scanning=" + isScanning);
+            if (!isRfidReady) {
+                rfidRetryHandler.postDelayed(() -> {
+                    try {
+                        String retryStatus = rfidHandler.onResume();
+                        isRfidReady = rfidHandler.isConnected();
+                        Log.d(TAG, "onResume retry RFID status=" + retryStatus + " ready=" + isRfidReady);
+                    } catch (Exception e) {
+                        Log.e(TAG, "onResume retry RFID error", e);
+                    }
+                }, 650L);
+            }
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        if (pendingStartScanRetry != null) {
+            rfidRetryHandler.removeCallbacks(pendingStartScanRetry);
+            pendingStartScanRetry = null;
+        }
+        pendingScanRetry = false;
         if (rfidHandler != null) {
             rfidHandler.stopRead();
         }
         isScanning = false;
+        isRfidReady = false;
         updateUIState();
     }
 
@@ -1925,17 +1963,41 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             Log.d(TAG, "startScan ignored: Already scanning");
             return;
         }
-        if (rfidHandler != null) {
+        if (rfidHandler == null) {
+            Log.w(TAG, "startScan aborted: rfidHandler is null");
+            return;
+        }
+        if (!rfidHandler.isConnected()) {
+            isRfidReady = false;
             try {
-                rfidHandler.startRead();
-                isScanning = true;
-                updateUIState();
+                String reconnectStatus = rfidHandler.onResume();
+                Log.w(TAG, "startScan deferred: reader disconnected. reconnectStatus=" + reconnectStatus);
             } catch (Exception e) {
-                Log.e(TAG, "Error starting scan", e);
-                isScanning = false;
-                updateUIState();
-                Toast.makeText(this, "Error al iniciar lectura: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "startScan reconnect error", e);
             }
+            if (!pendingScanRetry) {
+                pendingScanRetry = true;
+                pendingStartScanRetry = () -> {
+                    pendingScanRetry = false;
+                    pendingStartScanRetry = null;
+                    Log.d(TAG, "startScan retry attempt after deferred reconnect");
+                    startScan();
+                };
+                rfidRetryHandler.postDelayed(pendingStartScanRetry, 700L);
+            }
+            return;
+        }
+        isRfidReady = true;
+        try {
+            Log.d(TAG, "startScan execute: connected=" + rfidHandler.isConnected());
+            rfidHandler.startRead();
+            isScanning = true;
+            updateUIState();
+        } catch (Exception e) {
+            Log.e(TAG, "Error starting scan", e);
+            isScanning = false;
+            updateUIState();
+            Toast.makeText(this, "Error al iniciar lectura: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1943,6 +2005,11 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         if (!isScanning) {
             Log.d(TAG, "stopScan ignored: Not scanning");
             return;
+        }
+        if (pendingStartScanRetry != null) {
+            rfidRetryHandler.removeCallbacks(pendingStartScanRetry);
+            pendingStartScanRetry = null;
+            pendingScanRetry = false;
         }
         if (rfidHandler != null) {
             try {
@@ -2138,6 +2205,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (pendingStartScanRetry != null) {
+            rfidRetryHandler.removeCallbacks(pendingStartScanRetry);
+            pendingStartScanRetry = null;
+        }
         // Liberar recursos de RFID
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(null);
@@ -2159,6 +2230,12 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     @Override
     public void handleTagdata(ReaderTag[] tagData) {
         if (tagData == null || tagData.length == 0) return;
+        isRfidReady = true;
+        if (!firstTagAfterResumeLogged) {
+            firstTagAfterResumeLogged = true;
+            long delta = android.os.SystemClock.elapsedRealtime() - resumeTimestampMs;
+            Log.d(TAG, "RFID FIRST TAG after resume in " + delta + "ms, tagsInBatch=" + tagData.length);
+        }
 
         // Extract EPCs first to avoid multiple traversals
         Set<String> batchEpcs = new HashSet<>();
@@ -2273,6 +2350,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             return;
         }
         lastTriggerEventAt = now;
+        Log.d(TAG, "trigger event pressed=" + pressed + " connected=" + (rfidHandler != null && rfidHandler.isConnected()) + " ready=" + isRfidReady + " scanning=" + isScanning);
         runOnUiThread(() -> {
             if (pressed) {
                 startScan();
@@ -2289,7 +2367,18 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     @Override
     public void SetMessage(String Text) {
-        runOnUiThread(() -> Toast.makeText(this, Text, Toast.LENGTH_SHORT).show());
+        Log.d(TAG, "RFID_MSG: " + Text);
+        if (Text != null) {
+            String normalized = Text.toLowerCase(Locale.ROOT);
+            if (normalized.contains("conectado")) {
+                isRfidReady = true;
+            } else if (normalized.contains("desconect") || normalized.contains("error")) {
+                isRfidReady = false;
+            }
+            if (normalized.contains("error")) {
+                runOnUiThread(() -> Toast.makeText(this, Text, Toast.LENGTH_SHORT).show());
+            }
+        }
     }
 
     // Adapter for RecyclerView
