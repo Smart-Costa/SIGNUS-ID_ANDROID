@@ -308,7 +308,6 @@ public class RegistroConteosActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         checkEstadoToma();
-        cargarDatos();checkEstadoToma();
         cargarDatos();
         cargarActivosSpinner();
         updateHeaderTitle();
@@ -755,47 +754,45 @@ public class RegistroConteosActivity extends AppCompatActivity {
     }
 
     private void refreshSummaryCounts() {
-        String ua = selectedUbicacionAId != null ? selectedUbicacionAId : baseUbicacionAId;
-        String ub = selectedUbicacionBId != null ? selectedUbicacionBId : baseUbicacionBId;
-        String uc = selectedUbicacionCId != null ? selectedUbicacionCId : baseUbicacionCId;
-        String ud = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
-        String us = selectedUbicacionSecundariaId;
-        String uo = baseUnidadOrganizativaId;
-        String cat = baseCategoriaId;
+        // BUGFIX: Mover todas las queries de BD a un background thread para evitar ANR.
+        // Antes se ejecutaban hasta 8 queries en el hilo principal (UI thread).
+        final String ua = selectedUbicacionAId != null ? selectedUbicacionAId : baseUbicacionAId;
+        final String ub = selectedUbicacionBId != null ? selectedUbicacionBId : baseUbicacionBId;
+        final String uc = selectedUbicacionCId != null ? selectedUbicacionCId : baseUbicacionCId;
+        final String ud = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
+        final String us = selectedUbicacionSecundariaId;
+        final String uo = baseUnidadOrganizativaId;
+        final String cat = baseCategoriaId;
 
-        // Count expected actives based on filters
-        int countFiltrados = activoDao.countActivosByFiltros(ua, ub, uc, ud, us, uo, cat);
-        if (txtCountActivosFiltrados != null) txtCountActivosFiltrados.setText("Activos filtrados: " + countFiltrados);
+        // Snapshot de variables para el hilo secundario
+        final String ubForA = baseUbicacionBId;
+        final String ucForA = baseUbicacionCId;
+        final String udForA = baseUbicacionDId;
+        final String ubForB = selectedUbicacionBId != null ? selectedUbicacionBId : baseUbicacionBId;
+        final String ucForC = selectedUbicacionCId != null ? selectedUbicacionCId : baseUbicacionCId;
+        final String udForD = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
 
-        // Update counts per filter level
-        String ubForA = baseUbicacionBId;
-        String ucForA = baseUbicacionCId;
-        String udForA = baseUbicacionDId;
+        new Thread(() -> {
+            // Todas las queries de BD en background
+            int countFiltrados = activoDao.countActivosByFiltros(ua, ub, uc, ud, us, uo, cat);
+            int countA = activoDao.countActivosByFiltros(ua, ubForA, ucForA, udForA, null, uo, cat);
+            int countB = activoDao.countActivosByFiltros(ua, ubForB, baseUbicacionCId, baseUbicacionDId, null, uo, cat);
+            int countC = activoDao.countActivosByFiltros(ua, ubForB, ucForC, baseUbicacionDId, null, uo, cat);
+            int countD = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, null, uo, cat);
+            int countS = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, us, uo, cat);
 
-        String ubForB = selectedUbicacionBId != null ? selectedUbicacionBId : baseUbicacionBId;
-        String ucForB = baseUbicacionCId;
-        String udForB = baseUbicacionDId;
-
-        String ucForC = selectedUbicacionCId != null ? selectedUbicacionCId : baseUbicacionCId;
-        String udForC = baseUbicacionDId;
-
-        String udForD = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
-
-        int countA = activoDao.countActivosByFiltros(ua, ubForA, ucForA, udForA, null, uo, cat);
-        int countB = activoDao.countActivosByFiltros(ua, ubForB, ucForB, udForB, null, uo, cat);
-        int countC = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForC, null, uo, cat);
-        int countD = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, null, uo, cat);
-        int countS = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, us, uo, cat);
-
-        if (txtCountUbicacionA != null) txtCountUbicacionA.setText("Activos: " + countA);
-        if (txtCountUbicacionB != null) txtCountUbicacionB.setText("Activos: " + countB);
-        if (txtCountUbicacionC != null) txtCountUbicacionC.setText("Activos: " + countC);
-        if (txtCountUbicacionD != null) txtCountUbicacionD.setText("Activos: " + countD);
-        if (txtCountUbicacionSecundaria != null) txtCountUbicacionSecundaria.setText("Activos: " + countS);
-        if (txtCountCategoria != null) txtCountCategoria.setText("Activos: " + countFiltrados);
-
-        // Update Main Summary (KPIs)
-        cargarDatos();
+            runOnUiThread(() -> {
+                if (txtCountActivosFiltrados != null) txtCountActivosFiltrados.setText("Activos filtrados: " + countFiltrados);
+                if (txtCountUbicacionA != null) txtCountUbicacionA.setText("Activos: " + countA);
+                if (txtCountUbicacionB != null) txtCountUbicacionB.setText("Activos: " + countB);
+                if (txtCountUbicacionC != null) txtCountUbicacionC.setText("Activos: " + countC);
+                if (txtCountUbicacionD != null) txtCountUbicacionD.setText("Activos: " + countD);
+                if (txtCountUbicacionSecundaria != null) txtCountUbicacionSecundaria.setText("Activos: " + countS);
+                if (txtCountCategoria != null) txtCountCategoria.setText("Activos: " + countFiltrados);
+                // Recargar los KPIs principales
+                cargarDatos();
+            });
+        }).start();
     }
 
     private void updateTomasTabs() {
@@ -1529,6 +1526,8 @@ public class RegistroConteosActivity extends AppCompatActivity {
         void setItems(List<TomaFisicaDetallesEntity> nuevos) {
             items.clear();
             cacheByKey.clear();
+            // BUGFIX: Al cambiar los items, limpiar el bitmapCache para liberar memoria.
+            // El cache crece sin límite ya que nunca hay evicción explícita.
             bitmapCacheByKey.clear();
             if (nuevos != null) items.addAll(nuevos);
             notifyDataSetChanged();
@@ -1601,6 +1600,13 @@ public class RegistroConteosActivity extends AppCompatActivity {
                         bmp = decodeFileToBitmap(ruta);
                     }
                     if (bmp != null) {
+                        // BUGFIX: Limitar cache a 20 bitmaps para evitar OOM
+                        if (bitmapCacheByKey.size() >= 20) {
+                            // Remover la primera entrada (mas antigua) para liberar memoria
+                            String oldestKey = bitmapCacheByKey.keySet().iterator().next();
+                            Bitmap old = bitmapCacheByKey.remove(oldestKey);
+                            if (old != null) old.recycle();
+                        }
                         bitmapCacheByKey.put(lookupKey, bmp);
                         holder.imgFoto.setImageBitmap(bmp);
                         tieneFoto = true;

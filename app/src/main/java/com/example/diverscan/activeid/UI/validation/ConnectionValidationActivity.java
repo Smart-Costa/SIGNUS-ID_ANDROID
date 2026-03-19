@@ -151,7 +151,12 @@ public class ConnectionValidationActivity extends AppCompatActivity
         btnTestSingle.setOnClickListener(v -> startSingleRead());
         btnTestMulti.setOnClickListener(v -> toggleMultiRead());
         btnRfidDiagnostic.setOnClickListener(v -> runInlineDiagnostic());
-        registerReceiver(usbPermissionReceiver, new IntentFilter(ACTION_USB_PERMISSION));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(usbPermissionReceiver, new IntentFilter(ACTION_USB_PERMISSION),
+                    Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(usbPermissionReceiver, new IntentFilter(ACTION_USB_PERMISSION));
+        }
 
         checkAndRequestPermissions();
         updateUI();

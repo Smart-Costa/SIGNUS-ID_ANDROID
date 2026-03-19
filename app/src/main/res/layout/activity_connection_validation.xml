@@ -68,13 +68,13 @@
             android:gravity="center"
             android:layout_marginBottom="8dp">
 
-            <RadioButton
+            <!-- <RadioButton
                 android:id="@+id/rb_bluetooth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Bluetooth"
                 android:checked="true"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp"/> -->
 
             <RadioButton
                 android:id="@+id/rb_usb"

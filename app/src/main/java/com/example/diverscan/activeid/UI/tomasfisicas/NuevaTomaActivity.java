@@ -121,6 +121,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     // Summary Views
     private LinearLayout llSummaryContainer;
     private LinearLayout llListContainer;
+    private android.widget.ScrollView scrollSummary; // ScrollView padre de llSummaryContainer
     private LinearLayout rowFaltantes, rowEncontrados, rowSobrantes, rowNoInventariados;
     private TextView txtFaltantesCount, txtEncontradosCount, txtSobrantesCount, txtNoInventariadosCount;
     private ImageView btnBackToList;
@@ -202,22 +203,30 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private void showDetailList(CategoriaEstado estado) {
         currentDetailFilter = estado;
         updateAdapterList();
-        
-        if (llSummaryContainer != null) llSummaryContainer.setVisibility(View.GONE);
+
+        // Si el usuario viene del tab Resumen (gauge), cambiar al tab Activos primero
+        if (viewActivos != null && viewActivos.getVisibility() != View.VISIBLE) {
+            switchTab(false);
+        }
+
+        // Ocultar el ScrollView COMPLETO que contiene llSummaryContainer
+        // (no basta con ocultar llSummaryContainer solo, porque scrollSummary tiene match_parent)
+        if (scrollSummary != null) scrollSummary.setVisibility(View.GONE);
         if (llListContainer != null) llListContainer.setVisibility(View.VISIBLE);
-        
+
         String title = "Detalle";
         if (estado == CategoriaEstado.FALTANTE) title = "Faltantes";
         else if (estado == CategoriaEstado.ENCONTRADO) title = "Encontrados";
         else if (estado == CategoriaEstado.SOBRANTE) title = "Sobrantes";
         else if (estado == CategoriaEstado.NO_INVENTARIADO) title = "No Inventariados";
-        
+
         if (txtListTitle != null) txtListTitle.setText(title);
     }
     
     private void closeDetailList() {
         currentDetailFilter = null;
-        if (llSummaryContainer != null) llSummaryContainer.setVisibility(View.VISIBLE);
+        // Restaurar el ScrollView padre y ocultar el contenedor de detalle
+        if (scrollSummary != null) scrollSummary.setVisibility(View.VISIBLE);
         if (llListContainer != null) llListContainer.setVisibility(View.GONE);
     }
     
@@ -317,6 +326,12 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     
     // Executor para serializar operaciones de base de datos y evitar saturación de hilos
     private final java.util.concurrent.ExecutorService databaseExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
+    
+    // Debounce del auto-save: evita lanzar SaveLocalTask por cada batch RFID individual,
+    // lo que compite con getActivosByEpcs() en el mismo SingleThreadExecutor y genera latencia.
+    private final android.os.Handler saveDebounceHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable pendingSaveRunnable = null;
+    private static final long SAVE_DEBOUNCE_MS = 500L; // 500ms: balance entre latencia y frecuencia de guardado
 
     private static class SpinnerItem {
         String id;
@@ -568,11 +583,12 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         btnSubir.setOnClickListener(v -> uploadTake());
         btnBack.setOnClickListener(v -> finish());
         
-        btnPotencia.setOnClickListener(v -> Toast.makeText(this, "Configuración de potencia no disponible", Toast.LENGTH_SHORT).show());
+        btnPotencia.setOnClickListener(v -> showPowerDialog());
         
         // Summary View Bindings
         llSummaryContainer = findViewById(R.id.llSummaryContainer);
         llListContainer = findViewById(R.id.llListContainer);
+        scrollSummary = findViewById(R.id.scrollSummary);
         
         rowFaltantes = findViewById(R.id.rowFaltantes);
         rowEncontrados = findViewById(R.id.rowEncontrados);
@@ -1894,18 +1910,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         updateUIState();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Liberar recursos de RFID para evitar memory leaks
-        if (rfidHandler != null) {
-            rfidHandler.setResponseHandler(null);
-        }
-        // Apagar executor
-        if (databaseExecutor != null) {
-            databaseExecutor.shutdown();
-        }
-    }
+
 
     private void toggleScan() {
         if (isScanning) {
@@ -2130,6 +2135,25 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Liberar recursos de RFID
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(null);
+        }
+        // Cancelar cualquier auto-save pendiente en el debounce handler
+        if (pendingSaveRunnable != null) {
+            saveDebounceHandler.removeCallbacks(pendingSaveRunnable);
+            pendingSaveRunnable = null;
+        }
+        // Apagar el executor limpiamente
+        if (databaseExecutor != null && !databaseExecutor.isShutdown()) {
+            databaseExecutor.shutdown();
+        }
+        Log.d(TAG, "onDestroy: Recursos liberados.");
+    }
+
     // ResponseHandlerInterface methods
 
     @Override
@@ -2223,9 +2247,20 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     updateSummaryCounts();
                     updateAdapterList();
                     updateGaugeDisplay();
-                    
-                    // Auto-save ONCE per batch
-                    new SaveLocalTask(false).execute();
+
+                    // BUGFIX Latencia: Debounce del auto-save (500ms).
+                    // Antes, SaveLocalTask se lanzaba por CADA batch de tags, compitiendo
+                    // con la query getActivosByEpcs() en el mismo SingleThreadExecutor
+                    // y bloqueando el procesamiento del siguiente batch. Ahora se espera
+                    // 500ms desde el ultimo batch nuevo antes de persistir.
+                    if (pendingSaveRunnable != null) {
+                        saveDebounceHandler.removeCallbacks(pendingSaveRunnable);
+                    }
+                    pendingSaveRunnable = () -> {
+                        pendingSaveRunnable = null;
+                        new SaveLocalTask(false).execute();
+                    };
+                    saveDebounceHandler.postDelayed(pendingSaveRunnable, SAVE_DEBOUNCE_MS);
                 }
             });
         });

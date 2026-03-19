@@ -344,18 +344,28 @@ public class TomaFisicaTomasDao {
         }
     }
 
+    /**
+     * Retorna el máximo número de toma existente para un TomaFisicaId dado.
+     * Esto se usa para calcular el número de la SIGUIENTE toma nueva: getMaxTomaNumber() + 1.
+     *
+     * BUGFIX: La implementación anterior usaba COUNT(*) que contaba todas las tomas
+     * incluyendo las ya sincronizadas de la API (SYNC_STATUS=1). Si el servidor tenía
+     * 2 tomas históricas y el usuario creaba una "nueva", se numeraba como 3 en lugar de 1.
+     * Con MAX(NumeroToma) se obtiene el número real de la última toma registrada.
+     */
     public int getPendientesCount(String tomaFisicaId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        int count = 0;
-        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM TomasFisicasResumen WHERE LOWER(TomaFisicaId) = LOWER(?)", new String[]{tomaFisicaId})) {
-            if (cursor.moveToFirst()) {
-                count = cursor.getInt(0);
+        int maxNum = 0;
+        try (Cursor cursor = db.rawQuery(
+                "SELECT MAX(CAST(NumeroToma AS INTEGER)) FROM TomasFisicasResumen WHERE LOWER(TomaFisicaId) = LOWER(?)",
+                new String[]{tomaFisicaId})) {
+            if (cursor.moveToFirst() && !cursor.isNull(0)) {
+                maxNum = cursor.getInt(0);
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error counting pendientes", e);
+            Log.e(TAG, "Error getting max toma number", e);
         }
-        // Removed db.close()
-        return count;
+        return maxNum;
     }
 
     public void pushSubtoma(TomaFisicaTomasEntity entity, ApiCallback<JsonObject> callback) {

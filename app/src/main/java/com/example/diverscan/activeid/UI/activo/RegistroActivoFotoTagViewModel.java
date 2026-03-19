@@ -70,14 +70,23 @@ public class RegistroActivoFotoTagViewModel extends AndroidViewModel {
         Log.d("ViewModel", "Guardando tag y fotos para activo " + idActivo);
     }
 
-    public void guardarActivoFinal(Context context, ActivoEntity activo) {
-        ActivoDao dao = new ActivoDao(context);
-        long res = dao.insertActivo(activo);
+    public interface OnSaveCallback {
+        void onSaveComplete(boolean success);
+    }
 
-        if (res == -1) {
-            Log.e("DAO", "Error al insertar activo");
-        } else {
-            Log.i("DAO", "Activo guardado con ID fila: " + res);
-        }
+    public void guardarActivoFinal(Context context, ActivoEntity activo, OnSaveCallback callback) {
+        new Thread(() -> {
+            ActivoDao dao = new ActivoDao(context);
+            long res = dao.insertActivo(activo);
+            boolean success = (res != -1);
+            if (!success) {
+                Log.e("DAO", "Error al insertar activo");
+            } else {
+                Log.i("DAO", "Activo guardado con ID fila: " + res);
+            }
+            if (callback != null) {
+                callback.onSaveComplete(success);
+            }
+        }).start();
     }
 }

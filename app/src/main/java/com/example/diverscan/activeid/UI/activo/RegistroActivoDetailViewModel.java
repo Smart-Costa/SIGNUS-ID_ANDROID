@@ -68,7 +68,6 @@ public class RegistroActivoDetailViewModel extends AndroidViewModel {
 
     public void guardarActivo(Context context, ActivoEntity activo) {
         repository.guardarActivo(context, activo);
-        Toast.makeText(context, "Activo guardado correctamente", Toast.LENGTH_SHORT).show();
     }
 
     private List<ComboItem> mapearCategorias(List<CategoriaEntity> lista) {

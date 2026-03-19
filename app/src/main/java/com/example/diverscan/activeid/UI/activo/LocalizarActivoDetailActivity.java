@@ -39,14 +39,10 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         
         initRFID();
 
+        // BUGFIX: El listener original llamaba rfidHandler.startRead() incondicionalmente,
+        // incluso si el usuario des-seleccionaba el checkbox. Ahora solo inicia si está checked.
         binding.opcRFID.setOnClickListener(v -> {
-            if (rfidHandler != null) {
-                // Si el handler ya está inicializado, aseguramos que esté en modo lectura o listo
-                if (!binding.opcRFID.isChecked()) {
-                   // Si era un toggle, aquí manejaríamos lógica, pero es un radiobutton/checkbox probablemente?
-                   // Asumimos que es para activar el modo
-                }
-                // Iniciar lectura si se selecciona
+            if (rfidHandler != null && binding.opcRFID.isChecked()) {
                 rfidHandler.startRead();
             }
         });
@@ -82,6 +78,14 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
             rfidHandler.stopRead();
         }
         isScanning = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(null);
+        }
     }
 
     @Override
@@ -151,19 +155,26 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
             return;
         }
 
-        ActivoEntity activo = activoDAO.getActivoByEpc(epc);
-
-        if (activo != null) {
-            activoLeido = activo;
-            epcLeido = epc;
-            binding.txtNumeroActivo.setText(activo.getNumeroActivo());
-            binding.txtNumeroEtiqueta.setText(activo.getNumeroEtiqueta());
-            binding.txtDescripcionCorta.setText(activo.getDescripcionCorta());
-            if (rfidHandler != null) rfidHandler.stopRead();
-            isScanning = false;
-        } else {
-            Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
-        }
+        // BUGFIX: getActivoByEpc() es una query SQLite que debe ejecutarse en background.
+        // Antes se ejecutaba directamente en el UI thread, con riesgo de ANR.
+        final String epcFinal = epc;
+        new Thread(() -> {
+            ActivoEntity activo = activoDAO.getActivoByEpc(epcFinal);
+            runOnUiThread(() -> {
+                if (isDestroyed() || isFinishing()) return;
+                if (activo != null) {
+                    activoLeido = activo;
+                    epcLeido = epcFinal;
+                    binding.txtNumeroActivo.setText(activo.getNumeroActivo());
+                    binding.txtNumeroEtiqueta.setText(activo.getNumeroEtiqueta());
+                    binding.txtDescripcionCorta.setText(activo.getDescripcionCorta());
+                    if (rfidHandler != null) rfidHandler.stopRead();
+                    isScanning = false;
+                } else {
+                    Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
+                }
+            });
+        }).start();
     }
 
     private void mostrarPopupActivo(ActivoEntity activo, String epc) {
@@ -207,18 +218,23 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
                 return;
             }
 
-            ActivoEntity activo = activoDAO.getActivoById(id);
-
-            if (activo != null) {
-                // Usar getEpc() en lugar de getTagEpc() para mostrar el valor real
-                String epcReal = activo.getEpc();
-                if (epcReal == null || epcReal.isEmpty()) {
-                    epcReal = "Sin EPC";
-                }
-                mostrarPopupActivo(activo, epcReal);
-            } else {
-                Toast.makeText(this, "Activo no encontrado", Toast.LENGTH_SHORT).show();
-            }
+            // BUGFIX: getActivoById() movido a background thread para evitar ANR
+            final String idFinal = id;
+            new Thread(() -> {
+                ActivoEntity activo = activoDAO.getActivoById(idFinal);
+                runOnUiThread(() -> {
+                    if (isDestroyed() || isFinishing()) return;
+                    if (activo != null) {
+                        String epcReal = activo.getEpc();
+                        if (epcReal == null || epcReal.isEmpty()) {
+                            epcReal = "Sin EPC";
+                        }
+                        mostrarPopupActivo(activo, epcReal);
+                    } else {
+                        Toast.makeText(this, "Activo no encontrado", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }).start();
         });
     }
 }

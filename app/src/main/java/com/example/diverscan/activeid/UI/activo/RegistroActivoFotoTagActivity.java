@@ -15,9 +15,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.io.IOException;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -86,13 +84,6 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
                 spUbicacionSecundaria.setAdapter(adapter);
             }
         });
-
-        String idActivo = getIntent().getStringExtra("idActivo");
-
-        if (idActivo == null || idActivo.isEmpty()) {
-            idActivo = getSharedPreferences("RegistroActivo", MODE_PRIVATE).getString("idActivo", "");
-        }
-
 
         // Cargar catálogo
         viewModel.cargarUbicacionesSecundarias(this);
@@ -181,12 +172,6 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         super.onResume();
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                    return; 
-                }
-            }
         }
     }
 
@@ -199,20 +184,24 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         isScanning = false;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (rfidHandler != null) {
+            rfidHandler.setResponseHandler(null);
+        }
+    }
+
     // --- Implementación de ResponseHandlerInterface ---
 
     @Override
     public void handleTagdata(ReaderTag[] tagData) {
-        if (tagData == null || tagData.length == 0) {
-            return;
-        }
+        if (tagData == null || tagData.length == 0) return;
         
-        // Si ya tenemos un valor, ignorar nuevas lecturas (o podríamos permitir sobrescribir si el usuario borra primero)
         if (etRfidTag.getText() != null && !etRfidTag.getText().toString().trim().isEmpty()) {
             return;
         }
 
-        // Validar si vienen múltiples tags en la misma lectura
         if (tagData.length > 1) {
             runOnUiThread(() -> {
                 if (rfidHandler != null) rfidHandler.stopRead();
@@ -222,16 +211,8 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
             return;
         }
 
-        // Procesar el primer tag válido
-        String epcLeido = null;
-        for (ReaderTag t : tagData) {
-            if (t.getEpc() != null && !t.getEpc().trim().isEmpty()) {
-                epcLeido = t.getEpc();
-                break;
-            }
-        }
-
-        if (epcLeido != null) {
+        String epcLeido = tagData[0].getEpc();
+        if (epcLeido != null && !epcLeido.trim().isEmpty()) {
             final String finalEpc = epcLeido;
             runOnUiThread(() -> {
                 if (rfidHandler != null) rfidHandler.stopRead();
@@ -251,7 +232,6 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         lastTriggerEventAt = now;
 
         if (pressed) {
-            runOnUiThread(() -> Toast.makeText(this, "Leyendo...", Toast.LENGTH_SHORT).show());
             if (rfidHandler != null) {
                 if (etRfidTag.getText() != null && !etRfidTag.getText().toString().trim().isEmpty()) {
                     runOnUiThread(() -> Toast.makeText(this, "TAG ya asignado. Limpie el campo para leer otro.", Toast.LENGTH_SHORT).show());
@@ -272,17 +252,13 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
 
     @Override
     public void SetMessage(String msg) {
-        runOnUiThread(() ->
-                Toast.makeText(this, "Reader: " + msg, Toast.LENGTH_SHORT).show()
-        );
+        runOnUiThread(() -> Toast.makeText(this, "Reader: " + msg, Toast.LENGTH_SHORT).show());
     }
 
     @Override
     public Context GetContext() {
         return this;
     }
-
-    // ------------------------------------------------
 
     private void configurarClickImagenes() {
         imgFoto1.setOnClickListener(v -> abrirGaleria(1));
@@ -317,7 +293,6 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
             return;
         }
 
-        // Validación de formato básico de EPC (opcional, ejemplo 24 caracteres hex)
         if (!rfid.matches("^[A-Fa-f0-9]+$")) {
              Toast.makeText(this, "El TAG debe contener solo caracteres hexadecimales", Toast.LENGTH_SHORT).show();
              return;
@@ -326,10 +301,8 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         SharedPreferences prefs = getSharedPreferences("RegistroActivo", MODE_PRIVATE);
         String idActivo = prefs.getString("idActivo", "");
 
-        // --- Construimos el Activo COMPLETO ---
         ActivoEntity activo = new ActivoEntity();
         activo.setIdActivo(idActivo);
-
         activo.setNumeroActivo(prefs.getString("NumeroActivo", ""));
         activo.setNumeroEtiqueta(prefs.getString("NumeroEtiqueta", ""));
         activo.setDescripcionCorta(prefs.getString("Descripcion", ""));
@@ -338,29 +311,33 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         activo.setEmpresa(prefs.getString("Empresa", ""));
         activo.setMarca(prefs.getString("Marca", ""));
         activo.setModelo(prefs.getString("Modelo", ""));
-
         activo.setUbicacionA(prefs.getString("UbicacionA", ""));
         activo.setUbicacionB(prefs.getString("UbicacionB", ""));
         activo.setUbicacionC(prefs.getString("UbicacionC", ""));
         activo.setUbicacionD(prefs.getString("UbicacionD", ""));
         activo.setUbicacionSecundaria(ubicacionSec);
-
-        // Usar la columna EPC real, no TAG_EPC
         activo.setEpc(rfid);
-        activo.setTagEpc(rfid); // Set real EPC, not "EPC Asignado"
-        
-        // Asignar estado activo explícitamente a true para evitar que se cuente como baja
+        activo.setTagEpc(rfid);
         activo.setEstadoActivo(true);
 
-        viewModel.guardarActivoFinal(this, activo);
-
-        Toast.makeText(this, "Activo registrado correctamente", Toast.LENGTH_LONG).show();
-
-        prefs.edit().clear().apply();
-        
-        Intent intent = new Intent(this, com.example.diverscan.activeid.UI.main.MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        finish();
+        // Bloquear botón para evitar doble envío
+        btnGuardar.setEnabled(false);
+        // BUGFIX: Usar callback asíncrono para cerrar la actividad solo tras confirmar el guardado
+        viewModel.guardarActivoFinal(this, activo, success -> {
+            runOnUiThread(() -> {
+                if (isDestroyed() || isFinishing()) return;
+                btnGuardar.setEnabled(true);
+                if (success) {
+                    Toast.makeText(this, "Activo registrado correctamente", Toast.LENGTH_LONG).show();
+                    prefs.edit().clear().apply();
+                    Intent intent = new Intent(this, com.example.diverscan.activeid.UI.main.MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(this, "Error al guardar el activo en la base de datos", Toast.LENGTH_LONG).show();
+                }
+            });
+        });
     }
 }

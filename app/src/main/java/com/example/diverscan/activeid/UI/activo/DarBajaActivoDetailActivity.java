@@ -159,18 +159,25 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
             return;
         }
 
-        ActivoEntity activo = activoDAO.getActivoByEpc(epc);
-        if (activo != null) {
-            mostrarNotificacionActivo(epc, activo.getNumeroActivo(), activo.getDescripcionCorta(), true);
-            cargarDatosActivo(activo);
-            rfidHandler.stopRead();
-            isScanning = false;
-        } else {
-            rfidHandler.stopRead();
-            isScanning = false;
-            mostrarNotificacionActivo(epc, "Desconocido", "No encontrado", false);
-            Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
-        }
+        // BUGFIX: query de BD movida a background thread para evitar ANR
+        final String epcFinal = epc;
+        new Thread(() -> {
+            ActivoEntity activo = activoDAO.getActivoByEpc(epcFinal);
+            runOnUiThread(() -> {
+                if (isDestroyed() || isFinishing()) return;
+                if (activo != null) {
+                    mostrarNotificacionActivo(epcFinal, activo.getNumeroActivo(), activo.getDescripcionCorta(), true);
+                    cargarDatosActivo(activo);
+                    rfidHandler.stopRead();
+                    isScanning = false;
+                } else {
+                    rfidHandler.stopRead();
+                    isScanning = false;
+                    mostrarNotificacionActivo(epcFinal, "Desconocido", "No encontrado", false);
+                    Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
+                }
+            });
+        }).start();
     }
 
     private void mostrarNotificacionActivo(String epc, String numeroActivo, String descripcion, boolean encontrado) {
@@ -238,14 +245,21 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
 
     private void buscarActivoPorNumero(String numero) {
         if (numero == null || numero.trim().isEmpty()) return;
-        
-        ActivoEntity activo = activoDAO.getActivoById(numero.trim());
-        if (activo != null) {
-            cargarDatosActivo(activo);
-        } else {
-            Toast.makeText(this, "Activo no encontrado con número: " + numero, Toast.LENGTH_SHORT).show();
-            limpiarCampos(false);
-        }
+        // BUGFIX: Query de BD movida a background thread para evitar ANR
+        final String numTrim = numero.trim();
+        new Thread(() -> {
+            ActivoEntity activo = activoDAO.getActivoById(numTrim);
+            runOnUiThread(() -> {
+                if (!isDestroyed() && !isFinishing()) {
+                    if (activo != null) {
+                        cargarDatosActivo(activo);
+                    } else {
+                        Toast.makeText(this, "Activo no encontrado con número: " + numTrim, Toast.LENGTH_SHORT).show();
+                        limpiarCampos(false);
+                    }
+                }
+            });
+        }).start();
     }
 
     private void cargarDatosActivo(ActivoEntity activo) {
@@ -285,19 +299,28 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
     }
 
     private void ejecutarBaja(String razon) {
+        // Deshabilitar botón durante operación para evitar doble baja
+        binding.btnGuardar.setEnabled(false);
         activoLeido.setEstadoActivo(Boolean.FALSE);
         activoLeido.setObservaciones(razon);
-
-        int updated = activoDAO.updateEstadoActivo(activoLeido);
-        if (updated > 0) {
-            Toast.makeText(this, "Activo dado de baja correctamente", Toast.LENGTH_SHORT).show();
-            limpiarCampos(true);
-            if (binding.opcRFID.isChecked()) {
-                rfidHandler.startRead();
-            }
-        } else {
-            Toast.makeText(this, "Error al dar de baja el activo", Toast.LENGTH_SHORT).show();
-        }
+        final ActivoEntity activoParaBaja = activoLeido;
+        // BUGFIX: `updateEstadoActivo()` es una operación de BD que debe ir en background
+        new Thread(() -> {
+            int updated = activoDAO.updateEstadoActivo(activoParaBaja);
+            runOnUiThread(() -> {
+                if (isDestroyed() || isFinishing()) return;
+                binding.btnGuardar.setEnabled(true);
+                if (updated > 0) {
+                    Toast.makeText(this, "Activo dado de baja correctamente", Toast.LENGTH_SHORT).show();
+                    limpiarCampos(true);
+                    if (binding.opcRFID.isChecked()) {
+                        rfidHandler.startRead();
+                    }
+                } else {
+                    Toast.makeText(this, "Error al dar de baja el activo", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }).start();
     }
 
     private void limpiarCampos(boolean full) {
