@@ -295,6 +295,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private boolean firstTagAfterResumeLogged = false;
     private final android.os.Handler rfidRetryHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private Runnable pendingStartScanRetry = null;
+    private long currentScanStartMs = 0L;
+    private Runnable pendingScanWatchdog = null;
+    private int refreshActivosRunCounter = 0;
     private java.util.Map<String, String> manualEpcToActivoId = new java.util.HashMap<>();
     private java.util.Map<String, String> epcToDisplayName = new java.util.HashMap<>();
 
@@ -1118,6 +1121,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     private void refreshActivosList() {
+        final int runId = ++refreshActivosRunCounter;
+        final long t0 = android.os.SystemClock.elapsedRealtime();
+        Log.d(TAG, "refreshActivosList[" + runId + "] start");
         String ua = selectedUbicacionAId != null ? selectedUbicacionAId : baseUbicacionAId;
         String ub = selectedUbicacionBId != null ? selectedUbicacionBId : baseUbicacionBId;
         String uc = selectedUbicacionCId != null ? selectedUbicacionCId : baseUbicacionCId;
@@ -1129,8 +1135,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         // Perform calculation in background to avoid UI lag and ensure correct filtered count
         if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
+            long q0 = android.os.SystemClock.elapsedRealtime();
             // 1. Get expected assets for current filter
             List<ActivoEntity> expected = activoDao.getActivosByFiltros(ua, ub, uc, ud, us, uo, cat);
+            long q1 = android.os.SystemClock.elapsedRealtime();
             
             Set<String> expEpcs = new HashSet<>();
             Set<String> expIds = new HashSet<>();
@@ -1173,6 +1181,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             int countC = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, null, uo, cat);
             int countD = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, null, uo, cat);
             int countS = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, us, uo, cat);
+            long q2 = android.os.SystemClock.elapsedRealtime();
 
             // Fetch Scanned Entities for Sobrantes logic
             Map<String, ActivoEntity> scannedEntityMap = new HashMap<>();
@@ -1189,6 +1198,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             } catch (Exception e) {
                 Log.e(TAG, "Error fetching scanned entities", e);
             }
+            long q3 = android.os.SystemClock.elapsedRealtime();
+            Log.d(TAG, "refreshActivosList[" + runId + "] queryTimes ms expected=" + (q1 - q0) + " counts=" + (q2 - q1) + " scannedMap=" + (q3 - q2) + " totalBg=" + (q3 - q0) + " expectedSize=" + countFiltrados + " uniqueTags=" + uniqueTags.size());
 
             runOnUiThread(() -> {
                 // Update Gauge Data
@@ -1242,6 +1253,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 updateAdapterList();
                 
                 updateGaugeDisplay(); // Updated after list is refreshed
+                long uiDone = android.os.SystemClock.elapsedRealtime();
+                Log.d(TAG, "refreshActivosList[" + runId + "] done total=" + (uiDone - t0) + "ms listSize=" + itemsList.size());
             });
 
             // 3. Load Spinner
@@ -1269,6 +1282,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
         if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
+            long s0 = android.os.SystemClock.elapsedRealtime();
             listaActivosSpinner = new ArrayList<>();
 
             // Si todos son null, podrÃ­amos querer cargar TODO o NADA.
@@ -1277,6 +1291,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             listaActivosSpinner = activoDao.getActivosByFiltros(ua, ub, uc, ud, us);
             
             Log.d(TAG, "Total activos cargados para selector manual: " + listaActivosSpinner.size());
+            long s1 = android.os.SystemClock.elapsedRealtime();
+            Log.d(TAG, "cargarActivosSpinner: queryTime=" + (s1 - s0) + "ms");
             /*
             if (listaActivosSpinner != null) {
                 for (int i = 0; i < Math.min(3, listaActivosSpinner.size()); i++) {
@@ -1939,6 +1955,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             rfidRetryHandler.removeCallbacks(pendingStartScanRetry);
             pendingStartScanRetry = null;
         }
+        if (pendingScanWatchdog != null) {
+            rfidRetryHandler.removeCallbacks(pendingScanWatchdog);
+            pendingScanWatchdog = null;
+        }
         pendingScanRetry = false;
         if (rfidHandler != null) {
             rfidHandler.stopRead();
@@ -1992,6 +2012,17 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             Log.d(TAG, "startScan execute: connected=" + rfidHandler.isConnected());
             rfidHandler.startRead();
             isScanning = true;
+            currentScanStartMs = android.os.SystemClock.elapsedRealtime();
+            if (pendingScanWatchdog != null) {
+                rfidRetryHandler.removeCallbacks(pendingScanWatchdog);
+            }
+            pendingScanWatchdog = () -> {
+                if (isScanning && !firstTagAfterResumeLogged) {
+                    long elapsed = android.os.SystemClock.elapsedRealtime() - currentScanStartMs;
+                    Log.w(TAG, "SCAN WATCHDOG: sin tags en " + elapsed + "ms. connected=" + (rfidHandler != null && rfidHandler.isConnected()) + " ready=" + isRfidReady);
+                }
+            };
+            rfidRetryHandler.postDelayed(pendingScanWatchdog, 3000L);
             updateUIState();
         } catch (Exception e) {
             Log.e(TAG, "Error starting scan", e);
@@ -2014,6 +2045,15 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         if (rfidHandler != null) {
             try {
                 rfidHandler.stopRead();
+                if (currentScanStartMs > 0L) {
+                    long elapsed = android.os.SystemClock.elapsedRealtime() - currentScanStartMs;
+                    Log.d(TAG, "stopScan: duración sesión lectura=" + elapsed + "ms");
+                }
+                currentScanStartMs = 0L;
+                if (pendingScanWatchdog != null) {
+                    rfidRetryHandler.removeCallbacks(pendingScanWatchdog);
+                    pendingScanWatchdog = null;
+                }
                 isScanning = false;
                 updateUIState();
             } catch (Exception e) {
@@ -2209,6 +2249,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             rfidRetryHandler.removeCallbacks(pendingStartScanRetry);
             pendingStartScanRetry = null;
         }
+        if (pendingScanWatchdog != null) {
+            rfidRetryHandler.removeCallbacks(pendingScanWatchdog);
+            pendingScanWatchdog = null;
+        }
         // Liberar recursos de RFID
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(null);
@@ -2231,6 +2275,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     public void handleTagdata(ReaderTag[] tagData) {
         if (tagData == null || tagData.length == 0) return;
         isRfidReady = true;
+        if (pendingScanWatchdog != null) {
+            rfidRetryHandler.removeCallbacks(pendingScanWatchdog);
+            pendingScanWatchdog = null;
+        }
         if (!firstTagAfterResumeLogged) {
             firstTagAfterResumeLogged = true;
             long delta = android.os.SystemClock.elapsedRealtime() - resumeTimestampMs;
