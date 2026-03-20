@@ -14,7 +14,7 @@ if (-not $Password) {
 if ($Env -eq 'prod') {
   $base = 'http://srvapppro/ApiHH/api'
 } else {
-  $base = 'http://44.193.11.135:70/ApiHH/Api'
+  $base = 'http://44.200.127.109:70/ApiHH/Api'
 }
 
 $loginUrl = "$base/auth/login"
@@ -58,4 +58,3 @@ try {
   Write-Host "ERROR $Env $testUrl ($($sw.ElapsedMilliseconds) ms): $($_.Exception.Message)" -ForegroundColor Red
   exit 4
 }
-
