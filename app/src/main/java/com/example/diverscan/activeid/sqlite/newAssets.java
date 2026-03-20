@@ -47,11 +47,14 @@ public class newAssets extends SQLiteOpenHelper {
     public boolean VerificarPlaca(String Placa){
         SQLiteDatabase db = this.getReadableDatabase();
         String query="Select * from NewAssets Where CodeBar ='" + Placa + "'";
-        Cursor activosCursor = db.rawQuery(query, null);
-        if (activosCursor.moveToFirst()) {
-            return true;
-        } else
-        {
+        try (Cursor activosCursor = db.rawQuery(query, null)) {
+            if (activosCursor.moveToFirst()) {
+                return true;
+            } else
+            {
+                return false;
+            }
+        } catch (Exception e) {
             return false;
         }
     }

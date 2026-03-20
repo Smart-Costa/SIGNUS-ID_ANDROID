@@ -95,12 +95,14 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
 
     public EntidadActivos cargarActivo (String query){
         SQLiteDatabase db = this.getReadableDatabase(); // el login ?  podemos empezar de nuevo pero tambien debugueando lo del login ?? oki ve
-        Cursor cursor=  db.rawQuery(query, null);
-        if (cursor.getCount() != 0) {
-            cursor.moveToFirst();
-            EntidadActivos entidadActivos=getEntidadActivos(cursor);
-            cursor.close();
-            return  entidadActivos;
+        try (Cursor cursor=  db.rawQuery(query, null)) {
+            if (cursor.getCount() != 0) {
+                cursor.moveToFirst();
+                EntidadActivos entidadActivos=getEntidadActivos(cursor);
+                return  entidadActivos;
+            }
+        } catch (Exception e) {
+            Log.e("AssetsDBHelper", "Error cargarActivo", e);
         }
         return  null;
     }
@@ -177,25 +179,25 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
 
     public EntidadActivosInventarios CargarActivosInventario (String query){
         SQLiteDatabase db = this.getReadableDatabase(); // el login ?  podemos empezar de nuevo pero tambien debugueando lo del login ?? oki ve
-        Cursor cursor=  db.rawQuery(query, null);
-        if (cursor.getCount() != 0) {
-            cursor.moveToFirst();
-            EntidadActivosInventarios entidadActivos=getEntidadActivosInventarios(cursor);
-            cursor.close();
-            return  entidadActivos;
-        }
+        try (Cursor cursor=  db.rawQuery(query, null)) {
+            if (cursor.getCount() != 0) {
+                cursor.moveToFirst();
+                EntidadActivosInventarios entidadActivos=getEntidadActivosInventarios(cursor);
+                return  entidadActivos;
+            }
+        } catch (Exception e) {}
         return  null;
     }
 
     public EntidadCategoriaActivos cargarCategoriaActivo (String query){
         SQLiteDatabase db = this.getReadableDatabase(); // el login ?  podemos empezar de nuevo pero tambien debugueando lo del login ?? oki ve
-        Cursor cursor=  db.rawQuery(query, null);
-        if (cursor.getCount() != 0) {
-            cursor.moveToFirst();
-            EntidadCategoriaActivos entidadCategoriaActivos=getEntidadCategoriaActivos(cursor);
-            cursor.close();
-            return  entidadCategoriaActivos;
-        }
+        try (Cursor cursor=  db.rawQuery(query, null)) {
+            if (cursor.getCount() != 0) {
+                cursor.moveToFirst();
+                EntidadCategoriaActivos entidadCategoriaActivos=getEntidadCategoriaActivos(cursor);
+                return  entidadCategoriaActivos;
+            }
+        } catch (Exception e) {}
         return  null;
     }
 
@@ -527,11 +529,14 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
     {
         String q = "Select * FROM  Activos";
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(q, null);
-        if (cursor.moveToFirst()) {
-            return true;
-        } else
-        {
+        try (Cursor cursor = db.rawQuery(q, null)) {
+            if (cursor.moveToFirst()) {
+                return true;
+            } else
+            {
+                return false;
+            }
+        } catch (Exception e) {
             return false;
         }
     }
@@ -540,39 +545,37 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
         ArrayList<ActivoRecord> listActivos = new ArrayList<>();
         String query="Select * from Activos where SyncData ='1'";
         SQLiteDatabase db = this.getReadableDatabase(); //    el login ?  podemos empezar de nuevo pero tambien debugueando lo del login ?? oki ve
-        Cursor activosCursor = db.rawQuery(query, null);
-        int cantidadDatos = activosCursor.getCount();
-        activosCursor.moveToFirst();
-        for (int i = 0; i < cantidadDatos;i++) {
-            String Alias = activosCursor.getString(activosCursor.getColumnIndex("Alias"));
-            String Descripcion = activosCursor.getString(activosCursor.getColumnIndex("Descripcion"));
-            String IdTag = activosCursor.getString(activosCursor.getColumnIndex("Tag"));
-            String idActivo= activosCursor.getString(activosCursor.getColumnIndex("_id"));
-            String IdOficina = activosCursor.getString(activosCursor.getColumnIndex("IdOficina"));
-            String IdPiso = activosCursor.getString(activosCursor.getColumnIndex("IdPiso"));
-            String IdEdificio = activosCursor.getString(activosCursor.getColumnIndex("IdEdificio"));
-            String IdCompania = activosCursor.getString(activosCursor.getColumnIndex("IdCompania"));
-            String Marca = activosCursor.getString(activosCursor.getColumnIndex("Marca"));
-            String Modelo = activosCursor.getString(activosCursor.getColumnIndex("Modelo"));
-            String Serial = activosCursor.getString(activosCursor.getColumnIndex("Serial"));
-            String CodeBar = activosCursor.getString(activosCursor.getColumnIndex("CodeBar"));
-            String UpdateUser = activosCursor.getString(activosCursor.getColumnIndex("UpdateUser"));
-            String parentAssetSyId = activosCursor.getString(activosCursor.getColumnIndex("parentAssetSysId"));
-            String employeeRelatedSysId= activosCursor.getString(activosCursor.getColumnIndex("EmployeeRelatedSysId"));
-            String assetStatusSysId= activosCursor.getString(activosCursor.getColumnIndex("AssetStatusSysId"));
-            String AnoFabricacion= activosCursor.getString(activosCursor.getColumnIndex("AnoFabricacion"));
-            String Capacidad = activosCursor.getString(activosCursor.getColumnIndex("Capacidad"));
-            String _estadoDescripcion = activosCursor.getString(activosCursor.getColumnIndex("EstadoDescripcion"));
-            String _estadoConservacion = activosCursor.getString(activosCursor.getColumnIndex("EstadoConservacion"));
-            ActivoRecord activoRecord = new ActivoRecord(Alias, Descripcion, IdTag, idActivo, IdOficina,
-                    IdPiso, IdEdificio, IdCompania, Marca, Modelo, Serial, CodeBar, UpdateUser, parentAssetSyId
-                    ,employeeRelatedSysId,assetStatusSysId,AnoFabricacion,Capacidad,_estadoDescripcion,_estadoConservacion);
-            listActivos.add(activoRecord);
-            activosCursor.moveToNext();
-
+        try (Cursor activosCursor = db.rawQuery(query, null)) {
+            if (activosCursor.moveToFirst()) {
+                do {
+                    String Alias = activosCursor.getString(activosCursor.getColumnIndex("Alias"));
+                    String Descripcion = activosCursor.getString(activosCursor.getColumnIndex("Descripcion"));
+                    String IdTag = activosCursor.getString(activosCursor.getColumnIndex("Tag"));
+                    String idActivo= activosCursor.getString(activosCursor.getColumnIndex("_id"));
+                    String IdOficina = activosCursor.getString(activosCursor.getColumnIndex("IdOficina"));
+                    String IdPiso = activosCursor.getString(activosCursor.getColumnIndex("IdPiso"));
+                    String IdEdificio = activosCursor.getString(activosCursor.getColumnIndex("IdEdificio"));
+                    String IdCompania = activosCursor.getString(activosCursor.getColumnIndex("IdCompania"));
+                    String Marca = activosCursor.getString(activosCursor.getColumnIndex("Marca"));
+                    String Modelo = activosCursor.getString(activosCursor.getColumnIndex("Modelo"));
+                    String Serial = activosCursor.getString(activosCursor.getColumnIndex("Serial"));
+                    String CodeBar = activosCursor.getString(activosCursor.getColumnIndex("CodeBar"));
+                    String UpdateUser = activosCursor.getString(activosCursor.getColumnIndex("UpdateUser"));
+                    String parentAssetSyId = activosCursor.getString(activosCursor.getColumnIndex("parentAssetSysId"));
+                    String employeeRelatedSysId= activosCursor.getString(activosCursor.getColumnIndex("EmployeeRelatedSysId"));
+                    String assetStatusSysId= activosCursor.getString(activosCursor.getColumnIndex("AssetStatusSysId"));
+                    String AnoFabricacion= activosCursor.getString(activosCursor.getColumnIndex("AnoFabricacion"));
+                    String Capacidad = activosCursor.getString(activosCursor.getColumnIndex("Capacidad"));
+                    String _estadoDescripcion = activosCursor.getString(activosCursor.getColumnIndex("EstadoDescripcion"));
+                    String _estadoConservacion = activosCursor.getString(activosCursor.getColumnIndex("EstadoConservacion"));
+                    ActivoRecord activoRecord = new ActivoRecord(Alias, Descripcion, IdTag, idActivo, IdOficina,
+                            IdPiso, IdEdificio, IdCompania, Marca, Modelo, Serial, CodeBar, UpdateUser, parentAssetSyId
+                            ,employeeRelatedSysId,assetStatusSysId,AnoFabricacion,Capacidad,_estadoDescripcion,_estadoConservacion);
+                    listActivos.add(activoRecord);
+                } while (activosCursor.moveToNext());
+            }
         }
         return listActivos;
-
     }
 
     public boolean ActualizarSync (ArrayList<ActivoRecord> listActivos){
@@ -603,13 +606,13 @@ public class AssetsDBHelper extends SQLiteOpenHelper{
 
     public EntidadTiposTags cargarNombreTag (String query){
         SQLiteDatabase db = this.getReadableDatabase(); // el login ?  podemos empezar de nuevo pero tambien debugueando lo del login ?? oki ve
-        Cursor cursor=  db.rawQuery(query, null);
-        if (cursor.getCount() != 0) {
-            cursor.moveToFirst();
-            EntidadTiposTags entidadTiposTags=getEntidadTiposTags(cursor);
-            cursor.close();
-            return  entidadTiposTags;
-        }
+        try (Cursor cursor=  db.rawQuery(query, null)) {
+            if (cursor.getCount() != 0) {
+                cursor.moveToFirst();
+                EntidadTiposTags entidadTiposTags=getEntidadTiposTags(cursor);
+                return  entidadTiposTags;
+            }
+        } catch (Exception e) {}
         return  null;
     }
 

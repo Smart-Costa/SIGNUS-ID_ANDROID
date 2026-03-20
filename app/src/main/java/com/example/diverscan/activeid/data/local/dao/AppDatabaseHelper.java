@@ -96,6 +96,8 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 // Ignore
             }
         }
+        
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_TfResumen_TomaFisicaId ON TomasFisicasResumen (TomaFisicaId)");
     }
 
     private static void ensureTomasFisicasDetalleTable(SQLiteDatabase db) {
@@ -122,6 +124,9 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 // Ignore
             }
         }
+        
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_TfDetalle_IdToma ON TomasFisicasDetalle (IdToma)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_TfDetalle_Epc ON TomasFisicasDetalle (EPC)");
     }
 
     private static void ensurePendingDeletesTable(SQLiteDatabase db) {
@@ -186,6 +191,11 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "SYNC_STATUS INTEGER DEFAULT 1" +
                 ")");
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_ActivosApi_TAG_EPC ON ActivosApi (TAG_EPC)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_ActivosApi_EPC ON ActivosApi (EPC)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_ActivosApi_NUMERO_ACTIVO ON ActivosApi (NUMERO_ACTIVO)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_ActivosApi_ID_ACTIVO ON ActivosApi (ID_ACTIVO)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_ActivosApi_Ubicaciones ON ActivosApi (UBICACION_A, UBICACION_B, UBICACION_C, UBICACION_D)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_ActivosApi_Secundaria ON ActivosApi (UBICACION_SECUNDARIA)");
         
         // Ensure column exists for upgrades from older versions if table existed
         if (!checkColumnExists(db, "ActivosApi", "SYNC_STATUS")) {

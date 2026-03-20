@@ -250,31 +250,33 @@ public class TomaFisicaTomasDao {
         List<TomaFisicaTomasEntity> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         // Usar LOWER para comparar GUIDs sin importar mayúsculas/minúsculas
-        Cursor cursor = db.rawQuery("SELECT * FROM TomasFisicasResumen WHERE LOWER(TomaFisicaId) = LOWER(?)", new String[]{tomaFisicaId});
-        if (cursor.moveToFirst()) {
-            do {
-                TomaFisicaTomasEntity entity = new TomaFisicaTomasEntity();
-                entity.setTomaFisicaId(cursor.getString(cursor.getColumnIndexOrThrow("TomaFisicaId")));
-                entity.setNumeroToma(cursor.getString(cursor.getColumnIndexOrThrow("NumeroToma")));
-                entity.setIdToma(cursor.getString(cursor.getColumnIndexOrThrow("IdToma")));
-                entity.setTotalLecturas(cursor.getString(cursor.getColumnIndexOrThrow("TotalLecturas")));
-                entity.setFechaCreacion(cursor.getString(cursor.getColumnIndexOrThrow("FechaCreacion")));
-                entity.setActivosLeidos(cursor.getString(cursor.getColumnIndexOrThrow("ActivosLeidos")));
-                entity.setSobrantes(cursor.getString(cursor.getColumnIndexOrThrow("Sobrantes")));
-                entity.setFaltantes(cursor.getString(cursor.getColumnIndexOrThrow("Faltantes")));
-                entity.setTotalActivos(cursor.getString(cursor.getColumnIndexOrThrow("TotalActivos")));
+        try (Cursor cursor = db.rawQuery("SELECT * FROM TomasFisicasResumen WHERE LOWER(TomaFisicaId) = LOWER(?)", new String[]{tomaFisicaId})) {
+            if (cursor.moveToFirst()) {
+                do {
+                    TomaFisicaTomasEntity entity = new TomaFisicaTomasEntity();
+                    entity.setTomaFisicaId(cursor.getString(cursor.getColumnIndexOrThrow("TomaFisicaId")));
+                    entity.setNumeroToma(cursor.getString(cursor.getColumnIndexOrThrow("NumeroToma")));
+                    entity.setIdToma(cursor.getString(cursor.getColumnIndexOrThrow("IdToma")));
+                    entity.setTotalLecturas(cursor.getString(cursor.getColumnIndexOrThrow("TotalLecturas")));
+                    entity.setFechaCreacion(cursor.getString(cursor.getColumnIndexOrThrow("FechaCreacion")));
+                    entity.setActivosLeidos(cursor.getString(cursor.getColumnIndexOrThrow("ActivosLeidos")));
+                    entity.setSobrantes(cursor.getString(cursor.getColumnIndexOrThrow("Sobrantes")));
+                    entity.setFaltantes(cursor.getString(cursor.getColumnIndexOrThrow("Faltantes")));
+                    entity.setTotalActivos(cursor.getString(cursor.getColumnIndexOrThrow("TotalActivos")));
 
-                int idxEstado = cursor.getColumnIndex("Estado");
-                if (idxEstado != -1) {
-                    entity.setEstado(cursor.getString(idxEstado));
-                } else {
-                    entity.setEstado("ABIERTA");
-                }
+                    int idxEstado = cursor.getColumnIndex("Estado");
+                    if (idxEstado != -1) {
+                        entity.setEstado(cursor.getString(idxEstado));
+                    } else {
+                        entity.setEstado("ABIERTA");
+                    }
 
-                list.add(entity);
-            } while (cursor.moveToNext());
+                    list.add(entity);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error obteniendo tomas por tomaFisicaId", e);
         }
-        cursor.close();
         return list;
     }
 

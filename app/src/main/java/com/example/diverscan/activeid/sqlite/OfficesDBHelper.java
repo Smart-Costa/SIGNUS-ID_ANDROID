@@ -110,11 +110,12 @@ public class OfficesDBHelper extends SQLiteOpenHelper {
             String query = "Select a._id, a.CodeBar, a.Descripcion, a.IdOficina, o.Nombre, a.Tag from Oficina o " +
                     " Inner Join Activos a ON a.IdOficina = o._id " +
                     " where o._id = '" + idSector + "'";
-            Cursor activosUbicacion = db.rawQuery(query, null);
-            if(activosUbicacion.getCount() != 0){
-                return true;
-            }else{
-                return false;
+            try (Cursor activosUbicacion = db.rawQuery(query, null)) {
+                if(activosUbicacion.getCount() != 0){
+                    return true;
+                }else{
+                    return false;
+                }
             }
         }catch(Exception ex){
             Log.e("Eleccion Toma Fisica", ex.getMessage());

@@ -1887,7 +1887,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                             activo = activoDao.getActivoByEpc(epc);
                         }
 
+                        // BUGFIX: Excluir de la BD a los EPCs no encontrados en la tabla Activos (no tienen ActivoEntity)
                         if (activo == null) {
+                            Log.d(TAG, "SaveLocalTask: Excluyendo EPC no inventariado de la BD: " + epc);
                             continue;
                         }
 
@@ -2134,15 +2136,21 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private void updateUIState() {
         runOnUiThread(() -> {
             if (isScanning) {
-                txtIniciar.setText("Detener");
-                iconIniciar.setImageResource(android.R.drawable.ic_media_pause); // Or custom stop icon
-                btnSubir.setEnabled(false);
-                btnSubir.setAlpha(0.5f);
+                if (txtIniciar != null) txtIniciar.setText("Detener");
+                if (iconIniciar != null) iconIniciar.setImageResource(android.R.drawable.ic_media_pause); // Or custom stop icon
+                if (btnSubir != null) {
+                    btnSubir.setEnabled(false);
+                    btnSubir.setAlpha(0.5f);
+                }
+                if (btnIniciar != null) btnIniciar.setBackgroundResource(R.drawable.btn_secondary_gray); // Feedback visual
             } else {
-                txtIniciar.setText("Iniciar");
-                iconIniciar.setImageResource(R.drawable.ic_nfc);
-                btnSubir.setEnabled(true);
-                btnSubir.setAlpha(1.0f);
+                if (txtIniciar != null) txtIniciar.setText("Iniciar");
+                if (iconIniciar != null) iconIniciar.setImageResource(R.drawable.ic_nfc);
+                if (btnSubir != null) {
+                    btnSubir.setEnabled(true);
+                    btnSubir.setAlpha(1.0f);
+                }
+                if (btnIniciar != null) btnIniciar.setBackgroundResource(R.drawable.btn_primary_orange); // Restaurar color original
             }
         });
     }
@@ -2393,53 +2401,63 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
                     ActivoEntity finalActivo = assetMap.get(epc);
                     if (finalActivo == null) {
-                        Log.d(TAG, "RFID IGNORED: EPC not in DB: " + epc);
-                        continue;
+                        Log.d(TAG, "SQL QUERY getActivosByEpcs -> EPC=" + epc + " RESULTADO: NO_ENCONTRADO");
+                        // No ignorarlo: procesarlo como tag desconocido
+                    } else {
+                        Log.d(TAG, "SQL QUERY getActivosByEpcs -> EPC=" + epc + " RESULTADO: ENCONTRADO (" + finalActivo.getDescripcionCorta() + ")");
                     }
 
-                    // Process New Valid Tag
+                    // Actualizar el UI y mantener el tag para el recycler view
                     uniqueTags.add(epc);
                     anyChange = true;
-                    Log.d(TAG, "RFID ACCEPTED: EPC found in DB: " + epc);
 
                     // Update Cache
-                    String desc = (finalActivo.getDescripcionCorta() != null) ? finalActivo.getDescripcionCorta() : "Desconocido";
+                    String desc = (finalActivo != null && finalActivo.getDescripcionCorta() != null) ? finalActivo.getDescripcionCorta() : "Desconocido";
                     String display = desc + " - " + epc;
                     epcToDisplayName.put(epc, display);
-                    if (finalActivo.getIdActivo() != null) {
+                    if (finalActivo != null && finalActivo.getIdActivo() != null) {
                         manualEpcToActivoId.put(epc, finalActivo.getIdActivo());
                     }
 
                     // Update List Logic
                     ItemActivo item = itemsMap.get(epc);
                     if(item == null) {
-                        String manualId = finalActivo.getIdActivo();
+                        String manualId = finalActivo != null ? finalActivo.getIdActivo() : null;
                         if(manualId != null) item = itemsMap.get(manualId);
                     }
 
                     if(item != null) {
-                        item.estado = CategoriaEstado.ENCONTRADO;
+                        // Si no estaba en BD, lo tratamos como NO_INVENTARIADO, si estaba depende del filtro
+                        item.estado = (finalActivo == null) ? CategoriaEstado.NO_INVENTARIADO : CategoriaEstado.ENCONTRADO;
                         item.entity = finalActivo;
                         // Update details
-                        item.nombre = finalActivo.getDescripcionCorta();
-                        item.placa = finalActivo.getNumeroEtiqueta();
-                        item.serie = finalActivo.getNumeroSerie();
-                        item.numeroActivo = finalActivo.getNumeroActivo();
-                        if(item.activoId == null) item.activoId = finalActivo.getIdActivo();
+                        if (finalActivo != null) {
+                            item.nombre = finalActivo.getDescripcionCorta();
+                            item.placa = finalActivo.getNumeroEtiqueta();
+                            item.serie = finalActivo.getNumeroSerie();
+                            item.numeroActivo = finalActivo.getNumeroActivo();
+                            if(item.activoId == null) item.activoId = finalActivo.getIdActivo();
+                        }
                     } else {
-                        // Valid in DB but not in expected list
+                        // Valid in DB but not in expected list, or NOT in DB at all
                         boolean isExpected = false;
-                        if (finalActivo.getIdActivo() != null && currentFilterExpectedIds != null && currentFilterExpectedIds.contains(finalActivo.getIdActivo().trim().toUpperCase())) {
+                        if (finalActivo != null && finalActivo.getIdActivo() != null && currentFilterExpectedIds != null && currentFilterExpectedIds.contains(finalActivo.getIdActivo().trim().toUpperCase())) {
                             isExpected = true;
                         } else if (epc != null && currentFilterExpectedEpcs != null && currentFilterExpectedEpcs.contains(epc.trim().toUpperCase())) {
                             isExpected = true;
                         }
 
                         // New Sobrante (or Encontrado if expected but missing from map)
-                        item = new ItemActivo(epc, finalActivo.getIdActivo(), isExpected ? CategoriaEstado.ENCONTRADO : CategoriaEstado.SOBRANTE, finalActivo);
+                        String actId = finalActivo != null ? finalActivo.getIdActivo() : null;
+                        
+                        // CORRECCIÓN: Si no hay finalActivo (no en BD local), es NO_INVENTARIADO en UI
+                        // Si está en BD pero isExpected es falso, es SOBRANTE
+                        CategoriaEstado nuevoEstado = (finalActivo == null) ? CategoriaEstado.NO_INVENTARIADO : (isExpected ? CategoriaEstado.ENCONTRADO : CategoriaEstado.SOBRANTE);
+                        
+                        item = new ItemActivo(epc, actId, nuevoEstado, finalActivo);
                         itemsList.add(0, item);
                         itemsMap.put(epc, item);
-                        if(finalActivo.getIdActivo() != null) itemsMap.put(finalActivo.getIdActivo().trim().toUpperCase(), item);
+                        if(actId != null) itemsMap.put(actId.trim().toUpperCase(), item);
                     }
                 }
                 
@@ -2531,10 +2549,11 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             holder.txtNumeroActivo.setText("Activo No: " + (item.numeroActivo != null ? item.numeroActivo : "-"));
 
             // Color Indicator
-            int colorRes = android.R.color.darker_gray;
+            int colorRes = android.R.color.darker_gray; // Default para NO_INVENTARIADO
             if (item.estado == CategoriaEstado.ENCONTRADO) colorRes = R.color.verde;
             else if (item.estado == CategoriaEstado.FALTANTE) colorRes = R.color.rojo;
             else if (item.estado == CategoriaEstado.SOBRANTE) colorRes = R.color.amarillo;
+            else if (item.estado == CategoriaEstado.NO_INVENTARIADO) colorRes = android.R.color.white; // O gris/blanco según prefieras
             
             holder.imgEstadoIndicator.setColorFilter(ContextCompat.getColor(holder.itemView.getContext(), colorRes));
 
