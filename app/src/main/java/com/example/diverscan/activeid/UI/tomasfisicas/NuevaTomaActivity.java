@@ -385,7 +385,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             TomaFisicaTomasEntity existingOpen = null;
 
             if (providedIdToma != null) {
+                Log.d(TAG, "SQL tomasDao.getByIdToma id=" + providedIdToma);
                 existingOpen = tomasDao.getByIdToma(providedIdToma);
+                Log.d(TAG, "SQL getByIdToma found=" + (existingOpen != null));
             } 
             // Removed auto-resume logic to prevent "Ghost Assets". 
             // If user clicks "New", we create New. If they want to resume, they click the item in the list.
@@ -396,7 +398,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 Log.d(TAG, "Resuming existing toma: " + idToma + " Num: " + numeroToma);
                 loadExistingDetails(idToma);
             } else {
+                Log.d(TAG, "SQL tomasDao.getPendientesCount tomaFisicaId=" + tomaFisicaId);
                 int existingCount = tomasDao.getPendientesCount(tomaFisicaId);
+                Log.d(TAG, "SQL getPendientesCount count=" + existingCount);
                 currentTomaIndex = existingCount + 1;
                 
                 // Generate new ID for this Take
@@ -428,7 +432,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private void loadExistingDetails(String idToma) {
         if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
+            Log.d(TAG, "SQL detallesDao.getByIdToma idToma=" + idToma);
             List<TomaFisicaDetallesEntity> detalles = detallesDao.getByIdToma(idToma);
+            Log.d(TAG, "SQL getByIdToma size=" + (detalles != null ? detalles.size() : -1));
             if (detalles == null) return;
             
             Set<String> loadedTags = new HashSet<>();
@@ -472,7 +478,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private void validarBaseDeDatosLocal() {
         if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
+            Log.d(TAG, "SQL activoDao.getActivosCount");
             int count = activoDao.getActivosCount();
+            Log.d(TAG, "SQL getActivosCount count=" + count);
             if (count == 0) {
                 runOnUiThread(() -> {
                     new androidx.appcompat.app.AlertDialog.Builder(this)
@@ -700,7 +708,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
         if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
+            Log.d(TAG, "SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=" + tomaFisicaId);
             TomaFisicaEntity toma = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
+            Log.d(TAG, "SQL getTomaFisicaById found=" + (toma != null));
             baseUbicacionAId = toma != null ? normalizeGuidFilter(toma.getUbicacionA()) : null;
             baseUbicacionBId = toma != null ? normalizeGuidFilter(toma.getUbicacionB()) : null;
             baseUbicacionCId = toma != null ? normalizeGuidFilter(toma.getUbicacionC()) : null;
@@ -709,6 +719,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             baseCategoriaId = toma != null ? normalizeGuidFilter(toma.getCategoria()) : null;
             baseEstadoId = toma != null ? normalizeGuidFilter(toma.getEstadoActivo()) : null;
 
+            Log.d(TAG, "SQL activoDao.countActivosByFiltros A=" + baseUbicacionAId + " B=" + baseUbicacionBId + " C=" + baseUbicacionCId + " D=" + baseUbicacionDId + " Sec=null UO=" + baseUnidadOrganizativaId + " Cat=" + baseCategoriaId + " Est=" + baseEstadoId);
             totalActivosInventario = activoDao.countActivosByFiltros(baseUbicacionAId, baseUbicacionBId, baseUbicacionCId, baseUbicacionDId, null, baseUnidadOrganizativaId, baseCategoriaId, baseEstadoId);
             Log.d(TAG, "Inventario base: tomaFisicaId=" + tomaFisicaId
                 + " A=" + baseUbicacionAId
@@ -771,7 +782,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 
                 // Try to find Activo to check ID
                 // Warning: DB access on UI thread
+                Log.d(TAG, "SQL activoDao.getActivoByEpc epc=" + epc);
                 ActivoEntity a = activoDao.getActivoByEpc(epc);
+                Log.d(TAG, "SQL getActivoByEpc found=" + (a != null));
                 if (a != null && a.getIdActivo() != null) {
                     return !cachedExpectedIds.contains(a.getIdActivo().trim().toUpperCase());
                 }
@@ -796,8 +809,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private void updateExpectedCache() {
         if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
+            Log.d(TAG, "SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=" + tomaFisicaId);
             TomaFisicaEntity toma = tomaFisicaDao.getTomaFisicaById(tomaFisicaId);
             if (toma != null) {
+                Log.d(TAG, "SQL activoDao.getActivosByFiltros A=" + toma.getUbicacionA() + " B=" + toma.getUbicacionB() + " C=" + toma.getUbicacionC() + " D=" + toma.getUbicacionD() + " Sec=null UO=" + toma.getUnidadOrganizativa());
                 List<ActivoEntity> expected = activoDao.getActivosByFiltros(
                         toma.getUbicacionA(),
                         toma.getUbicacionB(),
@@ -806,6 +821,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                         null,
                         toma.getUnidadOrganizativa()
                 );
+                Log.d(TAG, "SQL getActivosByFiltros size=" + (expected != null ? expected.size() : -1));
                 Set<String> epcs = new HashSet<>();
                 Set<String> ids = new HashSet<>();
                 for (ActivoEntity a : expected) {
@@ -913,12 +929,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         databaseExecutor.execute(() -> {
             listCategoria = new ArrayList<>();
             if (baseCategoriaId != null) {
-                // If base is set, try to find name? Or just show ID/Fixed?
-                // Ideally we get name. But EntidadCategoriaActivos has name.
-                // We don't have getCategoriaById in ActivoDao yet?
-                // We added getAllCategorias.
-                // Let's iterate to find name if possible, or just add base.
+                Log.d(TAG, "SQL activoDao.getAllCategorias");
                 List<EntidadCategoriaActivos> all = activoDao.getAllCategorias();
+                Log.d(TAG, "SQL getAllCategorias size=" + (all != null ? all.size() : -1));
                 String label = baseCategoriaId;
                 for(EntidadCategoriaActivos c : all) {
                     if(c.getAssetCategorySysId().equalsIgnoreCase(baseCategoriaId)) {
@@ -928,7 +941,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 }
                 listCategoria.add(new SpinnerItem(baseCategoriaId, label));
             } else {
+                Log.d(TAG, "SQL activoDao.getAllCategorias");
                 List<EntidadCategoriaActivos> list = activoDao.getAllCategorias();
+                Log.d(TAG, "SQL getAllCategorias size=" + (list != null ? list.size() : -1));
                 listCategoria.add(new SpinnerItem(null, "Todas"));
                 for (EntidadCategoriaActivos c : list) {
                     listCategoria.add(new SpinnerItem(c.getAssetCategorySysId(), c.getName()));
@@ -954,11 +969,15 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         databaseExecutor.execute(() -> {
             listUbicacionA = new ArrayList<>();
             if (baseUbicacionAId != null) {
+                Log.d(TAG, "SQL ubicacionDao.getUbicacionByASysId A=" + baseUbicacionAId);
                 UbicacionEntity u = ubicacionDao.getUbicacionByASysId(baseUbicacionAId);
+                Log.d(TAG, "SQL getUbicacionByASysId found=" + (u != null));
                 String label = (u != null && u.getUbicacionA() != null && !u.getUbicacionA().trim().isEmpty()) ? u.getUbicacionA().trim() : baseUbicacionAId;
                 listUbicacionA.add(new SpinnerItem(baseUbicacionAId, label));
             } else {
+                Log.d(TAG, "SQL ubicacionDao.getDistinctUbicacionA");
                 List<UbicacionEntity> list = ubicacionDao.getDistinctUbicacionA();
+                Log.d(TAG, "SQL getDistinctUbicacionA size=" + (list != null ? list.size() : -1));
                 listUbicacionA.add(new SpinnerItem(null, "Todas"));
                 for (UbicacionEntity u : list) listUbicacionA.add(new SpinnerItem(u.getASysId(), u.getUbicacionA()));
             }
@@ -987,7 +1006,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         databaseExecutor.execute(() -> {
             listUbicacionB = new ArrayList<>();
             if (baseUbicacionBId != null) {
+                Log.d(TAG, "SQL ubicacionDao.getUbicacionByBSysId B=" + baseUbicacionBId);
                 UbicacionEntity u = ubicacionDao.getUbicacionByBSysId(baseUbicacionBId);
+                Log.d(TAG, "SQL getUbicacionByBSysId found=" + (u != null));
                 String label = (u != null && u.getUbicacionB() != null && !u.getUbicacionB().trim().isEmpty()) ? u.getUbicacionB().trim() : baseUbicacionBId;
                 listUbicacionB.add(new SpinnerItem(baseUbicacionBId, label));
             } else {
@@ -1017,7 +1038,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         databaseExecutor.execute(() -> {
             listUbicacionC = new ArrayList<>();
             if (baseUbicacionCId != null) {
+                Log.d(TAG, "SQL ubicacionDao.getUbicacionByCSysId C=" + baseUbicacionCId);
                 UbicacionEntity u = ubicacionDao.getUbicacionByCSysId(baseUbicacionCId);
+                Log.d(TAG, "SQL getUbicacionByCSysId found=" + (u != null));
                 String label = (u != null && u.getUbicacionC() != null && !u.getUbicacionC().trim().isEmpty()) ? u.getUbicacionC().trim() : baseUbicacionCId;
                 listUbicacionC.add(new SpinnerItem(baseUbicacionCId, label));
             } else {
@@ -1046,7 +1069,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         databaseExecutor.execute(() -> {
             listUbicacionD = new ArrayList<>();
             if (baseUbicacionDId != null) {
+                Log.d(TAG, "SQL ubicacionDao.getUbicacionByDSysId D=" + baseUbicacionDId);
                 UbicacionEntity u = ubicacionDao.getUbicacionByDSysId(baseUbicacionDId);
+                Log.d(TAG, "SQL getUbicacionByDSysId found=" + (u != null));
                 String label = (u != null && u.getUbicacionD() != null && !u.getUbicacionD().trim().isEmpty()) ? u.getUbicacionD().trim() : baseUbicacionDId;
                 listUbicacionD.add(new SpinnerItem(baseUbicacionDId, label));
             } else {
@@ -1091,8 +1116,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             // If `baseUbicacionSecundaria` variable is missing, I should check if I missed it or if it needs to be added.
             // But I can't add it to Entity if it's not there.
             // Assuming "Secondary" follows the hierarchy restriction.
-            
+            Log.d(TAG, "SQL activoDao.getAllUbicacionesSecundarias parentId=" + parentId);
             List<EntidadUbicacionSecundaria> list = activoDao.getAllUbicacionesSecundarias(parentId);
+            Log.d(TAG, "SQL getAllUbicacionesSecundarias size=" + (list != null ? list.size() : -1));
             listUbicacionSecundaria.add(new SpinnerItem(null, "Todas"));
             for (EntidadUbicacionSecundaria u : list) {
                 listUbicacionSecundaria.add(new SpinnerItem(u.getId(), u.getNombre()));
@@ -1137,6 +1163,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         databaseExecutor.execute(() -> {
             long q0 = android.os.SystemClock.elapsedRealtime();
             // 1. Get expected assets for current filter
+            Log.d(TAG, "SQL activoDao.getActivosByFiltros ua=" + ua + " ub=" + ub + " uc=" + uc + " ud=" + ud + " us=" + us + " uo=" + uo + " cat=" + cat);
             List<ActivoEntity> expected = activoDao.getActivosByFiltros(ua, ub, uc, ud, us, uo, cat);
             long q1 = android.os.SystemClock.elapsedRealtime();
             
@@ -1176,19 +1203,23 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
             String udForD = selectedUbicacionDId != null ? selectedUbicacionDId : baseUbicacionDId;
 
+            Log.d(TAG, "SQL activoDao.countActivosByFiltros for counts");
             int countA = activoDao.countActivosByFiltros(ua, ubForA, ucForA, udForA, null, uo, cat);
             int countB = activoDao.countActivosByFiltros(ua, ubForB, ucForB, udForB, null, uo, cat);
             int countC = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, null, uo, cat);
             int countD = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, null, uo, cat);
             int countS = activoDao.countActivosByFiltros(ua, ubForB, ucForC, udForD, us, uo, cat);
             long q2 = android.os.SystemClock.elapsedRealtime();
+            Log.d(TAG, "SQL counts A=" + countA + " B=" + countB + " C=" + countC + " D=" + countD + " S=" + countS);
 
             // Fetch Scanned Entities for Sobrantes logic
             Map<String, ActivoEntity> scannedEntityMap = new HashMap<>();
             try {
                 if (uniqueTags != null && !uniqueTags.isEmpty()) {
+                     Log.d(TAG, "SQL activoDao.getActivosByEpcs size=" + uniqueTags.size());
                      List<String> epcList = new ArrayList<>(uniqueTags);
                      List<ActivoEntity> scannedAssets = activoDao.getActivosByEpcs(epcList);
+                     Log.d(TAG, "SQL getActivosByEpcs resultSize=" + (scannedAssets != null ? scannedAssets.size() : -1));
                      if (scannedAssets != null) {
                          for(ActivoEntity a : scannedAssets) {
                              if (a.getTagEpc() != null) scannedEntityMap.put(a.getTagEpc().trim().toUpperCase(), a);
