@@ -177,6 +177,15 @@ public class ConnectionValidationActivity extends AppCompatActivity
             rfidHandler.setValidationMode(true);
         }
         logInfo("Pantalla en primer plano. Modo validación activado.");
+        try {
+            Intent i = new Intent();
+            i.setAction("com.symbol.datawedge.api.ACTION");
+            i.putExtra("com.symbol.datawedge.api.ENABLE_DATAWEDGE", false);
+            sendBroadcast(i);
+            logWarn("DataWedge: deshabilitado temporalmente");
+        } catch (Exception e) {
+            logError("Error deshabilitando DataWedge: " + e.getMessage());
+        }
         updateUI();
     }
 
@@ -527,6 +536,13 @@ public class ConnectionValidationActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        try {
+            Intent i = new Intent();
+            i.setAction("com.symbol.datawedge.api.ACTION");
+            i.putExtra("com.symbol.datawedge.api.ENABLE_DATAWEDGE", true);
+            sendBroadcast(i);
+            logWarn("DataWedge: restaurado");
+        } catch (Exception ignored) {}
         try {
             unregisterReceiver(usbPermissionReceiver);
         } catch (Exception ignored) {}

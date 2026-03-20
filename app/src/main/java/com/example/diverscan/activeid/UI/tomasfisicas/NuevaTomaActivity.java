@@ -1977,6 +1977,15 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 }, 650L);
             }
         }
+        try {
+            android.content.Intent i = new android.content.Intent();
+            i.setAction("com.symbol.datawedge.api.ACTION");
+            i.putExtra("com.symbol.datawedge.api.ENABLE_DATAWEDGE", false);
+            sendBroadcast(i);
+            Log.w(TAG, "DataWedge: deshabilitado temporalmente");
+        } catch (Exception e) {
+            Log.e(TAG, "Error deshabilitando DataWedge", e);
+        }
     }
 
     @Override
@@ -2284,6 +2293,13 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             rfidRetryHandler.removeCallbacks(pendingScanWatchdog);
             pendingScanWatchdog = null;
         }
+        try {
+            android.content.Intent i = new android.content.Intent();
+            i.setAction("com.symbol.datawedge.api.ACTION");
+            i.putExtra("com.symbol.datawedge.api.ENABLE_DATAWEDGE", true);
+            sendBroadcast(i);
+            Log.w(TAG, "DataWedge: restaurado");
+        } catch (Exception ignored) {}
         // Liberar recursos de RFID
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(null);
