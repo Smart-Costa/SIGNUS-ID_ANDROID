@@ -125,6 +125,14 @@
             android:screenOrientation="portrait"
             android:exported="false"/>
 
+        <!-- 🌐 Validación de API/Endpoints -->
+        <activity
+            android:name=".UI.validation.ApiEndpointValidationActivity"
+            android:label="Probar API"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false"/>
+
         <!-- 🗂️ Creación y actualización de activos -->
         <activity android:name=".TomasFisicas.activoPorDescripcion" android:exported="false"/>
         <activity android:name=".TomasFisicas.createAssets"

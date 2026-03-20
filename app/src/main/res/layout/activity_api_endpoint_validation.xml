@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvBaseUrlLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BASE_URL"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvBaseUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#333333"
+        android:paddingBottom="8dp" />
+
+    <EditText
+        android:id="@+id/etEndpointPath"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Endpoint relativo (ej. ConsolidacionApi/ConsultarNovedades?username=Wilbert)"
+        android:inputType="textUri"
+        android:padding="8dp"
+        android:background="@drawable/bg_bloque_tabla" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <Button
+            android:id="@+id/btnProbeTcp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Probar TCP" />
+
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btnTestGet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GET" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvOutput"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#EEEEEE"
+        android:padding="8dp"
+        android:textSize="12sp" />
+
+</LinearLayout>
+
