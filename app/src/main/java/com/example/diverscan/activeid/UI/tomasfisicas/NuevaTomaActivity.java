@@ -2150,7 +2150,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     btnSubir.setEnabled(true);
                     btnSubir.setAlpha(1.0f);
                 }
-                if (btnIniciar != null) btnIniciar.setBackgroundResource(R.drawable.btn_primary_orange); // Restaurar color original
+                if (btnIniciar != null) btnIniciar.setBackgroundResource(R.drawable.btn_primary); // Restaurar color original
             }
         });
     }
