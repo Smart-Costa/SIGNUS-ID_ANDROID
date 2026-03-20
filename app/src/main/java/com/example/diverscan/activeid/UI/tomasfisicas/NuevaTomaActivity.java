@@ -806,6 +806,33 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private Set<String> currentFilterExpectedEpcs = new HashSet<>();
     private Set<String> currentFilterExpectedIds = new HashSet<>();
 
+    private final android.os.Handler statusHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private String lastStatusHash = null;
+    private final java.lang.Runnable statusProbe = new java.lang.Runnable() {
+        @Override
+        public void run() {
+            try {
+                boolean initialized = (rfidHandler != null && rfidHandler.isInitialized());
+                boolean connected = (rfidHandler != null && rfidHandler.isConnected());
+                String name = rfidHandler != null ? rfidHandler.getReaderName() : null;
+                String model = rfidHandler != null ? rfidHandler.getReaderModel() : null;
+                int devicesCount = 0;
+                try {
+                    java.util.List<String> devs = rfidHandler != null ? rfidHandler.getFoundDevices() : null;
+                    devicesCount = devs != null ? devs.size() : 0;
+                } catch (Throwable ignored) {}
+                String status = "init=" + initialized + " conn=" + connected + " name=" + name + " model=" + model + " devices=" + devicesCount;
+                if (!status.equals(lastStatusHash)) {
+                    lastStatusHash = status;
+                    Log.d(TAG, "Probe: " + status);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Probe error: " + e.getMessage());
+            } finally {
+                statusHandler.postDelayed(this, 7000L);
+            }
+        }
+    };
     private void updateExpectedCache() {
         if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
@@ -2293,6 +2320,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             rfidRetryHandler.removeCallbacks(pendingScanWatchdog);
             pendingScanWatchdog = null;
         }
+        statusHandler.removeCallbacks(statusProbe);
         try {
             android.content.Intent i = new android.content.Intent();
             i.setAction("com.symbol.datawedge.api.ACTION");
@@ -2546,4 +2574,3 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         }
     }
 }
-

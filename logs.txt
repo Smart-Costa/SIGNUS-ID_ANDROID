@@ -1,238 +1,809 @@
-2026-03-20 10:46:38.801  1526-2171  ActivityTaskManager     system_server                        I  START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.example.diverscan.activeid/.UI.splash.SplashActivity bnds=[282,576][540,936]} from uid 10200
-2026-03-20 10:46:38.835  1526-1964  ActivityManager         system_server                        I  Start proc 15351:com.example.diverscan.activeid/u0a235 for next-top-activity {com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity}
-2026-03-20 10:46:38.845  3619-9353  SQLiteLog               com.qualcomm.qti.workloadclassifier  W  (28) double-quoted string literal: "com.example.diverscan.activeid"
-2026-03-20 10:46:38.895  1526-4540  AppsFilter              system_server                        I  interaction: PackageSetting{5cf8fad com.example.diverscan.activeid/10235} -> PackageSetting{9370316 com.android.launcher3/10200} BLOCKED
-2026-03-20 10:46:38.900  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.splash.SplashActivity
-2026-03-20 10:46:38.903  5451-6672  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.splash.SplashActivity
----------------------------- PROCESS STARTED (15351) for package com.example.diverscan.activeid ----------------------------
-2026-03-20 10:46:39.072 15351-15351 nativeloader            com.example.diverscan.activeid       D  Configuring clns-4 for other apk /data/app/~~IfZ6FOjYb90CGP1QuH28nA==/com.example.diverscan.activeid-qRpr0omI3f_736WquHNOHg==/base.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~IfZ6FOjYb90CGP1QuH28nA==/com.example.diverscan.activeid-qRpr0omI3f_736WquHNOHg==/lib/arm64, permitted_path=/data:/mnt/expand:/data/user/0/com.example.diverscan.activeid
-2026-03-20 10:46:39.078 15351-15351 nativeloader            com.example.diverscan.activeid       D  Load libframework-connectivity-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity.jar: ok
-2026-03-20 10:46:39.081 15351-15351 Perf                    com.example.diverscan.activeid       I  Connecting to perf service.
-2026-03-20 10:46:39.086 15351-15351 GraphicsEnvironment     com.example.diverscan.activeid       V  ANGLE Developer option for 'com.example.diverscan.activeid' set to: 'default'
-2026-03-20 10:46:39.087 15351-15351 GraphicsEnvironment     com.example.diverscan.activeid       V  ANGLE GameManagerService for com.example.diverscan.activeid: false
-2026-03-20 10:46:39.088 15351-15351 GraphicsEnvironment     com.example.diverscan.activeid       V  Updatable production driver is not supported on the device.
-2026-03-20 10:46:39.092 15351-15351 NetworkSecurityConfig   com.example.diverscan.activeid       D  Using Network Security Config from resource network_security_config debugBuild: true
-2026-03-20 10:46:39.094 15351-15351 NetworkSecurityConfig   com.example.diverscan.activeid       D  Using Network Security Config from resource network_security_config debugBuild: true
-2026-03-20 10:46:39.140 15351-15351 AppCompatDelegate       com.example.diverscan.activeid       D  Checking for metadata for AppLocalesMetadataHolderService : Service not found
-2026-03-20 10:46:39.209 15351-15351 erscan.activeid         com.example.diverscan.activeid       I  hiddenapi: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/appcompat/widget/ViewUtils; (domain=app, TargetSdkVersion=34) using reflection: allowed
-2026-03-20 10:46:39.236  1526-3599  CoreBackPreview         system_server                        D  Window{ce4d817 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@4448ded, mPriority=-1}
-2026-03-20 10:46:39.253 15351-15375 AdrenoGLES-0            com.example.diverscan.activeid       I  QUALCOMM build                   : a3cdec2236, Ief33eea0db
+2026-03-20 10:58:15.894  1526-8811  ActivityManager         system_server                        I  Force stopping com.example.diverscan.activeid appid=10235 user=0: from pid 18310
+2026-03-20 10:58:15.895  1526-8811  ActivityManager         system_server                        I  Killing 16828:com.example.diverscan.activeid/u0a235 (adj 965): stop com.example.diverscan.activeid due to from pid 18310
+2026-03-20 10:58:15.908  2583-2583  CarrierSvcBindHelper    com.android.phone                    D  onHandleForceStop: [com.example.diverscan.activeid]
+---------------------------- PROCESS ENDED (16828) for package com.example.diverscan.activeid ----------------------------
+2026-03-20 10:58:15.955  1526-8811  ActivityManager         system_server                        V  Got obituary of 16828:com.example.diverscan.activeid
+2026-03-20 10:58:17.049 18340-18340 run-as                  pid-18340                            W  type=1400 audit(0.0:2300): avc: granted { execute } for name="install_server-a82ed9e3" dev="dm-40" ino=97704 scontext=u:r:runas_app:s0:c235,c256,c512,c768 tcontext=u:object_r:app_data_file:s0:c235,c256,c512,c768 tclass=file app=com.example.diverscan.activeid
+2026-03-20 10:58:17.049 18340-18340 install_server-         pid-18340                            W  type=1400 audit(0.0:2301): avc: granted { execute } for path="/data/data/com.example.diverscan.activeid/code_cache/install_server-a82ed9e3" dev="dm-40" ino=97704 scontext=u:r:runas_app:s0:c235,c256,c512,c768 tcontext=u:object_r:app_data_file:s0:c235,c256,c512,c768 tclass=file app=com.example.diverscan.activeid
+2026-03-20 10:58:17.049 18340-18340 install_server-         pid-18340                            W  type=1400 audit(0.0:2302): avc: denied { search } for name="tests" dev="dm-40" ino=111 scontext=u:r:runas_app:s0:c235,c256,c512,c768 tcontext=u:object_r:shell_test_data_file:s0 tclass=dir permissive=0 app=com.example.diverscan.activeid
+2026-03-20 10:58:17.049 18340-18340 install_server-         pid-18340                            W  type=1400 audit(0.0:2303): avc: denied { search } for name="tests" dev="dm-40" ino=111 scontext=u:r:runas_app:s0:c235,c256,c512,c768 tcontext=u:object_r:shell_test_data_file:s0 tclass=dir permissive=0 app=com.example.diverscan.activeid
+2026-03-20 10:58:17.049 18340-18340 install_server-         pid-18340                            W  type=1400 audit(0.0:2304): avc: denied { search } for name="tests" dev="dm-40" ino=111 scontext=u:r:runas_app:s0:c235,c256,c512,c768 tcontext=u:object_r:shell_test_data_file:s0 tclass=dir permissive=0 app=com.example.diverscan.activeid
+2026-03-20 10:58:17.324  1526-8811  ActivityManager         system_server                        I  Force stopping com.example.diverscan.activeid appid=10235 user=0: from pid 18349
+2026-03-20 10:58:17.331  2583-2583  CarrierSvcBindHelper    com.android.phone                    D  onHandleForceStop: [com.example.diverscan.activeid]
+2026-03-20 10:58:17.406  1526-8811  ActivityTaskManager     system_server                        I  START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 cmp=com.example.diverscan.activeid/.UI.splash.SplashActivity} from uid 2000
+2026-03-20 10:58:17.440  1526-1964  ActivityManager         system_server                        I  Start proc 18364:com.example.diverscan.activeid/u0a235 for next-top-activity {com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity}
+2026-03-20 10:58:17.444  3619-9353  SQLiteLog               com.qualcomm.qti.workloadclassifier  W  (28) double-quoted string literal: "com.example.diverscan.activeid"
+2026-03-20 10:58:17.505  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.splash.SplashActivity
+2026-03-20 10:58:17.508  5451-6672  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.splash.SplashActivity
+2026-03-20 10:58:17.513 18364-18364 nativeloader            pid-18364                            D  Load /data/user/0/com.example.diverscan.activeid/code_cache/startup_agents/a82ed9e3-agent.so using system ns (caller=<unknown>): ok
+2026-03-20 10:58:17.519 18364-18364 erscan.activeid         pid-18364                            W  hiddenapi: DexFile /data/data/com.example.diverscan.activeid/code_cache/.studio/instruments-2fd5708c.jar is in boot class path but is not in a known location
+---------------------------- PROCESS STARTED (18364) for package com.example.diverscan.activeid ----------------------------
+2026-03-20 10:58:17.783 18364-18364 nativeloader            com.example.diverscan.activeid       D  Configuring clns-4 for other apk /data/app/~~IfZ6FOjYb90CGP1QuH28nA==/com.example.diverscan.activeid-qRpr0omI3f_736WquHNOHg==/base.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~IfZ6FOjYb90CGP1QuH28nA==/com.example.diverscan.activeid-qRpr0omI3f_736WquHNOHg==/lib/arm64, permitted_path=/data:/mnt/expand:/data/user/0/com.example.diverscan.activeid
+2026-03-20 10:58:17.789 18364-18364 nativeloader            com.example.diverscan.activeid       D  Load libframework-connectivity-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity.jar: ok
+2026-03-20 10:58:17.791 18364-18364 Perf                    com.example.diverscan.activeid       I  Connecting to perf service.
+2026-03-20 10:58:17.797 18364-18364 GraphicsEnvironment     com.example.diverscan.activeid       V  ANGLE Developer option for 'com.example.diverscan.activeid' set to: 'default'
+2026-03-20 10:58:17.798 18364-18364 GraphicsEnvironment     com.example.diverscan.activeid       V  ANGLE GameManagerService for com.example.diverscan.activeid: false
+2026-03-20 10:58:17.798 18364-18364 GraphicsEnvironment     com.example.diverscan.activeid       V  Updatable production driver is not supported on the device.
+2026-03-20 10:58:17.802 18364-18364 NetworkSecurityConfig   com.example.diverscan.activeid       D  Using Network Security Config from resource network_security_config debugBuild: true
+2026-03-20 10:58:17.804 18364-18364 NetworkSecurityConfig   com.example.diverscan.activeid       D  Using Network Security Config from resource network_security_config debugBuild: true
+2026-03-20 10:58:17.839 18364-18364 AppCompatDelegate       com.example.diverscan.activeid       D  Checking for metadata for AppLocalesMetadataHolderService : Service not found
+2026-03-20 10:58:17.893 18364-18364 erscan.activeid         com.example.diverscan.activeid       I  hiddenapi: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/appcompat/widget/ViewUtils; (domain=app, TargetSdkVersion=34) using reflection: allowed
+2026-03-20 10:58:17.915  1526-8811  CoreBackPreview         system_server                        D  Window{6130761 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@17c7747, mPriority=-1}
+2026-03-20 10:58:17.929 18364-18383 AdrenoGLES-0            com.example.diverscan.activeid       I  QUALCOMM build                   : a3cdec2236, Ief33eea0db
                                                                                                     Build Date                       : 08/23/22
                                                                                                     OpenGL ES Shader Compiler Version: EV031.35.01.12
                                                                                                     Local Branch                     : 
                                                                                                     Remote Branch                    : 
                                                                                                     Remote Branch                    : 
                                                                                                     Reconstruct Branch               : 
-2026-03-20 10:46:39.253 15351-15375 AdrenoGLES-0            com.example.diverscan.activeid       I  Build Config                     : S P 10.0.7 AArch64
-2026-03-20 10:46:39.253 15351-15375 AdrenoGLES-0            com.example.diverscan.activeid       I  Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
-2026-03-20 10:46:39.258 15351-15375 AdrenoGLES-0            com.example.diverscan.activeid       I  PFP: 0x016dc094, ME: 0x00000000
-2026-03-20 10:46:39.280 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-03-20 10:46:39.302 15351-15375 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-03-20 10:46:39.316  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.splash.SplashActivity: +508ms
-2026-03-20 10:46:39.338  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-03-20 10:46:39.640 15351-15357 erscan.activeid         com.example.diverscan.activeid       I  Compiler allocated 4197KB to compile void android.view.ViewRootImpl.performTraversals()
-2026-03-20 10:46:39.682  1526-13901 InputManager-JNI        system_server                        W  Input channel object 'd4948c5 Splash Screen com.example.diverscan.activeid (client)' was disposed without first being removed with the input manager!
-2026-03-20 10:46:41.244  1526-3599  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.login.LoginActivity} from uid 10235
-2026-03-20 10:46:41.265  1526-3599  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 15351
-2026-03-20 10:46:41.275 15351-15351 Compatibil...geReporter com.example.diverscan.activeid       D  Compat change id reported: 171228096; UID 10235; state: ENABLED
-2026-03-20 10:46:41.281 15351-15351 Compatibil...geReporter com.example.diverscan.activeid       D  Compat change id reported: 210923482; UID 10235; state: ENABLED
-2026-03-20 10:46:41.301  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.login.LoginActivity
-2026-03-20 10:46:41.304  5451-6672  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.login.LoginActivity
-2026-03-20 10:46:41.408  1526-3599  ActivityTaskManager     system_server                        I  START u0 {flg=0x10008000 cmp=com.example.diverscan.activeid/.UI.main.MainActivity} from uid 10235
-2026-03-20 10:46:41.423  1526-2171  ActivityTaskManager     system_server                        W  Duplicate finish request for r=ActivityRecord{56386cd u0 com.example.diverscan.activeid/.UI.login.LoginActivity} t18 f}}
-2026-03-20 10:46:41.430  1526-2171  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 15351
-2026-03-20 10:46:41.462  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
-2026-03-20 10:46:41.466  5451-6672  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
-2026-03-20 10:46:41.513 15351-15351 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
-2026-03-20 10:46:41.526  1526-3599  CoreBackPreview         system_server                        D  Window{2c2e7df u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@e6756f5, mPriority=-1}
-2026-03-20 10:46:41.535 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-03-20 10:46:41.578 15351-15375 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-03-20 10:46:41.583  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.main.MainActivity: +338ms
-2026-03-20 10:46:41.615  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-03-20 10:46:41.728 15351-15351 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 86 from 86 (100%)
-2026-03-20 10:46:41.871  1526-13901 InputManager-JNI        system_server                        W  Input channel object '357c285 Splash Screen com.example.diverscan.activeid (client)' was disposed without first being removed with the input manager!
-2026-03-20 10:46:41.998  1526-2171  CoreBackPreview         system_server                        D  Window{ce4d817 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity}: Setting back callback null
-2026-03-20 10:46:42.003  1526-13901 InputManager-JNI        system_server                        W  Input channel object 'ce4d817 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity (client)' was disposed without first being removed with the input manager!
-2026-03-20 10:46:43.716  1526-2171  CoreBackPreview         system_server                        D  Window{2c2e7df u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@caabadb, mPriority=1000000}
-2026-03-20 10:46:44.344 15351-15418 ProfileInstaller        com.example.diverscan.activeid       D  Installing profile for com.example.diverscan.activeid
-2026-03-20 10:46:45.122  1526-13901 ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity} from uid 10235
-2026-03-20 10:46:45.137  1526-3599  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 15351
-2026-03-20 10:46:45.155  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
-2026-03-20 10:46:45.157  5451-6672  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
-2026-03-20 10:46:45.206 15351-15351 RFID_TAG_WRITER         com.example.diverscan.activeid       D  InitSDK - Initializing via Factory
-2026-03-20 10:46:45.207 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Iniciando servicio de lectura...
-2026-03-20 10:46:45.209 15351-15351 ConnValidation          com.example.diverscan.activeid       W  No se detectan lectores en este momento.
-2026-03-20 10:46:45.209 15351-15351 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Inicializando ReaderType: ZEBRA ConnectionType: USB
-2026-03-20 10:46:45.209 15351-15351 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Configurando Lector: ZEBRA (USB)
-2026-03-20 10:46:45.209 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Configurando Lector: ZEBRA (USB)
-2026-03-20 10:46:45.210 15351-15351 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Creating new reader instance...
-2026-03-20 10:46:45.212 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Sesión iniciada: modelo=TC58 sdk=33
-2026-03-20 10:46:45.212 15351-15422 ZebraReaderImpl         com.example.diverscan.activeid       D  Searching for USB readers (SERVICE_USB)...
-2026-03-20 10:46:45.214 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Permisos ya concedidos para conexión RFID.
-2026-03-20 10:46:45.215 15351-15351 ConnValidation          com.example.diverscan.activeid       W  Estado conexión: DESCONECTADO
-2026-03-20 10:46:45.216 15351-15351 ConnValidation          com.example.diverscan.activeid       W  Si usa DataWedge, deshabilite Plugin RFID para permitir conexión directa por SDK.
-2026-03-20 10:46:45.216 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Conexión Zebra guardada: USB
-2026-03-20 10:46:45.219 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Pantalla en primer plano. Modo validación activado.
-2026-03-20 10:46:45.220 15351-15351 ConnValidation          com.example.diverscan.activeid       W  Estado conexión: DESCONECTADO
-2026-03-20 10:46:45.232  1526-13901 CoreBackPreview         system_server                        D  Window{f8c10cb u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@cdf17c1, mPriority=-1}
-2026-03-20 10:46:45.243 15351-15422 RfidHostManager         com.example.diverscan.activeid       D  bindhostService
-2026-03-20 10:46:45.245 15351-15422 RfidHostManager         com.example.diverscan.activeid       E  bindhostService fail (Intent { act=rfidhost.intent.action.bindMessageService cmp=com.zebra.rfidhost/.RFIDHostService })
-2026-03-20 10:46:45.245 15351-15422 protocol val is         com.example.diverscan.activeid       E  ASCII
-2026-03-20 10:46:45.254 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-03-20 10:46:45.270 15351-15422 UsbRequestJNI           com.example.diverscan.activeid       D  init
-2026-03-20 10:46:45.278 15351-15422 ZebraReaderImpl         com.example.diverscan.activeid       D  Readers found [SERVICE_USB]: 1
-2026-03-20 10:46:45.278 15351-15422 ZebraReaderImpl         com.example.diverscan.activeid       D  Reader selected: RFD4031-G00B700-WR:: Address: USB_PORT
-2026-03-20 10:46:45.278 15351-15422 protocol val is         com.example.diverscan.activeid       E  ASCII
-2026-03-20 10:46:45.281 15351-15375 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-03-20 10:46:45.299  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity: +168ms
-2026-03-20 10:46:45.434  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-03-20 10:46:45.563  1526-4540  CoreBackPreview         system_server                        D  Window{2c2e7df u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@93144c6, mPriority=-1}
-2026-03-20 10:46:45.818 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a22464d0 (NavigationMenuItemView) with handle 0xb4000077b224fde0
-2026-03-20 10:46:45.818 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a2240ab0 (NavigationMenuItemView) with handle 0xb4000077b2249e10
-2026-03-20 10:46:45.824 15351-15351 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Connected to RFD4031-G00B700-WR::
-2026-03-20 10:46:45.825 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Conectado a RFD4031-G00B700-WR::
-2026-03-20 10:46:46.596 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Reiniciando conexión...
-2026-03-20 10:46:46.604 15351-15351 ConnValidation          com.example.diverscan.activeid       I  USB devices: 1 | /dev/bus/usb/002/012 vid:pid=1504:5889 perm=true | ZebraUSB=1 | USBPermisos=1
-2026-03-20 10:46:46.611 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Reconectando como: ZEBRA via USB
-2026-03-20 10:46:46.614 15351-15351 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Configuracion sin cambios (ya conectado): ZEBRA (USB)
-2026-03-20 10:46:46.614 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Configuracion sin cambios (ya conectado): ZEBRA (USB)
-2026-03-20 10:46:46.621 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Estado conexión: CONECTADO (RFD4031-G00B700-WR:: / RFD4031-G00B700-WR::)
-2026-03-20 10:46:50.261 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Esperando lectura sencilla...
-2026-03-20 10:46:50.298 15351-15358 erscan.activeid         com.example.diverscan.activeid       W  Cleared Reference was only reachable from finalizer (only reported once)
-2026-03-20 10:46:51.532 15351-15406 System.err              com.example.diverscan.activeid       W  cz.msebera.android.httpclient.conn.ConnectTimeoutException: Connect to ec2-44-200-127-109.compute-1.amazonaws.com/44.200.127.109:70 timed out
-2026-03-20 10:46:51.533 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:123)
-2026-03-20 10:46:51.534 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:163)
-2026-03-20 10:46:51.534 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.SchemeSocketFactoryAdaptor.connectSocket(SchemeSocketFactoryAdaptor.java:66)
-2026-03-20 10:46:51.535 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.DefaultClientConnectionOperator.openConnection(DefaultClientConnectionOperator.java:180)
-2026-03-20 10:46:51.535 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.AbstractPoolEntry.open(AbstractPoolEntry.java:145)
-2026-03-20 10:46:51.536 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.AbstractPooledConnAdapter.open(AbstractPooledConnAdapter.java:134)
-2026-03-20 10:46:51.536 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.DefaultRequestDirector.tryConnect(DefaultRequestDirector.java:605)
-2026-03-20 10:46:51.536 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.DefaultRequestDirector.execute(DefaultRequestDirector.java:440)
-2026-03-20 10:46:51.537 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.AbstractHttpClient.doExecute(AbstractHttpClient.java:832)
-2026-03-20 10:46:51.537 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
-2026-03-20 10:46:51.538 15351-15406 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.makeRequest(AsyncHttpRequest.java:146)
-2026-03-20 10:46:51.539 15351-15406 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.makeRequestWithRetries(AsyncHttpRequest.java:177)
-2026-03-20 10:46:51.539 15351-15406 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.run(AsyncHttpRequest.java:106)
-2026-03-20 10:46:51.540 15351-15406 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
-2026-03-20 10:46:51.540 15351-15406 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
-2026-03-20 10:46:51.540 15351-15406 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
-2026-03-20 10:46:51.541 15351-15406 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
-2026-03-20 10:46:51.541 15351-15406 System.err              com.example.diverscan.activeid       W  	at java.lang.Thread.run(Thread.java:1564)
-2026-03-20 10:46:51.543 15351-15406 System.err              com.example.diverscan.activeid       W  cz.msebera.android.httpclient.conn.ConnectTimeoutException: Connect to ec2-44-200-127-109.compute-1.amazonaws.com/44.200.127.109:70 timed out
-2026-03-20 10:46:51.543 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:123)
-2026-03-20 10:46:51.544 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:163)
-2026-03-20 10:46:51.544 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.SchemeSocketFactoryAdaptor.connectSocket(SchemeSocketFactoryAdaptor.java:66)
-2026-03-20 10:46:51.545 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.DefaultClientConnectionOperator.openConnection(DefaultClientConnectionOperator.java:180)
-2026-03-20 10:46:51.545 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.AbstractPoolEntry.open(AbstractPoolEntry.java:145)
-2026-03-20 10:46:51.546 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.AbstractPooledConnAdapter.open(AbstractPooledConnAdapter.java:134)
-2026-03-20 10:46:51.546 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.DefaultRequestDirector.tryConnect(DefaultRequestDirector.java:605)
-2026-03-20 10:46:51.546 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.DefaultRequestDirector.execute(DefaultRequestDirector.java:440)
-2026-03-20 10:46:51.547 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.AbstractHttpClient.doExecute(AbstractHttpClient.java:832)
-2026-03-20 10:46:51.547 15351-15406 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
-2026-03-20 10:46:51.548 15351-15406 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.makeRequest(AsyncHttpRequest.java:146)
-2026-03-20 10:46:51.548 15351-15406 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.makeRequestWithRetries(AsyncHttpRequest.java:177)
-2026-03-20 10:46:51.548 15351-15406 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.run(AsyncHttpRequest.java:106)
-2026-03-20 10:46:51.548 15351-15406 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
-2026-03-20 10:46:51.549 15351-15406 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
-2026-03-20 10:46:51.549 15351-15406 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
-2026-03-20 10:46:51.549 15351-15406 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
-2026-03-20 10:46:51.550 15351-15406 System.err              com.example.diverscan.activeid       W  	at java.lang.Thread.run(Thread.java:1564)
-2026-03-20 10:46:51.551 15351-15351 LOGIN_APICLIENT         com.example.diverscan.activeid       E  GET failed: 0 body:null
-                                                                                                    cz.msebera.android.httpclient.conn.ConnectTimeoutException: Connect to ec2-44-200-127-109.compute-1.amazonaws.com/44.200.127.109:70 timed out
-                                                                                                    	at cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:123)
-                                                                                                    	at cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:163)
-                                                                                                    	at cz.msebera.android.httpclient.conn.scheme.SchemeSocketFactoryAdaptor.connectSocket(SchemeSocketFactoryAdaptor.java:66)
-                                                                                                    	at cz.msebera.android.httpclient.impl.conn.DefaultClientConnectionOperator.openConnection(DefaultClientConnectionOperator.java:180)
-                                                                                                    	at cz.msebera.android.httpclient.impl.conn.AbstractPoolEntry.open(AbstractPoolEntry.java:145)
-                                                                                                    	at cz.msebera.android.httpclient.impl.conn.AbstractPooledConnAdapter.open(AbstractPooledConnAdapter.java:134)
-                                                                                                    	at cz.msebera.android.httpclient.impl.client.DefaultRequestDirector.tryConnect(DefaultRequestDirector.java:605)
-                                                                                                    	at cz.msebera.android.httpclient.impl.client.DefaultRequestDirector.execute(DefaultRequestDirector.java:440)
-                                                                                                    	at cz.msebera.android.httpclient.impl.client.AbstractHttpClient.doExecute(AbstractHttpClient.java:832)
-                                                                                                    	at cz.msebera.android.httpclient.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
-                                                                                                    	at com.loopj.android.http.AsyncHttpRequest.makeRequest(AsyncHttpRequest.java:146)
-                                                                                                    	at com.loopj.android.http.AsyncHttpRequest.makeRequestWithRetries(AsyncHttpRequest.java:177)
-                                                                                                    	at com.loopj.android.http.AsyncHttpRequest.run(AsyncHttpRequest.java:106)
-                                                                                                    	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
-                                                                                                    	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
-                                                                                                    	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
-                                                                                                    	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
-                                                                                                    	at java.lang.Thread.run(Thread.java:1564)
-2026-03-20 10:47:02.289 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Reiniciando conexión...
-2026-03-20 10:47:02.298 15351-15351 ConnValidation          com.example.diverscan.activeid       I  USB devices: 1 | /dev/bus/usb/002/012 vid:pid=1504:5889 perm=true | ZebraUSB=1 | USBPermisos=1
-2026-03-20 10:47:02.301 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Reconectando como: ZEBRA via USB
-2026-03-20 10:47:02.303 15351-15351 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Configuracion sin cambios (ya conectado): ZEBRA (USB)
-2026-03-20 10:47:02.303 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Configuracion sin cambios (ya conectado): ZEBRA (USB)
-2026-03-20 10:47:02.309 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Estado conexión: CONECTADO (RFD4031-G00B700-WR:: / RFD4031-G00B700-WR::)
-2026-03-20 10:47:08.137 15351-15351 IRFIDError              com.example.diverscan.activeid       D  GetStatus Inventory RFID_OPERATION_IN_PROGRESS Operation In Progress-Command Not Allowed
-2026-03-20 10:47:08.138 15351-15351 ZebraReaderImpl         com.example.diverscan.activeid       D  Inventory already in progress, ignoring redundant start command.
-2026-03-20 10:47:08.139 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Esperando lectura sencilla...
-2026-03-20 10:47:17.285 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Gatillo: Presionado [P=1 R=0]
-2026-03-20 10:47:19.491 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Gatillo: Liberado [P=1 R=1]
-2026-03-20 10:47:21.872 15351-15351 IRFIDError              com.example.diverscan.activeid       D  GetStatus Inventory RFID_OPERATION_IN_PROGRESS Operation In Progress-Command Not Allowed
-2026-03-20 10:47:21.873 15351-15351 ZebraReaderImpl         com.example.diverscan.activeid       D  Inventory already in progress, ignoring redundant start command.
-2026-03-20 10:47:21.873 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Iniciando lectura múltiple...
-2026-03-20 10:47:26.353 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Lectura múltiple detenida. tags únicos=0
-2026-03-20 10:47:26.399 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Resumen múltiple: encontrados=0 desconocidos=0
-2026-03-20 10:47:26.404  1526-3599  CoreBackPreview         system_server                        D  Window{57ae874 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@b5aa15e, mPriority=-1}
-2026-03-20 10:47:26.416 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-03-20 10:47:26.428 15351-15375 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-03-20 10:47:26.754 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:26.775 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:26.793 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:26.809 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:26.825 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:26.842 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:26.859 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:27.076 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:27.109 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:27.126 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:27.142 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:27.799  1526-13901 CoreBackPreview         system_server                        D  Window{57ae874 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback null
-2026-03-20 10:47:27.801 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a227f6f0 (RippleDrawable) with handle 0xb4000077b2233400
-2026-03-20 10:47:27.803  1526-13901 InputManager-JNI        system_server                        W  Input channel object '57ae874 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity (client)' was disposed without first being removed with the input manager!
-2026-03-20 10:47:27.851  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-03-20 10:47:29.416 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Esperando lectura sencilla...
-2026-03-20 10:47:30.255 15351-15351 IRFIDError              com.example.diverscan.activeid       D  GetStatus Inventory RFID_OPERATION_IN_PROGRESS Operation In Progress-Command Not Allowed
-2026-03-20 10:47:30.256 15351-15351 ZebraReaderImpl         com.example.diverscan.activeid       D  Inventory already in progress, ignoring redundant start command.
-2026-03-20 10:47:30.257 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Esperando lectura sencilla...
-2026-03-20 10:47:35.088 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Reiniciando conexión...
-2026-03-20 10:47:35.100 15351-15351 ConnValidation          com.example.diverscan.activeid       I  USB devices: 1 | /dev/bus/usb/002/012 vid:pid=1504:5889 perm=true | ZebraUSB=1 | USBPermisos=1
-2026-03-20 10:47:35.104 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Reconectando como: ZEBRA via USB
-2026-03-20 10:47:35.106 15351-15351 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Configuracion sin cambios (ya conectado): ZEBRA (USB)
-2026-03-20 10:47:35.106 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Configuracion sin cambios (ya conectado): ZEBRA (USB)
-2026-03-20 10:47:35.114 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Estado conexión: CONECTADO (RFD4031-G00B700-WR:: / RFD4031-G00B700-WR::)
-2026-03-20 10:47:38.419 15351-15351 IRFIDError              com.example.diverscan.activeid       D  GetStatus Inventory RFID_OPERATION_IN_PROGRESS Operation In Progress-Command Not Allowed
-2026-03-20 10:47:38.420 15351-15351 ZebraReaderImpl         com.example.diverscan.activeid       D  Inventory already in progress, ignoring redundant start command.
-2026-03-20 10:47:38.420 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Esperando lectura sencilla...
-2026-03-20 10:47:39.347 15351-15351 IRFIDError              com.example.diverscan.activeid       D  GetStatus Inventory RFID_OPERATION_IN_PROGRESS Operation In Progress-Command Not Allowed
-2026-03-20 10:47:39.348 15351-15351 ZebraReaderImpl         com.example.diverscan.activeid       D  Inventory already in progress, ignoring redundant start command.
-2026-03-20 10:47:39.349 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Iniciando lectura múltiple...
-2026-03-20 10:47:40.863 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Lectura múltiple detenida. tags únicos=0
-2026-03-20 10:47:40.938 15351-15351 ConnValidation          com.example.diverscan.activeid       I  Resumen múltiple: encontrados=0 desconocidos=0
-2026-03-20 10:47:40.941  1526-13901 CoreBackPreview         system_server                        D  Window{deb0627 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@9535979, mPriority=-1}
-2026-03-20 10:47:40.951 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-03-20 10:47:40.958 15351-15375 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-03-20 10:47:41.083 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:41.092 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:41.108 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:41.125 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:41.142 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:41.158 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:41.376 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:41.392 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:41.409 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:41.426 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:41.442 15351-15351 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
-2026-03-20 10:47:42.100  1526-4540  CoreBackPreview         system_server                        D  Window{deb0627 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback null
-2026-03-20 10:47:42.104 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a22938d0 (RippleDrawable) with handle 0xb4000077b2240210
-2026-03-20 10:47:42.106  1526-13901 InputManager-JNI        system_server                        W  Input channel object 'deb0627 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity (client)' was disposed without first being removed with the input manager!
-2026-03-20 10:47:42.155  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-03-20 10:47:43.643 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-03-20 10:47:43.649  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
-2026-03-20 10:47:43.655  5451-6672  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
-2026-03-20 10:47:43.655 15351-15351 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
-2026-03-20 10:47:43.732  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-03-20 10:47:44.056 15351-15351 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
-2026-03-20 10:47:44.171  1526-13901 CoreBackPreview         system_server                        D  Window{f8c10cb u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback null
-2026-03-20 10:47:44.175 15351-15375 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a2265af0 (RippleDrawable) with handle 0xb4000077b22754c0
-2026-03-20 10:47:44.176  1526-3599  InputManager-JNI        system_server                        W  Input channel object 'f8c10cb com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 10:58:17.929 18364-18383 AdrenoGLES-0            com.example.diverscan.activeid       I  Build Config                     : S P 10.0.7 AArch64
+2026-03-20 10:58:17.929 18364-18383 AdrenoGLES-0            com.example.diverscan.activeid       I  Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+2026-03-20 10:58:17.933 18364-18383 AdrenoGLES-0            com.example.diverscan.activeid       I  PFP: 0x016dc094, ME: 0x00000000
+2026-03-20 10:58:17.978 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 10:58:18.004 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 10:58:18.031  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.splash.SplashActivity: +606ms
+2026-03-20 10:58:18.048  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 10:58:18.212 18364-18371 erscan.activeid         com.example.diverscan.activeid       I  Compiler allocated 4197KB to compile void android.view.ViewRootImpl.performTraversals()
+2026-03-20 10:58:18.380  1526-6496  InputManager-JNI        system_server                        W  Input channel object '13e0314 Splash Screen com.example.diverscan.activeid (client)' was disposed without first being removed with the input manager!
+2026-03-20 10:58:19.923  1526-2674  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.login.LoginActivity} from uid 10235
+2026-03-20 10:58:19.940  1526-2674  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 18364
+2026-03-20 10:58:19.951 18364-18364 Compatibil...geReporter com.example.diverscan.activeid       D  Compat change id reported: 171228096; UID 10235; state: ENABLED
+2026-03-20 10:58:19.956 18364-18364 Compatibil...geReporter com.example.diverscan.activeid       D  Compat change id reported: 210923482; UID 10235; state: ENABLED
+2026-03-20 10:58:19.989  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.login.LoginActivity
+2026-03-20 10:58:19.991  5451-6672  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.login.LoginActivity
+2026-03-20 10:58:20.094  1526-2674  ActivityTaskManager     system_server                        I  START u0 {flg=0x10008000 cmp=com.example.diverscan.activeid/.UI.main.MainActivity} from uid 10235
+2026-03-20 10:58:20.110  1526-6496  ActivityTaskManager     system_server                        W  Duplicate finish request for r=ActivityRecord{1b6e3d4 u0 com.example.diverscan.activeid/.UI.login.LoginActivity} t24 f}}
+2026-03-20 10:58:20.118  1526-2674  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 18364
+2026-03-20 10:58:20.149  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
+2026-03-20 10:58:20.151  5451-6672  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
+2026-03-20 10:58:20.193  1526-6496  CoreBackPreview         system_server                        D  Window{41e166e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@b4d759c, mPriority=-1}
+2026-03-20 10:58:20.202 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 10:58:20.243 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 10:58:20.247 18364-18364 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
+2026-03-20 10:58:20.248  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.main.MainActivity: +325ms
+2026-03-20 10:58:20.283  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 10:58:20.543  1526-2674  InputManager-JNI        system_server                        W  Input channel object '2ad96c Splash Screen com.example.diverscan.activeid (client)' was disposed without first being removed with the input manager!
+2026-03-20 10:58:20.678  1526-13162 CoreBackPreview         system_server                        D  Window{6130761 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity}: Setting back callback null
+2026-03-20 10:58:20.680  1526-13162 InputManager-JNI        system_server                        W  Input channel object '6130761 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 10:58:20.781 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 1649 (62%)
+2026-03-20 10:58:20.781 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
+2026-03-20 10:58:22.995 18364-18424 ProfileInstaller        com.example.diverscan.activeid       D  Installing profile for com.example.diverscan.activeid
+2026-03-20 10:58:25.281 18364-18405 System.err              com.example.diverscan.activeid       W  cz.msebera.android.httpclient.conn.ConnectTimeoutException: Connect to ec2-44-200-127-109.compute-1.amazonaws.com/44.200.127.109:70 timed out
+2026-03-20 10:58:25.282 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:123)
+2026-03-20 10:58:25.282 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:163)
+2026-03-20 10:58:25.282 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.SchemeSocketFactoryAdaptor.connectSocket(SchemeSocketFactoryAdaptor.java:66)
+2026-03-20 10:58:25.283 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.DefaultClientConnectionOperator.openConnection(DefaultClientConnectionOperator.java:180)
+2026-03-20 10:58:25.283 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.AbstractPoolEntry.open(AbstractPoolEntry.java:145)
+2026-03-20 10:58:25.283 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.AbstractPooledConnAdapter.open(AbstractPooledConnAdapter.java:134)
+2026-03-20 10:58:25.283 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.DefaultRequestDirector.tryConnect(DefaultRequestDirector.java:605)
+2026-03-20 10:58:25.283 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.DefaultRequestDirector.execute(DefaultRequestDirector.java:440)
+2026-03-20 10:58:25.284 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.AbstractHttpClient.doExecute(AbstractHttpClient.java:832)
+2026-03-20 10:58:25.284 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
+2026-03-20 10:58:25.284 18364-18405 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.makeRequest(AsyncHttpRequest.java:146)
+2026-03-20 10:58:25.284 18364-18405 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.makeRequestWithRetries(AsyncHttpRequest.java:177)
+2026-03-20 10:58:25.285 18364-18405 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.run(AsyncHttpRequest.java:106)
+2026-03-20 10:58:25.285 18364-18405 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
+2026-03-20 10:58:25.285 18364-18405 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
+2026-03-20 10:58:25.285 18364-18405 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+2026-03-20 10:58:25.285 18364-18405 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+2026-03-20 10:58:25.285 18364-18405 System.err              com.example.diverscan.activeid       W  	at java.lang.Thread.run(Thread.java:1564)
+2026-03-20 10:58:25.286 18364-18405 System.err              com.example.diverscan.activeid       W  cz.msebera.android.httpclient.conn.ConnectTimeoutException: Connect to ec2-44-200-127-109.compute-1.amazonaws.com/44.200.127.109:70 timed out
+2026-03-20 10:58:25.287 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:123)
+2026-03-20 10:58:25.287 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:163)
+2026-03-20 10:58:25.287 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.conn.scheme.SchemeSocketFactoryAdaptor.connectSocket(SchemeSocketFactoryAdaptor.java:66)
+2026-03-20 10:58:25.287 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.DefaultClientConnectionOperator.openConnection(DefaultClientConnectionOperator.java:180)
+2026-03-20 10:58:25.288 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.AbstractPoolEntry.open(AbstractPoolEntry.java:145)
+2026-03-20 10:58:25.288 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.conn.AbstractPooledConnAdapter.open(AbstractPooledConnAdapter.java:134)
+2026-03-20 10:58:25.288 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.DefaultRequestDirector.tryConnect(DefaultRequestDirector.java:605)
+2026-03-20 10:58:25.288 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.DefaultRequestDirector.execute(DefaultRequestDirector.java:440)
+2026-03-20 10:58:25.289 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.AbstractHttpClient.doExecute(AbstractHttpClient.java:832)
+2026-03-20 10:58:25.289 18364-18405 System.err              com.example.diverscan.activeid       W  	at cz.msebera.android.httpclient.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
+2026-03-20 10:58:25.289 18364-18405 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.makeRequest(AsyncHttpRequest.java:146)
+2026-03-20 10:58:25.289 18364-18405 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.makeRequestWithRetries(AsyncHttpRequest.java:177)
+2026-03-20 10:58:25.290 18364-18405 System.err              com.example.diverscan.activeid       W  	at com.loopj.android.http.AsyncHttpRequest.run(AsyncHttpRequest.java:106)
+2026-03-20 10:58:25.290 18364-18405 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
+2026-03-20 10:58:25.290 18364-18405 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
+2026-03-20 10:58:25.290 18364-18405 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+2026-03-20 10:58:25.291 18364-18405 System.err              com.example.diverscan.activeid       W  	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+2026-03-20 10:58:25.291 18364-18405 System.err              com.example.diverscan.activeid       W  	at java.lang.Thread.run(Thread.java:1564)
+2026-03-20 10:58:27.664 18364-18372 erscan.activeid         com.example.diverscan.activeid       W  Cleared Reference was only reachable from finalizer (only reported once)
+2026-03-20 10:58:27.680 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 10:58:54.364  1526-1989  AppsFilter              system_server                        I  interaction: PackageSetting{3616fb7 com.example.diverscan.activeid/10235} -> PackageSetting{f108324 com.symbol.datawedge/10068} BLOCKED
+2026-03-20 10:58:57.485  1526-1989  AppsFilter              system_server                        I  interaction: PackageSetting{3616fb7 com.example.diverscan.activeid/10235} -> PackageSetting{30b8a7e com.google.android.apps.docs/10155} BLOCKED
+2026-03-20 10:59:04.222 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 10:59:04.229  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
+2026-03-20 10:59:04.231 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
+2026-03-20 10:59:04.237 18364-18364 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
+2026-03-20 10:59:04.260  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 10:59:04.501 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 1649 (62%)
+2026-03-20 10:59:04.501 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
+2026-03-20 10:59:06.136  1526-8811  CoreBackPreview         system_server                        D  Window{41e166e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@1233309, mPriority=1000000}
+2026-03-20 10:59:07.857  1526-2680  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity} from uid 10235
+2026-03-20 10:59:07.874  1526-2680  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 18364
+2026-03-20 10:59:07.922  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
+2026-03-20 10:59:07.927 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
+2026-03-20 10:59:07.984 18364-18364 RFID_TAG_WRITER         com.example.diverscan.activeid       D  InitSDK - Initializing via Factory
+2026-03-20 10:59:07.986 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Iniciando servicio de lectura...
+2026-03-20 10:59:07.989 18364-18364 ConnValidation          com.example.diverscan.activeid       W  No se detectan lectores en este momento.
+2026-03-20 10:59:07.989 18364-18364 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Inicializando ReaderType: ZEBRA ConnectionType: USB
+2026-03-20 10:59:07.990 18364-18364 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Configurando Lector: ZEBRA (USB)
+2026-03-20 10:59:07.990 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Configurando Lector: ZEBRA (USB)
+2026-03-20 10:59:07.990 18364-18364 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Creating new reader instance...
+2026-03-20 10:59:07.993 18364-19426 ZebraReaderImpl         com.example.diverscan.activeid       D  Searching for USB readers (SERVICE_USB)...
+2026-03-20 10:59:07.994 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Sesión iniciada: modelo=TC58 sdk=33
+2026-03-20 10:59:07.999 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Permisos ya concedidos para conexión RFID.
+2026-03-20 10:59:08.000 18364-18364 ConnValidation          com.example.diverscan.activeid       W  Estado conexión: DESCONECTADO
+2026-03-20 10:59:08.001 18364-18364 ConnValidation          com.example.diverscan.activeid       W  Si usa DataWedge, deshabilite Plugin RFID para permitir conexión directa por SDK.
+2026-03-20 10:59:08.001 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Conexión Zebra guardada: USB
+2026-03-20 10:59:08.005 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Pantalla en primer plano. Modo validación activado.
+2026-03-20 10:59:08.006 18364-18364 ConnValidation          com.example.diverscan.activeid       W  Estado conexión: DESCONECTADO
+2026-03-20 10:59:08.019  1526-2674  CoreBackPreview         system_server                        D  Window{3b5172a u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@dbeebf7, mPriority=-1}
+2026-03-20 10:59:08.025 18364-19426 RfidHostManager         com.example.diverscan.activeid       D  bindhostService
+2026-03-20 10:59:08.028 18364-19426 RfidHostManager         com.example.diverscan.activeid       E  bindhostService fail (Intent { act=rfidhost.intent.action.bindMessageService cmp=com.zebra.rfidhost/.RFIDHostService })
+2026-03-20 10:59:08.028 18364-19426 protocol val is         com.example.diverscan.activeid       E  ASCII
+2026-03-20 10:59:08.062 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 10:59:08.070 18364-19426 UsbRequestJNI           com.example.diverscan.activeid       D  init
+2026-03-20 10:59:08.074 18364-19426 ZebraReaderImpl         com.example.diverscan.activeid       D  Readers found [SERVICE_USB]: 1
+2026-03-20 10:59:08.074 18364-19426 ZebraReaderImpl         com.example.diverscan.activeid       D  Reader selected: RFD4031-G00B700-WR:: Address: USB_PORT
+2026-03-20 10:59:08.074 18364-19426 protocol val is         com.example.diverscan.activeid       E  ASCII
+2026-03-20 10:59:08.112 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 10:59:08.121  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity: +261ms
+2026-03-20 10:59:08.244  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 10:59:08.300  1526-2230  CoreBackPreview         system_server                        D  Window{41e166e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@fb22d56, mPriority=-1}
+2026-03-20 10:59:08.554 18364-18364 RFID_TAG_WRITER         com.example.diverscan.activeid       D  Connected to RFD4031-G00B700-WR::
+2026-03-20 10:59:08.555 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Conectado a RFD4031-G00B700-WR::
+2026-03-20 10:59:08.627 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a2238380 (NavigationMenuItemView) with handle 0xb4000077b22412c0
+2026-03-20 10:59:08.627 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a224a530 (NavigationMenuItemView) with handle 0xb4000077b222ee10
+2026-03-20 10:59:09.037 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Reiniciando conexión...
+2026-03-20 10:59:09.045 18364-18364 ConnValidation          com.example.diverscan.activeid       I  USB devices: 1 | /dev/bus/usb/002/014 vid:pid=1504:5889 perm=true | ZebraUSB=1 | USBPermisos=1
+2026-03-20 10:59:09.054 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Reconectando como: ZEBRA via USB
+2026-03-20 10:59:09.057 18364-18364 RFID_TAG_WRITER         com.example.diverscan.activeid       I  Configuracion sin cambios (ya conectado): ZEBRA (USB)
+2026-03-20 10:59:09.057 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Configuracion sin cambios (ya conectado): ZEBRA (USB)
+2026-03-20 10:59:09.066 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Estado conexión: CONECTADO (RFD4031-G00B700-WR:: / RFD4031-G00B700-WR::)
+2026-03-20 10:59:10.916 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Esperando lectura sencilla...
+2026-03-20 10:59:14.978 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Gatillo: Presionado [P=1 R=0]
+2026-03-20 10:59:15.056 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Tag recibido. cantidad=1 epc=DE00000000000000DE005426
+2026-03-20 10:59:15.073 18364-19455 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='DE00000000000000DE005426'
+2026-03-20 10:59:15.073 18364-19455 ConnValidation          com.example.diverscan.activeid       I  getActivoByEpc: Buscando EPC='DE00000000000000DE005426'
+2026-03-20 10:59:15.078 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Tag recibido. cantidad=1 epc=DE00000000000000DE004819
+2026-03-20 10:59:15.082 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Tag recibido. cantidad=1 epc=000000000000000000017994
+2026-03-20 10:59:15.165 18364-19455 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 1
+2026-03-20 10:59:15.165 18364-19455 ConnValidation          com.example.diverscan.activeid       I  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 1
+2026-03-20 10:59:15.166 18364-19455 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 1
+2026-03-20 10:59:15.166 18364-19455 ConnValidation          com.example.diverscan.activeid       I  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 1
+2026-03-20 10:59:15.167 18364-19455 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO ENCONTRADO -> ESTACION DE TRABAJO ID: 4cb96212-a93b-4fe2-8806-0059b2478b9c
+2026-03-20 10:59:15.167 18364-19455 ConnValidation          com.example.diverscan.activeid       I  getActivoByEpc: ACTIVO ENCONTRADO -> ESTACION DE TRABAJO ID: 4cb96212-a93b-4fe2-8806-0059b2478b9c
+2026-03-20 10:59:15.219  1526-2680  CoreBackPreview         system_server                        D  Window{590ff78 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@6196042, mPriority=-1}
+2026-03-20 10:59:15.237 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 10:59:15.248 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 10:59:15.376 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Gatillo: Liberado [P=1 R=1]
+2026-03-20 10:59:17.475 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 10:59:17.493 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 10:59:17.509 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 10:59:17.526 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 10:59:17.543 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 10:59:17.792 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 10:59:17.809 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 10:59:17.825 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 10:59:18.288  1526-4543  CoreBackPreview         system_server                        D  Window{590ff78 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback null
+2026-03-20 10:59:18.301 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a224ff50 (RippleDrawable) with handle 0xb4000077b227e280
+2026-03-20 10:59:18.302  1526-2680  InputManager-JNI        system_server                        W  Input channel object '590ff78 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 10:59:18.342  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 10:59:28.260  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
+2026-03-20 10:59:28.263 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
+2026-03-20 10:59:28.306 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 10:59:28.331 18364-18364 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
+2026-03-20 10:59:28.417  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 10:59:28.481 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 1649 (62%)
+2026-03-20 10:59:28.481 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
+2026-03-20 10:59:28.860 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a22667d0 (RippleDrawable) with handle 0xb4000077b227c9c0
+2026-03-20 10:59:28.869  1526-2230  CoreBackPreview         system_server                        D  Window{3b5172a u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback null
+2026-03-20 10:59:28.871  1526-2680  InputManager-JNI        system_server                        W  Input channel object '3b5172a com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 10:59:30.179  1526-2680  CoreBackPreview         system_server                        D  Window{41e166e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@6931426, mPriority=1000000}
+2026-03-20 10:59:30.821  1526-2680  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.RegistroTomaFisicaActivity} from uid 10235
+2026-03-20 10:59:30.853  1526-2680  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 18364
+2026-03-20 10:59:30.900  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity
+2026-03-20 10:59:30.902 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity
+2026-03-20 10:59:30.923  1526-2680  CoreBackPreview         system_server                        D  Window{5ae9f80 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@36e81fe, mPriority=-1}
+2026-03-20 10:59:30.941 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 10:59:30.969 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 10:59:30.989  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.RegistroTomaFisicaActivity: +155ms
+2026-03-20 10:59:31.135  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 10:59:31.265  1526-2680  CoreBackPreview         system_server                        D  Window{41e166e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@b30ce61, mPriority=-1}
+2026-03-20 10:59:31.515 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a2232960 (NavigationMenuItemView) with handle 0xb4000077b2272a00
+2026-03-20 10:59:32.397  1526-2680  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity (has extras)} from uid 10235
+2026-03-20 10:59:32.415  1526-2680  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 18364
+2026-03-20 10:59:32.422  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-20 10:59:32.424 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-20 10:59:32.465 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Iniciando carga de datos y sincronización...
+2026-03-20 10:59:32.466 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Llamando a fetchAndSyncFromApi para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 10:59:32.476  1526-8811  CoreBackPreview         system_server                        D  Window{c850b6a u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@c5f88f8, mPriority=-1}
+2026-03-20 10:59:32.477 18364-19542 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 10:59:32.478 18364-19543 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 10:59:32.497 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 10:59:32.516 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 10:59:32.520 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-20 10:59:32.520 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-20 10:59:32.520 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-20 10:59:32.520 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-20 10:59:32.525  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity: +125ms
+2026-03-20 10:59:32.648  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 10:59:33.892 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Click en Nueva Toma. Iniciando NuevaTomaActivity para tomaFisicaId: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 10:59:33.895  1526-2680  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity (has extras)} from uid 10235
+2026-03-20 10:59:33.910  1526-2230  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 18364
+2026-03-20 10:59:33.946  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-20 10:59:33.949 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-20 10:59:33.990 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Iniciando NuevaTomaActivity
+2026-03-20 10:59:33.990 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: tomaFisicaId recibido: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 10:59:33.991 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomasDao.getPendientesCount tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 10:59:33.991 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosCount
+2026-03-20 10:59:33.999 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getPendientesCount count=0
+2026-03-20 10:59:33.999 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Creating NEW toma: d60e437e-fbda-4c51-a4eb-8bcab6ae6da8 Num: 1
+2026-03-20 10:59:33.999 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Configurado idToma=d60e437e-fbda-4c51-a4eb-8bcab6ae6da8, numero=1
+2026-03-20 10:59:34.001 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID: initialized=true
+2026-03-20 10:59:34.001 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID/onResume status=Conectado
+2026-03-20 10:59:34.001 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID: ready=true
+2026-03-20 10:59:34.005 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onResume RFID status=Conectado
+2026-03-20 10:59:34.005 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onResume RFID ready=true scanning=false
+2026-03-20 10:59:34.006 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getActivosCount count=20267
+2026-03-20 10:59:34.006 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 10:59:34.014  1526-2230  CoreBackPreview         system_server                        D  Window{32686ca u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@b92e358, mPriority=-1}
+2026-03-20 10:59:34.015 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getTomaFisicaById found=true
+2026-03-20 10:59:34.015 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null Sec=null UO=null Cat=null Est=b475f3af-c9f3-4b27-a187-f1c72c3aee98
+2026-03-20 10:59:34.028 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  Inventario base: tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59 A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null UO=null Cat=null Est=b475f3af-c9f3-4b27-a187-f1c72c3aee98 totalActivosInventario=0
+2026-03-20 10:59:34.033 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 10:59:34.047 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 10:59:34.052 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 10:59:34.053 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null Sec=null UO=00000000-0000-0000-0000-000000000000
+2026-03-20 10:59:34.068  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity: +162ms
+2026-03-20 10:59:34.070 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-20 10:59:34.070 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] start
+2026-03-20 10:59:34.084 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getActivosByFiltros size=227
+2026-03-20 10:59:34.085 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL ubicacionDao.getUbicacionByASysId A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94
+2026-03-20 10:59:34.096 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getUbicacionByASysId found=true
+2026-03-20 10:59:34.096 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getAllCategorias
+2026-03-20 10:59:34.097 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getAllCategorias size=5
+2026-03-20 10:59:34.097 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 10:59:34.116 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] start
+2026-03-20 10:59:34.116 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionA: id=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 text=DIRECCION GENERAL
+2026-03-20 10:59:34.116 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] start
+2026-03-20 10:59:34.124 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 10:59:34.133 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro Categoria: id=null
+2026-03-20 10:59:34.133 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[4] start
+2026-03-20 10:59:34.172 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 10:59:34.172 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] queryTimes ms expected=25 counts=50 scannedMap=1 totalBg=76 expectedSize=227 uniqueTags=0
+2026-03-20 10:59:34.173 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 10:59:34.176 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] done total=106ms listSize=227
+2026-03-20 10:59:34.177 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 10:59:34.177 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[5] start
+2026-03-20 10:59:34.185 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-20 10:59:34.186 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[6] start
+2026-03-20 10:59:34.200  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 10:59:34.201 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 10:59:34.249 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 10:59:34.249 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] queryTimes ms expected=26 counts=50 scannedMap=0 totalBg=76 expectedSize=227 uniqueTags=0
+2026-03-20 10:59:34.249 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 10:59:34.252 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] done total=136ms listSize=227
+2026-03-20 10:59:34.252 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 10:59:34.252 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[7] start
+2026-03-20 10:59:34.265 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-20 10:59:34.265 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[8] start
+2026-03-20 10:59:34.277 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 10:59:34.323 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 10:59:34.323 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] queryTimes ms expected=25 counts=49 scannedMap=0 totalBg=74 expectedSize=227 uniqueTags=0
+2026-03-20 10:59:34.323 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 10:59:34.327 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] done total=211ms listSize=227
+2026-03-20 10:59:34.327 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 10:59:34.352 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 10:59:34.398 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 10:59:34.398 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[4] queryTimes ms expected=27 counts=48 scannedMap=0 totalBg=75 expectedSize=227 uniqueTags=0
+2026-03-20 10:59:34.401 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[4] done total=267ms listSize=227
+2026-03-20 10:59:34.401 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 10:59:34.423 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 10:59:34.423 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=24ms
+2026-03-20 10:59:34.423 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 10:59:34.450 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 10:59:34.495 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 10:59:34.495 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[5] queryTimes ms expected=24 counts=48 scannedMap=0 totalBg=72 expectedSize=227 uniqueTags=0
+2026-03-20 10:59:34.495 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 10:59:34.498 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[5] done total=321ms listSize=227
+2026-03-20 10:59:34.498 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 10:59:34.524 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 10:59:34.570 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 10:59:34.570 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[6] queryTimes ms expected=26 counts=49 scannedMap=0 totalBg=75 expectedSize=227 uniqueTags=0
+2026-03-20 10:59:34.578 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a229f380 (RippleDrawable) with handle 0xb4000077b225cd70
+2026-03-20 10:59:34.587 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[6] done total=401ms listSize=227
+2026-03-20 10:59:34.587 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 10:59:34.596 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 10:59:34.596 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=26ms
+2026-03-20 10:59:34.596 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 10:59:34.625 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 10:59:34.665 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 10:59:34.665 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[7] queryTimes ms expected=27 counts=42 scannedMap=1 totalBg=70 expectedSize=227 uniqueTags=0
+2026-03-20 10:59:34.666 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 10:59:34.669 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[7] done total=416ms listSize=227
+2026-03-20 10:59:34.669 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 10:59:34.692 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 10:59:34.733 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 10:59:34.733 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[8] queryTimes ms expected=23 counts=44 scannedMap=0 totalBg=67 expectedSize=227 uniqueTags=0
+2026-03-20 10:59:34.736 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[8] done total=471ms listSize=227
+2026-03-20 10:59:34.736 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 10:59:34.756 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 10:59:34.756 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=23ms
+2026-03-20 10:59:34.779 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 10:59:34.779 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=23ms
+2026-03-20 10:59:34.802 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 10:59:34.802 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=22ms
+2026-03-20 10:59:34.825 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 10:59:34.825 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=23ms
+2026-03-20 10:59:34.849 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 10:59:34.849 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=24ms
+2026-03-20 10:59:34.871 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 10:59:34.871 18364-19556 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=23ms
+2026-03-20 10:59:35.649 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  startScan execute: connected=true
+2026-03-20 10:59:38.662 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       W  SCAN WATCHDOG: sin tags en 3003ms. connected=true ready=true
+2026-03-20 10:59:46.854 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  stopScan: duración sesión lectura=11195ms
+2026-03-20 10:59:48.122 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  trigger event pressed=true connected=true ready=true scanning=false
+2026-03-20 10:59:48.123 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  startScan execute: connected=true
+2026-03-20 10:59:51.131 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       W  SCAN WATCHDOG: sin tags en 3001ms. connected=true ready=true
+2026-03-20 10:59:58.839 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  trigger event pressed=false connected=true ready=true scanning=true
+2026-03-20 10:59:58.891 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  stopScan: duración sesión lectura=10761ms
+2026-03-20 11:00:06.389 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  trigger event pressed=true connected=true ready=true scanning=false
+2026-03-20 11:00:06.389 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  startScan execute: connected=true
+2026-03-20 11:00:09.398 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       W  SCAN WATCHDOG: sin tags en 3000ms. connected=true ready=true
+2026-03-20 11:00:11.382 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  trigger event pressed=false connected=true ready=true scanning=true
+2026-03-20 11:00:11.418 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  stopScan: duración sesión lectura=5021ms
+2026-03-20 11:00:13.537 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  startScan execute: connected=true
+2026-03-20 11:00:14.631 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  stopScan: duración sesión lectura=1084ms
+2026-03-20 11:00:16.690  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-20 11:00:16.693 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-20 11:00:16.722 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Iniciando carga de datos y sincronización...
+2026-03-20 11:00:16.723 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Llamando a fetchAndSyncFromApi para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:16.731 18364-19691 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:16.744 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:00:16.752 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-20 11:00:16.752 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-20 11:00:16.867  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:00:17.321  1526-2683  CoreBackPreview         system_server                        D  Window{32686ca u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback null
+2026-03-20 11:00:17.321 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onDestroy: Recursos liberados.
+2026-03-20 11:00:17.324  1526-13167 InputManager-JNI        system_server                        W  Input channel object '32686ca com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 11:00:18.171 18364-19703 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:18.180 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-20 11:00:18.181 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: COMPLETADAS. Items visibles: 0
+2026-03-20 11:00:18.786 18364-19708 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:18.798 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-20 11:00:18.798 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-20 11:00:19.771 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Click en Nueva Toma. Iniciando NuevaTomaActivity para tomaFisicaId: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:19.773  1526-5906  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity (has extras)} from uid 10235
+2026-03-20 11:00:19.791  1526-5906  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 18364
+2026-03-20 11:00:19.821  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-20 11:00:19.824 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-20 11:00:19.867 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Iniciando NuevaTomaActivity
+2026-03-20 11:00:19.867 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: tomaFisicaId recibido: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:19.867 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomasDao.getPendientesCount tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:19.867 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosCount
+2026-03-20 11:00:19.875 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getPendientesCount count=0
+2026-03-20 11:00:19.875 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Creating NEW toma: d5d32c8d-3aad-45f2-8dc4-6f32df299d9f Num: 1
+2026-03-20 11:00:19.875 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Configurado idToma=d5d32c8d-3aad-45f2-8dc4-6f32df299d9f, numero=1
+2026-03-20 11:00:19.876 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID: initialized=true
+2026-03-20 11:00:19.876 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID/onResume status=Conectado
+2026-03-20 11:00:19.876 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID: ready=true
+2026-03-20 11:00:19.879 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onResume RFID status=Conectado
+2026-03-20 11:00:19.879 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onResume RFID ready=true scanning=false
+2026-03-20 11:00:19.879 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getActivosCount count=20267
+2026-03-20 11:00:19.880 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:19.886 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getTomaFisicaById found=true
+2026-03-20 11:00:19.886 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null Sec=null UO=null Cat=null Est=b475f3af-c9f3-4b27-a187-f1c72c3aee98
+2026-03-20 11:00:19.886  1526-5906  CoreBackPreview         system_server                        D  Window{8f81f63 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@7288419, mPriority=-1}
+2026-03-20 11:00:19.897 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  Inventario base: tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59 A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null UO=null Cat=null Est=b475f3af-c9f3-4b27-a187-f1c72c3aee98 totalActivosInventario=0
+2026-03-20 11:00:19.902 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:00:19.912 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 11:00:19.920 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:19.921 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null Sec=null UO=00000000-0000-0000-0000-000000000000
+2026-03-20 11:00:19.932  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity: +148ms
+2026-03-20 11:00:19.939 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-20 11:00:19.939 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] start
+2026-03-20 11:00:19.952 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getActivosByFiltros size=227
+2026-03-20 11:00:19.954 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL ubicacionDao.getUbicacionByASysId A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94
+2026-03-20 11:00:19.961 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getUbicacionByASysId found=true
+2026-03-20 11:00:19.961 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getAllCategorias
+2026-03-20 11:00:19.961 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getAllCategorias size=5
+2026-03-20 11:00:19.961 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:19.975 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] start
+2026-03-20 11:00:19.987 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro Categoria: id=null
+2026-03-20 11:00:19.987 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] start
+2026-03-20 11:00:19.987 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionA: id=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 text=DIRECCION GENERAL
+2026-03-20 11:00:19.987 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[4] start
+2026-03-20 11:00:19.988 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:20.033 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 11:00:20.033 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] queryTimes ms expected=25 counts=47 scannedMap=0 totalBg=72 expectedSize=227 uniqueTags=0
+2026-03-20 11:00:20.033 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:20.036 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] done total=97ms listSize=227
+2026-03-20 11:00:20.036 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 11:00:20.036 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[5] start
+2026-03-20 11:00:20.058 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:20.061 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-20 11:00:20.061 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[6] start
+2026-03-20 11:00:20.071  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:00:20.104 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 11:00:20.104 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] queryTimes ms expected=23 counts=48 scannedMap=0 totalBg=71 expectedSize=227 uniqueTags=0
+2026-03-20 11:00:20.104 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:20.107 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] done total=132ms listSize=227
+2026-03-20 11:00:20.107 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 11:00:20.135 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:20.173 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:00:20.173 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:00:20.174 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:00:20.174 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:20.176 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:00:20.176 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:00:20.177 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:00:20.177 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:20.179 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:00:20.179 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:00:20.180 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:00:20.180 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:20.180 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:20.181 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:00:20.181 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:00:20.182 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:00:20.182 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:20.183 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 11:00:20.183 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] queryTimes ms expected=26 counts=53 scannedMap=1 totalBg=80 expectedSize=227 uniqueTags=0
+2026-03-20 11:00:20.183 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:20.191 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] done total=203ms listSize=227
+2026-03-20 11:00:20.191 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 11:00:20.191 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[7] start
+2026-03-20 11:00:20.200 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-20 11:00:20.200 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[8] start
+2026-03-20 11:00:20.209 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:20.255 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 11:00:20.255 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[4] queryTimes ms expected=24 counts=47 scannedMap=0 totalBg=71 expectedSize=227 uniqueTags=0
+2026-03-20 11:00:20.257 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[4] done total=269ms listSize=227
+2026-03-20 11:00:20.257 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 11:00:20.279 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 11:00:20.279 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=24ms
+2026-03-20 11:00:20.279 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:20.304 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:20.349 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 11:00:20.349 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[5] queryTimes ms expected=23 counts=47 scannedMap=0 totalBg=70 expectedSize=227 uniqueTags=0
+2026-03-20 11:00:20.349 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:20.352 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[5] done total=316ms listSize=227
+2026-03-20 11:00:20.353 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 11:00:20.376 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:20.421 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 11:00:20.421 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[6] queryTimes ms expected=25 counts=47 scannedMap=0 totalBg=72 expectedSize=227 uniqueTags=0
+2026-03-20 11:00:20.427 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a229f380 (RippleDrawable) with handle 0xb4000077b227d890
+2026-03-20 11:00:20.437 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[6] done total=376ms listSize=227
+2026-03-20 11:00:20.437 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 11:00:20.445 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 11:00:20.445 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=24ms
+2026-03-20 11:00:20.471 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 11:00:20.471 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=26ms
+2026-03-20 11:00:20.471 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:20.496 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:20.534 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 11:00:20.534 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[7] queryTimes ms expected=23 counts=40 scannedMap=0 totalBg=63 expectedSize=227 uniqueTags=0
+2026-03-20 11:00:20.534 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:20.537 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[7] done total=345ms listSize=227
+2026-03-20 11:00:20.537 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 11:00:20.558 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:20.599 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
+2026-03-20 11:00:20.599 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[8] queryTimes ms expected=23 counts=42 scannedMap=0 totalBg=65 expectedSize=227 uniqueTags=0
+2026-03-20 11:00:20.601 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[8] done total=401ms listSize=227
+2026-03-20 11:00:20.602 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
+2026-03-20 11:00:20.622 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 11:00:20.622 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=23ms
+2026-03-20 11:00:20.644 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 11:00:20.644 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=23ms
+2026-03-20 11:00:20.669 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 11:00:20.669 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=24ms
+2026-03-20 11:00:20.691 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 11:00:20.691 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=22ms
+2026-03-20 11:00:20.713 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
+2026-03-20 11:00:20.713 18364-19722 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=22ms
+2026-03-20 11:00:21.301 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  startScan execute: connected=true
+2026-03-20 11:00:24.309 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       W  SCAN WATCHDOG: sin tags en 3001ms. connected=true ready=true
+2026-03-20 11:00:26.361 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  stopScan: duración sesión lectura=5053ms
+2026-03-20 11:00:34.856  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-20 11:00:34.862 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Iniciando carga de datos y sincronización...
+2026-03-20 11:00:34.863 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Llamando a fetchAndSyncFromApi para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:34.864 18364-19767 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
+2026-03-20 11:00:34.867 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-20 11:00:34.886 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:00:34.895 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-20 11:00:34.895 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-20 11:00:35.004  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:00:35.443 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onDestroy: Recursos liberados.
+2026-03-20 11:00:35.443  1526-13164 CoreBackPreview         system_server                        D  Window{8f81f63 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback null
+2026-03-20 11:00:35.450  1526-8811  InputManager-JNI        system_server                        W  Input channel object '8f81f63 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 11:00:36.540  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity
+2026-03-20 11:00:36.557 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity
+2026-03-20 11:00:36.584 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:00:36.719  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:00:37.189  1526-8811  CoreBackPreview         system_server                        D  Window{c850b6a u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity}: Setting back callback null
+2026-03-20 11:00:37.193  1526-8811  InputManager-JNI        system_server                        W  Input channel object 'c850b6a com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 11:00:38.200  1526-13167 ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity (has extras)} from uid 10235
+2026-03-20 11:00:38.219  1526-13167 ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 18364
+2026-03-20 11:00:38.244  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-20 11:00:38.246 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-20 11:00:38.249 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Iniciando carga de datos y sincronización...
+2026-03-20 11:00:38.250 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Llamando a fetchAndSyncFromApi para tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-20 11:00:38.259  1526-5906  CoreBackPreview         system_server                        D  Window{9a13672 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@9dfff40, mPriority=-1}
+2026-03-20 11:00:38.261 18364-19793 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-20 11:00:38.261 18364-19794 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-20 11:00:38.276 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:00:38.293 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 11:00:38.296 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-20 11:00:38.296 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-20 11:00:38.297 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-20 11:00:38.297 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-20 11:00:38.304  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity: +97ms
+2026-03-20 11:00:38.419  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:00:39.969 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Click en Nueva Toma. Iniciando NuevaTomaActivity para tomaFisicaId: 1082d85c-5461-47ad-833c-9389a5081963
+2026-03-20 11:00:39.972  1526-13164 ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity (has extras)} from uid 10235
+2026-03-20 11:00:39.988  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-20 11:00:39.991  1526-5906  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 18364
+2026-03-20 11:00:39.997 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
+2026-03-20 11:00:40.059 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Iniciando NuevaTomaActivity
+2026-03-20 11:00:40.059 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: tomaFisicaId recibido: 1082d85c-5461-47ad-833c-9389a5081963
+2026-03-20 11:00:40.059 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomasDao.getPendientesCount tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-20 11:00:40.059 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosCount
+2026-03-20 11:00:40.066 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getPendientesCount count=0
+2026-03-20 11:00:40.066 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Creating NEW toma: 0e27be77-e56b-473c-9220-dbfa46b1108f Num: 1
+2026-03-20 11:00:40.066 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Configurado idToma=0e27be77-e56b-473c-9220-dbfa46b1108f, numero=1
+2026-03-20 11:00:40.067 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getActivosCount count=20267
+2026-03-20 11:00:40.067 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-20 11:00:40.067 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID: initialized=true
+2026-03-20 11:00:40.067 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID/onResume status=Conectado
+2026-03-20 11:00:40.067 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID: ready=true
+2026-03-20 11:00:40.070 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onResume RFID status=Conectado
+2026-03-20 11:00:40.070 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onResume RFID ready=true scanning=false
+2026-03-20 11:00:40.074 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getTomaFisicaById found=true
+2026-03-20 11:00:40.074 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros A=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B=null C=null D=null Sec=null UO=null Cat=null Est=e2b475fc-2d39-4633-951d-6b98144b033a
+2026-03-20 11:00:40.076  1526-5906  CoreBackPreview         system_server                        D  Window{2a699ff u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@432a615, mPriority=-1}
+2026-03-20 11:00:40.084 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  Inventario base: tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963 A=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B=null C=null D=null UO=null Cat=null Est=e2b475fc-2d39-4633-951d-6b98144b033a totalActivosInventario=0
+2026-03-20 11:00:40.088 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:00:40.100 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 11:00:40.102 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-20 11:00:40.103 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros A=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B=null C=null D=null Sec=null UO=00000000-0000-0000-0000-000000000000
+2026-03-20 11:00:40.109  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity: +133ms
+2026-03-20 11:00:40.117 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-20 11:00:40.117 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] start
+2026-03-20 11:00:40.138 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getActivosByFiltros size=333
+2026-03-20 11:00:40.139 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL ubicacionDao.getUbicacionByASysId A=a35ad9de-18ea-4c3f-a4d5-184e902f2a77
+2026-03-20 11:00:40.146 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getUbicacionByASysId found=true
+2026-03-20 11:00:40.146 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getAllCategorias
+2026-03-20 11:00:40.147 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getAllCategorias size=5
+2026-03-20 11:00:40.147 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:40.168 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] start
+2026-03-20 11:00:40.168 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionA: id=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 text=ASESORIA JURIDICA
+2026-03-20 11:00:40.168 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] start
+2026-03-20 11:00:40.175 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:00:40.175 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:00:40.178 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:40.178 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:00:40.178 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:00:40.178 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:00:40.180 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:40.180 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:00:40.180 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:00:40.180 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:00:40.180 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:40.182 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro Categoria: id=null
+2026-03-20 11:00:40.182 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[4] start
+2026-03-20 11:00:40.185 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:40.185 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:40.185 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:00:40.186 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:00:40.186 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:00:40.187 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:40.187 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:00:40.187 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:00:40.187 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:00:40.188 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:00:40.188 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:00:40.222  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:00:40.228 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-20 11:00:40.228 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] queryTimes ms expected=31 counts=50 scannedMap=1 totalBg=82 expectedSize=333 uniqueTags=0
+2026-03-20 11:00:40.228 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:40.245 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] done total=128ms listSize=333
+2026-03-20 11:00:40.245 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-20 11:00:40.246 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[5] start
+2026-03-20 11:00:40.259 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:40.266 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-20 11:00:40.266 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[6] start
+2026-03-20 11:00:40.305 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-20 11:00:40.305 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] queryTimes ms expected=28 counts=48 scannedMap=0 totalBg=76 expectedSize=333 uniqueTags=0
+2026-03-20 11:00:40.305 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:40.309 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] done total=141ms listSize=333
+2026-03-20 11:00:40.309 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-20 11:00:40.309 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[7] start
+2026-03-20 11:00:40.317 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-20 11:00:40.317 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[8] start
+2026-03-20 11:00:40.336 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:40.380 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-20 11:00:40.380 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] queryTimes ms expected=29 counts=46 scannedMap=0 totalBg=75 expectedSize=333 uniqueTags=0
+2026-03-20 11:00:40.380 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:40.384 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] done total=216ms listSize=333
+2026-03-20 11:00:40.384 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-20 11:00:40.411 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:40.455 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-20 11:00:40.456 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[4] queryTimes ms expected=29 counts=47 scannedMap=0 totalBg=76 expectedSize=333 uniqueTags=0
+2026-03-20 11:00:40.460 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[4] done total=278ms listSize=333
+2026-03-20 11:00:40.460 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-20 11:00:40.485 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-20 11:00:40.485 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=29ms
+2026-03-20 11:00:40.485 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:40.516 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:40.561 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-20 11:00:40.561 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[5] queryTimes ms expected=28 counts=48 scannedMap=0 totalBg=76 expectedSize=333 uniqueTags=0
+2026-03-20 11:00:40.561 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:40.564 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[5] done total=319ms listSize=333
+2026-03-20 11:00:40.565 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-20 11:00:40.592 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:40.611 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a230b730 (RippleDrawable) with handle 0xb4000077b224c1b0
+2026-03-20 11:00:40.641 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-20 11:00:40.641 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[6] queryTimes ms expected=29 counts=51 scannedMap=0 totalBg=80 expectedSize=333 uniqueTags=0
+2026-03-20 11:00:40.645 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[6] done total=379ms listSize=333
+2026-03-20 11:00:40.645 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-20 11:00:40.670 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-20 11:00:40.670 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=29ms
+2026-03-20 11:00:40.670 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:40.702 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:40.743 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-20 11:00:40.743 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[7] queryTimes ms expected=30 counts=43 scannedMap=1 totalBg=74 expectedSize=333 uniqueTags=0
+2026-03-20 11:00:40.744 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-20 11:00:40.747 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[7] done total=438ms listSize=333
+2026-03-20 11:00:40.747 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-20 11:00:40.773 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-20 11:00:40.816 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-20 11:00:40.816 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[8] queryTimes ms expected=27 counts=45 scannedMap=0 totalBg=72 expectedSize=333 uniqueTags=0
+2026-03-20 11:00:40.819 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[8] done total=502ms listSize=333
+2026-03-20 11:00:40.819 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-20 11:00:40.843 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-20 11:00:40.843 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=27ms
+2026-03-20 11:00:40.871 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-20 11:00:40.871 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=28ms
+2026-03-20 11:00:40.899 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-20 11:00:40.899 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=29ms
+2026-03-20 11:00:40.926 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-20 11:00:40.926 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=27ms
+2026-03-20 11:00:40.954 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-20 11:00:40.954 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=27ms
+2026-03-20 11:00:40.983 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-20 11:00:40.983 18364-19808 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=29ms
+2026-03-20 11:00:41.108 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  startScan execute: connected=true
+2026-03-20 11:00:44.121 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       W  SCAN WATCHDOG: sin tags en 3003ms. connected=true ready=true
+2026-03-20 11:00:46.592 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  stopScan: duración sesión lectura=5474ms
+2026-03-20 11:00:48.607  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-20 11:00:48.621 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
+2026-03-20 11:00:48.626 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Iniciando carga de datos y sincronización...
+2026-03-20 11:00:48.627 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Llamando a fetchAndSyncFromApi para tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-20 11:00:48.628 18364-19848 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 0 registros locales para tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-20 11:00:48.645 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:00:48.657 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 0
+2026-03-20 11:00:48.658 18364-18364 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 0
+2026-03-20 11:00:48.748  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:00:49.194  1526-13167 CoreBackPreview         system_server                        D  Window{2a699ff u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback null
+2026-03-20 11:00:49.195 18364-18364 NuevaTomaActivity       com.example.diverscan.activeid       D  onDestroy: Recursos liberados.
+2026-03-20 11:00:49.199  1526-13167 InputManager-JNI        system_server                        W  Input channel object '2a699ff com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 11:00:49.322  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity
+2026-03-20 11:00:49.329 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity
+2026-03-20 11:00:49.383 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:00:49.518  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:00:49.986  1526-2680  CoreBackPreview         system_server                        D  Window{9a13672 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity}: Setting back callback null
+2026-03-20 11:00:49.991  1526-2680  InputManager-JNI        system_server                        W  Input channel object '9a13672 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 11:00:50.282  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
+2026-03-20 11:00:50.290 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
+2026-03-20 11:00:50.292 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:00:50.317 18364-18364 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
+2026-03-20 11:00:50.382  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:00:50.486 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 1649 (62%)
+2026-03-20 11:00:50.486 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
+2026-03-20 11:00:50.831 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a228e520 (RippleDrawable) with handle 0xb4000077b224cfc0
+2026-03-20 11:00:50.851  1526-3602  CoreBackPreview         system_server                        D  Window{5ae9f80 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity}: Setting back callback null
+2026-03-20 11:00:50.852  1526-3602  InputManager-JNI        system_server                        W  Input channel object '5ae9f80 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 11:00:51.779  1526-3602  CoreBackPreview         system_server                        D  Window{41e166e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@62ee17f, mPriority=1000000}
+2026-03-20 11:00:52.306  1526-13164 ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity} from uid 10235
+2026-03-20 11:00:52.321  1526-13164 ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 18364
+2026-03-20 11:00:52.364  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
+2026-03-20 11:00:52.367 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
+2026-03-20 11:00:52.389 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Sesión iniciada: modelo=TC58 sdk=33
+2026-03-20 11:00:52.391 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Permisos ya concedidos para conexión RFID.
+2026-03-20 11:00:52.392 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Estado conexión: CONECTADO (RFD4031-G00B700-WR:: / RFD4031-G00B700-WR::)
+2026-03-20 11:00:52.392 18364-18364 ConnValidation          com.example.diverscan.activeid       W  No se detectan lectores en este momento.
+2026-03-20 11:00:52.393 18364-18364 ConnValidation          com.example.diverscan.activeid       W  Si usa DataWedge, deshabilite Plugin RFID para permitir conexión directa por SDK.
+2026-03-20 11:00:52.393 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Conexión Zebra guardada: USB
+2026-03-20 11:00:52.395 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Pantalla en primer plano. Modo validación activado.
+2026-03-20 11:00:52.396 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Estado conexión: CONECTADO (RFD4031-G00B700-WR:: / RFD4031-G00B700-WR::)
+2026-03-20 11:00:52.405  1526-13167 CoreBackPreview         system_server                        D  Window{f9ee850 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@6697f4e, mPriority=-1}
+2026-03-20 11:00:52.415 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:00:52.431 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 11:00:52.441  1526-1952  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.validation.ConnectionValidationActivity: +131ms
+2026-03-20 11:00:52.551  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:00:52.748  1526-13167 CoreBackPreview         system_server                        D  Window{41e166e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@d2f68d6, mPriority=-1}
+2026-03-20 11:00:52.932 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a224a530 (NavigationMenuItemView) with handle 0xb4000077b224b220
+2026-03-20 11:00:54.023 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Esperando lectura sencilla...
+2026-03-20 11:01:03.290 18364-18364 IRFIDError              com.example.diverscan.activeid       D  GetStatus Inventory RFID_OPERATION_IN_PROGRESS Operation In Progress-Command Not Allowed
+2026-03-20 11:01:03.292 18364-18364 ZebraReaderImpl         com.example.diverscan.activeid       D  Inventory already in progress, ignoring redundant start command.
+2026-03-20 11:01:03.293 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Esperando lectura sencilla...
+2026-03-20 11:01:04.145 18364-18364 IRFIDError              com.example.diverscan.activeid       D  GetStatus Inventory RFID_OPERATION_IN_PROGRESS Operation In Progress-Command Not Allowed
+2026-03-20 11:01:04.146 18364-18364 ZebraReaderImpl         com.example.diverscan.activeid       D  Inventory already in progress, ignoring redundant start command.
+2026-03-20 11:01:04.148 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Iniciando lectura múltiple...
+2026-03-20 11:01:10.616 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Lectura múltiple detenida. tags únicos=0
+2026-03-20 11:01:10.663 18364-18364 ConnValidation          com.example.diverscan.activeid       I  Resumen múltiple: encontrados=0 desconocidos=0
+2026-03-20 11:01:10.668  1526-2680  CoreBackPreview         system_server                        D  Window{c0c628 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@3577172, mPriority=-1}
+2026-03-20 11:01:10.691 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:01:10.708 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 11:01:10.755 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:01:10.755 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:01:10.755 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:01:10.756 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:01:10.756 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:01:10.756 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:01:10.756 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:01:10.756 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:01:10.756 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:01:10.756 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:01:10.757 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:01:10.758 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:01:10.758 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:01:10.760 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:01:10.760 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:01:10.761 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:01:10.761 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:01:10.761 18364-18374 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-20 11:01:10.761 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-20 11:01:10.762 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-20 11:01:10.762 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:01:10.762 18364-18374 System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-20 11:01:11.358 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 11:01:11.376 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 11:01:11.392 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 11:01:11.409 18364-18364 VRI[Connec...nActivity] com.example.diverscan.activeid       D  updatePointerIcon called with position out of bounds
+2026-03-20 11:01:11.809  1526-2683  CoreBackPreview         system_server                        D  Window{c0c628 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback null
+2026-03-20 11:01:11.816 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a22edad0 (RippleDrawable) with handle 0xb4000077b2274ad0
+2026-03-20 11:01:11.818  1526-2683  InputManager-JNI        system_server                        W  Input channel object 'c0c628 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 11:01:11.818  1526-2122  InputDispatcher         system_server                        I  Could not find connection for c0c628 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity
+2026-03-20 11:01:11.818  1526-2122  InputDispatcher         system_server                        W  Not sending touch gesture to c0c628 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity because it is not responsive
+2026-03-20 11:01:11.869  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:01:13.519  2535-6824  f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
+2026-03-20 11:01:13.526 19127-19149 ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
+2026-03-20 11:01:13.565 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:01:13.590 18364-18364 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
+2026-03-20 11:01:13.701  8230-8230  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-20 11:01:13.833 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 1649 (62%)
+2026-03-20 11:01:13.833 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
+2026-03-20 11:01:13.917 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
+2026-03-20 11:01:13.920 18364-18383 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
+2026-03-20 11:01:14.130 18364-18383 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb4000078a22d8c10 (RippleDrawable) with handle 0xb4000077b2265c80
+2026-03-20 11:01:14.151  1526-4543  CoreBackPreview         system_server                        D  Window{f9ee850 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity}: Setting back callback null
+2026-03-20 11:01:14.157  1526-4543  InputManager-JNI        system_server                        W  Input channel object 'f9ee850 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity (client)' was disposed without first being removed with the input manager!
+2026-03-20 11:01:14.160 18364-18364 WindowManager           com.example.diverscan.activeid       E  android.view.WindowLeaked: Activity com.example.diverscan.activeid.UI.validation.ConnectionValidationActivity has leaked window android.widget.LinearLayout{d6a1e84 V.E...... ........ 0,0-543,144} that was originally added here
+                                                                                                    	at android.view.ViewRootImpl.<init>(ViewRootImpl.java:936)
+                                                                                                    	at android.view.ViewRootImpl.<init>(ViewRootImpl.java:924)
+                                                                                                    	at android.view.WindowManagerGlobal.addView(WindowManagerGlobal.java:394)
+                                                                                                    	at android.view.WindowManagerImpl.addView(WindowManagerImpl.java:149)
+                                                                                                    	at com.android.internal.view.TooltipPopup.show(TooltipPopup.java:74)
+                                                                                                    	at android.view.View.showTooltip(View.java:31281)
+                                                                                                    	at android.view.View.showHoverTooltip(View.java:31315)
+                                                                                                    	at android.view.View.$r8$lambda$27VXCdyLVNkujfByQKuywAc_nkI(Unknown Source:0)
+                                                                                                    	at android.view.View$$ExternalSyntheticLambda2.run(Unknown Source:2)
+                                                                                                    	at android.os.Handler.handleCallback(Handler.java:942)
+                                                                                                    	at android.os.Handler.dispatchMessage(Handler.java:99)
+                                                                                                    	at android.os.Looper.loopOnce(Looper.java:201)
+                                                                                                    	at android.os.Looper.loop(Looper.java:288)
+                                                                                                    	at android.app.ActivityThread.main(ActivityThread.java:7930)
+                                                                                                    	at java.lang.reflect.Method.invoke(Native Method)
+                                                                                                    	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:548)
+                                                                                                    	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:942)
+2026-03-20 11:02:13.631 18364-18364 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
+2026-03-20 11:02:13.850 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 1649 (62%)
+2026-03-20 11:02:13.850 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
+2026-03-20 11:03:13.651 18364-18364 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
+2026-03-20 11:03:13.857 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
+2026-03-20 11:04:13.709 18364-18364 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
+2026-03-20 11:04:13.965 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 1649 (62%)
+2026-03-20 11:04:13.966 18364-18364 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
+!

@@ -1923,7 +1923,7 @@ public class sincronizar_base extends AppCompatActivity {
 
     private void EnvioFotoVolley()
     {
-        final String BASE_URL = "http://138.59.16.3/WCFTESTIMAS/Service1.svc/";
+        final String BASE_URL = com.example.diverscan.activeid.BuildConfig.BASE_URL;
         StringRequest request = new StringRequest(Request.Method.POST, BASE_URL + "/EnvioFotoActivo", new Response.Listener<String>()
         {
             @Override

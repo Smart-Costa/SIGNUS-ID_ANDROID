@@ -69,6 +69,30 @@ public class ConnectionValidationActivity extends AppCompatActivity
     private int triggerPressedCount = 0;
     private int triggerReleasedCount = 0;
     private String lastDevicesSnapshot = "";
+    private final Handler statusHandler = new Handler(Looper.getMainLooper());
+    private String lastStatusHash = null;
+    private final Runnable statusProbe = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                boolean initialized = rfidHandler != null && rfidHandler.isInitialized();
+                boolean connected = rfidHandler != null && rfidHandler.isConnected();
+                String name = rfidHandler != null ? rfidHandler.getReaderName() : null;
+                String model = rfidHandler != null ? rfidHandler.getReaderModel() : null;
+                List<String> devices = rfidHandler != null ? rfidHandler.getFoundDevices() : null;
+                int devicesCount = devices != null ? devices.size() : 0;
+                String status = "init=" + initialized + " conn=" + connected + " name=" + name + " model=" + model + " devices=" + devicesCount;
+                if (!status.equals(lastStatusHash)) {
+                    lastStatusHash = status;
+                    logInfo("Probe: " + status);
+                }
+            } catch (Exception e) {
+                logError("Probe error: " + e.getMessage());
+            } finally {
+                statusHandler.postDelayed(this, 5000L);
+            }
+        }
+    };
     private final BroadcastReceiver usbPermissionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -146,6 +170,12 @@ public class ConnectionValidationActivity extends AppCompatActivity
             logInfo("Reconectando como: " + type + " via " + connType);
             rfidHandler.setReaderType(type, connType);
             updateUI();
+            try {
+                List<String> devices = rfidHandler.getFoundDevices();
+                logInfo("Dispositivos detectados tras reconexión: " + (devices == null ? 0 : devices.size()));
+            } catch (Exception e) {
+                logError("Error obteniendo dispositivos tras reconexión: " + e.getMessage());
+            }
         });
 
         btnTestSingle.setOnClickListener(v -> startSingleRead());
@@ -187,6 +217,8 @@ public class ConnectionValidationActivity extends AppCompatActivity
             logError("Error deshabilitando DataWedge: " + e.getMessage());
         }
         updateUI();
+        statusHandler.removeCallbacks(statusProbe);
+        statusHandler.post(statusProbe);
     }
 
     @Override
@@ -196,6 +228,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
             rfidHandler.setValidationMode(false);
         }
         logInfo("Pantalla en segundo plano. Modo validación desactivado.");
+        statusHandler.removeCallbacks(statusProbe);
         // Don't nullify handler here if we want background updates,
         // but for safety in this app structure:
         // if (rfidHandler != null) rfidHandler.setResponseHandler(null);
