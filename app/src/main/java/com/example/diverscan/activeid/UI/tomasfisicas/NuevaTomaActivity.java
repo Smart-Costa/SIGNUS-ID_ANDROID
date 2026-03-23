@@ -3,6 +3,8 @@ package com.example.diverscan.activeid.UI.tomasfisicas;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -198,6 +200,25 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         if (txtEncontradosCount != null) txtEncontradosCount.setText(String.valueOf(encontrados));
         if (txtSobrantesCount != null) txtSobrantesCount.setText(String.valueOf(sobrantes));
         if (txtNoInventariadosCount != null) txtNoInventariadosCount.setText(String.valueOf(noinv));
+
+        // Update main tab gauge UI
+        final int fEncontrados = encontrados;
+        final int fSobrantes = sobrantes;
+        final int fFaltantes = faltantes;
+        final int fNoInventariados = noinv;
+        final int countEsperados = encontrados + faltantes;
+        
+        runOnUiThread(() -> {
+            if (txtGaugeCount != null) {
+                txtGaugeCount.setText(fEncontrados + " / " + countEsperados);
+            }
+            if (txtSobrantesGauge != null) {
+                txtSobrantesGauge.setText("Sobrantes: " + fSobrantes);
+            }
+            if (txtFaltantesGauge != null) {
+                txtFaltantesGauge.setText("Faltantes: " + fFaltantes);
+            }
+        });
     }
     
     private void showDetailList(CategoriaEstado estado) {
@@ -332,6 +353,18 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private int totalActivosInventario = 0;
 
     private boolean isUpdatingSpinners = false;
+    private Handler refreshHandler = new Handler(Looper.getMainLooper());
+    private Runnable refreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            refreshActivosList();
+        }
+    };
+
+    private void scheduleRefreshActivosList() {
+        refreshHandler.removeCallbacks(refreshRunnable);
+        refreshHandler.postDelayed(refreshRunnable, 500); // 500ms debounce
+    }
     
     // Executor para serializar operaciones de base de datos y evitar saturación de hilos
     private final java.util.concurrent.ExecutorService databaseExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
@@ -538,30 +571,23 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         iconIniciar = findViewById(R.id.iconIniciar);
         btnBack = findViewById(R.id.btnBack);
 
-        /*
         spinnerActivos = findViewById(R.id.spinnerActivos);
-        */
         spinnerUbicacionA = findViewById(R.id.spinnerUbicacionA);
         spinnerUbicacionB = findViewById(R.id.spinnerUbicacionB);
         spinnerUbicacionC = findViewById(R.id.spinnerUbicacionC);
         spinnerUbicacionD = findViewById(R.id.spinnerUbicacionD);
         spinnerUbicacionSecundaria = findViewById(R.id.spinnerUbicacionSecundaria);
         spinnerCategoria = findViewById(R.id.spinnerCategoria);
-        /*
         chkIncluirExternos = findViewById(R.id.chkIncluirExternos);
-        */
 
-        /*
         progressCargaManual = findViewById(R.id.progressCargaManual);
         txtSinDatosManual = findViewById(R.id.txtSinDatosManual);
         btnAgregarLectura = findViewById(R.id.btnAgregarLectura);
         etManualInput = findViewById(R.id.etManualInput);
         btnManualAdd = findViewById(R.id.btnManualAdd);
-        */
         
         initResumenBaseAndFilters();
 
-        /*
         if (btnAgregarLectura != null) {
             btnAgregarLectura.setOnClickListener(v -> agregarLecturaManual());
         }
@@ -569,13 +595,11 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             btnManualAdd.setOnClickListener(v -> agregarLecturaManualTexto());
         }
 
-        /*
         if (chkIncluirExternos != null) {
             chkIncluirExternos.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                refreshActivosList();
+                scheduleRefreshActivosList();
             });
         }
-        */
 
         // Setup List Adapter
         scannedTagsList = new ArrayList<>();
@@ -911,7 +935,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                         setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria);
                     });
                 }
-                refreshActivosList();
+                scheduleRefreshActivosList();
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
@@ -928,7 +952,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
                 selectedUbicacionSecundariaId = (item != null && item.id != null) ? item.id : null;
                 Log.d(TAG, "Filtro UbicacionSecundaria: value=" + selectedUbicacionSecundariaId);
-                refreshActivosList();
+                scheduleRefreshActivosList();
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
@@ -941,7 +965,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     SpinnerItem item = (SpinnerItem) parent.getItemAtPosition(position);
                     selectedCategoriaId = (item != null && item.id != null) ? item.id : null;
                     Log.d(TAG, "Filtro Categoria: id=" + selectedCategoriaId);
-                    refreshActivosList();
+                    scheduleRefreshActivosList();
                 }
                 @Override public void onNothingSelected(AdapterView<?> parent) {}
             });
@@ -986,7 +1010,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     spinnerCategoria.setEnabled(true);
                     selectedCategoriaId = null;
                 }
-                refreshActivosList();
+                scheduleRefreshActivosList();
             });
         });
     }
@@ -1022,7 +1046,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     setSoloTodasForSpinnerItem(spinnerUbicacionC); spinnerUbicacionC.setEnabled(false);
                     setSoloTodasForSpinnerItem(spinnerUbicacionD); spinnerUbicacionD.setEnabled(false);
                     setSoloTodasForSpinnerItem(spinnerUbicacionSecundaria); spinnerUbicacionSecundaria.setEnabled(false);
-                    refreshActivosList();
+                    scheduleRefreshActivosList();
                 }
             });
         });
@@ -1168,7 +1192,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 }
                 
                 selectedUbicacionSecundariaId = null;
-                refreshActivosList();
+                scheduleRefreshActivosList();
             });
         });
     }
@@ -1331,12 +1355,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private void cargarActivosSpinner(String ua, String ub, String uc, String ud, String us) {
         Log.d(TAG, "cargarActivosSpinner: Filtros -> A:" + ua + " B:" + ub + " C:" + uc + " D:" + ud + " Sec:" + us);
         
-        /*
         if (progressCargaManual != null) progressCargaManual.setVisibility(View.VISIBLE);
         if (spinnerActivos != null) spinnerActivos.setVisibility(View.GONE);
         if (txtSinDatosManual != null) txtSinDatosManual.setVisibility(View.GONE);
         if (btnAgregarLectura != null) btnAgregarLectura.setVisibility(View.GONE);
-        */
 
         if (databaseExecutor.isShutdown()) return;
         databaseExecutor.execute(() -> {
@@ -1351,19 +1373,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             Log.d(TAG, "Total activos cargados para selector manual: " + listaActivosSpinner.size());
             long s1 = android.os.SystemClock.elapsedRealtime();
             Log.d(TAG, "cargarActivosSpinner: queryTime=" + (s1 - s0) + "ms");
-            /*
-            if (listaActivosSpinner != null) {
-                for (int i = 0; i < Math.min(3, listaActivosSpinner.size()); i++) {
-                    ActivoEntity a = listaActivosSpinner.get(i);
-                    Log.d(TAG, "ActivoSample[" + i + "]: id=" + (a != null ? a.getIdActivo() : "")
-                        + " num=" + (a != null ? a.getNumeroActivo() : "")
-                        + " desc=" + (a != null ? a.getDescripcionCorta() : ""));
-                }
-            }
-            */
             
             runOnUiThread(() -> {
-                /*
                 if (progressCargaManual != null) progressCargaManual.setVisibility(View.GONE);
 
                 Log.d(TAG, "Actualizando UI spinner. Items: " + (listaActivosSpinner != null ? listaActivosSpinner.size() : "null"));
@@ -1399,7 +1410,6 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     
                     spinnerActivos.setAdapter(null);
                 }
-                */
             });
         });
     }
@@ -1458,7 +1468,6 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     }
 
     
-    /*
     private void agregarLecturaManualTexto() {
         if (etManualInput == null) return;
         String input = etManualInput.getText().toString().trim();
@@ -1486,14 +1495,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             final String inputStr = input;
 
             runOnUiThread(() -> {
-                if (finalA == null) {
-                    Log.w(TAG, "Manual Input REJECTED: Not found in DB. Input=" + inputStr);
-                    Toast.makeText(this, "Activo no encontrado en base de datos", Toast.LENGTH_LONG).show();
-                    etManualInput.setText("");
-                    return;
-                }
-
-                String targetEpc = inputStr;
+                // CORRECCIÓN: Si el activo no se encuentra en la BD local, en lugar de rechazarlo, 
+                // lo agregamos como NO_INVENTARIADO.
+                String targetEpc = inputStr.toUpperCase();
                 String activoId = null;
 
                 if (finalA != null) {
@@ -1501,8 +1505,6 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                         targetEpc = finalA.getTagEpc().trim().toUpperCase();
                     }
                     activoId = finalA.getIdActivo() != null ? finalA.getIdActivo().toUpperCase() : null;
-                } else {
-                    targetEpc = targetEpc.toUpperCase();
                 }
 
                 Log.d(TAG, "Manual Input RESOLVED: ActivoId=" + activoId + " EPC=" + targetEpc);
@@ -1515,14 +1517,13 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 }
 
                 uniqueTags.add(targetEpc);
-                // scannedTagsList.add(targetEpc);
 
                 if (activoId != null) {
                      manualEpcToActivoId.put(targetEpc, activoId);
                      updateEpcDisplayCache(finalA, targetEpc);
                      Log.d(TAG, "Lectura añadida: " + (finalA.getDescripcionCorta() != null ? finalA.getDescripcionCorta() : targetEpc));
                 } else {
-                     Log.d(TAG, "Lectura añadida: " + targetEpc);
+                     Log.d(TAG, "Lectura añadida (No Inventariado): " + targetEpc);
                 }
                 
                 // Update List logic
@@ -1532,7 +1533,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 }
                 
                 if (item != null) {
-                    item.estado = CategoriaEstado.ENCONTRADO;
+                    item.estado = (finalA == null) ? CategoriaEstado.NO_INVENTARIADO : CategoriaEstado.ENCONTRADO;
                     if(finalA != null && item.entity == null) item.entity = finalA;
                 } else {
                      // Check if it is expected despite not being in itemsMap (e.g. filter mismatch or key issue)
@@ -1544,7 +1545,11 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                      }
                      
                      // New Item
-                     item = new ItemActivo(targetEpc, activoId, isExpected ? CategoriaEstado.ENCONTRADO : CategoriaEstado.SOBRANTE, finalA);
+                     CategoriaEstado nuevoEstado = (finalA == null) ? CategoriaEstado.NO_INVENTARIADO : (isExpected ? CategoriaEstado.ENCONTRADO : CategoriaEstado.SOBRANTE);
+                     item = new ItemActivo(targetEpc, activoId, nuevoEstado, finalA);
+                     if (finalA == null) {
+                         item.nombre = "Desconocido - " + targetEpc;
+                     }
                      itemsList.add(0, item);
                      itemsMap.put(targetEpc, item);
                      if(activoId != null) itemsMap.put(activoId, item);
@@ -1555,16 +1560,16 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 updateGaugeDisplay();
                 etManualInput.setText("");
                 
+                if (finalA == null) {
+                    Toast.makeText(this, "Añadido a No Inventariados", Toast.LENGTH_SHORT).show();
+                }
+                
                 // Auto-save
                 new SaveLocalTask(false).execute();
             });
         });
     }
-    */
-    
 
-    
-    /*
     private void agregarLecturaManual() {
         if (listaActivosSpinner == null || listaActivosSpinner.isEmpty()) {
              Toast.makeText(this, "No hay activos cargados", Toast.LENGTH_SHORT).show();
@@ -1594,7 +1599,6 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             
             if (!uniqueTags.contains(epc)) {
                 uniqueTags.add(epc);
-                // scannedTagsList.add(epc); // Removed
                 
                 if (activo.getIdActivo() != null) {
                     manualEpcToActivoId.put(epc, activo.getIdActivo());
@@ -1623,9 +1627,6 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
                     // New Item
                     item = new ItemActivo(epc, activo.getIdActivo(), isExpected ? CategoriaEstado.ENCONTRADO : CategoriaEstado.SOBRANTE, activo);
-                    // If it was manual selection from the list, it SHOULD be expected if filters match.
-                    // But if it wasn't in itemsMap, maybe filters didn't catch it?
-                    // Anyway, add it.
                     itemsList.add(0, item);
                     itemsMap.put(epc, item);
                     if(activo.getIdActivo() != null) itemsMap.put(activo.getIdActivo().trim().toUpperCase(), item);
@@ -1643,7 +1644,6 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             }
         }
     }
-    */
     
 
 
@@ -1663,15 +1663,32 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             runOnUiThread(() -> {
                 containerTomasTabs.removeAllViews();
                 
+                boolean isCurrentTabAlreadyAdded = false;
+
                 // 1. Add existing tabs
                 for (TomaFisicaTomasEntity t : finalList) {
                     TextView tab = new TextView(this);
                     tab.setText("Toma " + t.getNumeroToma());
                     
-                    // In NuevaTomaActivity, we are creating a NEW one. 
-                    // So existing ones are NEVER selected.
-                    tab.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint)); 
-                    tab.setBackgroundResource(R.drawable.btn_secondary_gray);
+                    // Si el tab que estamos renderizando es la toma actual que estamos editando/creando
+                    if (t.getNumeroToma() != null && t.getNumeroToma().equals(numeroToma)) {
+                        tab.setTextColor(ContextCompat.getColor(this, R.color.blanco));
+                        tab.setBackgroundResource(R.drawable.btn_dark_gray);
+                        isCurrentTabAlreadyAdded = true;
+                    } else {
+                        // In NuevaTomaActivity, if it's not the current, it's an existing one.
+                        tab.setTextColor(ContextCompat.getColor(this, R.color.nav_item_text_tint)); 
+                        tab.setBackgroundResource(R.drawable.btn_secondary_gray);
+                        
+                        tab.setOnClickListener(v -> {
+                            Intent intent = new Intent(this, RegistroConteosActivity.class);
+                            intent.putExtra("tomaFisicaId", tomaFisicaId);
+                            intent.putExtra("idToma", t.getIdToma());
+                            intent.putExtra("numeroToma", t.getNumeroToma());
+                            startActivity(intent);
+                            finish();
+                        });
+                    }
                     
                     tab.setPadding(48, 16, 48, 16);
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -1680,34 +1697,24 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                     params.setMargins(0, 0, 16, 0);
                     tab.setLayoutParams(params);
                     
-                    tab.setOnClickListener(v -> {
-                        Intent intent = new Intent(this, RegistroConteosActivity.class);
-                        intent.putExtra("tomaFisicaId", tomaFisicaId);
-                        intent.putExtra("idToma", t.getIdToma());
-                        intent.putExtra("numeroToma", t.getNumeroToma());
-                        startActivity(intent);
-                        // We might finish this activity or keep it in stack?
-                        // If we finish, we lose the "New" state if not saved.
-                        // Usually navigating away loses unsaved data.
-                        // Ideally we prompt or just let it happen. 
-                        // I'll finish() to keep stack clean.
-                        finish();
-                    });
                     containerTomasTabs.addView(tab);
                 }
 
-                // 2. Add CURRENT (New) tab
-                TextView currentTab = new TextView(this);
-                currentTab.setText("Toma " + numeroToma);
-                currentTab.setTextColor(ContextCompat.getColor(this, R.color.blanco));
-                currentTab.setBackgroundResource(R.drawable.btn_dark_gray);
-                currentTab.setPadding(48, 16, 48, 16);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT, 
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(0, 0, 16, 0);
-                currentTab.setLayoutParams(params);
-                containerTomasTabs.addView(currentTab);
+                // 2. Add CURRENT (New) tab ONLY if it wasn't already added from the DB query
+                // (This happens when we are creating a brand new Toma that is not yet saved to DB)
+                if (!isCurrentTabAlreadyAdded) {
+                    TextView currentTab = new TextView(this);
+                    currentTab.setText("Toma " + numeroToma);
+                    currentTab.setTextColor(ContextCompat.getColor(this, R.color.blanco));
+                    currentTab.setBackgroundResource(R.drawable.btn_dark_gray);
+                    currentTab.setPadding(48, 16, 48, 16);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT, 
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+                    params.setMargins(0, 0, 16, 0);
+                    currentTab.setLayoutParams(params);
+                    containerTomasTabs.addView(currentTab);
+                }
             });
         });
     }
@@ -2437,6 +2444,8 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                             item.serie = finalActivo.getNumeroSerie();
                             item.numeroActivo = finalActivo.getNumeroActivo();
                             if(item.activoId == null) item.activoId = finalActivo.getIdActivo();
+                        } else {
+                            item.nombre = "Desconocido - " + epc;
                         }
                     } else {
                         // Valid in DB but not in expected list, or NOT in DB at all
@@ -2455,6 +2464,9 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                         CategoriaEstado nuevoEstado = (finalActivo == null) ? CategoriaEstado.NO_INVENTARIADO : (isExpected ? CategoriaEstado.ENCONTRADO : CategoriaEstado.SOBRANTE);
                         
                         item = new ItemActivo(epc, actId, nuevoEstado, finalActivo);
+                        if (finalActivo == null) {
+                            item.nombre = "Desconocido - " + epc;
+                        }
                         itemsList.add(0, item);
                         itemsMap.put(epc, item);
                         if(actId != null) itemsMap.put(actId.trim().toUpperCase(), item);

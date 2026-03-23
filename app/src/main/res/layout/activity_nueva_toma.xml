@@ -691,7 +691,6 @@
                          android:textColor="#666"/>
                 </LinearLayout>
 
-                <!--
                 <LinearLayout
                     android:id="@+id/lyAgregarLecturaManual"
                     android:layout_width="match_parent"
@@ -699,7 +698,8 @@
                     android:orientation="vertical"
                     android:background="@drawable/bg_bloque_tabla"
                     android:padding="12dp"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -752,25 +752,13 @@
                         android:id="@+id/btnAgregarLectura"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:text="Añadir Lectura"
+                        android:text="Agregar de la Lista"
                         android:background="@drawable/btn_primary"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#E0E0E0"
-                        android:layout_marginTop="16dp"
+                        android:textColor="@color/blanco"
+                        android:textStyle="bold"
                         android:layout_marginBottom="16dp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="O ingresar EPC/Placa manual"
-                        android:textStyle="bold"
-                        android:textColor="#606060"
-                        android:layout_marginBottom="8dp"/>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="16dp"/>
 
                     <EditText
                         android:id="@+id/etManualInput"
@@ -791,7 +779,6 @@
                         android:textColor="#333"
                         android:textStyle="bold" />
                 </LinearLayout>
-                -->
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/listScannedTags"
