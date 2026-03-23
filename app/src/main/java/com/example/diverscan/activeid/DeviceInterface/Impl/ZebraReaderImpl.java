@@ -227,7 +227,9 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 }
                 reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, true);
                 
-                configureTrigger(true); // Default to handheld trigger
+                // BUGFIX: We MUST use IMMEDIATE trigger type so that startInventory() starts immediately
+                // regardless of whether it's triggered by the UI button or the physical trigger (handled via eventStatusNotify).
+                configureTrigger(false); 
                 
                 setPower(maxPower);
                 
