@@ -1038,6 +1038,12 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 if (baseUbicacionAId != null) {
                     spinnerUbicacionA.setEnabled(false);
                     selectedUbicacionAId = baseUbicacionAId;
+                    
+                    // Force the spinner UI to select the first item (the only one loaded) to ensure visual consistency
+                    if (spinnerUbicacionA.getAdapter() != null && spinnerUbicacionA.getAdapter().getCount() > 0) {
+                        spinnerUbicacionA.setSelection(0, false);
+                    }
+                    
                     loadUbicacionB(baseUbicacionAId);
                 } else {
                     spinnerUbicacionA.setEnabled(true);
