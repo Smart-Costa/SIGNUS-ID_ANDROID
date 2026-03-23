@@ -119,7 +119,6 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private TextView txtIniciar;
     private ImageView iconIniciar;
     private ImageView btnBack;
-    private TextView txtRfidStatus;
     
     // Summary Views
     private LinearLayout llSummaryContainer;
@@ -133,6 +132,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     private ActivosAdapter adapter; // Changed type
     private List<ItemActivo> adapterList = new ArrayList<>();
+    private android.widget.Toast rfidStatusToast;
 
     private void showPowerDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -571,7 +571,6 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         txtIniciar = findViewById(R.id.txtIniciar);
         iconIniciar = findViewById(R.id.iconIniciar);
         btnBack = findViewById(R.id.btnBack);
-        txtRfidStatus = findViewById(R.id.txtRfidStatus);
 
         spinnerActivos = findViewById(R.id.spinnerActivos);
         spinnerUbicacionA = findViewById(R.id.spinnerUbicacionA);
@@ -1975,14 +1974,21 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         }
     }
 
+    private void showRfidToast(String message) {
+        runOnUiThread(() -> {
+            if (rfidStatusToast != null) {
+                rfidStatusToast.cancel();
+            }
+            // Use LENGTH_LONG for the connecting message so it stays on screen longer
+            int duration = message.contains("Conectando") ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
+            rfidStatusToast = Toast.makeText(this, message, duration);
+            rfidStatusToast.show();
+        });
+    }
+
     private void initRFID() {
         try {
-            runOnUiThread(() -> {
-                if (txtRfidStatus != null) {
-                    txtRfidStatus.setText("Conectando Lector...");
-                    txtRfidStatus.setTextColor(ContextCompat.getColor(this, R.color.amarillo));
-                }
-            });
+            showRfidToast("Conectando Lector...");
             
             rfidHandler = TagWriter.getInstance();
             Log.d(TAG, "initRFID: initialized=" + rfidHandler.isInitialized());
@@ -1999,23 +2005,15 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             updateRfidStatusUI(isRfidReady);
         } catch (Exception e) {
             Log.e(TAG, "Error initializing RFID", e);
-            Toast.makeText(this, "Error RFID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            showRfidToast("Error RFID: " + e.getMessage());
             updateRfidStatusUI(false);
         }
     }
     
     private void updateRfidStatusUI(boolean isReady) {
-        runOnUiThread(() -> {
-            if (txtRfidStatus != null) {
-                if (isReady) {
-                    txtRfidStatus.setText("Lector Listo");
-                    txtRfidStatus.setTextColor(ContextCompat.getColor(this, R.color.verde));
-                } else {
-                    txtRfidStatus.setText("Lector Desconectado");
-                    txtRfidStatus.setTextColor(ContextCompat.getColor(this, R.color.rojo));
-                }
-            }
-        });
+        if (isReady) {
+            showRfidToast("Lector Listo");
+        }
     }
 
     @Override
@@ -2024,11 +2022,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         resumeTimestampMs = android.os.SystemClock.elapsedRealtime();
         firstTagAfterResumeLogged = false;
         
-        updateRfidStatusUI(false); // Assume disconnected until proven otherwise
-        if (txtRfidStatus != null) {
-            txtRfidStatus.setText("Conectando Lector...");
-            txtRfidStatus.setTextColor(ContextCompat.getColor(this, R.color.amarillo));
-        }
+        showRfidToast("Conectando Lector...");
 
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);

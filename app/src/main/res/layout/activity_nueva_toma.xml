@@ -28,31 +28,15 @@
             app:tint="@android:color/white"
             android:contentDescription="Atrás" />
 
-        <LinearLayout
+        <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
-            
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Nueva Toma Física"
-                android:textSize="20sp"
-                android:textColor="#333333"
-                android:textStyle="bold" />
-                
-            <TextView
-                android:id="@+id/txtRfidStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Conectando Lector..."
-                android:textSize="12sp"
-                android:textColor="#F57C00"
-                android:textStyle="bold"
-                android:layout_marginTop="2dp" />
-        </LinearLayout>
+            android:text="Nueva Toma Física"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
             
         <View
             android:layout_width="24dp"
