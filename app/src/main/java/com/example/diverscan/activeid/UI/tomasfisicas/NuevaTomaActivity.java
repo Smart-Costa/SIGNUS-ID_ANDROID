@@ -119,6 +119,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private TextView txtIniciar;
     private ImageView iconIniciar;
     private ImageView btnBack;
+    private TextView txtRfidStatus;
     
     // Summary Views
     private LinearLayout llSummaryContainer;
@@ -570,6 +571,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         txtIniciar = findViewById(R.id.txtIniciar);
         iconIniciar = findViewById(R.id.iconIniciar);
         btnBack = findViewById(R.id.btnBack);
+        txtRfidStatus = findViewById(R.id.txtRfidStatus);
 
         spinnerActivos = findViewById(R.id.spinnerActivos);
         spinnerUbicacionA = findViewById(R.id.spinnerUbicacionA);
@@ -1975,6 +1977,13 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     private void initRFID() {
         try {
+            runOnUiThread(() -> {
+                if (txtRfidStatus != null) {
+                    txtRfidStatus.setText("Conectando Lector...");
+                    txtRfidStatus.setTextColor(ContextCompat.getColor(this, R.color.amarillo));
+                }
+            });
+            
             rfidHandler = TagWriter.getInstance();
             Log.d(TAG, "initRFID: initialized=" + rfidHandler.isInitialized());
             if (!rfidHandler.isInitialized()) {
@@ -1986,10 +1995,27 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             }
             isRfidReady = rfidHandler.isConnected();
             Log.d(TAG, "initRFID: ready=" + isRfidReady);
+            
+            updateRfidStatusUI(isRfidReady);
         } catch (Exception e) {
             Log.e(TAG, "Error initializing RFID", e);
             Toast.makeText(this, "Error RFID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            updateRfidStatusUI(false);
         }
+    }
+    
+    private void updateRfidStatusUI(boolean isReady) {
+        runOnUiThread(() -> {
+            if (txtRfidStatus != null) {
+                if (isReady) {
+                    txtRfidStatus.setText("Lector Listo");
+                    txtRfidStatus.setTextColor(ContextCompat.getColor(this, R.color.verde));
+                } else {
+                    txtRfidStatus.setText("Lector Desconectado");
+                    txtRfidStatus.setTextColor(ContextCompat.getColor(this, R.color.rojo));
+                }
+            }
+        });
     }
 
     @Override
@@ -1997,6 +2023,13 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         super.onResume();
         resumeTimestampMs = android.os.SystemClock.elapsedRealtime();
         firstTagAfterResumeLogged = false;
+        
+        updateRfidStatusUI(false); // Assume disconnected until proven otherwise
+        if (txtRfidStatus != null) {
+            txtRfidStatus.setText("Conectando Lector...");
+            txtRfidStatus.setTextColor(ContextCompat.getColor(this, R.color.amarillo));
+        }
+
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
             try {
@@ -2006,15 +2039,19 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 Log.e(TAG, "onResume RFID error", e);
             }
             isRfidReady = rfidHandler.isConnected();
+            updateRfidStatusUI(isRfidReady);
             Log.d(TAG, "onResume RFID ready=" + isRfidReady + " scanning=" + isScanning);
+            
             if (!isRfidReady) {
                 rfidRetryHandler.postDelayed(() -> {
                     try {
                         String retryStatus = rfidHandler.onResume();
                         isRfidReady = rfidHandler.isConnected();
+                        updateRfidStatusUI(isRfidReady);
                         Log.d(TAG, "onResume retry RFID status=" + retryStatus + " ready=" + isRfidReady);
                     } catch (Exception e) {
                         Log.e(TAG, "onResume retry RFID error", e);
+                        updateRfidStatusUI(false);
                     }
                 }, 650L);
             }
