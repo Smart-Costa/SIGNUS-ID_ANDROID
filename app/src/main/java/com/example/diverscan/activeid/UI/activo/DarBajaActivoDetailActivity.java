@@ -60,6 +60,7 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         super.onPause();
         if (rfidHandler != null) {
             rfidHandler.stopRead();
+            rfidHandler.setResponseHandler(null);
             // No desconectamos para mantener la sesión
         }
         isScanning = false;
@@ -74,25 +75,29 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         // Si no está en modo RFID, ignorar lecturas
         if (!binding.opcRFID.isChecked()) return;
 
-        // Validar si vienen múltiples tags en la misma lectura
-        if (tagData.length > 1) {
+        // Validar si vienen múltiples tags (diferentes) en la misma lectura
+        java.util.Set<String> uniqueEpcs = new java.util.HashSet<>();
+        for (ReaderTag tag : tagData) {
+            if (tag.getEpc() != null && !tag.getEpc().isEmpty()) {
+                uniqueEpcs.add(tag.getEpc());
+            }
+        }
+
+        if (uniqueEpcs.size() > 1) {
             runOnUiThread(() -> {
-                rfidHandler.stopRead();
+                if (rfidHandler != null) rfidHandler.stopRead();
                 isScanning = false;
                 Toast.makeText(this, "Múltiples activos detectados. Por favor acerque solo uno.", Toast.LENGTH_LONG).show();
             });
             return;
         }
 
+        if (uniqueEpcs.isEmpty()) return;
+        String epc = uniqueEpcs.iterator().next();
+
         // Ejecutar en UI Thread porque TagWriter llama desde AsyncTask
         runOnUiThread(() -> {
-            for (ReaderTag tag : tagData) {
-                if (tag.getEpc() != null) {
-                    procesarLecturaRFID(tag.getEpc());
-                    // Procesar solo el primero válido de este lote
-                    break; 
-                }
-            }
+            procesarLecturaRFID(epc);
         });
     }
 
@@ -109,12 +114,12 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
         runOnUiThread(() -> {
             if (pressed) {
                 if (!isScanning) {
-                    rfidHandler.startRead();
+                    if (rfidHandler != null) rfidHandler.startRead();
                     isScanning = true;
                 }
             } else {
                 if (isScanning) {
-                    rfidHandler.stopRead();
+                    if (rfidHandler != null) rfidHandler.stopRead();
                     isScanning = false;
                 }
             }
@@ -153,7 +158,8 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
             // Verificar contra el EPC real, no contra el TAG_EPC que puede ser "EPC Asignado"
             String storedEpc = activoLeido.getEpc();
             if (storedEpc == null || !epc.equals(storedEpc)) {
-                rfidHandler.stopRead();
+                if (rfidHandler != null) rfidHandler.stopRead();
+                isScanning = false;
                 Toast.makeText(this, "Se detectaron múltiples TAGs. Acerque solo 1 y reintente.", Toast.LENGTH_SHORT).show();
             }
             return;
@@ -168,10 +174,10 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
                 if (activo != null) {
                     mostrarNotificacionActivo(epcFinal, activo.getNumeroActivo(), activo.getDescripcionCorta(), true);
                     cargarDatosActivo(activo);
-                    rfidHandler.stopRead();
+                    if (rfidHandler != null) rfidHandler.stopRead();
                     isScanning = false;
                 } else {
-                    rfidHandler.stopRead();
+                    if (rfidHandler != null) rfidHandler.stopRead();
                     isScanning = false;
                     mostrarNotificacionActivo(epcFinal, "Desconocido", "No encontrado", false);
                     Toast.makeText(this, "EPC no registrado en BD", Toast.LENGTH_LONG).show();
@@ -314,7 +320,8 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
                     Toast.makeText(this, "Activo dado de baja correctamente", Toast.LENGTH_SHORT).show();
                     limpiarCampos(true);
                     if (binding.opcRFID.isChecked()) {
-                        rfidHandler.startRead();
+                        // Opcional: auto-iniciar escaneo tras baja exitosa
+                        // if (rfidHandler != null) { rfidHandler.startRead(); isScanning = true; }
                     }
                 } else {
                     Toast.makeText(this, "Error al dar de baja el activo", Toast.LENGTH_SHORT).show();

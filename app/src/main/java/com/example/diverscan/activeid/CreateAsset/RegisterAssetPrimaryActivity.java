@@ -135,6 +135,7 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity implements R
         super.onPause();
         if (rfidHandler != null) {
             rfidHandler.stopRead();
+            rfidHandler.setResponseHandler(null);
         }
     }
 
@@ -142,8 +143,15 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity implements R
     public void handleTagdata(ReaderTag[] tagData) {
         if (tagData == null || tagData.length == 0) return;
 
-        // Lectura simple: validar si hay multiples tags
-        if (tagData.length > 1) {
+        // Lectura simple: validar si hay multiples tags (diferentes)
+        java.util.Set<String> uniqueEpcs = new java.util.HashSet<>();
+        for (ReaderTag tag : tagData) {
+            if (tag.getEpc() != null && !tag.getEpc().isEmpty()) {
+                uniqueEpcs.add(tag.getEpc());
+            }
+        }
+
+        if (uniqueEpcs.size() > 1) {
             runOnUiThread(() -> {
                 if (rfidHandler != null) {
                     rfidHandler.stopRead();
@@ -154,7 +162,9 @@ public class RegisterAssetPrimaryActivity extends AppCompatActivity implements R
             return;
         }
 
-        String epc = tagData[0].getEpc();
+        if (uniqueEpcs.isEmpty()) return;
+        String epc = uniqueEpcs.iterator().next();
+
         if (epc != null && !epc.isEmpty()) {
             runOnUiThread(() -> {
                 if (rfidHandler != null) {

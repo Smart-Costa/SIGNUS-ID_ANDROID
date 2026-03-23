@@ -180,6 +180,7 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         super.onPause();
         if (rfidHandler != null) {
             rfidHandler.stopRead();
+            rfidHandler.setResponseHandler(null);
         }
         isScanning = false;
     }
@@ -202,7 +203,14 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
             return;
         }
 
-        if (tagData.length > 1) {
+        java.util.Set<String> uniqueEpcs = new java.util.HashSet<>();
+        for (ReaderTag tag : tagData) {
+            if (tag.getEpc() != null && !tag.getEpc().isEmpty()) {
+                uniqueEpcs.add(tag.getEpc());
+            }
+        }
+
+        if (uniqueEpcs.size() > 1) {
             runOnUiThread(() -> {
                 if (rfidHandler != null) rfidHandler.stopRead();
                 isScanning = false;
@@ -211,7 +219,9 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
             return;
         }
 
-        String epcLeido = tagData[0].getEpc();
+        if (uniqueEpcs.isEmpty()) return;
+        String epcLeido = uniqueEpcs.iterator().next();
+
         if (epcLeido != null && !epcLeido.trim().isEmpty()) {
             final String finalEpc = epcLeido;
             runOnUiThread(() -> {

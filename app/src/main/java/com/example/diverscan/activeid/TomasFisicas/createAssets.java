@@ -164,6 +164,7 @@ public class createAssets extends AppCompatActivity implements ResponseHandlerIn
         super.onPause();
         if (rfidHandler != null) {
             rfidHandler.stopRead();
+            rfidHandler.setResponseHandler(null);
         }
     }
 
@@ -173,25 +174,30 @@ public class createAssets extends AppCompatActivity implements ResponseHandlerIn
     public void handleTagdata(ReaderTag[] tagData) {
         if (tagData == null || tagData.length == 0) return;
 
+        java.util.Set<String> uniqueEpcs = new java.util.HashSet<>();
+        for (ReaderTag tag : tagData) {
+            if (tag.getEpc() != null && !tag.getEpc().isEmpty()) {
+                uniqueEpcs.add(tag.getEpc());
+            }
+        }
+
         // Validar si vienen múltiples tags (opcional, pero para creación suele ser uno a uno)
-        if (tagData.length > 1) {
+        if (uniqueEpcs.size() > 1) {
             runOnUiThread(() -> {
-                rfidHandler.stopRead();
+                if (rfidHandler != null) rfidHandler.stopRead();
                 Toast.makeText(this, "Múltiples etiquetas detectadas. Acerque solo el activo a etiquetar.", Toast.LENGTH_LONG).show();
             });
             return;
         }
 
+        if (uniqueEpcs.isEmpty()) return;
+        String epc = uniqueEpcs.iterator().next();
+
         runOnUiThread(() -> {
-            for (ReaderTag tag : tagData) {
-                if (tag.getEpc() != null && !tag.getEpc().isEmpty()) {
-                    // Lógica de lectura ÚNICA
-                    EPCView.setText(tag.getEpc());
-                    rfidHandler.stopRead();
-                    Toast.makeText(this, "Etiqueta leída correctamente", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-            }
+            // Lógica de lectura ÚNICA
+            EPCView.setText(epc);
+            if (rfidHandler != null) rfidHandler.stopRead();
+            Toast.makeText(this, "Etiqueta leída correctamente", Toast.LENGTH_SHORT).show();
         });
     }
 
