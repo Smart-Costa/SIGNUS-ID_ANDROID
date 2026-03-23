@@ -315,6 +315,46 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private boolean pendingScanRetry = false;
     private long resumeTimestampMs = 0L;
     private boolean firstTagAfterResumeLogged = false;
+    
+    // Polling handler for RFID connection status
+    private Handler rfidStatusPollingHandler = new Handler(Looper.getMainLooper());
+    private int rfidPollingAttempts = 0;
+    private Runnable rfidStatusRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (rfidHandler != null) {
+                boolean currentStatus = rfidHandler.isConnected();
+                Log.d(TAG, "rfidStatusPolling attempt=" + rfidPollingAttempts + " connected=" + currentStatus);
+                
+                if (currentStatus) {
+                    isRfidReady = true;
+                    showRfidToast("Lector Listo");
+                    // Stop polling once connected
+                    return;
+                }
+                
+                rfidPollingAttempts++;
+                // If not connected yet, show connecting toast every 2 seconds to keep it on screen
+                if (rfidPollingAttempts < 5) { // 5 attempts * 2s = 10 seconds max timeout
+                    showRfidToast("Conectando Lector...");
+                    rfidStatusPollingHandler.postDelayed(this, 2000);
+                } else {
+                    showRfidToast("Lector Desconectado. Intente salir y volver a entrar.");
+                }
+            }
+        }
+    };
+    
+    private void startRfidStatusPolling() {
+        rfidPollingAttempts = 0;
+        rfidStatusPollingHandler.removeCallbacks(rfidStatusRunnable);
+        showRfidToast("Conectando Lector...");
+        rfidStatusPollingHandler.postDelayed(rfidStatusRunnable, 2000);
+    }
+
+    private void stopRfidStatusPolling() {
+        rfidStatusPollingHandler.removeCallbacks(rfidStatusRunnable);
+    }
     private final android.os.Handler rfidRetryHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private Runnable pendingStartScanRetry = null;
     private long currentScanStartMs = 0L;
@@ -1988,7 +2028,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     private void initRFID() {
         try {
-            showRfidToast("Conectando Lector...");
+            startRfidStatusPolling();
             
             rfidHandler = TagWriter.getInstance();
             Log.d(TAG, "initRFID: initialized=" + rfidHandler.isInitialized());
@@ -1999,20 +2039,18 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 String status = rfidHandler.onResume();
                 Log.d(TAG, "initRFID/onResume status=" + status);
             }
-            isRfidReady = rfidHandler.isConnected();
-            Log.d(TAG, "initRFID: ready=" + isRfidReady);
-            
-            updateRfidStatusUI(isRfidReady);
         } catch (Exception e) {
             Log.e(TAG, "Error initializing RFID", e);
             showRfidToast("Error RFID: " + e.getMessage());
-            updateRfidStatusUI(false);
+            stopRfidStatusPolling();
         }
     }
     
     private void updateRfidStatusUI(boolean isReady) {
         if (isReady) {
             showRfidToast("Lector Listo");
+        } else {
+            showRfidToast("Lector Desconectado. Intente salir y volver a entrar.");
         }
     }
 
@@ -2022,7 +2060,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         resumeTimestampMs = android.os.SystemClock.elapsedRealtime();
         firstTagAfterResumeLogged = false;
         
-        showRfidToast("Conectando Lector...");
+        startRfidStatusPolling();
 
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
@@ -2031,23 +2069,6 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 Log.d(TAG, "onResume RFID status=" + status);
             } catch (Exception e) {
                 Log.e(TAG, "onResume RFID error", e);
-            }
-            isRfidReady = rfidHandler.isConnected();
-            updateRfidStatusUI(isRfidReady);
-            Log.d(TAG, "onResume RFID ready=" + isRfidReady + " scanning=" + isScanning);
-            
-            if (!isRfidReady) {
-                rfidRetryHandler.postDelayed(() -> {
-                    try {
-                        String retryStatus = rfidHandler.onResume();
-                        isRfidReady = rfidHandler.isConnected();
-                        updateRfidStatusUI(isRfidReady);
-                        Log.d(TAG, "onResume retry RFID status=" + retryStatus + " ready=" + isRfidReady);
-                    } catch (Exception e) {
-                        Log.e(TAG, "onResume retry RFID error", e);
-                        updateRfidStatusUI(false);
-                    }
-                }, 650L);
             }
         }
         try {
@@ -2087,6 +2108,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         if (isScanning) {
             stopScan();
         } else {
+            if (!isRfidReady) {
+                showRfidToast("Lector Desconectado. Intente salir y volver a entrar.");
+                return;
+            }
             startScan();
         }
     }

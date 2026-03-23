@@ -1,564 +1,104 @@
-2026-03-23 11:43:44.424 24678-24678 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  Resumen de activos sincronizados: 267
-2026-03-23 11:43:44.459 24678-24678 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  Page 5 synced: 267 assets. TotalPages: 5
-2026-03-23 11:43:44.460 24678-24678 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  Requesting Activos page 6 (size=5000)
-2026-03-23 11:43:44.461 24678-24678 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/Api/Activos?page=6&pageSize=5000
-2026-03-23 11:43:44.596 24678-24678 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 2 from 2 (100%)
-2026-03-23 11:43:44.597 24678-24678 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  Finished syncing all pages.
-2026-03-23 11:43:44.602 24678-24678 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/Api/TomasFisicas
-2026-03-23 11:43:44.741 24678-24678 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 2048 from 2187 (94%)
-2026-03-23 11:43:44.741 24678-24678 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 2187 from 2187 (100%)
-2026-03-23 11:43:44.784 24678-24678 DB_DAO_TOMASFISICAS     com.example.diverscan.activeid       D  Tomas Fisicas sincronizadas desde API: 3
-2026-03-23 11:43:44.785 24678-24678 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  fetchAndSyncFromApi: Solicitando TomasFisicas/TFResumen
-2026-03-23 11:43:44.788 24678-24678 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/Api/TomasFisicas/TFResumen
-2026-03-23 11:43:44.942 24678-24678 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1348 from 1348 (100%)
-2026-03-23 11:43:44.956 24678-24678 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  fetchAndSyncFromApi onComplete: Success=true, StatusCode=200, Message=null
-2026-03-23 11:43:45.005 24678-24678 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  VALUES → IdToma=261420b4-cf93-4785-a36f-bdc9f1daafb0 TotalLecturas=null FechaCreacion=2026-01-20T16:32:15.197 SYNC_STATUS=1 ActivosLeidos=3 TotalActivos=0 Faltantes=0 NumeroToma=2 Sobrantes=2 TomaFisicaId=fb1ad39b-2ed8-4f37-aeb6-0acf012a8dde Estado=CERRADA
-2026-03-23 11:43:45.005 24678-24678 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  VALUES → IdToma=e0142b42-bceb-4c30-85ae-9e54ed20a1c1 TotalLecturas=null FechaCreacion=2026-01-15T14:58:33.86 SYNC_STATUS=1 ActivosLeidos=5 TotalActivos=2 Faltantes=0 NumeroToma=1 Sobrantes=2 TomaFisicaId=37da62af-1ee1-4740-aadb-8d89a60fb363 Estado=CERRADA
-2026-03-23 11:43:45.006 24678-24678 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  VALUES → IdToma=6b28d1fb-696d-4013-bd37-ee1b4d04b20b TotalLecturas=null FechaCreacion=2026-03-23T17:16:20.9 SYNC_STATUS=1 ActivosLeidos=2 TotalActivos=334 Faltantes=333 NumeroToma=2 Sobrantes=1 TomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963 Estado=CERRADA
-2026-03-23 11:43:45.007 24678-24678 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  VALUES → IdToma=015b6d21-5110-4d02-96c1-7f7addf71873 TotalLecturas=null FechaCreacion=2026-02-03T21:51:29.967 SYNC_STATUS=1 ActivosLeidos=2 TotalActivos=31 Faltantes=29 NumeroToma=1 Sobrantes=0 TomaFisicaId=bdee3780-c5df-4548-8efa-c16613236213 Estado=CERRADA
-2026-03-23 11:43:45.007 24678-24678 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  VALUES → IdToma=b34806e4-f6b7-452e-8730-e001c4c70688 TotalLecturas=null FechaCreacion=2026-01-12T20:34:46.76 SYNC_STATUS=1 ActivosLeidos=17 TotalActivos=1 Faltantes=1 NumeroToma=1 Sobrantes=17 TomaFisicaId=169e4a8e-50bd-4990-8271-dbaa288568b9 Estado=CERRADA
-2026-03-23 11:43:45.007 24678-24678 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  VALUES → IdToma=8561fe8b-4e55-4907-93b5-b7991023412b TotalLecturas=null FechaCreacion=2026-01-06T15:05:26.54 SYNC_STATUS=1 ActivosLeidos=9 TotalActivos=0 Faltantes=0 NumeroToma=1 Sobrantes=9 TomaFisicaId=a6bc6f02-7bc1-4889-b133-f5b5a98b4bb5 Estado=CERRADA
-2026-03-23 11:43:45.008 24678-24678 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  Tomas Fisicas sincronizadas desde API: 6
-2026-03-23 11:43:45.025 24678-24678 SYNC_DEBUG              com.example.diverscan.activeid       D  Solicitando detalles para toma: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:45.028 24678-24678 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/Api/TomasFisicas/TFDetalle?idToma=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:45.029 24678-24678 SYNC_DEBUG              com.example.diverscan.activeid       D  Solicitando detalles para toma: 1082d85c-5461-47ad-833c-9389a5081963
-2026-03-23 11:43:45.031 24678-24678 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/Api/TomasFisicas/TFDetalle?idToma=1082d85c-5461-47ad-833c-9389a5081963
-2026-03-23 11:43:45.032 24678-24678 SYNC_DEBUG              com.example.diverscan.activeid       D  Solicitando detalles para toma: aedadeb2-4e70-4663-a5a5-dd1b8ddc5615
-2026-03-23 11:43:45.035 24678-24678 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/Api/TomasFisicas/TFDetalle?idToma=aedadeb2-4e70-4663-a5a5-dd1b8ddc5615
-2026-03-23 11:43:45.136 24678-24678 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 26 from 26 (100%)
-2026-03-23 11:43:45.137 24678-24678 LOGIN_APICLIENT         com.example.diverscan.activeid       E  GET failed: 404 body:"No se encontró detalle."
-                                                                                                    cz.msebera.android.httpclient.client.HttpResponseException: status code: 404, reason phrase: Not Found
-                                                                                                    	at com.loopj.android.http.AsyncHttpResponseHandler.sendResponseMessage(AsyncHttpResponseHandler.java:449)
-                                                                                                    	at com.loopj.android.http.AsyncHttpRequest.makeRequest(AsyncHttpRequest.java:160)
-                                                                                                    	at com.loopj.android.http.AsyncHttpRequest.makeRequestWithRetries(AsyncHttpRequest.java:177)
-                                                                                                    	at com.loopj.android.http.AsyncHttpRequest.run(AsyncHttpRequest.java:106)
-                                                                                                    	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
-                                                                                                    	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
-                                                                                                    	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
-                                                                                                    	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
-                                                                                                    	at java.lang.Thread.run(Thread.java:1564)
-2026-03-23 11:43:45.137 24678-24678 DB_DAO_TFDETALLE        com.example.diverscan.activeid       W  API retornó 404 (Sin detalles) para idToma=cf44dec1-74fb-47f7-b9bb-4ba351a61b59. Se procesa como lista vacía.
-2026-03-23 11:43:45.166 24678-24678 DB_DAO_TFDETALLE        com.example.diverscan.activeid       D  Limpiados detalles sincronizados previos. Filtro idToma=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:45.167 24678-24678 DB_DAO_TFDETALLE        com.example.diverscan.activeid       D  Tomas Fisicas sincronizadas desde API: 0
-2026-03-23 11:43:45.167 24678-24678 SYNC_DEBUG              com.example.diverscan.activeid       D  Detalles procesados. Progreso: 1/3
-2026-03-23 11:43:45.236 24678-24678 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 26 from 26 (100%)
-2026-03-23 11:43:45.237 24678-24678 LOGIN_APICLIENT         com.example.diverscan.activeid       E  GET failed: 404 body:"No se encontró detalle."
-                                                                                                    cz.msebera.android.httpclient.client.HttpResponseException: status code: 404, reason phrase: Not Found
-                                                                                                    	at com.loopj.android.http.AsyncHttpResponseHandler.sendResponseMessage(AsyncHttpResponseHandler.java:449)
-                                                                                                    	at com.loopj.android.http.AsyncHttpRequest.makeRequest(AsyncHttpRequest.java:160)
-                                                                                                    	at com.loopj.android.http.AsyncHttpRequest.makeRequestWithRetries(AsyncHttpRequest.java:177)
-                                                                                                    	at com.loopj.android.http.AsyncHttpRequest.run(AsyncHttpRequest.java:106)
-                                                                                                    	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:520)
-                                                                                                    	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
-                                                                                                    	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
-                                                                                                    	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
-                                                                                                    	at java.lang.Thread.run(Thread.java:1564)
-2026-03-23 11:43:45.237 24678-24678 DB_DAO_TFDETALLE        com.example.diverscan.activeid       W  API retornó 404 (Sin detalles) para idToma=aedadeb2-4e70-4663-a5a5-dd1b8ddc5615. Se procesa como lista vacía.
-2026-03-23 11:43:45.266 24678-24678 DB_DAO_TFDETALLE        com.example.diverscan.activeid       D  Limpiados detalles sincronizados previos. Filtro idToma=aedadeb2-4e70-4663-a5a5-dd1b8ddc5615
-2026-03-23 11:43:45.266 24678-24678 DB_DAO_TFDETALLE        com.example.diverscan.activeid       D  Tomas Fisicas sincronizadas desde API: 0
-2026-03-23 11:43:45.266 24678-24678 SYNC_DEBUG              com.example.diverscan.activeid       D  Detalles procesados. Progreso: 2/3
-2026-03-23 11:43:45.266 24678-24678 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 911 from 911 (100%)
-2026-03-23 11:43:45.286 24678-24678 DB_DAO_TFDETALLE        com.example.diverscan.activeid       D  Limpiados detalles sincronizados previos. Filtro idToma=1082d85c-5461-47ad-833c-9389a5081963
-2026-03-23 11:43:45.289 24678-24678 DB_DAO_TFDETALLE        com.example.diverscan.activeid       D  Tomas Fisicas sincronizadas desde API: 2
-2026-03-23 11:43:45.289 24678-24678 SYNC_DEBUG              com.example.diverscan.activeid       D  Detalles procesados. Progreso: 3/3
-2026-03-23 11:43:45.289 24678-24678 SYNC_DEBUG              com.example.diverscan.activeid       D  Todas las tomas procesadas. Finalizando sincronización.
-2026-03-23 11:43:47.358  2562-25265 f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.main.MainActivity
-2026-03-23 11:43:47.366  7182-7309  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.main.MainActivity
-2026-03-23 11:43:47.377 24678-24713 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-03-23 11:43:47.395 24678-24678 LOGIN_APICLIENT         com.example.diverscan.activeid       D  GET http://44.200.127.109:70/ApiHH/Api/ConsolidacionApi/ConsultarNovedades?username=Wilbert
-2026-03-23 11:43:47.468  5809-5809  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-03-23 11:43:47.561  1445-2125  InputDispatcher         system_server                        D      * [TOUCHED] package=com.example.diverscan.activeid/10262, id=3666, mode=USE_OPACITY, alpha=1.00, frame=[-31,0][1048,2160], touchableRegion=[-31,0][1049,2160], window={93c52da com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}, inputConfig={0x0}, hasToken=true, applicationInfo.name=ActivityRecord{342cb2a u0 com.example.diverscan.activeid/.UI.main.MainActivity} t16}, applicationInfo.token=0xb400007a70b512b0
-2026-03-23 11:43:47.575 24678-24678 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1024 from 1649 (62%)
-2026-03-23 11:43:47.575 24678-24678 AsyncHttpRH             com.example.diverscan.activeid       V  Progress 1649 from 1649 (100%)
-2026-03-23 11:43:47.576  1445-2125  InputDispatcher         system_server                        D      * [TOUCHED] package=com.example.diverscan.activeid/10262, id=3666, mode=USE_OPACITY, alpha=1.00, frame=[-22,0][1057,2160], touchableRegion=[-22,0][1058,2160], window={93c52da com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}, inputConfig={0x0}, hasToken=true, applicationInfo.name=ActivityRecord{342cb2a u0 com.example.diverscan.activeid/.UI.main.MainActivity} t16}, applicationInfo.token=0xb400007a70b512b0
-2026-03-23 11:43:47.584  1445-2125  InputDispatcher         system_server                        D      * [TOUCHED] package=com.example.diverscan.activeid/10262, id=3666, mode=USE_OPACITY, alpha=1.00, frame=[-22,0][1057,2160], touchableRegion=[-22,0][1058,2160], window={93c52da com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}, inputConfig={0x0}, hasToken=true, applicationInfo.name=ActivityRecord{342cb2a u0 com.example.diverscan.activeid/.UI.main.MainActivity} t16}, applicationInfo.token=0xb400007a70b512b0
-2026-03-23 11:43:47.585  1445-2125  InputDispatcher         system_server                        D      * [TOUCHED] package=com.example.diverscan.activeid/10262, id=3666, mode=USE_OPACITY, alpha=1.00, frame=[-22,0][1057,2160], touchableRegion=[-22,0][1058,2160], window={93c52da com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}, inputConfig={0x0}, hasToken=true, applicationInfo.name=ActivityRecord{342cb2a u0 com.example.diverscan.activeid/.UI.main.MainActivity} t16}, applicationInfo.token=0xb400007a70b512b0
-2026-03-23 11:43:47.585  1445-2125  InputDispatcher         system_server                        D      * [TOUCHED] package=com.example.diverscan.activeid/10262, id=3666, mode=USE_OPACITY, alpha=1.00, frame=[-22,0][1057,2160], touchableRegion=[-22,0][1058,2160], window={93c52da com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}, inputConfig={0x0}, hasToken=true, applicationInfo.name=ActivityRecord{342cb2a u0 com.example.diverscan.activeid/.UI.main.MainActivity} t16}, applicationInfo.token=0xb400007a70b512b0
-2026-03-23 11:43:47.586  1445-2125  InputDispatcher         system_server                        D      * [TOUCHED] package=com.example.diverscan.activeid/10262, id=3666, mode=USE_OPACITY, alpha=1.00, frame=[-22,0][1057,2160], touchableRegion=[-22,0][1058,2160], window={93c52da com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}, inputConfig={0x0}, hasToken=true, applicationInfo.name=ActivityRecord{342cb2a u0 com.example.diverscan.activeid/.UI.main.MainActivity} t16}, applicationInfo.token=0xb400007a70b512b0
-2026-03-23 11:43:47.915 24678-24713 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb400007b30b02b70 (RippleDrawable) with handle 0xb400007a40ad8440
-2026-03-23 11:43:47.930  1445-4446  CoreBackPreview         system_server                        D  Window{488a933 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.Sincronizar.sincronizar_base}: Setting back callback null
-2026-03-23 11:43:47.932  1445-2470  InputManager-JNI        system_server                        W  Input channel object '488a933 com.example.diverscan.activeid/com.example.diverscan.activeid.Sincronizar.sincronizar_base (client)' was disposed without first being removed with the input manager!
-2026-03-23 11:43:49.136  1445-4446  CoreBackPreview         system_server                        D  Window{93c52da u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@1c6b4b, mPriority=1000000}
-2026-03-23 11:43:49.727  1445-4446  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.RegistroTomaFisicaActivity} from uid 10262
-2026-03-23 11:43:49.764  1445-4446  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 24678
-2026-03-23 11:43:49.770  2562-25265 f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity
-2026-03-23 11:43:49.772  7182-7309  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity
-2026-03-23 11:43:49.817  1445-2470  CoreBackPreview         system_server                        D  Window{badf57d u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.RegistroTomaFisicaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@6fcf8c3, mPriority=-1}
-2026-03-23 11:43:49.827 24678-24713 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-03-23 11:43:49.847 24678-24713 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-03-23 11:43:49.856  1445-1933  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.RegistroTomaFisicaActivity: +124ms
-2026-03-23 11:43:49.969  5809-5809  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-03-23 11:43:50.170  1445-4446  CoreBackPreview         system_server                        D  Window{93c52da u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@832677a, mPriority=-1}
-2026-03-23 11:43:50.368 24678-24713 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb400007b30a88000 (NavigationMenuItemView) with handle 0xb400007a40ab12c0
-2026-03-23 11:43:51.141  1445-4446  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity (has extras)} from uid 10262
-2026-03-23 11:43:51.157  1445-4446  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 24678
-2026-03-23 11:43:51.184 24678-24678 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Iniciando carga de datos y sincronización...
-2026-03-23 11:43:51.185 24678-24678 DetalleTomaFisica       com.example.diverscan.activeid       D  onResume: Llamando a fetchAndSyncFromApi para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:51.195  1445-2470  CoreBackPreview         system_server                        D  Window{c07731e u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@32659cc, mPriority=-1}
-2026-03-23 11:43:51.201 24678-25431 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 4 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:51.201 24678-25432 DetalleTomaFisica       com.example.diverscan.activeid       D  cargarDatosLocal: Encontrados 4 registros locales para tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:51.206 24678-24713 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-03-23 11:43:51.217 24678-24713 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-03-23 11:43:51.220 24678-24678 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 4
-2026-03-23 11:43:51.220 24678-24678 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 4
-2026-03-23 11:43:51.220 24678-24678 DetalleTomaFisica       com.example.diverscan.activeid       D  Vista Tabla Subtomas: Datos cargados y mostrados. Cantidad: 4
-2026-03-23 11:43:51.220 24678-24678 DetalleTomaFisica       com.example.diverscan.activeid       D  TAB ACTIVA: TOMAS (ABIERTAS). Items visibles: 4
-2026-03-23 11:43:51.225  1445-1933  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity: +81ms
-2026-03-23 11:43:51.232  2562-25265 f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
-2026-03-23 11:43:51.234  7182-7309  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.DetalleTomaFisicaActivity
-2026-03-23 11:43:51.368  5809-5809  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-03-23 11:43:52.538 24678-24678 DetalleTomaFisica       com.example.diverscan.activeid       D  Click en Nueva Toma. Iniciando NuevaTomaActivity para tomaFisicaId: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:52.540  1445-2147  ActivityTaskManager     system_server                        I  START u0 {cmp=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity (has extras)} from uid 10262
-2026-03-23 11:43:52.557  1445-2147  ActivityTaskManager     system_server                        I  The Process com.example.diverscan.activeid Already Exists in BG. So sending its PID: 24678
-2026-03-23 11:43:52.581  2562-25265 f                       com.zebra.zvahelper                  D  componentInfo - com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
-2026-03-23 11:43:52.582  7182-7309  ActivityTracker         com.symbol.datawedge                 D  #ACT# Handle New activity, p= com.example.diverscan.activeid a=com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity
-2026-03-23 11:43:52.637 24678-24690 SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
-2026-03-23 11:43:52.637 24678-24690 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
-2026-03-23 11:43:52.637 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Iniciando NuevaTomaActivity
-2026-03-23 11:43:52.637 24678-24690 System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
-2026-03-23 11:43:52.637 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: tomaFisicaId recibido: cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:52.637 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomasDao.getPendientesCount tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:52.637 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosCount
-2026-03-23 11:43:52.644 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getPendientesCount count=4
-2026-03-23 11:43:52.644 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  Creating NEW toma: 9ea47e45-ce63-4267-b887-2601cbc3a8c0 Num: 5
-2026-03-23 11:43:52.644 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Configurado idToma=9ea47e45-ce63-4267-b887-2601cbc3a8c0, numero=5
-2026-03-23 11:43:52.644 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getActivosCount count=20267
-2026-03-23 11:43:52.644 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:52.645 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID: initialized=true
-2026-03-23 11:43:52.645 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID/onResume status=Conectado
-2026-03-23 11:43:52.645 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID: ready=true
-2026-03-23 11:43:52.647 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  onResume RFID status=Conectado
-2026-03-23 11:43:52.647 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  onResume RFID ready=true scanning=false
-2026-03-23 11:43:52.648 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       W  DataWedge: deshabilitado temporalmente
-2026-03-23 11:43:52.651 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getTomaFisicaById found=true
-2026-03-23 11:43:52.651 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null Sec=null UO=null Cat=null Est=b475f3af-c9f3-4b27-a187-f1c72c3aee98
-2026-03-23 11:43:52.654 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  Inventario base: tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59 A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null UO=null Cat=null Est=b475f3af-c9f3-4b27-a187-f1c72c3aee98 totalActivosInventario=0
-2026-03-23 11:43:52.659  1445-5634  CoreBackPreview         system_server                        D  Window{2aae2c u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@1fbfe8a, mPriority=-1}
-2026-03-23 11:43:52.678 24678-24713 OpenGLRenderer          com.example.diverscan.activeid       E  Unable to match the desired swap behavior.
-2026-03-23 11:43:52.695 24678-24713 Parcel                  com.example.diverscan.activeid       W  Expecting binder but got null!
-2026-03-23 11:43:52.704  1445-1933  ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity: +160ms
-2026-03-23 11:43:52.706 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59
-2026-03-23 11:43:52.706 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B=null C=null D=null Sec=null UO=00000000-0000-0000-0000-000000000000
-2026-03-23 11:43:52.721 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
-2026-03-23 11:43:52.723 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getActivosByFiltros size=227
-2026-03-23 11:43:52.724 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL ubicacionDao.getUbicacionByASysId A=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94
-2026-03-23 11:43:52.731 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getUbicacionByASysId found=true
-2026-03-23 11:43:52.731 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getAllCategorias
-2026-03-23 11:43:52.731 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getAllCategorias size=5
-2026-03-23 11:43:52.754 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionA: id=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 text=DIRECCION GENERAL
-2026-03-23 11:43:52.755 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] start
-2026-03-23 11:43:52.755 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro Categoria: id=null
-2026-03-23 11:43:52.755 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
-2026-03-23 11:43:52.773 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] start
-2026-03-23 11:43:52.773 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
-2026-03-23 11:43:52.774 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
-2026-03-23 11:43:52.775 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
-2026-03-23 11:43:52.775 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] queryTimes ms expected=17 counts=2 scannedMap=0 totalBg=19 expectedSize=227 uniqueTags=0
-2026-03-23 11:43:52.775 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
-2026-03-23 11:43:52.790 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] done total=35ms listSize=227
-2026-03-23 11:43:52.790 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
-2026-03-23 11:43:52.791 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
-2026-03-23 11:43:52.792 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
-2026-03-23 11:43:52.792 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
-2026-03-23 11:43:52.793 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] queryTimes ms expected=16 counts=2 scannedMap=0 totalBg=18 expectedSize=227 uniqueTags=0
-2026-03-23 11:43:52.808 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
-2026-03-23 11:43:52.808 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=16ms
-2026-03-23 11:43:52.809 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] done total=36ms listSize=227
-2026-03-23 11:43:52.809 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
-2026-03-23 11:43:52.814 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  Actualizando UI spinner. Items: 0
-2026-03-23 11:43:52.822  5809-5809  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1385 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=-1, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
-2026-03-23 11:43:52.825 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
-2026-03-23 11:43:52.825 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=16ms
-2026-03-23 11:43:52.830 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  Actualizando UI spinner. Items: 227
-2026-03-23 11:43:53.216 24678-24713 OpenGLRenderer          com.example.diverscan.activeid       D  endAllActiveAnimators on 0xb400007b30a64310 (RippleDrawable) with handle 0xb400007a40acdeb0
-2026-03-23 11:43:53.291 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] start
-2026-03-23 11:43:53.292 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 ub=null uc=null ud=null us=null uo=null cat=null
-2026-03-23 11:43:53.327 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
-2026-03-23 11:43:53.328 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=227 B=227 C=227 D=227 S=227
-2026-03-23 11:43:53.328 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] queryTimes ms expected=33 counts=4 scannedMap=0 totalBg=37 expectedSize=227 uniqueTags=0
-2026-03-23 11:43:53.330 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] done total=40ms listSize=227
-2026-03-23 11:43:53.331 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:e0ddcef3-e5ba-46d2-b6ad-f2560a3c4e94 B:null C:null D:null Sec:null
-2026-03-23 11:43:53.355 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 227
-2026-03-23 11:43:53.355 24678-25448 NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=24ms
-2026-03-23 11:43:53.355 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  Actualizando UI spinner. Items: 227
-2026-03-23 11:43:54.823 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  trigger event pressed=true connected=true ready=true scanning=false
-2026-03-23 11:43:54.823 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  startScan execute: connected=true
-2026-03-23 11:43:57.830 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       W  SCAN WATCHDOG: sin tags en 3000ms. connected=true ready=true
-2026-03-23 11:43:59.574 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  trigger event pressed=false connected=true ready=true scanning=true
-2026-03-23 11:43:59.608 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  stopScan: duración sesión lectura=4778ms
-2026-03-23 11:44:06.683 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  trigger event pressed=true connected=true ready=true scanning=false
-2026-03-23 11:44:06.684 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  startScan execute: connected=true
-2026-03-23 11:44:06.918 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  RFID FIRST TAG after resume in 14270ms, tagsInBatch=3
-2026-03-23 11:44:06.921 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=800474453150000000015667 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.922 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=3039D849E413254050180976 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.922 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=800474453080000000017961 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.948 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=002820231010163052561404 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.948 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=303A3A2C25178F003B9ACA01 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.951 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=000000000000000000017994 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.951 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=3039D84661DC7FC03B9ACA01 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.966 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=3039D849D8A175403B9ACA01 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.969 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=3039D8842146FF003B9ACA01 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.969 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=0000000008002216572D0221 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.970 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=800474453240000000013723 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.970 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=D20150000000000000006085 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.970 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=DE00000000000000DE005426 RESULTADO: ENCONTRADO (ESTACION DE TRABAJO)
-2026-03-23 11:44:06.972 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=DE00000000000000DE004819 RESULTADO: ENCONTRADO (LAMPARA DE SEGURIDAD)
-2026-03-23 11:44:06.973 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=800474453150000000018395 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.974 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=E2806810000000393DEDE8B2 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.974 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=D20150000000000000006083 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.975 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=E280116060000212255F300B RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.975 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=E28068940000400311041CA8 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.976 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=800474453240000000019231 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.982 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=300833B2DDD9014000000000 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.982 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=E28068940000500311041CA9 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.983 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=0F8A15E0B2CA15E0B2CAD86E RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.985 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=000000000000000000002903 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.986 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=35E0170206000000002CEC02 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:06.986 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=63639880330893000021BA67 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:07.039 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=A20020180622114129602856 RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:07.108 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  SQL QUERY getActivosByEpcs -> EPC=301AD6AD014D3A400000007A RESULTADO: NO_ENCONTRADO
-2026-03-23 11:44:07.312 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  trigger event pressed=false connected=true ready=true scanning=true
-2026-03-23 11:44:07.333 24678-24678 NuevaTomaActivity       com.example.diverscan.activeid       D  stopScan: duración sesión lectura=641ms
-2026-03-23 11:44:07.613 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  AUTO-SAVE: Iniciando guardado automático. Tags en memoria: 28
-2026-03-23 11:44:07.615 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='002820231010163052561404'
-2026-03-23 11:44:07.617 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.618 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.620 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 002820231010163052561404
-2026-03-23 11:44:07.620 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453240000000013723'
-2026-03-23 11:44:07.621 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.622 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.622 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453240000000013723
-2026-03-23 11:44:07.623 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='000000000000000000002903'
-2026-03-23 11:44:07.623 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.624 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.625 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 000000000000000000002903
-2026-03-23 11:44:07.625 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D849E413254050180976'
-2026-03-23 11:44:07.625 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.626 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.627 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D849E413254050180976
-2026-03-23 11:44:07.627 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E28068940000500311041CA9'
-2026-03-23 11:44:07.628 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.628 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.629 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E28068940000500311041CA9
-2026-03-23 11:44:07.629 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='35E0170206000000002CEC02'
-2026-03-23 11:44:07.630 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.630 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.631 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 35E0170206000000002CEC02
-2026-03-23 11:44:07.631 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D849D8A175403B9ACA01'
-2026-03-23 11:44:07.632 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.632 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.633 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D849D8A175403B9ACA01
-2026-03-23 11:44:07.633 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='303A3A2C25178F003B9ACA01'
-2026-03-23 11:44:07.634 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.635 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.636 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 303A3A2C25178F003B9ACA01
-2026-03-23 11:44:07.636 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='0000000008002216572D0221'
-2026-03-23 11:44:07.636 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.637 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.638 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 0000000008002216572D0221
-2026-03-23 11:44:07.638 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453150000000018395'
-2026-03-23 11:44:07.639 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.639 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.640 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453150000000018395
-2026-03-23 11:44:07.640 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453240000000019231'
-2026-03-23 11:44:07.640 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.640 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.641 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453240000000019231
-2026-03-23 11:44:07.641 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E2806810000000393DEDE8B2'
-2026-03-23 11:44:07.641 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.641 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.642 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E2806810000000393DEDE8B2
-2026-03-23 11:44:07.642 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453150000000015667'
-2026-03-23 11:44:07.643 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.643 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.644 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453150000000015667
-2026-03-23 11:44:07.644 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D84661DC7FC03B9ACA01'
-2026-03-23 11:44:07.644 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.644 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.645 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D84661DC7FC03B9ACA01
-2026-03-23 11:44:07.645 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='D20150000000000000006085'
-2026-03-23 11:44:07.645 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.645 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.646 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: D20150000000000000006085
-2026-03-23 11:44:07.646 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='301AD6AD014D3A400000007A'
-2026-03-23 11:44:07.647 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.647 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.647 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 301AD6AD014D3A400000007A
-2026-03-23 11:44:07.647 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='000000000000000000017994'
-2026-03-23 11:44:07.648 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.648 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.649 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 000000000000000000017994
-2026-03-23 11:44:07.649 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E280116060000212255F300B'
-2026-03-23 11:44:07.649 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.649 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.650 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E280116060000212255F300B
-2026-03-23 11:44:07.650 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D8842146FF003B9ACA01'
-2026-03-23 11:44:07.650 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.651 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.651 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D8842146FF003B9ACA01
-2026-03-23 11:44:07.651 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='63639880330893000021BA67'
-2026-03-23 11:44:07.652 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.652 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.653 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 63639880330893000021BA67
-2026-03-23 11:44:07.653 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='D20150000000000000006083'
-2026-03-23 11:44:07.653 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.653 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.654 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: D20150000000000000006083
-2026-03-23 11:44:07.654 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453080000000017961'
-2026-03-23 11:44:07.654 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.655 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.655 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453080000000017961
-2026-03-23 11:44:07.655 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='A20020180622114129602856'
-2026-03-23 11:44:07.656 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.656 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.656 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: A20020180622114129602856
-2026-03-23 11:44:07.657 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='300833B2DDD9014000000000'
-2026-03-23 11:44:07.657 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.657 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.658 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 300833B2DDD9014000000000
-2026-03-23 11:44:07.658 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E28068940000400311041CA8'
-2026-03-23 11:44:07.658 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.659 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.659 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E28068940000400311041CA8
-2026-03-23 11:44:07.659 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='0F8A15E0B2CA15E0B2CAD86E'
-2026-03-23 11:44:07.659 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.660 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.660 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 0F8A15E0B2CA15E0B2CAD86E
-2026-03-23 11:44:07.681 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='002820231010163052561404'
-2026-03-23 11:44:07.681 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.681 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.682 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 002820231010163052561404
-2026-03-23 11:44:07.682 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='002820231010163052561404'
-2026-03-23 11:44:07.682 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.682 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.683 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 002820231010163052561404
-2026-03-23 11:44:07.683 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 002820231010163052561404
-2026-03-23 11:44:07.683 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453240000000013723'
-2026-03-23 11:44:07.683 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.683 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.683 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453240000000013723
-2026-03-23 11:44:07.684 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453240000000013723'
-2026-03-23 11:44:07.684 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.684 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.684 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453240000000013723
-2026-03-23 11:44:07.684 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 800474453240000000013723
-2026-03-23 11:44:07.684 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='000000000000000000002903'
-2026-03-23 11:44:07.685 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.685 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.685 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 000000000000000000002903
-2026-03-23 11:44:07.685 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='000000000000000000002903'
-2026-03-23 11:44:07.685 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.686 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.686 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 000000000000000000002903
-2026-03-23 11:44:07.686 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 000000000000000000002903
-2026-03-23 11:44:07.687 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D849E413254050180976'
-2026-03-23 11:44:07.687 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.687 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.687 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D849E413254050180976
-2026-03-23 11:44:07.687 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D849E413254050180976'
-2026-03-23 11:44:07.688 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.688 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.688 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D849E413254050180976
-2026-03-23 11:44:07.688 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 3039D849E413254050180976
-2026-03-23 11:44:07.688 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E28068940000500311041CA9'
-2026-03-23 11:44:07.688 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.689 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.689 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E28068940000500311041CA9
-2026-03-23 11:44:07.689 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E28068940000500311041CA9'
-2026-03-23 11:44:07.689 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.689 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.690 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E28068940000500311041CA9
-2026-03-23 11:44:07.690 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: E28068940000500311041CA9
-2026-03-23 11:44:07.690 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='35E0170206000000002CEC02'
-2026-03-23 11:44:07.690 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.691 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.691 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 35E0170206000000002CEC02
-2026-03-23 11:44:07.691 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='35E0170206000000002CEC02'
-2026-03-23 11:44:07.691 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.691 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.692 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 35E0170206000000002CEC02
-2026-03-23 11:44:07.692 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 35E0170206000000002CEC02
-2026-03-23 11:44:07.692 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D849D8A175403B9ACA01'
-2026-03-23 11:44:07.692 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.692 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.692 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D849D8A175403B9ACA01
-2026-03-23 11:44:07.693 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D849D8A175403B9ACA01'
-2026-03-23 11:44:07.693 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.693 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.693 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D849D8A175403B9ACA01
-2026-03-23 11:44:07.693 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 3039D849D8A175403B9ACA01
-2026-03-23 11:44:07.693 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='303A3A2C25178F003B9ACA01'
-2026-03-23 11:44:07.694 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.694 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.695 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 303A3A2C25178F003B9ACA01
-2026-03-23 11:44:07.695 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='303A3A2C25178F003B9ACA01'
-2026-03-23 11:44:07.695 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.695 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.695 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 303A3A2C25178F003B9ACA01
-2026-03-23 11:44:07.695 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 303A3A2C25178F003B9ACA01
-2026-03-23 11:44:07.696 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='0000000008002216572D0221'
-2026-03-23 11:44:07.696 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.696 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.696 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 0000000008002216572D0221
-2026-03-23 11:44:07.696 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='0000000008002216572D0221'
-2026-03-23 11:44:07.696 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.697 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.697 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 0000000008002216572D0221
-2026-03-23 11:44:07.697 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 0000000008002216572D0221
-2026-03-23 11:44:07.697 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453150000000018395'
-2026-03-23 11:44:07.697 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.698 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.699 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453150000000018395
-2026-03-23 11:44:07.699 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453150000000018395'
-2026-03-23 11:44:07.699 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.700 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.700 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453150000000018395
-2026-03-23 11:44:07.700 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 800474453150000000018395
-2026-03-23 11:44:07.700 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453240000000019231'
-2026-03-23 11:44:07.700 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.700 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.701 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453240000000019231
-2026-03-23 11:44:07.701 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453240000000019231'
-2026-03-23 11:44:07.701 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.701 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.701 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453240000000019231
-2026-03-23 11:44:07.701 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 800474453240000000019231
-2026-03-23 11:44:07.701 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E2806810000000393DEDE8B2'
-2026-03-23 11:44:07.702 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.702 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.702 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E2806810000000393DEDE8B2
-2026-03-23 11:44:07.702 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E2806810000000393DEDE8B2'
-2026-03-23 11:44:07.702 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.703 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.703 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E2806810000000393DEDE8B2
-2026-03-23 11:44:07.703 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: E2806810000000393DEDE8B2
-2026-03-23 11:44:07.704 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453150000000015667'
-2026-03-23 11:44:07.704 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.705 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.705 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453150000000015667
-2026-03-23 11:44:07.705 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453150000000015667'
-2026-03-23 11:44:07.705 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.705 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.706 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453150000000015667
-2026-03-23 11:44:07.706 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 800474453150000000015667
-2026-03-23 11:44:07.706 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D84661DC7FC03B9ACA01'
-2026-03-23 11:44:07.706 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.706 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.706 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D84661DC7FC03B9ACA01
-2026-03-23 11:44:07.707 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D84661DC7FC03B9ACA01'
-2026-03-23 11:44:07.707 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.707 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.707 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D84661DC7FC03B9ACA01
-2026-03-23 11:44:07.707 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 3039D84661DC7FC03B9ACA01
-2026-03-23 11:44:07.707 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='D20150000000000000006085'
-2026-03-23 11:44:07.707 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.708 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.708 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: D20150000000000000006085
-2026-03-23 11:44:07.708 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='D20150000000000000006085'
-2026-03-23 11:44:07.708 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.708 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.709 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: D20150000000000000006085
-2026-03-23 11:44:07.709 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: D20150000000000000006085
-2026-03-23 11:44:07.709 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='301AD6AD014D3A400000007A'
-2026-03-23 11:44:07.709 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.709 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.709 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 301AD6AD014D3A400000007A
-2026-03-23 11:44:07.709 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='301AD6AD014D3A400000007A'
-2026-03-23 11:44:07.710 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.710 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.710 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 301AD6AD014D3A400000007A
-2026-03-23 11:44:07.710 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 301AD6AD014D3A400000007A
-2026-03-23 11:44:07.711 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='000000000000000000017994'
-2026-03-23 11:44:07.711 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.711 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.711 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 000000000000000000017994
-2026-03-23 11:44:07.711 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='000000000000000000017994'
-2026-03-23 11:44:07.711 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.712 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.712 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 000000000000000000017994
-2026-03-23 11:44:07.712 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 000000000000000000017994
-2026-03-23 11:44:07.712 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E280116060000212255F300B'
-2026-03-23 11:44:07.712 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.712 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.713 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E280116060000212255F300B
-2026-03-23 11:44:07.713 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E280116060000212255F300B'
-2026-03-23 11:44:07.713 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.713 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.713 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E280116060000212255F300B
-2026-03-23 11:44:07.713 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: E280116060000212255F300B
-2026-03-23 11:44:07.713 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D8842146FF003B9ACA01'
-2026-03-23 11:44:07.714 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.714 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.714 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D8842146FF003B9ACA01
-2026-03-23 11:44:07.714 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='3039D8842146FF003B9ACA01'
-2026-03-23 11:44:07.714 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.715 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.715 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 3039D8842146FF003B9ACA01
-2026-03-23 11:44:07.715 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 3039D8842146FF003B9ACA01
-2026-03-23 11:44:07.715 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='63639880330893000021BA67'
-2026-03-23 11:44:07.715 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.715 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.716 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 63639880330893000021BA67
-2026-03-23 11:44:07.716 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='63639880330893000021BA67'
-2026-03-23 11:44:07.716 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.716 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.716 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 63639880330893000021BA67
-2026-03-23 11:44:07.716 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 63639880330893000021BA67
-2026-03-23 11:44:07.716 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='D20150000000000000006083'
-2026-03-23 11:44:07.717 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.717 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.717 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: D20150000000000000006083
-2026-03-23 11:44:07.717 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='D20150000000000000006083'
-2026-03-23 11:44:07.717 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.718 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.718 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: D20150000000000000006083
-2026-03-23 11:44:07.718 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: D20150000000000000006083
-2026-03-23 11:44:07.718 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453080000000017961'
-2026-03-23 11:44:07.718 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.718 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.719 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453080000000017961
-2026-03-23 11:44:07.719 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='800474453080000000017961'
-2026-03-23 11:44:07.719 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.719 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.719 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 800474453080000000017961
-2026-03-23 11:44:07.719 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 800474453080000000017961
-2026-03-23 11:44:07.719 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='A20020180622114129602856'
-2026-03-23 11:44:07.719 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.719 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.720 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: A20020180622114129602856
-2026-03-23 11:44:07.720 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='A20020180622114129602856'
-2026-03-23 11:44:07.720 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.720 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.720 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: A20020180622114129602856
-2026-03-23 11:44:07.720 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: A20020180622114129602856
-2026-03-23 11:44:07.720 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='300833B2DDD9014000000000'
-2026-03-23 11:44:07.721 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.721 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.721 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 300833B2DDD9014000000000
-2026-03-23 11:44:07.721 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='300833B2DDD9014000000000'
-2026-03-23 11:44:07.721 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.721 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.721 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 300833B2DDD9014000000000
-2026-03-23 11:44:07.721 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 300833B2DDD9014000000000
-2026-03-23 11:44:07.722 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E28068940000400311041CA8'
-2026-03-23 11:44:07.722 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.722 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.722 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E28068940000400311041CA8
-2026-03-23 11:44:07.722 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='E28068940000400311041CA8'
-2026-03-23 11:44:07.722 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.722 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.723 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: E28068940000400311041CA8
-2026-03-23 11:44:07.723 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: E28068940000400311041CA8
-2026-03-23 11:44:07.723 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='0F8A15E0B2CA15E0B2CAD86E'
-2026-03-23 11:44:07.723 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.723 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.723 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 0F8A15E0B2CA15E0B2CAD86E
-2026-03-23 11:44:07.723 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Buscando EPC='0F8A15E0B2CA15E0B2CAD86E'
-2026-03-23 11:44:07.723 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias exactas encontradas en columna EPC: 0
-2026-03-23 11:44:07.724 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: Coincidencias encontradas en columna TAG_EPC: 0
-2026-03-23 11:44:07.724 24678-25225 DB_DAO_ACTIVO           com.example.diverscan.activeid       D  getActivoByEpc: ACTIVO NO ENCONTRADO para EPC: 0F8A15E0B2CA15E0B2CAD86E
-2026-03-23 11:44:07.724 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Excluyendo EPC no inventariado de la BD: 0F8A15E0B2CA15E0B2CAD86E
-2026-03-23 11:44:07.724 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Guardando header. ID=9ea47e45-ce63-4267-b887-2601cbc3a8c0 Estado=ABIERTA TotalLecturas=28
-2026-03-23 11:44:07.724 24678-25225 DB_DAO_TFRESUMEN        com.example.diverscan.activeid       D  SAVING LOCAL RESUMEN (Pending) → IdToma=9ea47e45-ce63-4267-b887-2601cbc3a8c0 TotalLecturas=28 FechaCreacion=2026-03-23 11:44:07 SYNC_STATUS=0 ActivosLeidos=28 TotalActivos=227 Faltantes=227 NumeroToma=5 Sobrantes=2 TomaFisicaId=cf44dec1-74fb-47f7-b9bb-4ba351a61b59 Estado=ABIERTA
-2026-03-23 11:44:07.727 24678-25225 NuevaTomaActivity       com.example.diverscan.activeid       D  SaveLocalTask: Guardando 2 detalles.
- 
+2026-03-23 12:52:37.161  2176-2176  DetalleTomaFisica       com.example.diverscan.activeid       D  Click en Nueva Toma. Iniciando NuevaTomaActivity para tomaFisicaId: 1082d85c-5461-47ad-833c-9389a5081963
+2026-03-23 12:52:37.186   726-816   ActivityTaskManager     system_server                        I  START u0 {xflg=0x4 cmp=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity (has extras)} with LAUNCH_MULTIPLE from uid 10218 (sr=224030054) (BAL_ALLOW_VISIBLE_WINDOW) result code=0
+2026-03-23 12:52:37.191  1017-1073  WindowManagerShell      com.android.systemui                 V  Transition requested (#15): android.os.BinderProxy@f0a4cae TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=23 effectiveUid=10218 displayId=0 isRunning=true baseIntent=Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 cmp=com.example.diverscan.activeid/.UI.splash.SplashActivity } baseActivity=ComponentInfo{com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity} topActivity=ComponentInfo{com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity} origActivity=null realActivity=ComponentInfo{com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity} numActivities=4 lastActiveTime=293771 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@753da4f} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 0 - 0, 0) topActivityInfo=ActivityInfo{35235dc com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=true isVisible=true isVisibleRequested=true isTopActivityNoDisplay=false isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false isActivityStackTransparent=false lastNonFullscreenBounds=Rect(284, 660 - 796, 1740) capturedLink=null capturedLinkTimestamp=0 requestedVisibleTypes=-9 topActivityRequestOpenInBrowserEducationTimestamp=0 appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false eligibleForLetterboxEducation= false isLetterboxEducationEnabled= true isLetterboxDoubleTapEnabled= false eligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 topActivityAppBounds=Rect(0, 0 - 1080, 2337) isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false hasMinAspectRatioOverride=false topActivityLetterboxBounds=null cameraCompatTaskInfo=CameraCompatTaskInfo { freeformCameraCompatMode=inactive}} topActivityMainWindowFrame=null}, pipChange = null, remoteTransition = null, displayChange = null, flags = 0, debugId = 15 }
+2026-03-23 12:52:37.219  2176-2176  erscan.activeid         com.example.diverscan.activeid       I  AssetManager2(0x70a50c525d78) locale list changing from [] to [en-US]
+2026-03-23 12:52:37.299  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Iniciando NuevaTomaActivity
+2026-03-23 12:52:37.299  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: tomaFisicaId recibido: 1082d85c-5461-47ad-833c-9389a5081963
+2026-03-23 12:52:37.299  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomasDao.getPendientesCount tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-23 12:52:37.302  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosCount
+2026-03-23 12:52:37.324  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getPendientesCount count=0
+2026-03-23 12:52:37.324  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  Creating NEW toma: 328755a2-67d5-4823-aec4-dbcf17f69b1a Num: 1
+2026-03-23 12:52:37.324  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  onCreate: Configurado idToma=328755a2-67d5-4823-aec4-dbcf17f69b1a, numero=1
+2026-03-23 12:52:37.335  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID: initialized=true
+2026-03-23 12:52:37.336  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID/onResume status=Iniciando conexión...
+2026-03-23 12:52:37.342  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  initRFID: ready=false
+2026-03-23 12:52:37.348  2176-4783  RFID_TAG_WRITER         com.example.diverscan.activeid       W  Background connection attempt failed or returned false
+2026-03-23 12:52:37.354   726-2170  NotificationService     system_server                        I  cancelToast pkg=com.example.diverscan.activeid token=android.os.BinderProxy@9eab89c
+2026-03-23 12:52:37.366  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  onResume RFID status=Iniciando conexión...
+2026-03-23 12:52:37.366  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  onResume RFID ready=false scanning=false
+2026-03-23 12:52:37.366  2176-4784  RFID_TAG_WRITER         com.example.diverscan.activeid       W  Background connection attempt failed or returned false
+2026-03-23 12:52:37.371  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       W  DataWedge: deshabilitado temporalmente
+2026-03-23 12:52:37.394  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getActivosCount count=20267
+2026-03-23 12:52:37.395  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-23 12:52:37.444   726-875   CoreBackPreview         system_server                        D  Window{ddb7f34 u0 com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@4508ad2, mPriority=-1, mIsAnimationCallback=false, mOverrideBehavior=0}
+2026-03-23 12:52:37.487  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getTomaFisicaById found=true
+2026-03-23 12:52:37.487  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros A=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B=null C=null D=null Sec=null UO=null Cat=null Est=b475f3af-c9f3-4b27-a187-f1c72c3aee98
+2026-03-23 12:52:37.495  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  Inventario base: tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963 A=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B=null C=null D=null UO=null Cat=null Est=b475f3af-c9f3-4b27-a187-f1c72c3aee98 totalActivosInventario=0
+2026-03-23 12:52:37.604  2176-2184  erscan.activeid         com.example.diverscan.activeid       I  Background concurrent mark compact GC freed 7102KB AllocSpace bytes, 0(0B) LOS objects, 49% free, 8016KB/15MB, paused 3.225ms,5.809ms total 132.542ms
+2026-03-23 12:52:37.747  2176-2186  System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-23 12:52:37.754  2176-2186  System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-23 12:52:37.759  2176-2186  System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-23 12:52:37.759  2176-2186  SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-23 12:52:37.761  2176-2186  System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-23 12:52:37.766   726-763   ActivityTaskManager     system_server                        I  Displayed com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity for user 0: +583ms
+2026-03-23 12:52:37.768  2176-2186  System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-23 12:52:37.770  2176-2186  System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-23 12:52:37.770  2176-2186  SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-23 12:52:37.770  2176-2186  System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-23 12:52:37.777  2176-2186  System                  com.example.diverscan.activeid       W  A resource failed to call close. 
+2026-03-23 12:52:37.779  2176-2186  System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnectionPool.close. 
+2026-03-23 12:52:37.780  2176-2186  SQLiteConnectionPool    com.example.diverscan.activeid       W  A SQLiteConnection object for database '/data/user/0/com.example.diverscan.activeid/databases/Test_ActiveId_v1' was leaked!  Please fix your application to end transactions in progress properly and to close the database when it is no longer needed.
+2026-03-23 12:52:37.781  2176-2186  System                  com.example.diverscan.activeid       W  A resource failed to call SQLiteConnection.close. 
+2026-03-23 12:52:37.786  1017-1073  WindowManagerShell      com.android.systemui                 V  onTransitionReady (#15) android.os.BinderProxy@f0a4cae: {id=15 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[
+                                                                                                            {m=OPEN f=FILLS_TASK leash=Surface(name=ActivityRecord{217355554 u0 com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity)/@0xe55d23c sb=Rect(0, 0 - 0, 0) eb=Rect(0, 0 - 1080, 2400) epz=Point(1080, 2400) d=-1->0 r=-1->0:-1 bc=ffffffff component=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity opt={t=FROM_STYLE mUserId=0}},
+                                                                                                            {m=TO_BACK f=FILLS_TASK leash=Surface(name=ActivityRecord{224030054 u0 com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity)/@0x700fbc5 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) epz=Point(1080, 2400) d=0 bc=ffffffff component=com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity opt={t=FROM_STYLE mUserId=0}}
+                                                                                                        ]}
+2026-03-23 12:52:37.790  1017-1073  WindowManagerShell      com.android.systemui                 V  Transition doesn't have explicit remote, search filters for match for {id=15 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{m=OPEN f=FILLS_TASK leash=Surface(name=ActivityRecord{217355554 u0 com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity)/@0xe55d23c sb=Rect(0, 0 - 0, 0) eb=Rect(0, 0 - 1080, 2400) epz=Point(1080, 2400) d=-1->0 r=-1->0:-1 bc=ffffffff component=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity opt={t=FROM_STYLE mUserId=0}},{m=TO_BACK f=FILLS_TASK leash=Surface(name=ActivityRecord{224030054 u0 com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity)/@0x700fbc5 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) epz=Point(1080, 2400) d=0 bc=ffffffff component=com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity opt={t=FROM_STYLE mUserId=0}}]}
+2026-03-23 12:52:37.791  1017-1073  WindowManagerShell      com.android.systemui                 V  start default transition animation, info = {id=15 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{m=OPEN f=FILLS_TASK leash=Surface(name=ActivityRecord{217355554 u0 com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity)/@0xe55d23c sb=Rect(0, 0 - 0, 0) eb=Rect(0, 0 - 1080, 2400) epz=Point(1080, 2400) d=-1->0 r=-1->0:-1 bc=ffffffff component=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity opt={t=FROM_STYLE mUserId=0}},{m=TO_BACK f=FILLS_TASK leash=Surface(name=ActivityRecord{224030054 u0 com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity)/@0x700fbc5 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) epz=Point(1080, 2400) d=0 bc=ffffffff component=com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity opt={t=FROM_STYLE mUserId=0}}]}
+2026-03-23 12:52:37.847   726-763   WindowManager           system_server                        V  Sent Transition (#15) createdAt=03-23 17:52:37.167 via request=TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=23 effectiveUid=10218 displayId=0 isRunning=true baseIntent=Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 cmp=com.example.diverscan.activeid/.UI.splash.SplashActivity } baseActivity=ComponentInfo{com.example.diverscan.activeid/com.example.diverscan.activeid.UI.main.MainActivity} topActivity=ComponentInfo{com.example.diverscan.activeid/com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity} origActivity=null realActivity=ComponentInfo{com.example.diverscan.activeid/com.example.diverscan.activeid.UI.splash.SplashActivity} numActivities=4 lastActiveTime=293771 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{d5032c8 Task{8a45722 #23 type=standard A=10218:com.example.diverscan.activeid}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 0 - 0, 0) topActivityInfo=ActivityInfo{9b6a22a com.example.diverscan.activeid.UI.tomasfisicas.NuevaTomaActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=true isVisible=true isVisibleRequested=true isTopActivityNoDisplay=false isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false isActivityStackTransparent=false lastNonFullscreenBounds=Rect(284, 660 - 796, 1740) capturedLink=null capturedLinkTimestamp=0 requestedVisibleTypes=-9 topActivityRequestOpenInBrowserEducationTimestamp=0 appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false eligibleForLetterboxEducation= false isLetterboxEducationEnabled= true isLetterboxDoubleTapEnabled= false eligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 topActivityAppBounds=Rect(0, 0 - 1080, 2337) isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false hasMinAspectRatioOverride=false topActivityLetterboxBounds=null cameraCompatTaskInfo=CameraCompatTaskInfo { freeformCameraCompatMode=inactive}} topActivityMainWindowFrame=null}, pipChange = null, remoteTransition = null, displayChange = null, flags = 0, debugId = 15 }
+2026-03-23 12:52:37.866   726-763   WindowManager           system_server                        V      info={id=15 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[
+                                                                                                            {m=OPEN f=FILLS_TASK leash=Surface(name=ActivityRecord{217355554 u0 com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity)/@0xff8baff sb=Rect(0, 0 - 0, 0) eb=Rect(0, 0 - 1080, 2400) epz=Point(1080, 2400) d=-1->0 r=-1->0:-1 bc=ffffffff component=com.example.diverscan.activeid/.UI.tomasfisicas.NuevaTomaActivity opt={t=FROM_STYLE mUserId=0}},
+                                                                                                            {m=TO_BACK f=FILLS_TASK leash=Surface(name=ActivityRecord{224030054 u0 com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity)/@0x213a812 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) epz=Point(1080, 2400) d=0 bc=ffffffff component=com.example.diverscan.activeid/.UI.tomasfisicas.DetalleTomaFisicaActivity opt={t=FROM_STYLE mUserId=0}}
+                                                                                                        ]}
+2026-03-23 12:52:37.915  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL tomaFisicaDao.getTomaFisicaById tomaFisicaId=1082d85c-5461-47ad-833c-9389a5081963
+2026-03-23 12:52:37.928  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros A=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B=null C=null D=null Sec=null UO=00000000-0000-0000-0000-000000000000
+2026-03-23 12:52:37.931   726-875   NotificationService     system_server                        W  Toast already killed. pkg=com.example.diverscan.activeid token=android.os.BinderProxy@9eab89c
+2026-03-23 12:52:38.204  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getActivosByFiltros size=333
+2026-03-23 12:52:38.227  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL ubicacionDao.getUbicacionByASysId A=a35ad9de-18ea-4c3f-a4d5-184e902f2a77
+2026-03-23 12:52:38.235  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  onResume retry RFID status=Iniciando conexión... ready=false
+2026-03-23 12:52:38.243  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-23 12:52:38.275  2176-4789  RFID_TAG_WRITER         com.example.diverscan.activeid       W  Background connection attempt failed or returned false
+2026-03-23 12:52:38.279   726-863   ImeTracker              system_server                        I  com.example.diverscan.activeid:93c16cb6: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false
+2026-03-23 12:52:38.332  2515-2515  GoogleInpu...hodService com...gle.android.inputmethod.latin  I  GoogleInputMethodService.onStartInput():1293 onStartInput(EditorInfo{EditorInfo{packageName=com.example.diverscan.activeid, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=0, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+2026-03-23 12:52:38.362   726-875   PackageConfigPersister  system_server                        W  App-specific configuration not found for packageName: com.example.diverscan.activeid and userId: 0
+2026-03-23 12:52:38.430  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getUbicacionByASysId found=true
+2026-03-23 12:52:38.430  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getAllCategorias
+2026-03-23 12:52:38.431  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL getAllCategorias size=5
+2026-03-23 12:52:38.449  2176-2176  InsetsController        com.example.diverscan.activeid       D  hide(ime(), fromIme=false)
+2026-03-23 12:52:38.450  2176-2176  ImeTracker              com.example.diverscan.activeid       I  com.example.diverscan.activeid:93c16cb6: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+2026-03-23 12:52:38.451  2176-2176  VRI[Detall...aActivity] com.example.diverscan.activeid       D  visibilityChanged oldVisibility=true newVisibility=false
+2026-03-23 12:52:38.527  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionA: id=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 text=ASESORIA JURIDICA
+2026-03-23 12:52:38.533  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] start
+2026-03-23 12:52:38.540  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-23 12:52:38.567  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro Categoria: id=null
+2026-03-23 12:52:38.587  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] start
+2026-03-23 12:52:38.587  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-23 12:52:38.610  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  Filtro UbicacionSecundaria: value=null
+2026-03-23 12:52:38.776  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-23 12:52:38.781  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-23 12:52:38.782  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] queryTimes ms expected=230 counts=10 scannedMap=1 totalBg=241 expectedSize=333 uniqueTags=0
+2026-03-23 12:52:38.787  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-23 12:52:38.791  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[1] done total=258ms listSize=333
+2026-03-23 12:52:38.805  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-23 12:52:38.836  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-23 12:52:38.839  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-23 12:52:38.839  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] queryTimes ms expected=45 counts=7 scannedMap=0 totalBg=52 expectedSize=333 uniqueTags=0
+2026-03-23 12:52:38.845  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[2] done total=258ms listSize=333
+2026-03-23 12:52:38.845  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-23 12:52:38.879  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-23 12:52:38.879  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=40ms
+2026-03-23 12:52:38.880  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  Actualizando UI spinner. Items: 0
+2026-03-23 12:52:38.916  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-23 12:52:38.917  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=37ms
+2026-03-23 12:52:38.917  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  Actualizando UI spinner. Items: 333
+2026-03-23 12:52:39.132  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] start
+2026-03-23 12:52:39.133  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.getActivosByFiltros ua=a35ad9de-18ea-4c3f-a4d5-184e902f2a77 ub=null uc=null ud=null us=null uo=null cat=null
+2026-03-23 12:52:39.166  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL activoDao.countActivosByFiltros for counts
+2026-03-23 12:52:39.170  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  SQL counts A=333 B=333 C=333 D=333 S=333
+2026-03-23 12:52:39.170  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] queryTimes ms expected=29 counts=7 scannedMap=1 totalBg=37 expectedSize=333 uniqueTags=0
+2026-03-23 12:52:39.201  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  refreshActivosList[3] done total=69ms listSize=333
+2026-03-23 12:52:39.201  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: Filtros -> A:a35ad9de-18ea-4c3f-a4d5-184e902f2a77 B:null C:null D:null Sec:null
+2026-03-23 12:52:39.251  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  Total activos cargados para selector manual: 333
+2026-03-23 12:52:39.252  2176-4782  NuevaTomaActivity       com.example.diverscan.activeid       D  cargarActivosSpinner: queryTime=50ms
+2026-03-23 12:52:39.285  2176-2176  NuevaTomaActivity       com.example.diverscan.activeid       D  Actualizando UI spinner. Items: 333
+2026-03-23 12:52:41.503   726-2170  NotificationService     system_server                        W  Toast already killed. pkg=com.example.diverscan.activeid token=android.os.BinderProxy@6c4a23d
