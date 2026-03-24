@@ -175,7 +175,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                    if(rfidHandler != null) {
                        rfidHandler.setAntennaPower(val);
                        SharedPreferencesGetSet.guardar_local("potenciaAntena", String.valueOf(val), this);
-                       Toast.makeText(this, "Potencia ajustada a " + val, Toast.LENGTH_SHORT).show();
+                       Toast.makeText(getApplicationContext(), "Potencia ajustada a " + val, Toast.LENGTH_SHORT).show();
                    }
                })
                .setNegativeButton("Cancelar", (dialog, id) -> dialog.cancel());
@@ -438,7 +438,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             Log.d(TAG, "onCreate: tomaFisicaId recibido: " + tomaFisicaId);
         } else {
             Log.e(TAG, "onCreate: Error: No se recibiÃ³ ID de Toma FÃ­sica");
-            Toast.makeText(this, "Error: No se recibiÃ³ ID de Toma FÃ­sica", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Error: No se recibiÃ³ ID de Toma FÃ­sica", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -498,7 +498,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             }
         } catch (Exception e) {
             Log.e(TAG, "onCreate: Error fatal inicializando actividad", e);
-            Toast.makeText(this, "Error inicializando: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Error inicializando: " + e.getMessage(), Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -530,7 +530,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 runOnUiThread(() -> {
                     uniqueTags.addAll(loadedTags);
                     manualEpcToActivoId.putAll(loadedMap);
-                    Toast.makeText(this, "Se han cargado " + loadedTags.size() + " lecturas previas", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Se han cargado " + loadedTags.size() + " lecturas previas", Toast.LENGTH_SHORT).show();
                     refreshActivosList();
                 });
             }
@@ -544,7 +544,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             if (grantResults.length > 0 && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 initRFID();
             } else {
-                Toast.makeText(this, "Permiso Bluetooth necesario para RFID", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Permiso Bluetooth necesario para RFID", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -1519,7 +1519,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         if (etManualInput == null) return;
         String input = etManualInput.getText().toString().trim();
         if (input.isEmpty()) {
-            Toast.makeText(this, "Ingrese Placa o EPC", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Ingrese Placa o EPC", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1559,7 +1559,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 // Check uniqueTags on UI Thread to avoid race conditions
                 if (uniqueTags.contains(targetEpc)) {
                     Log.d(TAG, "Manual Input IGNORED: Already scanned. EPC=" + targetEpc);
-                    Toast.makeText(this, "Este activo ya fue leído (" + targetEpc + ")", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Este activo ya fue leído (" + targetEpc + ")", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -1608,7 +1608,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 etManualInput.setText("");
                 
                 if (finalA == null) {
-                    Toast.makeText(this, "Añadido a No Inventariados", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Añadido a No Inventariados", Toast.LENGTH_SHORT).show();
                 }
                 
                 // Auto-save
@@ -1619,7 +1619,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
 
     private void agregarLecturaManual() {
         if (listaActivosSpinner == null || listaActivosSpinner.isEmpty()) {
-             Toast.makeText(this, "No hay activos cargados", Toast.LENGTH_SHORT).show();
+             Toast.makeText(getApplicationContext(), "No hay activos cargados", Toast.LENGTH_SHORT).show();
              return;
         }
         int pos = spinnerActivos.getSelectedItemPosition();
@@ -1687,7 +1687,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 new SaveLocalTask(false).execute();
             } else {
                 Log.d(TAG, "EPC duplicado: " + epc);
-                Toast.makeText(this, "Este activo ya fue leído", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Este activo ya fue leído", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -1886,7 +1886,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         protected void onPreExecute() {
             super.onPreExecute();
             if (navigateAfterSave) {
-                Toast.makeText(NuevaTomaActivity.this, "Guardando y saliendo...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Guardando y saliendo...", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -2005,11 +2005,11 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         protected void onPostExecute(Boolean success) {
             if (success) {
                 if (navigateAfterSave) {
-                    Toast.makeText(NuevaTomaActivity.this, "Guardado localmente. Envia desde Sincronizar", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Guardado localmente. Envia desde Sincronizar", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             } else {
-                Toast.makeText(NuevaTomaActivity.this, "Error al guardar datos", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Error al guardar datos", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -2021,7 +2021,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             }
             // Use LENGTH_LONG for the connecting message so it stays on screen longer
             int duration = message.contains("Conectando") ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
-            rfidStatusToast = Toast.makeText(this, message, duration);
+            rfidStatusToast = Toast.makeText(getApplicationContext(), message, duration);
             rfidStatusToast.show();
         });
     }
@@ -2166,7 +2166,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             Log.e(TAG, "Error starting scan", e);
             isScanning = false;
             updateUIState();
-            Toast.makeText(this, "Error al iniciar lectura: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Error al iniciar lectura: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -2227,7 +2227,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     private void uploadTake() {
         Log.d(TAG, "ENVIAR: Usuario hizo click en Enviar/Subir toma. Cantidad de lecturas: " + uniqueTags.size());
         if (uniqueTags.isEmpty()) {
-            Toast.makeText(this, "No hay lecturas para guardar", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "No hay lecturas para guardar", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -2253,7 +2253,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(NuevaTomaActivity.this, "Cerrando toma...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Cerrando toma...", Toast.LENGTH_SHORT).show();
             btnSubir.setEnabled(false);
         }
 
@@ -2377,10 +2377,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
-                Toast.makeText(NuevaTomaActivity.this, "Toma cerrada y guardada localmente. Vaya a Sincronizar para enviar.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Toma cerrada y guardada localmente. Vaya a Sincronizar para enviar.", Toast.LENGTH_LONG).show();
                 finish();
             } else {
-                Toast.makeText(NuevaTomaActivity.this, "Error al guardar localmente", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Error al guardar localmente", Toast.LENGTH_SHORT).show();
                 btnSubir.setEnabled(true);
             }
         }
@@ -2591,7 +2591,7 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 isRfidReady = false;
             }
             if (normalized.contains("error")) {
-                runOnUiThread(() -> Toast.makeText(this, Text, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT).show());
             }
         }
     }

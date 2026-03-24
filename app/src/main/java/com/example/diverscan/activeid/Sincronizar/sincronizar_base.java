@@ -273,7 +273,7 @@ public class sincronizar_base extends AppCompatActivity {
                 .setTitle("Confirmar limpieza")
                 .setMessage("¿Estás seguro de que quieres eliminar TODOS los datos locales? Esta acción no se puede deshacer.")
                 .setPositiveButton("Sí, eliminar", (dialog, which) -> {
-                    com.example.diverscan.activeid.data.local.dao.AppDatabaseHelper helper = new com.example.diverscan.activeid.data.local.dao.AppDatabaseHelper(mSincronizarView.getContext());
+                    com.example.diverscan.activeid.data.local.dao.AppDatabaseHelper helper = com.example.diverscan.activeid.data.local.dao.AppDatabaseHelper.getInstance(mSincronizarView.getContext());
                     helper.clearAllData();
                     mostrarSnack("Base de datos limpiada correctamente.", Color.rgb(4, 165, 77));
                     updateDebugSummary();

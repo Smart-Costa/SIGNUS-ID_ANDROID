@@ -10,7 +10,16 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 9;
     private final Context context;
 
-    public AppDatabaseHelper(Context context) {
+    private static AppDatabaseHelper sInstance;
+
+    public static synchronized AppDatabaseHelper getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new AppDatabaseHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
+    private AppDatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         this.context = context.getApplicationContext();
     }

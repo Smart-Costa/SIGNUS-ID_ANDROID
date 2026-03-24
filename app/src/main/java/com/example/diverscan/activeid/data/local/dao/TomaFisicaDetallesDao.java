@@ -34,8 +34,8 @@ public class TomaFisicaDetallesDao {
     private static final String TAG = "DB_DAO_TFDETALLE";
 
     public TomaFisicaDetallesDao(Context context) {
-        this.context = context;
-        this.dbHelper = new AppDatabaseHelper(context);
+        this.context = context.getApplicationContext();
+        this.dbHelper = AppDatabaseHelper.getInstance(context);
     }
 
     private ContentValues entityToValues(TomaFisicaDetallesEntity a) {

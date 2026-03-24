@@ -26,7 +26,7 @@ public class TomaFisicaDao {
 
     public TomaFisicaDao(Context context) {
         this.context = context.getApplicationContext();
-        this.dbHelper = new AppDatabaseHelper(context);
+        this.dbHelper = AppDatabaseHelper.getInstance(context);
     }
 
     private ContentValues entityToContentValues(TomaFisicaEntity a) {

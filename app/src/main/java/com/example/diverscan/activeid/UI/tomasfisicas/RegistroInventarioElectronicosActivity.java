@@ -226,14 +226,14 @@ public class RegistroInventarioElectronicosActivity extends AppCompatActivity {
                 android.util.Log.d("DEBUG_DELETE", "Eliminación exitosa en BD para: " + item.getIdToma());
 
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Toma eliminada", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Toma eliminada", Toast.LENGTH_SHORT).show();
                     setToggleMostrandoCompletas(mostrandoCompletas);
                     cargarKpi();
                 });
             } catch (Exception e) {
                 android.util.Log.e("DEBUG_DELETE", "Excepción al eliminar", e);
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Error al eliminar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Error al eliminar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();

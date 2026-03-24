@@ -57,7 +57,7 @@ public class LimpiarBaseDatosActivity extends AppCompatActivity {
 
     private void ejecutarLimpieza() {
         try {
-            AppDatabaseHelper helper = new AppDatabaseHelper(context);
+            AppDatabaseHelper helper = AppDatabaseHelper.getInstance(context);
             helper.clearAllData();
             Toast.makeText(context, "Base de datos limpiada correctamente.", Toast.LENGTH_LONG).show();
             finish(); // Cerrar actividad

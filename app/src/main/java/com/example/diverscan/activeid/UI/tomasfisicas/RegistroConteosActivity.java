@@ -144,7 +144,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                     if (btnAgregarLectura != null) btnAgregarLectura.setEnabled(false);
                     if (spinnerActivos != null) spinnerActivos.setEnabled(false);
                     // Show message
-                    // Toast.makeText(this, "Esta toma está CERRADA y no se puede editar.", Toast.LENGTH_LONG).show();
+                    // Toast.makeText(getApplicationContext(), "Esta toma está CERRADA y no se puede editar.", Toast.LENGTH_LONG).show();
                 });
             } else {
                 runOnUiThread(() -> {
@@ -857,7 +857,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                 tabAdd.setAlpha(canAdd ? 1f : 0.45f);
                 tabAdd.setOnClickListener(v -> {
                     if (!canAdd) {
-                        Toast.makeText(this, "Límite de 5 tomas alcanzado", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Límite de 5 tomas alcanzado", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     Intent intent = new Intent(this, NuevaTomaActivity.class);
@@ -952,11 +952,11 @@ public class RegistroConteosActivity extends AppCompatActivity {
 
     private void agregarLecturaManual() {
         if (isTomaCerrada) {
-            Toast.makeText(this, "La toma está cerrada", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "La toma está cerrada", Toast.LENGTH_SHORT).show();
             return;
         }
         if (listaActivosSpinner == null || listaActivosSpinner.isEmpty()) {
-             Toast.makeText(this, "No hay activos cargados", Toast.LENGTH_SHORT).show();
+             Toast.makeText(getApplicationContext(), "No hay activos cargados", Toast.LENGTH_SHORT).show();
              return;
         }
         int pos = spinnerActivos.getSelectedItemPosition();
@@ -973,7 +973,7 @@ public class RegistroConteosActivity extends AppCompatActivity {
                  String activoId = activo.getIdActivo() != null ? activo.getIdActivo().trim() : "";
                  if (activoId.isEmpty()) {
                      runOnUiThread(() -> {
-                         Toast.makeText(RegistroConteosActivity.this, "Activo inválido", Toast.LENGTH_SHORT).show();
+                         Toast.makeText(getApplicationContext(), "Activo inválido", Toast.LENGTH_SHORT).show();
                          restaurarBoton();
                      });
                      return;
@@ -987,14 +987,14 @@ public class RegistroConteosActivity extends AppCompatActivity {
                          String dEpc = d.getEpc() != null ? d.getEpc().trim() : "";
                          if (!dActivoId.isEmpty() && dActivoId.equalsIgnoreCase(activoId)) {
                              runOnUiThread(() -> {
-                                 Toast.makeText(RegistroConteosActivity.this, "Este activo ya fue leído", Toast.LENGTH_SHORT).show();
+                                 Toast.makeText(getApplicationContext(), "Este activo ya fue leído", Toast.LENGTH_SHORT).show();
                                  restaurarBoton();
                              });
                              return;
                          }
                          if (!dEpc.isEmpty() && dEpc.equalsIgnoreCase(epc)) {
                              runOnUiThread(() -> {
-                                 Toast.makeText(RegistroConteosActivity.this, "Este activo ya fue leído", Toast.LENGTH_SHORT).show();
+                                 Toast.makeText(getApplicationContext(), "Este activo ya fue leído", Toast.LENGTH_SHORT).show();
                                  restaurarBoton();
                              });
                              return;
@@ -1034,14 +1034,14 @@ public class RegistroConteosActivity extends AppCompatActivity {
                  recalcularResumenCompleto(idToma);
 
                  runOnUiThread(() -> {
-                     Toast.makeText(RegistroConteosActivity.this, "Guardada localmente", Toast.LENGTH_SHORT).show();
+                     Toast.makeText(getApplicationContext(), "Guardada localmente", Toast.LENGTH_SHORT).show();
                      cargarDatos();
                      restaurarBoton();
                  });
              } catch (Exception e) {
                  Log.e("RegistroConteos", "Error agregando lectura manual", e);
                  runOnUiThread(() -> {
-                     Toast.makeText(RegistroConteosActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                     Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                      restaurarBoton();
                  });
              }

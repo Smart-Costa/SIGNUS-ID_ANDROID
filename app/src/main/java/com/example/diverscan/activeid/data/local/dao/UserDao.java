@@ -24,7 +24,7 @@ public class UserDao {
 
     public UserDao(Context context) {
         this.context = context.getApplicationContext();
-        this.dbHelper = new AppDatabaseHelper(context);
+        this.dbHelper = AppDatabaseHelper.getInstance(context);
     }
 
     public boolean validateUser(String user, String pass) {

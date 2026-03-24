@@ -152,7 +152,7 @@ public class DetalleTomaFisicaActivity extends AppCompatActivity {
         // Listeners
         btnNuevaToma.setOnClickListener(v -> {
             if (listaTomas.size() >= MAX_TOMAS) {
-                Toast.makeText(this, "Límite de " + MAX_TOMAS + " tomas alcanzado.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Límite de " + MAX_TOMAS + " tomas alcanzado.", Toast.LENGTH_SHORT).show();
             } else {
                 // Log click event
                 android.util.Log.d("DetalleTomaFisica", "Click en Nueva Toma. Iniciando NuevaTomaActivity para tomaFisicaId: " + tomaFisicaId);

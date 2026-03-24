@@ -73,7 +73,7 @@ public class ActivoDao {
 
     public ActivoDao(Context context) {
         this.context = context.getApplicationContext();
-        this.dbHelper = new AppDatabaseHelper(context);
+        this.dbHelper = AppDatabaseHelper.getInstance(context);
     }
 
     public int getActivosCount() {

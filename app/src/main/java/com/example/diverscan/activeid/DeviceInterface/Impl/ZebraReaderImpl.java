@@ -303,6 +303,24 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
             return false;
         }
         try {
+            if (!reader.isConnected()) {
+                notifyError("Error: Lector desconectado.");
+                return false;
+            }
+            try {
+                reader.Actions.Inventory.stop();
+                Thread.sleep(150);
+            } catch (Exception ignored) {
+            }
+            configureTrigger(false);
+            setPower(maxPower);
+            Antennas.SingulationControl s1SingulationControl = reader.Config.Antennas.getSingulationControl(1);
+            s1SingulationControl.setSession(SESSION.SESSION_S0);
+            s1SingulationControl.Action.setInventoryState(INVENTORY_STATE.INVENTORY_STATE_A);
+            s1SingulationControl.Action.setSLFlag(SL_FLAG.SL_ALL);
+            reader.Config.Antennas.setSingulationControl(1, s1SingulationControl);
+            reader.Actions.PreFilters.deleteAll();
+            reader.Actions.getReadTags(1000);
             reader.Actions.Inventory.perform();
             return true;
         } catch (InvalidUsageException | OperationFailureException e) {
@@ -313,6 +331,15 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
             if (detail.contains("Operation In Progress") || detail.contains("Command in progress")) {
                 Log.d(TAG, "Inventory already in progress, ignoring redundant start command.");
                 return true; 
+            }
+
+            if (detail.contains("Response timeout") || msg.contains("timeout") || msg.contains("Timeout")) {
+                Log.e(TAG, "Timeout detectado. Forzando reconexión del lector RFID.");
+                new Thread(() -> {
+                    disconnect();
+                    try { Thread.sleep(500); } catch (Exception ignored) {}
+                    connect();
+                }).start();
             }
             
             notifyError("Error iniciando inventario: " + msg + " [Info: " + detail + "]");

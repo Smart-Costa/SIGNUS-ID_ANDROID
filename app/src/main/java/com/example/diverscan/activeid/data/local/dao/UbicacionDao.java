@@ -24,7 +24,7 @@ public class UbicacionDao {
 
     public UbicacionDao(Context context) {
         this.context = context.getApplicationContext();
-        this.dbHelper = new AppDatabaseHelper(context);
+        this.dbHelper = AppDatabaseHelper.getInstance(context);
     }
 
     public void syncUbicaciones(List<UbicacionEntity> lista) {
