@@ -172,6 +172,9 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
         super.onResume();
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
+            try {
+                rfidHandler.onResume(); // Reconectar si se desconectó durante pausa
+            } catch (Exception ignored) {}
         }
     }
 
@@ -262,7 +265,19 @@ public class RegistroActivoFotoTagActivity extends AppCompatActivity implements 
 
     @Override
     public void SetMessage(String msg) {
-        runOnUiThread(() -> Toast.makeText(this, "Reader: " + msg, Toast.LENGTH_SHORT).show());
+        android.util.Log.d("RegistroFotoTag", "RFID_MSG: " + msg);
+        if (msg == null) return;
+        final String n = msg.toLowerCase(java.util.Locale.ROOT);
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            if (n.contains("timeout"))              Toast.makeText(this, "Timeout RFID — Reconectando...", Toast.LENGTH_SHORT).show();
+            else if (n.contains("reconect"))        Toast.makeText(this, "Reconectando lector...", Toast.LENGTH_SHORT).show();
+            else if (n.contains("operation in progress") || n.contains("ocupado")) Toast.makeText(this, "Lector ocupado, espere...", Toast.LENGTH_SHORT).show();
+            else if (n.contains("conectado a"))     Toast.makeText(this, "Lector listo", Toast.LENGTH_SHORT).show();
+            else if (n.contains("desconectado"))    Toast.makeText(this, "Lector desconectado", Toast.LENGTH_SHORT).show();
+            else if (n.contains("error"))           Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+            // Msgs de configuración interna → silencio
+        });
     }
 
     @Override

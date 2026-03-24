@@ -31,7 +31,7 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
 
         PermissionUtils.requestPermissions(this);
 
-        activoDAO = new ActivoDao(this);
+        activoDAO = new ActivoDao(this); // Constructor internamente usa AppDatabaseHelper.getInstance(context)
         
         // Usar TagWriter (Singleton) en lugar de RfidManager para mantener conexión global
         rfidHandler = TagWriter.getInstance();
@@ -128,9 +128,18 @@ public class DarBajaActivoDetailActivity extends AppCompatActivity implements Re
 
     @Override
     public void SetMessage(String message) {
-        runOnUiThread(() -> 
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        );
+        android.util.Log.d("DarBajaActivo", "RFID_MSG: " + message);
+        if (message == null) return;
+        final String n = message.toLowerCase(java.util.Locale.ROOT);
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            if (n.contains("timeout"))              Toast.makeText(this, "Timeout RFID — Reconectando...", Toast.LENGTH_SHORT).show();
+            else if (n.contains("reconect"))        Toast.makeText(this, "Reconectando lector...", Toast.LENGTH_SHORT).show();
+            else if (n.contains("operation in progress") || n.contains("ocupado")) Toast.makeText(this, "Lector ocupado, espere...", Toast.LENGTH_SHORT).show();
+            else if (n.contains("conectado a"))     Toast.makeText(this, "Lector listo", Toast.LENGTH_SHORT).show();
+            else if (n.contains("desconectado"))    Toast.makeText(this, "Lector desconectado", Toast.LENGTH_SHORT).show();
+            else if (n.contains("error"))           Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override

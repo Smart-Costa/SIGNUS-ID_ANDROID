@@ -43,7 +43,12 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         // incluso si el usuario des-seleccionaba el checkbox. Ahora solo inicia si está checked.
         binding.opcRFID.setOnClickListener(v -> {
             if (rfidHandler != null && binding.opcRFID.isChecked()) {
+                if (!rfidHandler.isConnected()) {
+                    Toast.makeText(this, "Lector no disponible. Espere la conexión.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 rfidHandler.startRead();
+                isScanning = true;
             }
         });
         
@@ -68,6 +73,9 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
         super.onResume();
         if (rfidHandler != null) {
             rfidHandler.setResponseHandler(this);
+            try {
+                rfidHandler.onResume(); // Reconectar si se desconectó
+            } catch (Exception ignored) {}
         }
     }
 
@@ -144,7 +152,18 @@ public class LocalizarActivoDetailActivity extends AppCompatActivity implements 
 
     @Override
     public void SetMessage(String msg) {
-        runOnUiThread(() -> Toast.makeText(this, "Reader: " + msg, Toast.LENGTH_SHORT).show());
+        android.util.Log.d("LocalizarActivo", "RFID_MSG: " + msg);
+        if (msg == null) return;
+        final String n = msg.toLowerCase(java.util.Locale.ROOT);
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            if (n.contains("timeout"))              Toast.makeText(this, "Timeout RFID — Reconectando...", Toast.LENGTH_SHORT).show();
+            else if (n.contains("reconect"))        Toast.makeText(this, "Reconectando lector...", Toast.LENGTH_SHORT).show();
+            else if (n.contains("operation in progress") || n.contains("ocupado")) Toast.makeText(this, "Lector ocupado, espere...", Toast.LENGTH_SHORT).show();
+            else if (n.contains("conectado a"))     Toast.makeText(this, "Lector listo", Toast.LENGTH_SHORT).show();
+            else if (n.contains("desconectado"))    Toast.makeText(this, "Lector desconectado", Toast.LENGTH_SHORT).show();
+            else if (n.contains("error"))           Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override
