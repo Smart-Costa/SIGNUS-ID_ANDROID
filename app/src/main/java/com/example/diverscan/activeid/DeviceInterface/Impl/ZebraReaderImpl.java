@@ -320,6 +320,25 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 notifyError("Error: Lector desconectado.");
                 return false;
             }
+            // Detener cualquier inventario previo y limpiar el estado del reader
+            // antes de reconfigurar. Sin esto, SetStartTrigger / SetAntennaConfiguration
+            // generan RFID_API_COMMAND_TIMEOUT en la segunda sesión de escaneo.
+            try {
+                reader.Actions.Inventory.stop();
+                Log.d(TAG, "startInventory() pre-stop OK");
+                Thread.sleep(150);
+            } catch (Exception ignored) {
+                Log.d(TAG, "startInventory() pre-stop ignored: " + ignored.getMessage());
+            }
+            configureTrigger(false);
+            setPower(maxPower);
+            Antennas.SingulationControl s1SingulationControl = reader.Config.Antennas.getSingulationControl(1);
+            s1SingulationControl.setSession(SESSION.SESSION_S0);
+            s1SingulationControl.Action.setInventoryState(INVENTORY_STATE.INVENTORY_STATE_A);
+            s1SingulationControl.Action.setSLFlag(SL_FLAG.SL_ALL);
+            reader.Config.Antennas.setSingulationControl(1, s1SingulationControl);
+            reader.Actions.PreFilters.deleteAll();
+            reader.Actions.getReadTags(1000);
             reader.Actions.Inventory.perform();
             Log.d(TAG, "startInventory() perform OK");
             return true;

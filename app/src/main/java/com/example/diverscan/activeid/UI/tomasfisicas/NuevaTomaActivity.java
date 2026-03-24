@@ -2583,18 +2583,50 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
     @Override
     public void SetMessage(String Text) {
         Log.d(TAG, "RFID_MSG: " + Text);
-        if (Text != null) {
-            String normalized = Text.toLowerCase(Locale.ROOT);
-            if (normalized.contains("conectado")) {
-                isRfidReady = true;
-            } else if (normalized.contains("desconect") || normalized.contains("error")) {
-                isRfidReady = false;
-            }
-            if (normalized.contains("error")) {
-                runOnUiThread(() -> Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT).show());
-            }
+        if (Text == null) return;
+
+        final String normalized = Text.toLowerCase(java.util.Locale.ROOT);
+
+        // --- Actualizar estado interno ---
+        if (normalized.contains("conectado a") || normalized.contains("conectado (")) {
+            isRfidReady = true;
+        } else if (normalized.contains("desconect") || normalized.contains("error")) {
+            isRfidReady = false;
         }
+
+        // --- Toasts diferenciados por caso ---
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
+
+            if (normalized.contains("timeout") || normalized.contains("response timeout")) {
+                showRfidToast("Timeout RFID — Reconectando automaticamente...");
+
+            } else if (normalized.contains("reconect") || normalized.contains("forzando reconex")) {
+                showRfidToast("Reconectando lector RFID...");
+
+            } else if (normalized.contains("operation in progress") || normalized.contains("command in progress") || normalized.contains("ocupado")) {
+                showRfidToast("Lector ocupado, espere un momento...");
+
+            } else if (normalized.contains("conectado a")) {
+                showRfidToast("Lector conectado: " + Text.replaceFirst("(?i)conectado a ", ""));
+                stopRfidStatusPolling();
+
+            } else if (normalized.contains("desconectado")) {
+                showRfidToast("Lector desconectado");
+
+            } else if (normalized.contains("error iniciando inventario")) {
+                showRfidToast("Error de lectura RFID. Intente nuevamente.");
+
+            } else if (normalized.contains("error:") || normalized.startsWith("error ")) {
+                showRfidToast(Text);
+
+            } else if (normalized.contains("configurando lector") || normalized.contains("iniciando servicio")) {
+                showRfidToast("Preparando lector...");
+            }
+            // Mensajes informativos internos (sin cambio en config) no muestran toast
+        });
     }
+
 
     // Adapter for RecyclerView
     private class ActivosAdapter extends RecyclerView.Adapter<ActivosAdapter.VH> {
