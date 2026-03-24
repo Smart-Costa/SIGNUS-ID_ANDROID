@@ -173,17 +173,20 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public synchronized boolean connect() {
+        Log.d(TAG, "connect() called isConnecting=" + isConnecting + " readerNull=" + (reader == null));
         if (isConnecting) return false;
         isConnecting = true;
         try {
             if (reader != null) {
                 try {
                     if (!reader.isConnected()) {
+                        Log.d(TAG, "connect() reader not connected. starting retries");
                         // Retry logic for connection
                         int retries = 3;
                         while (retries > 0) {
                             try {
                                 reader.connect();
+                                Log.d(TAG, "connect() reader.connect() success host=" + reader.getHostName());
                                 configureReader();
                                 notifyConnected(reader.getHostName());
                                 isConnecting = false;
@@ -196,16 +199,19 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                             }
                         }
                     } else {
+                        Log.d(TAG, "connect() reader already connected host=" + reader.getHostName());
                         notifyConnected(reader.getHostName()); // Already connected
                         isConnecting = false;
                         return true;
                     }
                 } catch (InvalidUsageException | OperationFailureException e) {
+                    Log.e(TAG, "connect() failed msg=" + e.getMessage(), e);
                     notifyError("Error conectando: " + e.getMessage() + (e instanceof OperationFailureException ? " [Info: " + ((OperationFailureException)e).getVendorMessage() + "]" : ""));
                 }
             }
         } finally {
             isConnecting = false;
+            Log.d(TAG, "connect() finished isConnected=" + isConnected());
         }
         return false;
     }
@@ -213,6 +219,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     private void configureReader() {
         if (reader != null && reader.isConnected()) {
             try {
+                Log.d(TAG, "configureReader() start host=" + reader.getHostName() + " maxPower=" + maxPower);
                 if (eventHandler == null) {
                     eventHandler = new EventHandler();
                 }
@@ -241,8 +248,10 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 reader.Config.Antennas.setSingulationControl(1, s1_singulationControl);
                 
                 reader.Actions.PreFilters.deleteAll();
+                Log.d(TAG, "configureReader() done trigger=IMMEDIATE prefiltersCleared=true");
                 
             } catch (InvalidUsageException | OperationFailureException e) {
+                Log.e(TAG, "configureReader() error msg=" + e.getMessage(), e);
                 e.printStackTrace();
             }
         }
@@ -250,6 +259,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     
     private void configureTrigger(boolean isHandheld) {
         try {
+            Log.d(TAG, "configureTrigger() isHandheld=" + isHandheld);
             TriggerInfo triggerInfo = new TriggerInfo();
             if (isHandheld) {
                 triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_HANDHELD);
@@ -260,7 +270,9 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
             }
             reader.Config.setStartTrigger(triggerInfo.StartTrigger);
             reader.Config.setStopTrigger(triggerInfo.StopTrigger);
+            Log.d(TAG, "configureTrigger() applied start=" + triggerInfo.StartTrigger.getTriggerType() + " stop=" + triggerInfo.StopTrigger.getTriggerType());
         } catch (InvalidUsageException | OperationFailureException e) {
+            Log.e(TAG, "configureTrigger() error msg=" + e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -298,6 +310,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public boolean startInventory() {
+        Log.d(TAG, "startInventory() called readerNull=" + (reader == null) + " connected=" + isConnected());
         if (reader == null) {
             notifyError("Error: Lector no inicializado.");
             return false;
@@ -308,10 +321,12 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 return false;
             }
             reader.Actions.Inventory.perform();
+            Log.d(TAG, "startInventory() perform OK");
             return true;
         } catch (InvalidUsageException | OperationFailureException e) {
             String msg = (e.getMessage() != null) ? e.getMessage() : "Error de operación";
             String detail = (e instanceof OperationFailureException) ? ((OperationFailureException)e).getVendorMessage() : "";
+            Log.e(TAG, "startInventory() error msg=" + msg + " detail=" + detail, e);
             
             // Ignore "Operation In Progress" or "Command in progress" as they are redundant
             if (detail.contains("Operation In Progress") || detail.contains("Command in progress")) {
@@ -326,12 +341,15 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public boolean stopInventory() {
+        Log.d(TAG, "stopInventory() called connected=" + isConnected());
         if (!isConnected() || reader == null) return false;
         try {
             reader.Actions.Inventory.stop();
+            Log.d(TAG, "stopInventory() stop OK");
             return true;
         } catch (InvalidUsageException e) {
             // Already stopped or not running, ignore
+            Log.d(TAG, "stopInventory() invalid usage ignored msg=" + e.getMessage());
             return true;
         } catch (OperationFailureException e) {
             // If it's already stopped, it might throw here too. Check results if possible.
@@ -344,6 +362,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     @Override
     public void setPower(int power) {
         this.maxPower = power;
+        Log.d(TAG, "setPower() power=" + power + " connected=" + isConnected());
         if (isConnected()) {
             try {
                 Antennas.AntennaRfConfig config = reader.Config.Antennas.getAntennaRfConfig(1);
@@ -351,7 +370,9 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 config.setrfModeTableIndex(0);
                 config.setTari(0);
                 reader.Config.Antennas.setAntennaRfConfig(1, config);
+                Log.d(TAG, "setPower() applied powerIndex=" + power);
             } catch (InvalidUsageException | OperationFailureException e) {
+                Log.e(TAG, "setPower() error msg=" + e.getMessage(), e);
                 e.printStackTrace();
             }
         }
@@ -446,6 +467,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         public void eventReadNotify(RfidReadEvents e) {
             TagData[] myTags = reader.Actions.getReadTags(100);
             if (myTags != null) {
+                Log.d(TAG, "eventReadNotify() tagsBatch=" + myTags.length);
                 List<ReaderTag> convertedTags = new ArrayList<>();
                 for (TagData tag : myTags) {
                     convertedTags.add(new ReaderTag(tag.getTagID(), tag.getPeakRSSI()));
@@ -460,6 +482,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
         public void eventStatusNotify(RfidStatusEvents e) {
             if (e.StatusEventData.getStatusEventType() == STATUS_EVENT_TYPE.HANDHELD_TRIGGER_EVENT) {
                 boolean pressed = e.StatusEventData.HandheldTriggerEventData.getHandheldEvent() == HANDHELD_TRIGGER_EVENT_TYPE.HANDHELD_TRIGGER_PRESSED;
+                Log.d(TAG, "eventStatusNotify() HANDHELD_TRIGGER_EVENT pressed=" + pressed);
                 if (listener != null) {
                      new Handler(Looper.getMainLooper()).post(() -> listener.onTrigger(pressed));
                 }
