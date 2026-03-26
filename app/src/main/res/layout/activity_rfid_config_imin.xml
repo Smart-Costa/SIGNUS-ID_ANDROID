@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configuración RFID — iMin"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#2E7D32"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SDK iMin RFID v1.0.3  |  Modelo: I24P01 / Lark 1"
+            android:textSize="12sp"
+            android:textColor="#888888"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- Service Health -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estado del Servicio iMin:"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tv_imin_service_status"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="com.imin.peripherservice: ?"
+                android:textSize="13sp"
+                android:background="#F9FBE7"
+                android:padding="8dp"/>
+
+            <Button
+                android:id="@+id/btn_imin_check_service"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Verificar"
+                android:backgroundTint="#558B2F"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+        <!-- Connection State -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado de Conexión:"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tv_imin_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DESCONECTADO"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FF0000"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tv_imin_device_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dispositivo: --"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Connect/Disconnect -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/btn_imin_connect"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Conectar"
+                android:backgroundTint="#2E7D32"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_imin_disconnect"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Desconectar"
+                android:backgroundTint="#B71C1C"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <!-- Inventory Controls -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/btn_imin_single"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Lectura Sencilla"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_imin_multi"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Lectura Múltiple"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <!-- IMIN-specific: antenna power in dBm -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Potencia Antena iMin (dBm):"
+            android:textStyle="bold"/>
+
+        <SeekBar
+            android:id="@+id/sb_imin_power"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="33"
+            android:progress="30"
+            android:layout_marginBottom="4dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="5 dBm"/>
+
+            <TextView
+                android:id="@+id/tv_imin_power_label"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="30 dBm"
+                android:gravity="center"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="33 dBm"
+                android:gravity="end"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_imin_set_power"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aplicar Potencia"
+            android:backgroundTint="#1B5E20"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- IMIN Diagnostic -->
+        <Button
+            android:id="@+id/btn_imin_diagnostic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔍 Diagnóstico iMin"
+            android:backgroundTint="#2E7D32"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Tags Read -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tags Leídos:"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tv_imin_tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:background="#E8F5E9"
+            android:padding="8dp"
+            android:text="Esperando lectura..."
+            android:textColor="#000000"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Log -->
+        <TextView
+            android:id="@+id/tv_imin_log"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:text="Logs iMin..."
+            android:background="#EEEEEE"
+            android:padding="8dp"
+            android:textSize="12sp"
+            android:scrollbars="vertical"/>
+
+    </LinearLayout>
+</ScrollView>

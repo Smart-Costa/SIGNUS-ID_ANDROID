@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configuración RFID — Zebra"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#1565C0"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SDK API3 v2.0.5.226"
+            android:textSize="12sp"
+            android:textColor="#888888"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- Connection State -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado de Conexión:"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tv_zebra_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DESCONECTADO"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FF0000"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tv_zebra_device_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dispositivo: --"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Transport Type -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo de Transporte Zebra:"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+        <RadioGroup
+            android:id="@+id/rg_zebra_transport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="8dp">
+
+            <RadioButton
+                android:id="@+id/rb_zebra_usb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="USB (SERVICE_USB)"
+                android:layout_marginHorizontal="8dp"/>
+
+            <RadioButton
+                android:id="@+id/rb_zebra_serial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Serial (eConnex)"
+                android:checked="true"
+                android:layout_marginStart="8dp"/>
+        </RadioGroup>
+
+        <!-- Reconnect -->
+        <Button
+            android:id="@+id/btn_zebra_reconnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reconectar Zebra"
+            android:backgroundTint="#1565C0"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Test Buttons Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/btn_zebra_single"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Lectura Sencilla"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_zebra_multi"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Lectura Múltiple"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <!-- Zebra-specific diagnostics row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/btn_zebra_usb_inspect"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="🔌 Inspeccionar USB"
+                android:backgroundTint="#0277BD"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_zebra_diagnostic"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="🔍 Diagnóstico Zebra"
+                android:backgroundTint="#1565C0"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <!-- DataWedge control -->
+        <Button
+            android:id="@+id/btn_toggle_datawedge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⚡ Habilitar/Deshabilitar DataWedge"
+            android:backgroundTint="#E65100"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Found Devices -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dispositivos Zebra Encontrados:"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tv_zebra_found_devices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:background="#E3F2FD"
+            android:padding="8dp"
+            android:text="Buscando..."
+            android:textColor="#000000"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Power Slider -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Potencia Antena (índice):"
+            android:textStyle="bold"/>
+
+        <SeekBar
+            android:id="@+id/sb_zebra_power"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="270"
+            android:progress="270"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tv_zebra_power_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Índice: 270"
+            android:gravity="center"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Log -->
+        <TextView
+            android:id="@+id/tv_zebra_log"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:text="Logs Zebra..."
+            android:background="#EEEEEE"
+            android:padding="8dp"
+            android:textSize="12sp"
+            android:scrollbars="vertical"/>
+
+    </LinearLayout>
+</ScrollView>

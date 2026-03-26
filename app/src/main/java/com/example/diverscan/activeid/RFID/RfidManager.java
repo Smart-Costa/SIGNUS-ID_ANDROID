@@ -25,8 +25,11 @@ public class RfidManager implements IReaderListener {
 
     public void connect() {
         // Use Factory to create reader (Decoupled from specific implementation)
-        // This abstracts away the Serial/Bluetooth logic which is now in ZebraReaderImpl
-        device = ReaderFactory.createReader(ReaderType.ZEBRA, context, this);
+        // Detect the best reader type dynamically
+        ReaderType bestType = ReaderFactory.getBestReaderType(context);
+        com.example.diverscan.activeid.DeviceInterface.ConnectionType bestConn = ReaderFactory.getBestConnectionType(context, bestType);
+        
+        device = ReaderFactory.createReader(bestType, bestConn, context, this);
         
         new Thread(() -> {
             if (device != null) {

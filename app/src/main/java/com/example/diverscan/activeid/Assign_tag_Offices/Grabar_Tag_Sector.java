@@ -23,8 +23,7 @@ import com.example.diverscan.activeid.UI.login.LoginActivity;
 import com.example.diverscan.activeid.sqlite.AssetsDBHelper;
 import com.example.diverscan.activeid.sqlite.OfficesDBHelper;
 import com.example.diverscan.activeid.sqlite.TagsDBHelper;
-import com.zebra.rfid.api3.TagData;
-
+// Imported com.zebra.rfid.api3.TagData removed for abstraction.
 public class Grabar_Tag_Sector extends AppCompatActivity implements ResponseHandlerInterface {
 
     private EditText OfficeView;

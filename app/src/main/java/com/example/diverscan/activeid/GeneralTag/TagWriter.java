@@ -76,9 +76,6 @@ public class TagWriter implements IReaderListener {
             Log.e(TAG, "Error parsing power preference", e);
         }
         
-        // Only InitSDK if not initialized or if we want to force a refresh.
-        // But traditionally onCreate implies setup. 
-        // We'll keep InitSDK here for backward compatibility, but updateContext should be used for simple context switches.
         InitSDK();
         initialized = true;
     }
@@ -106,12 +103,10 @@ public class TagWriter implements IReaderListener {
     }
 
     public void setTransport(Object transport) {
-        // Generic transport setter, implementation depends on specific device
         Log.d(TAG, "setTransport called with: " + transport);
     }
 
     public boolean setTriggerMode(String mode) {
-        // Todo: Implement
         return true;
     }
 
@@ -127,8 +122,7 @@ public class TagWriter implements IReaderListener {
         if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) {
             return ((com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) device).getDiagnosticInfo();
         } else if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminScannerImpl) {
-             // Basic scanner diagnostic
-             return "Diagnóstico Scanner: Activo (Broadcast Mode)";
+            return "Diagnóstico Scanner: Activo (Broadcast Mode)";
         }
         return "Diagnóstico no disponible para este dispositivo.";
     }
@@ -139,64 +133,8 @@ public class TagWriter implements IReaderListener {
         if (handler != null)
             handler.SetMessage("Iniciando servicio de lectura...");
 
-        // Load reader type from preferences
-        String typeStr = SharedPreferencesGetSet.leer_local("reader_type", context);
-        ReaderType type = ReaderType.ZEBRA; // Default
-        
-        // Load connection type from preferences
-        String connStr = SharedPreferencesGetSet.leer_local("connection_type", context);
-        String connLastOk = SharedPreferencesGetSet.leer_local("connection_type_last_ok", context);
-        ConnectionType connType = ConnectionType.AUTO;
-
-        if ((connStr == null || connStr.isEmpty()) && connLastOk != null && !connLastOk.isEmpty()) {
-            connStr = connLastOk;
-        }
-
-        if (connStr != null && !connStr.isEmpty()) {
-            try {
-                connType = ConnectionType.valueOf(connStr);
-            } catch (Exception e) {
-                connType = ConnectionType.AUTO;
-                Log.w(TAG, "Tipo de conexión inválido en preferencias, usando AUTO");
-            }
-        }
-
-        if (typeStr != null && !typeStr.isEmpty()) {
-            try {
-                type = ReaderType.valueOf(typeStr.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                Log.e(TAG, "Invalid reader type: " + typeStr + ", defaulting to ZEBRA");
-                type = ReaderType.ZEBRA;
-            }
-        } else if (autoDetect) {
-            // Auto-detect device model if no preference is set and autoDetect is true
-            String model = android.os.Build.MODEL;
-            Log.d(TAG, "Auto-detecting reader. Device Model: " + model);
-            if (model != null) {
-                if (model.contains("Lark 1")) {
-                     type = ReaderType.IMIN_SCANNER;
-                     Log.i(TAG, "Auto-detected iMin Lark 1 device (Scanner): " + model);
-                } else if (model.contains("I24P01")) {
-                    type = ReaderType.IMIN;
-                    Log.i(TAG, "Auto-detected iMin device (RFID): " + model);
-                }
-            }
-        }
-
-        if (type == ReaderType.ZEBRA && connType == ConnectionType.AUTO) {
-            String zebraConn = SharedPreferencesGetSet.leer_local("zebra_connection_type_last_ok", context);
-            if (zebraConn != null && !zebraConn.isEmpty()) {
-                try {
-                    ConnectionType restored = ConnectionType.valueOf(zebraConn);
-                    if (restored != ConnectionType.AUTO) {
-                        connType = restored;
-                    }
-                } catch (Exception ignored) {}
-            }
-            if (connType == ConnectionType.AUTO) {
-                connType = ConnectionType.SERIAL;
-            }
-        }
+        ReaderType type = ReaderFactory.getBestReaderType(context);
+        ConnectionType connType = ReaderFactory.getBestConnectionType(context, type);
 
         Log.i(TAG, "Inicializando ReaderType: " + type + " ConnectionType: " + connType);
         setReaderType(type, connType);
@@ -209,22 +147,19 @@ public class TagWriter implements IReaderListener {
     public void setReaderType(ReaderType type, ConnectionType connType) {
         if (device != null && currentReaderType == type && currentConnectionType == connType) {
             if (device.isConnected()) {
-                // Ya conectado con la misma configuracion, no hacer nada
                 String sameMsg = "Configuracion sin cambios (ya conectado): " + type + " (" + connType + ")";
                 Log.i(TAG, sameMsg);
                 ResponseHandlerInterface sameHandler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
                 if (sameHandler != null) sameHandler.SetMessage(sameMsg);
                 return;
             } else {
-                // BUG #3 FIX: mismo type+conn pero device desconectado puede significar SDK roto.
-                // Forzar reinicializacion completa en lugar de solo llamar connect().
                 Log.w(TAG, "Misma config pero device desconectado. Forzando reinicializacion del SDK...");
                 try {
                     device.dispose();
                 } catch (Exception e) {
                     Log.w(TAG, "Error en dispose durante reinicializacion forzada: " + e.getMessage());
                 }
-                device = null; // Permite caer al bloque de creacion nueva abajo
+                device = null;
             }
         }
 
@@ -233,7 +168,6 @@ public class TagWriter implements IReaderListener {
         ResponseHandlerInterface handler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
         if (handler != null) handler.SetMessage(msg);
 
-        // Dispose existing device if any
         if (device != null) {
             try {
                 Log.d(TAG, "Disposing previous device...");
@@ -243,27 +177,24 @@ public class TagWriter implements IReaderListener {
             }
         }
 
-        // Use Factory to create new reader
         Log.d(TAG, "Creating new reader instance...");
         device = ReaderFactory.createReader(type, connType, context, this);
         currentReaderType = type;
         currentConnectionType = connType;
         
-        // Persist preference
         SharedPreferencesGetSet.guardar_local("reader_type", type.name(), context);
         SharedPreferencesGetSet.guardar_local("connection_type", connType.name(), context);
     }
     
     public ReaderType getCurrentReaderType() {
         if (device != null) {
-             if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminScannerImpl) return ReaderType.IMIN_SCANNER;
-             if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) return ReaderType.IMIN;
-             if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.ZebraReaderImpl) return ReaderType.ZEBRA;
+            if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminScannerImpl) return ReaderType.IMIN_SCANNER;
+            if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) return ReaderType.IMIN;
+            if (device instanceof com.example.diverscan.activeid.DeviceInterface.Impl.ZebraReaderImpl) return ReaderType.ZEBRA;
         }
-        // Fallback to preference or detection
         String typeStr = SharedPreferencesGetSet.leer_local("reader_type", context);
         if (typeStr != null) {
-             try { return ReaderType.valueOf(typeStr); } catch (Exception e) {}
+            try { return ReaderType.valueOf(typeStr); } catch (Exception e) {}
         }
         return ReaderType.ZEBRA;
     }
@@ -327,8 +258,7 @@ public class TagWriter implements IReaderListener {
     }
 
     public void onPause() {
-        // Typically we don't disconnect on pause to keep reader active, 
-        // but if required: disconnect();
+        // Typically we don't disconnect on pause to keep reader active
     }
 
     public void onDestroy() {
@@ -339,10 +269,8 @@ public class TagWriter implements IReaderListener {
         if (device != null) {
             if (device.isConnected()) return "Conectado";
             
-            // Run connection in background to avoid ANR
             new Thread(() -> {
                 if (!device.connect()) {
-                    // connect() in device should handle notification of error/success
                     Log.w(TAG, "Background connection attempt failed or returned false");
                 }
             }).start();
@@ -388,17 +316,16 @@ public class TagWriter implements IReaderListener {
     }
 
     // Stub methods for compatibility
-    public void setDPO(boolean bEnable) {
-        // TODO: Implement DPO in IReaderDevice if needed
-    }
+    public void setDPO(boolean bEnable) {}
 
     public void setAccessOperationConfiguration() {
         if (device != null) device.setPower(MAX_POWER);
     }
     
-    // public void setAutoDetect(boolean enable) {} // Removed duplicate
     public void setTransport(String transport) {} 
-    public void setValidationMode(boolean enabled) {}    public boolean isReaderConnected() {
+    public void setValidationMode(boolean enabled) {}
+
+    public boolean isReaderConnected() {
         return device != null && device.isConnected();
     }
     

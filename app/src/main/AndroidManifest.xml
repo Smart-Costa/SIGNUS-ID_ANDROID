@@ -117,13 +117,29 @@
             android:screenOrientation="portrait"
             android:exported="false"/>
 
-        <!-- 📡 Validación de Conexión -->
         <activity
             android:name=".UI.validation.ConnectionValidationActivity"
             android:label="Validación Conexión"
             android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"
             android:exported="false"/>
+
+        <!-- 📡 Configuración RFID Zebra (API3 v2.0.5.226) -->
+        <activity
+            android:name=".UI.validation.ZebraRfidConfigActivity"
+            android:label="Config RFID Zebra"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false"/>
+
+        <!-- 📡 Configuración RFID iMin (SDK v1.0.3) -->
+        <activity
+            android:name=".UI.validation.IminRfidConfigActivity"
+            android:label="Config RFID iMin"
+            android:parentActivityName=".UI.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false"/>
+
 
         <!-- 🌐 Validación de API/Endpoints -->
         <activity
