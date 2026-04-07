@@ -2145,29 +2145,39 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
             }
             return;
         }
+        // [FIX #3 - UI Side]
+        // performInventory() ahora corre en un background thread (TagWriter).
+        // Marcamos isScanning=true ANTES de startRead() para que la UI quede en
+        // estado 'escaneando' mientras el background thread inicializa el SDK Zebra.
         isRfidReady = true;
+        isScanning = true;
+        currentScanStartMs = android.os.SystemClock.elapsedRealtime();
+
+        Log.d(TAG, "[SCAN-UI] startScan dispatching. connected=" + rfidHandler.isConnected()
+                + " ts=" + currentScanStartMs);
         try {
-            Log.d(TAG, "startScan execute: connected=" + rfidHandler.isConnected());
-            rfidHandler.startRead();
-            isScanning = true;
-            currentScanStartMs = android.os.SystemClock.elapsedRealtime();
-            if (pendingScanWatchdog != null) {
-                rfidRetryHandler.removeCallbacks(pendingScanWatchdog);
-            }
-            pendingScanWatchdog = () -> {
-                if (isScanning && !firstTagAfterResumeLogged) {
-                    long elapsed = android.os.SystemClock.elapsedRealtime() - currentScanStartMs;
-                    Log.w(TAG, "SCAN WATCHDOG: sin tags en " + elapsed + "ms. connected=" + (rfidHandler != null && rfidHandler.isConnected()) + " ready=" + isRfidReady);
-                }
-            };
-            rfidRetryHandler.postDelayed(pendingScanWatchdog, 3000L);
-            updateUIState();
+            rfidHandler.startRead();   // fire-and-forget -> background thread en TagWriter
+            Log.d(TAG, "[SCAN-UI] startRead() dispatched OK. UI thread libre.");
         } catch (Exception e) {
-            Log.e(TAG, "Error starting scan", e);
+            Log.e(TAG, "[SCAN-UI] startRead() unexpected exception", e);
             isScanning = false;
             updateUIState();
             Toast.makeText(getApplicationContext(), "Error al iniciar lectura: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        if (pendingScanWatchdog != null) {
+            rfidRetryHandler.removeCallbacks(pendingScanWatchdog);
+        }
+        pendingScanWatchdog = () -> {
+            if (isScanning && !firstTagAfterResumeLogged) {
+                long elapsed = android.os.SystemClock.elapsedRealtime() - currentScanStartMs;
+                Log.w(TAG, "[SCAN-WATCHDOG] sin tags en " + elapsed + "ms. connected="
+                        + (rfidHandler != null && rfidHandler.isConnected()) + " ready=" + isRfidReady);
+            }
+        };
+        rfidRetryHandler.postDelayed(pendingScanWatchdog, 3000L);
+        updateUIState();
     }
 
     private void stopScan() {
