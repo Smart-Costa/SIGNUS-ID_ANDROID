@@ -219,7 +219,8 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     private void configureReader() {
         if (reader != null && reader.isConnected()) {
             try {
-                Log.d(TAG, "configureReader() start host=" + reader.getHostName() + " maxPower=" + maxPower);
+                long _ts = System.currentTimeMillis();
+                Log.d(TAG, "[RFID-CFG] configureReader() BEGIN host=" + reader.getHostName() + " maxPower=" + maxPower);
                 if (eventHandler == null) {
                     eventHandler = new EventHandler();
                 }
@@ -230,51 +231,64 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 try {
                     reader.Events.setReaderDisconnectEvent(true);
                 } catch (Exception e) {
-                    Log.w(TAG, "setReaderDisconnectEvent not supported or failed: " + e.getMessage());
+                    Log.w(TAG, "[RFID-CFG] setReaderDisconnectEvent not supported: " + e.getMessage());
                 }
                 reader.Config.setTriggerMode(ENUM_TRIGGER_MODE.RFID_MODE, true);
-                
-                // BUGFIX: We MUST use IMMEDIATE trigger type so that startInventory() starts immediately
-                // regardless of whether it's triggered by the UI button or the physical trigger (handled via eventStatusNotify).
-                configureTrigger(false); 
-                
+
+                // Trigger IMMEDIATE para que startInventory() arranque sin depender del gatillo físico
+                try {
+                    configureTrigger(false);
+                    Log.d(TAG, "[RFID-CFG] configureTrigger OK elapsed=" + (System.currentTimeMillis() - _ts) + "ms");
+                } catch (Exception e) {
+                    Log.e(TAG, "[RFID-CFG] configureTrigger FAILED (se ignora en configureReader): " + e.getMessage());
+                }
+
                 setPower(maxPower);
-                
+
                 // Singulation
                 Antennas.SingulationControl s1_singulationControl = reader.Config.Antennas.getSingulationControl(1);
                 s1_singulationControl.setSession(SESSION.SESSION_S0);
                 s1_singulationControl.Action.setInventoryState(INVENTORY_STATE.INVENTORY_STATE_A);
                 s1_singulationControl.Action.setSLFlag(SL_FLAG.SL_ALL);
                 reader.Config.Antennas.setSingulationControl(1, s1_singulationControl);
-                
+
                 reader.Actions.PreFilters.deleteAll();
-                Log.d(TAG, "configureReader() done trigger=IMMEDIATE prefiltersCleared=true");
-                
+                Log.d(TAG, "[RFID-CFG] configureReader() DONE total_elapsed=" + (System.currentTimeMillis() - _ts) + "ms trigger=IMMEDIATE prefiltersCleared=true");
+
             } catch (InvalidUsageException | OperationFailureException e) {
-                Log.e(TAG, "configureReader() error msg=" + e.getMessage(), e);
+                Log.e(TAG, "[RFID-CFG] configureReader() error msg=" + e.getMessage(), e);
                 e.printStackTrace();
             }
         }
     }
     
-    private void configureTrigger(boolean isHandheld) {
-        try {
-            Log.d(TAG, "configureTrigger() isHandheld=" + isHandheld);
-            TriggerInfo triggerInfo = new TriggerInfo();
-            if (isHandheld) {
-                triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_HANDHELD);
-                triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_HANDHELD_WITH_TIMEOUT);
-            } else {
-                triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_IMMEDIATE);
-                triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_IMMEDIATE);
-            }
-            reader.Config.setStartTrigger(triggerInfo.StartTrigger);
-            reader.Config.setStopTrigger(triggerInfo.StopTrigger);
-            Log.d(TAG, "configureTrigger() applied start=" + triggerInfo.StartTrigger.getTriggerType() + " stop=" + triggerInfo.StopTrigger.getTriggerType());
-        } catch (InvalidUsageException | OperationFailureException e) {
-            Log.e(TAG, "configureTrigger() error msg=" + e.getMessage(), e);
-            e.printStackTrace();
+    /**
+     * Configura los triggers de inicio y parada del lector.
+     *
+     * IMPORTANTE: Este método lanza las excepciones del SDK hacia arriba (NO las captura).
+     * El caller (startInventory) debe manejarlas con fail-fast para evitar continuar
+     * con setPower/getSingulationControl cuando el canal ya está congestionado.
+     *
+     * @throws InvalidUsageException si el uso es inválido
+     * @throws OperationFailureException si el firmware responde con COMMAND_TIMEOUT
+     */
+    private void configureTrigger(boolean isHandheld) throws InvalidUsageException, OperationFailureException {
+        long _ts = System.currentTimeMillis();
+        Log.d(TAG, "[RFID-TRIGGER] configureTrigger() BEGIN isHandheld=" + isHandheld);
+        TriggerInfo triggerInfo = new TriggerInfo();
+        if (isHandheld) {
+            triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_HANDHELD);
+            triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_HANDHELD_WITH_TIMEOUT);
+        } else {
+            triggerInfo.StartTrigger.setTriggerType(START_TRIGGER_TYPE.START_TRIGGER_TYPE_IMMEDIATE);
+            triggerInfo.StopTrigger.setTriggerType(STOP_TRIGGER_TYPE.STOP_TRIGGER_TYPE_IMMEDIATE);
         }
+        // FIX #2 soporte: excepciones propagadas al caller para fail-fast
+        reader.Config.setStartTrigger(triggerInfo.StartTrigger);
+        reader.Config.setStopTrigger(triggerInfo.StopTrigger);
+        Log.d(TAG, "[RFID-TRIGGER] configureTrigger() OK elapsed=" + (System.currentTimeMillis() - _ts)
+                + "ms start=" + triggerInfo.StartTrigger.getTriggerType()
+                + " stop=" + triggerInfo.StopTrigger.getTriggerType());
     }
 
     @Override
@@ -310,7 +324,8 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
 
     @Override
     public boolean startInventory() {
-        Log.d(TAG, "startInventory() called readerNull=" + (reader == null) + " connected=" + isConnected());
+        long _startTs = System.currentTimeMillis();
+        Log.d(TAG, "[RFID-START] startInventory() BEGIN readerNull=" + (reader == null) + " connected=" + isConnected());
         if (reader == null) {
             notifyError("Error: Lector no inicializado.");
             return false;
@@ -320,39 +335,102 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 notifyError("Error: Lector desconectado.");
                 return false;
             }
-            // Detener cualquier inventario previo y limpiar el estado del reader
-            // antes de reconfigurar. Sin esto, SetStartTrigger / SetAntennaConfiguration
-            // generan RFID_API_COMMAND_TIMEOUT en la segunda sesión de escaneo.
+
+            // ── FIX #1: pre-stop con sleep extendido (150ms → 400ms) ────────────────
+            // El firmware Zebra necesita más tiempo entre stop() y la siguiente
+            // configuración. Con 150ms se generaban RFID_API_COMMAND_TIMEOUT en la
+            // segunda sesión de escaneo.
+            long _preStopTs = System.currentTimeMillis();
             try {
                 reader.Actions.Inventory.stop();
-                Log.d(TAG, "startInventory() pre-stop OK");
-                Thread.sleep(150);
+                Log.d(TAG, "[RFID-START] pre-stop OK elapsed=" + (System.currentTimeMillis() - _preStopTs) + "ms");
+                Thread.sleep(400); // FIX #1: aumentado de 150ms a 400ms
+                Log.d(TAG, "[RFID-START] post-stop sleep done. total_pre_stop_phase=" + (System.currentTimeMillis() - _preStopTs) + "ms");
             } catch (Exception ignored) {
-                Log.d(TAG, "startInventory() pre-stop ignored: " + ignored.getMessage());
+                Log.d(TAG, "[RFID-START] pre-stop ignored (" + ignored.getMessage() + ") elapsed=" + (System.currentTimeMillis() - _preStopTs) + "ms");
             }
-            configureTrigger(false);
+
+            // ── FIX #2: configureTrigger con fail-fast + auto-recovery ──────────────
+            // Si setStartTrigger falla con COMMAND_TIMEOUT, el canal USB puede estar
+            // muerto (IOException: Queueing USB request failed en SerialInputOutputManager).
+            // En ese caso se lanza un recovery automático: disconnect → reconnect en BG.
+            long _triggerTs = System.currentTimeMillis();
+            Log.d(TAG, "[RFID-START] configureTrigger BEGIN");
+            try {
+                configureTrigger(false);
+                Log.d(TAG, "[RFID-START] configureTrigger OK elapsed=" + (System.currentTimeMillis() - _triggerTs) + "ms");
+            } catch (Exception triggerEx) {
+                String triggerDetail = (triggerEx instanceof OperationFailureException)
+                        ? ((OperationFailureException) triggerEx).getVendorMessage() : triggerEx.getMessage();
+                Log.e(TAG, "[RFID-START] configureTrigger TIMEOUT — ABORT. elapsed="
+                        + (System.currentTimeMillis() - _triggerTs) + "ms detail=" + triggerDetail);
+
+                // [FIX #5] Auto-recovery: el canal USB puede estar muerto.
+                // Se desconecta limpiamente y se re-inicializa el SDK en background.
+                Log.w(TAG, "[RFID-RECOVERY] Iniciando auto-recovery: disconnect + reinit SDK...");
+                new Thread(() -> {
+                    try {
+                        if (reader != null) {
+                            try { reader.Events.removeEventsListener(eventHandler); } catch (Exception ignored2) {}
+                            try { reader.disconnect(); } catch (Exception ignored2) {}
+                        }
+                        if (readers != null) {
+                            try { readers.Dispose(); } catch (Exception ignored2) {}
+                            readers = null;
+                        }
+                        reader = null;
+                        readerDevice = null;
+                        availableRFIDReaderList = null;
+                        Log.w(TAG, "[RFID-RECOVERY] Canal limpiado. Re-inicializando SDK...");
+                        Thread.sleep(800); // Esperar before re-init
+                        initSDK();
+                    } catch (Exception recEx) {
+                        Log.e(TAG, "[RFID-RECOVERY] Error durante auto-recovery: " + recEx.getMessage(), recEx);
+                    }
+                }, "RFID-Recovery-Thread").start();
+
+                notifyError("Error iniciando inventario: Timeout configurando trigger. Reconectando automáticamente...");
+                return false;
+            }
+
+            // ── setPower ──────────────────────────────────────────────────────────────
+            long _powerTs = System.currentTimeMillis();
+            Log.d(TAG, "[RFID-START] setPower BEGIN power=" + maxPower);
             setPower(maxPower);
+            Log.d(TAG, "[RFID-START] setPower done elapsed=" + (System.currentTimeMillis() - _powerTs) + "ms");
+
+            // ── SingulationControl ────────────────────────────────────────────────────
+            long _singTs = System.currentTimeMillis();
+            Log.d(TAG, "[RFID-START] getSingulationControl BEGIN");
             Antennas.SingulationControl s1SingulationControl = reader.Config.Antennas.getSingulationControl(1);
+            Log.d(TAG, "[RFID-START] getSingulationControl OK elapsed=" + (System.currentTimeMillis() - _singTs) + "ms");
             s1SingulationControl.setSession(SESSION.SESSION_S0);
             s1SingulationControl.Action.setInventoryState(INVENTORY_STATE.INVENTORY_STATE_A);
             s1SingulationControl.Action.setSLFlag(SL_FLAG.SL_ALL);
             reader.Config.Antennas.setSingulationControl(1, s1SingulationControl);
+
             reader.Actions.PreFilters.deleteAll();
             reader.Actions.getReadTags(1000);
+
+            long _performTs = System.currentTimeMillis();
+            Log.d(TAG, "[RFID-START] perform BEGIN");
             reader.Actions.Inventory.perform();
-            Log.d(TAG, "startInventory() perform OK");
+            Log.d(TAG, "[RFID-START] perform OK elapsed=" + (System.currentTimeMillis() - _performTs) + "ms");
+
+            Log.d(TAG, "[RFID-START] startInventory() SUCCESS total_elapsed=" + (System.currentTimeMillis() - _startTs) + "ms");
             return true;
+
         } catch (InvalidUsageException | OperationFailureException e) {
             String msg = (e.getMessage() != null) ? e.getMessage() : "Error de operación";
             String detail = (e instanceof OperationFailureException) ? ((OperationFailureException)e).getVendorMessage() : "";
-            Log.e(TAG, "startInventory() error msg=" + msg + " detail=" + detail, e);
-            
-            // Ignore "Operation In Progress" or "Command in progress" as they are redundant
-            if (detail.contains("Operation In Progress") || detail.contains("Command in progress")) {
-                Log.d(TAG, "Inventory already in progress, ignoring redundant start command.");
-                return true; 
+            Log.e(TAG, "[RFID-START] startInventory() FAILED elapsed=" + (System.currentTimeMillis() - _startTs) + "ms msg=" + msg + " detail=" + detail, e);
+
+            // Ignorar si ya hay un inventario en progreso
+            if (detail != null && (detail.contains("Operation In Progress") || detail.contains("Command in progress"))) {
+                Log.d(TAG, "[RFID-START] Inventory already in progress, ignoring redundant start command.");
+                return true;
             }
-            
+
             notifyError("Error iniciando inventario: " + msg + " [Info: " + detail + "]");
             return false;
         }
@@ -381,17 +459,19 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
     @Override
     public void setPower(int power) {
         this.maxPower = power;
-        Log.d(TAG, "setPower() power=" + power + " connected=" + isConnected());
+        long _ts = System.currentTimeMillis();
+        Log.d(TAG, "[RFID-POWER] setPower() BEGIN power=" + power + " connected=" + isConnected());
         if (isConnected()) {
             try {
                 Antennas.AntennaRfConfig config = reader.Config.Antennas.getAntennaRfConfig(1);
+                Log.d(TAG, "[RFID-POWER] getAntennaRfConfig OK elapsed=" + (System.currentTimeMillis() - _ts) + "ms");
                 config.setTransmitPowerIndex(power);
                 config.setrfModeTableIndex(0);
                 config.setTari(0);
                 reader.Config.Antennas.setAntennaRfConfig(1, config);
-                Log.d(TAG, "setPower() applied powerIndex=" + power);
+                Log.d(TAG, "[RFID-POWER] setPower() applied powerIndex=" + power + " total_elapsed=" + (System.currentTimeMillis() - _ts) + "ms");
             } catch (InvalidUsageException | OperationFailureException e) {
-                Log.e(TAG, "setPower() error msg=" + e.getMessage(), e);
+                Log.e(TAG, "[RFID-POWER] setPower() error elapsed=" + (System.currentTimeMillis() - _ts) + "ms msg=" + e.getMessage(), e);
                 e.printStackTrace();
             }
         }

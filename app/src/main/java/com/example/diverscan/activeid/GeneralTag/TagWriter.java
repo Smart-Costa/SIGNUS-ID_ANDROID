@@ -289,6 +289,7 @@ public class TagWriter implements IReaderListener {
     }
 
     public synchronized void startRead() {
+        Log.d(TAG, "[RFID-BG] startRead() called — delegating to performInventory (background)");
         performInventory();
     }
 
@@ -296,8 +297,27 @@ public class TagWriter implements IReaderListener {
         stopInventory();
     }
 
+    /**
+     * [FIX #3] Ejecuta startInventory() en un background thread para evitar bloquear
+     * el UI Thread con las llamadas blocking del SDK de Zebra (setStartTrigger,
+     * getAntennaRfConfig, getSingulationControl), que pueden tardar hasta 2s cada una
+     * cuando el firmware está en estado de timeout (RFID_API_COMMAND_TIMEOUT).
+     *
+     * Patrón: fire-and-forget. Los resultados se reportan a través de IReaderListener.
+     */
     public synchronized void performInventory() {
-        if (device != null) device.startInventory();
+        if (device == null) {
+            Log.w(TAG, "[RFID-BG] performInventory skipped: device is null");
+            return;
+        }
+        Log.d(TAG, "[RFID-BG] performInventory() dispatching to background thread");
+        final long _launchTs = System.currentTimeMillis();
+        new Thread(() -> {
+            Log.d(TAG, "[RFID-BG] background thread START queueDelay=" + (System.currentTimeMillis() - _launchTs) + "ms");
+            boolean result = device.startInventory();
+            Log.d(TAG, "[RFID-BG] background thread END result=" + result
+                    + " total_elapsed=" + (System.currentTimeMillis() - _launchTs) + "ms");
+        }, "RFID-Inventory-Thread").start();
     }
 
     public synchronized void stopInventory() {
@@ -305,7 +325,20 @@ public class TagWriter implements IReaderListener {
     }
 
     public void setAntennaPower(int power) {
-        if (device != null) device.setPower(power);
+        if (device == null) return;
+        // [FIX #4] Ejecutar setPower() en background thread.
+        // La llamada a getAntennaRfConfig() es bloqueante (~2-4s cuando el firmware
+        // está congestionado). Llamarla desde el UI thread (AlertDialog.onClick)
+        // generaba "Skipped 121 frames" y potencial ANR.
+        new Thread(() -> {
+            Log.d(TAG, "[RFID-POWER-BG] setAntennaPower() dispatched power=" + power);
+            try {
+                device.setPower(power);
+                Log.d(TAG, "[RFID-POWER-BG] setAntennaPower() OK power=" + power);
+            } catch (Exception e) {
+                Log.e(TAG, "[RFID-POWER-BG] setAntennaPower() error: " + e.getMessage(), e);
+            }
+        }, "RFID-SetPower-Thread").start();
     }
     
     public boolean WriteTag(String SourceEPC, String EPCToWrite) {
