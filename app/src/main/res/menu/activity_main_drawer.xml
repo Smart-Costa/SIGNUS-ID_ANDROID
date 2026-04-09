@@ -129,6 +129,18 @@
             android:background="@color/blanco" />
 
         <item
+            android:id="@+id/sub_config_zebra"
+            android:title=" o Configuración RFID Zebra"
+            android:visible="false"
+            android:background="@color/blanco" />
+
+        <item
+            android:id="@+id/sub_config_imin"
+            android:title=" o Configuración RFID iMin"
+            android:visible="false"
+            android:background="@color/blanco" />
+
+        <item
             android:id="@+id/sub_validar_api"
             android:title=" o Probar API/Endpoints"
             android:visible="false"

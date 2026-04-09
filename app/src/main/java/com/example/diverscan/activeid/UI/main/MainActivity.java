@@ -333,6 +333,10 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 //            intent = new Intent(this, AsignarUbicacion.class);
         } else if (id == R.id.sub_validar_conexion) {
             intent = new Intent(this, ConnectionValidationActivity.class);
+        } else if (id == R.id.sub_config_zebra) {
+            intent = new Intent(this, com.example.diverscan.activeid.UI.validation.ZebraRfidConfigActivity.class);
+        } else if (id == R.id.sub_config_imin) {
+            intent = new Intent(this, com.example.diverscan.activeid.UI.validation.IminRfidConfigActivity.class);
         } else if (id == R.id.sub_validar_api) {
             intent = new Intent(this, com.example.diverscan.activeid.UI.validation.ApiEndpointValidationActivity.class);
         } else if (id == R.id.sub_ver_activos_bd) {
@@ -366,6 +370,8 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
 //        menu.findItem(R.id.sub_asignar_tag_sector).setVisible(false);
 //        menu.findItem(R.id.sub_activos_sector).setVisible(false);
         menu.findItem(R.id.sub_validar_conexion).setVisible(false);
+        menu.findItem(R.id.sub_config_zebra).setVisible(false);
+        menu.findItem(R.id.sub_config_imin).setVisible(false);
         menu.findItem(R.id.sub_validar_api).setVisible(false);
         menu.findItem(R.id.sub_ver_activos_bd).setVisible(false);
         menu.findItem(R.id.sub_limpiar_bd).setVisible(false);
@@ -413,6 +419,8 @@ public class MainActivity extends AppCompatActivity implements ResponseHandlerIn
                 case R.id.menu_configuracion:
                     toggleGroup(menu,
                             R.id.sub_validar_conexion,
+                            R.id.sub_config_zebra,
+                            R.id.sub_config_imin,
                             R.id.sub_validar_api
                             //,R.id.sub_ver_activos_bd
                             //,R.id.sub_limpiar_bd
