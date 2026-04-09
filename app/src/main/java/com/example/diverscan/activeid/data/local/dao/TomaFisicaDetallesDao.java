@@ -292,6 +292,28 @@ public class TomaFisicaDetallesDao {
         r.ubicacionDetalleC = d != null ? safeGuidOptional(d.getUbicacionDetalleC()) : null;
         r.ubicacionDetalleD = d != null ? safeGuidOptional(d.getUbicacionDetalleD()) : null;
         r.observaciones = d != null ? safe(d.getObservaciones()) : "";
+
+        // ─── LOG DIAGNÓSTICO ANDROID: mapeo entidad → request ───────────────────────────
+        android.util.Log.d(TAG,
+            "[SYNC-DTREQUEST] Mapeando detalle →"
+            + " idTakeDetail=" + r.idTakeDetail
+            + " | idToma=" + r.idToma
+            + " | nroToma=" + r.numeroToma
+            + " | activoId=" + (r.activoId != null ? r.activoId : "NULL-SIN_ACTIVO_ID")
+            + " | epc=" + (r.epc != null && !r.epc.isEmpty() ? r.epc : "(sin_epc)")
+            + " | estado=" + r.estadoInventario
+            + " | dateRead=" + r.dateRead
+            + " | ubA=" + r.ubicacionDetalleA);
+        // ALERTA si no tiene ActivoId (no se podrá calcular VERDE en la web)
+        if (r.activoId == null || r.activoId.isEmpty()) {
+            android.util.Log.w(TAG,
+                "[SYNC-DTREQUEST] ⚠️ SIN ActivoId → Este registro llegará como AMARILLO en web si EPC no coincide"
+                + " | idTakeDetail=" + r.idTakeDetail
+                + " | epc=" + r.epc
+                + " | estado=" + r.estadoInventario);
+        }
+        // ────────────────────────────────────────────────────────────────
+
         return r;
     }
 
