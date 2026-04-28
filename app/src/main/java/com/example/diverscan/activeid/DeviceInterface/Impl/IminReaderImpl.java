@@ -283,11 +283,19 @@ public class IminReaderImpl implements IReaderDevice {
         executor.execute(() -> {
             try {
                 Log.i(TAG, "[SINGLE] ══ Modo SENCILLA iniciando...");
-                Log.d(TAG, "[SINGLE] Llamando rfidHelper.tagInventoryAsyncFastStartReading()");
-                rfidHelper.tagInventoryAsyncFastStartReading();
-                Log.i(TAG, "[SINGLE] tagInventoryAsyncFastStartReading() → OK ✓");
+                Log.d(TAG, "[SINGLE] Llamando rfidHelper.tagInventoryRawStartReading()");
+                rfidHelper.tagInventoryRawStartReading();
+                Log.i(TAG, "[SINGLE] tagInventoryRawStartReading() → OK ✓");
+                
+                // Timeout de 3 segundos para detener la lectura si no se encuentra ningún tag
+                uiHandler.postDelayed(() -> {
+                    if (isSingleReadMode) {
+                        Log.i(TAG, "[SINGLE] Timeout de lectura sencilla alcanzado (3s). Deteniendo...");
+                        stopInventory();
+                    }
+                }, 3000);
             } catch (Exception e) {
-                Log.e(TAG, "[SINGLE] Error en tagInventoryAsyncFastStartReading(): " + e.getMessage(), e);
+                Log.e(TAG, "[SINGLE] Error en tagInventoryRawStartReading(): " + e.getMessage(), e);
                 handleBinderError(e);
             }
         });
