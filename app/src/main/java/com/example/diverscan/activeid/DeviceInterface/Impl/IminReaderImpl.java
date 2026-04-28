@@ -272,7 +272,6 @@ public class IminReaderImpl implements IReaderDevice {
     /**
      * Inicia lectura en modo SENCILLA (auto-stop al primer tag).
      */
-    @Override
     public boolean startSingleRead() {
         if (!isConnected || rfidHelper == null) {
             Log.w(TAG, "[SINGLE] No conectado o RFIDHelper null — no se puede iniciar lectura.");
@@ -284,8 +283,8 @@ public class IminReaderImpl implements IReaderDevice {
         executor.execute(() -> {
             try {
                 Log.i(TAG, "[SINGLE] ══ Modo SENCILLA iniciando...");
-                Log.d(TAG, "[SINGLE] Llamando rfidHelper.tagInventoryAsyncFastStartReading(0, 0)");
-                rfidHelper.tagInventoryAsyncFastStartReading((byte)0, (byte)0);
+                Log.d(TAG, "[SINGLE] Llamando rfidHelper.tagInventoryAsyncFastStartReading()");
+                rfidHelper.tagInventoryAsyncFastStartReading();
                 Log.i(TAG, "[SINGLE] tagInventoryAsyncFastStartReading() → OK ✓");
             } catch (Exception e) {
                 Log.e(TAG, "[SINGLE] Error en tagInventoryAsyncFastStartReading(): " + e.getMessage(), e);
