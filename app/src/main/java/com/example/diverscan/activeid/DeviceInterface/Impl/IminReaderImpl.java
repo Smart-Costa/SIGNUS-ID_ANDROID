@@ -17,6 +17,8 @@ import com.imin.rfid.entity.DataParameter;
 import com.imin.rfid.constant.ParamCts;
 import com.imin.rfid.constant.CMD;
 import com.google.gson.Gson;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * IminReaderImpl — Integración RFID UHF para dispositivos iMin (modelo I24P01 / Lark 1).
@@ -71,11 +73,11 @@ public class IminReaderImpl implements IReaderDevice {
     private ConnectionType connectionType = ConnectionType.AUTO;
 
     // ── Estado ────────────────────────────────────────────────────────────────
-    private boolean isConnected = false;
+    private volatile boolean isConnected = false;
     private int currentPower = 30; // dBm por defecto
     /** true → lectura sencilla (auto-stop al primer tag)
      *  false → lectura múltiple continua */
-    private boolean isSingleReadMode = false;
+    private volatile boolean isSingleReadMode = false;
 
     // ── SDK iMin ──────────────────────────────────────────────────────────────
     private RFIDManager rfidManager;
@@ -83,6 +85,7 @@ public class IminReaderImpl implements IReaderDevice {
 
     // ── Threading ─────────────────────────────────────────────────────────────
     private Handler uiHandler;
+    private ExecutorService executor;
 
     // ─────────────────────────────────────────────────────────────────────────
     // IReaderDevice — Inicialización
@@ -98,55 +101,58 @@ public class IminReaderImpl implements IReaderDevice {
     public void initialize(Context context) {
         this.context = context;
         this.uiHandler = new Handler(Looper.getMainLooper());
+        this.executor = Executors.newSingleThreadExecutor();
 
-        Log.i(TAG, "╔══════════════════════════════════════════╗");
-        Log.i(TAG, "║  iMin RFID SDK v1.0.3 — Inicializando   ║");
-        Log.i(TAG, "╚══════════════════════════════════════════╝");
-        Log.i(TAG, "[DEVICE] Modelo: " + android.os.Build.MODEL);
-        Log.i(TAG, "[DEVICE] Android SDK: " + android.os.Build.VERSION.SDK_INT);
-        Log.i(TAG, "[CONFIG] ConnectionType: " + connectionType);
+        executor.execute(() -> {
+            Log.i(TAG, "╔══════════════════════════════════════════╗");
+            Log.i(TAG, "║  iMin RFID SDK v1.0.3 — Inicializando   ║");
+            Log.i(TAG, "╚══════════════════════════════════════════╝");
+            Log.i(TAG, "[DEVICE] Modelo: " + android.os.Build.MODEL);
+            Log.i(TAG, "[DEVICE] Android SDK: " + android.os.Build.VERSION.SDK_INT);
+            Log.i(TAG, "[CONFIG] ConnectionType: " + connectionType);
 
-        // 1. Verificar servicio iMin instalado
-        if (!isServiceInstalled("com.imin.peripherservice")) {
-            String msg = "CRÍTICO: com.imin.peripherservice NO encontrado. " +
-                         "Este dispositivo no soporta iMin RFID.";
-            Log.e(TAG, "[INIT] " + msg);
-            notifyError(msg);
-            return;
-        }
-        Log.i(TAG, "[INIT] Servicio com.imin.peripherservice: FOUND ✓");
-
-        // 2. Obtener instancia RFIDManager
-        try {
-            rfidManager = RFIDManager.getInstance();
-            if (rfidManager == null) {
-                Log.e(TAG, "[INIT] RFIDManager.getInstance() retornó null — SDK no disponible.");
-                notifyError("RFIDManager null — SDK no cargado correctamente.");
+            // 1. Verificar servicio iMin instalado
+            if (!isServiceInstalled("com.imin.peripherservice")) {
+                String msg = "CRÍTICO: com.imin.peripherservice NO encontrado. " +
+                             "Este dispositivo no soporta iMin RFID.";
+                Log.e(TAG, "[INIT] " + msg);
+                notifyError(msg);
                 return;
             }
-            Log.d(TAG, "[INIT] RFIDManager.getInstance() → OK");
+            Log.i(TAG, "[INIT] Servicio com.imin.peripherservice: FOUND ✓");
 
-            // 3. Activar logs internos del SDK
+            // 2. Obtener instancia RFIDManager
             try {
-                rfidManager.setPrintLog(true);
-                Log.d(TAG, "[INIT] rfidManager.setPrintLog(true) → Logs SDK activados");
-            } catch (Exception e) {
-                Log.w(TAG, "[INIT] setPrintLog no disponible en esta versión de SDK: " + e.getMessage());
+                rfidManager = RFIDManager.getInstance();
+                if (rfidManager == null) {
+                    Log.e(TAG, "[INIT] RFIDManager.getInstance() retornó null — SDK no disponible.");
+                    notifyError("RFIDManager null — SDK no cargado correctamente.");
+                    return;
+                }
+                Log.d(TAG, "[INIT] RFIDManager.getInstance() → OK");
+
+                // 3. Activar logs internos del SDK
+                try {
+                    rfidManager.setPrintLog(true);
+                    Log.d(TAG, "[INIT] rfidManager.setPrintLog(true) → Logs SDK activados");
+                } catch (Exception e) {
+                    Log.w(TAG, "[INIT] setPrintLog no disponible en esta versión de SDK: " + e.getMessage());
+                }
+
+                // 4. Bind al servicio iMin (async)
+                Log.d(TAG, "[INIT] Llamando rfidManager.connect(context)...");
+                rfidManager.connect(context);
+                Log.d(TAG, "[INIT] rfidManager.connect() invocado — bind asíncrono en curso");
+
+                // 5. Auto-connect tras 500ms (tiempo para que el servicio se bindee)
+                Log.d(TAG, "[INIT] Programando connect() en 500ms...");
+                uiHandler.postDelayed(this::connect, 500);
+
+            } catch (Throwable e) {
+                Log.e(TAG, "[INIT] Excepción crítica inicializando SDK iMin", e);
+                notifyError("Excepción SDK iMin: " + e.getMessage());
             }
-
-            // 4. Bind al servicio iMin (async)
-            Log.d(TAG, "[INIT] Llamando rfidManager.connect(context)...");
-            rfidManager.connect(context);
-            Log.d(TAG, "[INIT] rfidManager.connect() invocado — bind asíncrono en curso");
-
-            // 5. Auto-connect tras 500ms (tiempo para que el servicio se bindee)
-            Log.d(TAG, "[INIT] Programando connect() en 500ms...");
-            uiHandler.postDelayed(this::connect, 500);
-
-        } catch (Throwable e) {
-            Log.e(TAG, "[INIT] Excepción crítica inicializando SDK iMin", e);
-            notifyError("Excepción SDK iMin: " + e.getMessage());
-        }
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -164,59 +170,60 @@ public class IminReaderImpl implements IReaderDevice {
             return false;
         }
 
-        try {
-            if (rfidManager == null) {
-                Log.w(TAG, "[CONNECT] rfidManager era null, re-inicializando...");
-                rfidManager = RFIDManager.getInstance();
+        executor.execute(() -> {
+            try {
                 if (rfidManager == null) {
-                    Log.e(TAG, "[CONNECT] RFIDManager.getInstance() retornó null en re-init.");
-                    notifyError("RFIDManager null en connect().");
-                    return false;
+                    Log.w(TAG, "[CONNECT] rfidManager era null, re-inicializando...");
+                    rfidManager = RFIDManager.getInstance();
+                    if (rfidManager == null) {
+                        Log.e(TAG, "[CONNECT] RFIDManager.getInstance() retornó null en re-init.");
+                        notifyError("RFIDManager null en connect().");
+                        return;
+                    }
+                    rfidManager.connect(context);
+                    Log.d(TAG, "[CONNECT] rfidManager.connect() re-invocado.");
                 }
-                rfidManager.connect(context);
-                Log.d(TAG, "[CONNECT] rfidManager.connect() re-invocado.");
+
+                // getHelper() retorna null si el bind aún no completó
+                rfidHelper = rfidManager.getHelper();
+                Log.d(TAG, "[CONNECT] rfidManager.getHelper() → " +
+                        (rfidHelper != null ? "OK ✓" : "NULL (servicio no vinculado aún)"));
+
+                if (rfidHelper != null) {
+                    // Modelo de escaneo
+                    try {
+                        int scanModel = rfidHelper.getScanModel();
+                        Log.i(TAG, "[CONNECT] getScanModel() → " + scanModel +
+                                " (0=normal, ver docs SDK para códigos)");
+                    } catch (Exception e) {
+                        Log.w(TAG, "[CONNECT] getScanModel() fallo: " + e.getMessage());
+                        handleBinderError(e);
+                    }
+
+                    // Registrar callbacks
+                    registerReaderCall();
+
+                    isConnected = true;
+                    Log.i(TAG, "[CONNECT] Estado: CONECTADO ✓ (RFIDHelper listo)");
+                    Log.i(TAG, "[CONNECT] Dispositivo: " + getDeviceName());
+
+                    if (listener != null) {
+                        uiHandler.post(() -> listener.onConnected(getDeviceName()));
+                    }
+
+                } else {
+                    String msg = "RFIDHelper es null — el servicio puede estar iniciándose. " +
+                                 "Intente de nuevo en un momento.";
+                    Log.e(TAG, "[CONNECT] " + msg);
+                    notifyError(msg);
+                }
+
+            } catch (Exception e) {
+                Log.e(TAG, "[CONNECT] Excepción durante conexión", e);
+                notifyError("Error al conectar: " + e.getMessage());
             }
-
-            // getHelper() retorna null si el bind aún no completó
-            rfidHelper = rfidManager.getHelper();
-            Log.d(TAG, "[CONNECT] rfidManager.getHelper() → " +
-                    (rfidHelper != null ? "OK ✓" : "NULL (servicio no vinculado aún)"));
-
-            if (rfidHelper != null) {
-                // Modelo de escaneo
-                try {
-                    int scanModel = rfidHelper.getScanModel();
-                    Log.i(TAG, "[CONNECT] getScanModel() → " + scanModel +
-                            " (0=normal, ver docs SDK para códigos)");
-                } catch (Exception e) {
-                    Log.w(TAG, "[CONNECT] getScanModel() fallo: " + e.getMessage());
-                }
-
-                // Registrar callbacks
-                registerReaderCall();
-
-                isConnected = true;
-                Log.i(TAG, "[CONNECT] Estado: CONECTADO ✓ (RFIDHelper listo)");
-                Log.i(TAG, "[CONNECT] Dispositivo: " + getDeviceName());
-
-                if (listener != null) {
-                    listener.onConnected(getDeviceName());
-                }
-                return true;
-
-            } else {
-                String msg = "RFIDHelper es null — el servicio puede estar iniciándose. " +
-                             "Intente de nuevo en un momento.";
-                Log.e(TAG, "[CONNECT] " + msg);
-                notifyError(msg);
-                return false;
-            }
-
-        } catch (Exception e) {
-            Log.e(TAG, "[CONNECT] Excepción durante conexión", e);
-            notifyError("Error al conectar: " + e.getMessage());
-            return false;
-        }
+        });
+        return true;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -255,45 +262,23 @@ public class IminReaderImpl implements IReaderDevice {
         }
 
         isSingleReadMode = singleMode;
-
-        if (singleMode) {
-            // ── LECTURA SENCILLA ──────────────────────────────────────────
-            // tagInventoryAsyncFastStartReading() está diseñado para captura
-            // rápida de un solo tag. El callback onTag() recibirá el primer
-            // resultado y automáticamente detenemos el lector.
-            Log.i(TAG, "[INVENTORY] ══ Modo SENCILLA iniciando...");
-            Log.d(TAG, "[INVENTORY] Llamando rfidHelper.tagInventoryAsyncFastStartReading()");
+        
+        executor.execute(() -> {
             try {
-                rfidHelper.tagInventoryAsyncFastStartReading();
-                Log.i(TAG, "[INVENTORY] tagInventoryAsyncFastStartReading() → OK ✓");
-                Log.i(TAG, "[INVENTORY] Esperando primer tag → se detendrá automáticamente.");
-                return true;
+                if (singleMode) {
+                    Log.i(TAG, "[INVENTORY] ══ Modo SENCILLA iniciando... (usando Raw para evitar crash)");
+                } else {
+                    Log.i(TAG, "[INVENTORY] ══ Modo MÚLTIPLE iniciando...");
+                }
+                Log.d(TAG, "[INVENTORY] Llamando rfidHelper.tagInventoryRawStartReading()");
+                rfidHelper.tagInventoryRawStartReading();
+                Log.i(TAG, "[INVENTORY] tagInventoryRawStartReading() → OK ✓");
             } catch (Exception e) {
-                Log.e(TAG, "[INVENTORY] Error en tagInventoryAsyncFastStartReading()", e);
-                // Fallback a RawStartReading si Fast falla
-                Log.w(TAG, "[INVENTORY] Fallback → tagInventoryRawStartReading() para modo sencilla");
-                return startRawInventory();
+                Log.e(TAG, "[INVENTORY] Error en tagInventoryRawStartReading(): " + e.getMessage(), e);
+                handleBinderError(e);
             }
-        } else {
-            // ── LECTURA MÚLTIPLE ──────────────────────────────────────────
-            // tagInventoryRawStartReading() inicia inventario continuo.
-            // El callback onTag() recibe tags hasta stopInventory().
-            Log.i(TAG, "[INVENTORY] ══ Modo MÚLTIPLE iniciando...");
-            Log.d(TAG, "[INVENTORY] Llamando rfidHelper.tagInventoryRawStartReading()");
-            return startRawInventory();
-        }
-    }
-
-    private boolean startRawInventory() {
-        try {
-            rfidHelper.tagInventoryRawStartReading();
-            Log.i(TAG, "[INVENTORY] tagInventoryRawStartReading() → OK ✓");
-            Log.i(TAG, "[INVENTORY] Lectura continua activa. Llamar stopInventory() para detener.");
-            return true;
-        } catch (Exception e) {
-            Log.e(TAG, "[INVENTORY] Error en tagInventoryRawStartReading()", e);
-            return false;
-        }
+        });
+        return true;
     }
 
     @Override
@@ -302,26 +287,24 @@ public class IminReaderImpl implements IReaderDevice {
             Log.w(TAG, "[STOP] No conectado — stopInventory() ignorado.");
             return false;
         }
-        Log.d(TAG, "[STOP] Llamando rfidHelper.tagInventoryRawStopReading()...");
-        try {
-            // Para ambos modos (raw y asyncFast) la detención usa tagInventoryRawStopReading
-            rfidHelper.tagInventoryRawStopReading();
-            Log.i(TAG, "[STOP] tagInventoryRawStopReading() → OK ✓");
-
-            // También detener el FastReading por si acaso
+        executor.execute(() -> {
+            Log.d(TAG, "[STOP] Llamando rfidHelper.tagInventoryRawStopReading()...");
+            try {
+                rfidHelper.tagInventoryRawStopReading();
+                Log.i(TAG, "[STOP] tagInventoryRawStopReading() → OK ✓");
+            } catch (Exception e) {
+                Log.e(TAG, "[STOP] Error en stopInventory()", e);
+                handleBinderError(e);
+            }
+            
+            // También intentar detener el FastReading por si acaso el SDK lo mantuvo vivo
             try {
                 rfidHelper.tagInventoryAsyncFastStopReading();
-                Log.d(TAG, "[STOP] tagInventoryAsyncFastStopReading() → OK ✓");
-            } catch (Exception ex) {
-                Log.w(TAG, "[STOP] tagInventoryAsyncFastStopReading() no disponible o falló: " + ex.getMessage());
-            }
-
-            isSingleReadMode = false;
-            return true;
-        } catch (Exception e) {
-            Log.e(TAG, "[STOP] Error en stopInventory()", e);
-            return false;
-        }
+            } catch (Exception ignored) { }
+        });
+        
+        isSingleReadMode = false;
+        return true;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -451,33 +434,36 @@ public class IminReaderImpl implements IReaderDevice {
             return;
         }
 
-        try {
-            // Normalizar: si viene en formato Zebra (ej. 270 = 27.0 dBm) → dividir entre 10
-            int dBm = power;
-            if (dBm > 33) {
-                dBm = dBm / 10;
-                Log.d(TAG, "[POWER] Valor normalizado (Zebra format): " + power + " → " + dBm + " dBm");
+        executor.execute(() -> {
+            try {
+                // Normalizar: si viene en formato Zebra (ej. 270 = 27.0 dBm) → dividir entre 10
+                int dBm = power;
+                if (dBm > 33) {
+                    dBm = dBm / 10;
+                    Log.d(TAG, "[POWER] Valor normalizado (Zebra format): " + power + " → " + dBm + " dBm");
+                }
+
+                // Rango SDK iMin: 5–33 dBm
+                if (dBm < 5)  dBm = 5;
+                if (dBm > 33) dBm = 33;
+                Log.i(TAG, "[POWER] Potencia final a aplicar: " + dBm + " dBm (rango válido: 5–33 dBm)");
+
+                ReadWritePower rwPower = new ReadWritePower();
+                rwPower.readPower  = dBm;
+                rwPower.writePower = dBm;
+                String configJson = new Gson().toJson(rwPower);
+
+                Log.d(TAG, "[POWER] CMD=0x" + String.format("%02X", CMD.SET_READ_WRITE_POWER) +
+                        " (SET_READ_WRITE_POWER) JSON: " + configJson);
+                rfidHelper.extendOperation(CMD.SET_READ_WRITE_POWER, configJson);
+                Log.i(TAG, "[POWER] extendOperation(SET_READ_WRITE_POWER) → OK ✓");
+
+            } catch (Exception e) {
+                Log.e(TAG, "[POWER] Error configurando potencia", e);
+                notifyError("Error al configurar potencia: " + e.getMessage());
+                handleBinderError(e);
             }
-
-            // Rango SDK iMin: 5–33 dBm
-            if (dBm < 5)  dBm = 5;
-            if (dBm > 33) dBm = 33;
-            Log.i(TAG, "[POWER] Potencia final a aplicar: " + dBm + " dBm (rango válido: 5–33 dBm)");
-
-            ReadWritePower rwPower = new ReadWritePower();
-            rwPower.readPower  = dBm;
-            rwPower.writePower = dBm;
-            String configJson = new Gson().toJson(rwPower);
-
-            Log.d(TAG, "[POWER] CMD=0x" + String.format("%02X", CMD.SET_READ_WRITE_POWER) +
-                    " (SET_READ_WRITE_POWER) JSON: " + configJson);
-            rfidHelper.extendOperation(CMD.SET_READ_WRITE_POWER, configJson);
-            Log.i(TAG, "[POWER] extendOperation(SET_READ_WRITE_POWER) → OK ✓");
-
-        } catch (Exception e) {
-            Log.e(TAG, "[POWER] Error configurando potencia", e);
-            notifyError("Error al configurar potencia: " + e.getMessage());
-        }
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -504,42 +490,46 @@ public class IminReaderImpl implements IReaderDevice {
     @Override
     public boolean disconnect() {
         Log.d(TAG, "[DISCONNECT] Desconectando iMin Reader...");
-        try {
-            if (rfidHelper != null && isServiceInstalled("com.imin.peripherservice")) {
-                Log.d(TAG, "[DISCONNECT] Llamando rfidHelper.unregisterReaderCall()...");
+        if (executor != null && !executor.isShutdown()) {
+            executor.execute(() -> {
                 try {
-                    rfidHelper.unregisterReaderCall();
-                    Log.i(TAG, "[DISCONNECT] unregisterReaderCall() → OK ✓");
+                    if (rfidHelper != null && isServiceInstalled("com.imin.peripherservice")) {
+                        Log.d(TAG, "[DISCONNECT] Llamando rfidHelper.unregisterReaderCall()...");
+                        try {
+                            rfidHelper.unregisterReaderCall();
+                            Log.i(TAG, "[DISCONNECT] unregisterReaderCall() → OK ✓");
+                        } catch (Exception e) {
+                            Log.w(TAG, "[DISCONNECT] Error en unregisterReaderCall(): " + e.getMessage());
+                        }
+
+                        Log.d(TAG, "[DISCONNECT] Llamando rfidHelper.tagInventoryRawStopReading()...");
+                        try {
+                            rfidHelper.tagInventoryRawStopReading();
+                            Log.i(TAG, "[DISCONNECT] tagInventoryRawStopReading() → OK ✓");
+                        } catch (Exception e) {
+                            Log.w(TAG, "[DISCONNECT] Error en tagInventoryRawStopReading(): " + e.getMessage());
+                        }
+                    }
+
+                    if (rfidManager != null) {
+                        Log.d(TAG, "[DISCONNECT] Llamando rfidManager.disconnect()...");
+                        rfidManager.disconnect();
+                        Log.i(TAG, "[DISCONNECT] rfidManager.disconnect() → OK ✓");
+                    }
+
                 } catch (Exception e) {
-                    Log.w(TAG, "[DISCONNECT] Error en unregisterReaderCall(): " + e.getMessage());
+                    Log.e(TAG, "[DISCONNECT] Excepción durante desconexión", e);
                 }
 
-                Log.d(TAG, "[DISCONNECT] Llamando rfidHelper.tagInventoryRawStopReading()...");
-                try {
-                    rfidHelper.tagInventoryRawStopReading();
-                    Log.i(TAG, "[DISCONNECT] tagInventoryRawStopReading() → OK ✓");
-                } catch (Exception e) {
-                    Log.w(TAG, "[DISCONNECT] Error en tagInventoryRawStopReading(): " + e.getMessage());
+                rfidHelper = null;
+                isConnected = false;
+                isSingleReadMode = false;
+
+                Log.i(TAG, "[DISCONNECT] Estado: DESCONECTADO");
+                if (listener != null) {
+                    uiHandler.post(() -> listener.onDisconnected());
                 }
-            }
-
-            if (rfidManager != null) {
-                Log.d(TAG, "[DISCONNECT] Llamando rfidManager.disconnect()...");
-                rfidManager.disconnect();
-                Log.i(TAG, "[DISCONNECT] rfidManager.disconnect() → OK ✓");
-            }
-
-        } catch (Exception e) {
-            Log.e(TAG, "[DISCONNECT] Excepción durante desconexión", e);
-        }
-
-        rfidHelper = null;
-        isConnected = false;
-        isSingleReadMode = false;
-
-        Log.i(TAG, "[DISCONNECT] Estado: DESCONECTADO");
-        if (listener != null) {
-            listener.onDisconnected();
+            });
         }
         return true;
     }
@@ -548,6 +538,9 @@ public class IminReaderImpl implements IReaderDevice {
     public void dispose() {
         Log.d(TAG, "[DISPOSE] Liberando recursos iMin...");
         disconnect();
+        if (executor != null) {
+            executor.shutdown();
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -608,6 +601,23 @@ public class IminReaderImpl implements IReaderDevice {
             }
         }
         return sb.toString();
+    }
+
+    private void handleBinderError(Exception e) {
+        if (e.toString().contains("DeadObjectException") || e.toString().contains("RemoteException") || e.toString().contains("IllegalStateException")) {
+            Log.e(TAG, "[RECOVERY] Binder died o estado ilegal. Intentando reconectar en 1 segundo...");
+            isConnected = false;
+            rfidHelper = null;
+            uiHandler.postDelayed(() -> {
+                Log.i(TAG, "[RECOVERY] Re-ejecutando rfidManager.connect()...");
+                try {
+                    if (rfidManager != null) rfidManager.connect(context);
+                    uiHandler.postDelayed(this::connect, 500);
+                } catch (Exception ex) {
+                    Log.e(TAG, "[RECOVERY] Fallo crítico intentando reconectar: " + ex.getMessage());
+                }
+            }, 1000);
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────

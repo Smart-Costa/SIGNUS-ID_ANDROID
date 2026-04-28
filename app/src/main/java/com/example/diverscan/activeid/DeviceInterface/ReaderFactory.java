@@ -47,6 +47,20 @@ public class ReaderFactory {
     }
 
     public static ReaderType getBestReaderType(Context context) {
+        String model = Build.MODEL;
+        Log.d(TAG, "Checking device model for hardware priority: " + model);
+        
+        // Priorizar detección por hardware siempre (evita falso ZEBRA de SharedPreferences)
+        if (model != null) {
+            if (model.contains("Lark 1")) {
+                Log.i(TAG, "Auto-detected iMin Lark 1 device (Scanner): " + model);
+                return ReaderType.IMIN_SCANNER;
+            } else if (model.contains("I24P01")) {
+                Log.i(TAG, "Auto-detected iMin device (RFID): " + model);
+                return ReaderType.IMIN;
+            }
+        }
+
         String typeStr = SharedPreferencesGetSet.leer_local("reader_type", context);
         ReaderType type = ReaderType.ZEBRA; // Default
         
@@ -56,18 +70,6 @@ public class ReaderFactory {
             } catch (IllegalArgumentException e) {
                 Log.e(TAG, "Invalid reader type: " + typeStr + ", defaulting to ZEBRA");
                 type = ReaderType.ZEBRA;
-            }
-        } else {
-            String model = Build.MODEL;
-            Log.d(TAG, "Auto-detecting reader. Device Model: " + model);
-            if (model != null) {
-                if (model.contains("Lark 1")) {
-                     type = ReaderType.IMIN_SCANNER;
-                     Log.i(TAG, "Auto-detected iMin Lark 1 device (Scanner): " + model);
-                } else if (model.contains("I24P01")) {
-                    type = ReaderType.IMIN;
-                    Log.i(TAG, "Auto-detected iMin device (RFID): " + model);
-                }
             }
         }
         return type;
