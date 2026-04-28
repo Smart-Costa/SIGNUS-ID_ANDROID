@@ -362,6 +362,46 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         logInfo("[SDK] " + message);
     }
 
+    // ─── Hardware Trigger (Gatillo) ──────────────────────────────────────────
+
+    @Override
+    public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
+        // En dispositivos iMin, el gatillo suele reportarse como uno de estos KeyCodes
+        // Dependiendo del modelo podría ser distinto (280, F1, F2, F3, F4, BUTTON_L1/R1)
+        if (event.getRepeatCount() == 0) {
+            logInfo("[TRIGGER] onKeyDown: KeyCode=" + keyCode);
+            if (isTriggerKey(keyCode)) {
+                logInfo("[TRIGGER] Gatillo físico PRESIONADO → Iniciando lectura múltiple...");
+                toggleMultiRead(); // o startSingleRead() según se requiera
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, android.view.KeyEvent event) {
+        if (isTriggerKey(keyCode)) {
+            logInfo("[TRIGGER] Gatillo físico LIBERADO");
+            // Si quieres que pare al soltar el gatillo, puedes llamar a stopInventory() aquí:
+            // if (isMultiReading) toggleMultiRead(); 
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
+    private boolean isTriggerKey(int keyCode) {
+        return keyCode == android.view.KeyEvent.KEYCODE_F1 ||
+               keyCode == android.view.KeyEvent.KEYCODE_F2 ||
+               keyCode == android.view.KeyEvent.KEYCODE_F3 ||
+               keyCode == android.view.KeyEvent.KEYCODE_F4 ||
+               keyCode == android.view.KeyEvent.KEYCODE_BUTTON_L1 ||
+               keyCode == android.view.KeyEvent.KEYCODE_BUTTON_R1 ||
+               keyCode == android.view.KeyEvent.KEYCODE_BUTTON_L2 ||
+               keyCode == android.view.KeyEvent.KEYCODE_BUTTON_R2 ||
+               keyCode == 280; // Custom key code for some iMin guns
+    }
+
     // ─── Logging ─────────────────────────────────────────────────────────────
 
     private void logInfo(String msg) { log("INFO", msg); }

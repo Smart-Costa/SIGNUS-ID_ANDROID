@@ -246,51 +246,49 @@ public class IminReaderImpl implements IReaderDevice {
     // IReaderDevice — Lectura (Inventario)
     // ─────────────────────────────────────────────────────────────────────────
 
-    /**
-     * Inicia lectura en modo MÚLTIPLE (continuo).
-     * Internamente usa tagInventoryRawStartReading().
-     * Equivalente a CMD.INVENTORY continuo.
-     */
     @Override
     public boolean startInventory() {
-        return startInventoryInternal(false);
-    }
-
-    /**
-     * Inicia lectura en modo SENCILLA (auto-stop al primer tag).
-     * Internamente usa tagInventoryAsyncFastStartReading() que es más rápido
-     * para capturar un único tag sin necesidad de polling continuo.
-     */
-    public boolean startSingleRead() {
-        return startInventoryInternal(true);
-    }
-
-    /**
-     * Método central de inicio de inventario.
-     *
-     * @param singleMode true → lectura sencilla (auto-stop al primer tag);
-     *                   false → lectura múltiple continua.
-     */
-    private boolean startInventoryInternal(boolean singleMode) {
         if (!isConnected || rfidHelper == null) {
             Log.w(TAG, "[INVENTORY] No conectado o RFIDHelper null — no se puede iniciar lectura.");
             return false;
         }
 
-        isSingleReadMode = singleMode;
+        isSingleReadMode = false;
         
         executor.execute(() -> {
             try {
-                if (singleMode) {
-                    Log.i(TAG, "[INVENTORY] ══ Modo SENCILLA iniciando... (usando Raw para evitar crash)");
-                } else {
-                    Log.i(TAG, "[INVENTORY] ══ Modo MÚLTIPLE iniciando...");
-                }
+                Log.i(TAG, "[INVENTORY] ══ Modo MÚLTIPLE iniciando...");
                 Log.d(TAG, "[INVENTORY] Llamando rfidHelper.tagInventoryRawStartReading()");
                 rfidHelper.tagInventoryRawStartReading();
                 Log.i(TAG, "[INVENTORY] tagInventoryRawStartReading() → OK ✓");
             } catch (Exception e) {
                 Log.e(TAG, "[INVENTORY] Error en tagInventoryRawStartReading(): " + e.getMessage(), e);
+                handleBinderError(e);
+            }
+        });
+        return true;
+    }
+
+    /**
+     * Inicia lectura en modo SENCILLA (auto-stop al primer tag).
+     */
+    @Override
+    public boolean startSingleRead() {
+        if (!isConnected || rfidHelper == null) {
+            Log.w(TAG, "[SINGLE] No conectado o RFIDHelper null — no se puede iniciar lectura.");
+            return false;
+        }
+
+        isSingleReadMode = true;
+        
+        executor.execute(() -> {
+            try {
+                Log.i(TAG, "[SINGLE] ══ Modo SENCILLA iniciando...");
+                Log.d(TAG, "[SINGLE] Llamando rfidHelper.tagInventoryAsyncFastStartReading(0, 0)");
+                rfidHelper.tagInventoryAsyncFastStartReading((byte)0, (byte)0);
+                Log.i(TAG, "[SINGLE] tagInventoryAsyncFastStartReading() → OK ✓");
+            } catch (Exception e) {
+                Log.e(TAG, "[SINGLE] Error en tagInventoryAsyncFastStartReading(): " + e.getMessage(), e);
                 handleBinderError(e);
             }
         });
