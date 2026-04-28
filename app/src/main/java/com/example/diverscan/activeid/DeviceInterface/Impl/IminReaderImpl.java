@@ -533,9 +533,8 @@ public class IminReaderImpl implements IReaderDevice {
                     }
 
                     if (rfidManager != null) {
-                        Log.d(TAG, "[DISCONNECT] Llamando rfidManager.disconnect()...");
-                        rfidManager.disconnect();
-                        Log.i(TAG, "[DISCONNECT] rfidManager.disconnect() → OK ✓");
+                        // NO llamar rfidManager.disconnect() porque corrompe el estado del Singleton
+                        // para futuras conexiones en la app y causa 'RFID service not available'.
                     }
 
                 } catch (Exception e) {

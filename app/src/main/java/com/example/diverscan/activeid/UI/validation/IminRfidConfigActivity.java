@@ -112,7 +112,7 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         logInfo("╚══════════════════════════════════════════╝");
         logInfo("Modelo: " + Build.MODEL + " | Android SDK: " + Build.VERSION.SDK_INT);
         logInfo("SDK iMin RFID: v1.0.3 | Requiere: com.imin.peripherservice");
-        logInfo("Modos: SENCILLA=tagInventoryAsyncFastStartReading | MÚLTIPLE=tagInventoryRawStartReading");
+        logInfo("Modos: SENCILLA=tagInventoryRawStartReading (con timeout) | MÚLTIPLE=tagInventoryRawStartReading");
         logWarn("Dispositivo DEBE ser iMin I24P01/Lark 1 con módulo RFID interno.");
 
         // Auto-check service on start
@@ -194,7 +194,7 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         isSingleReading = true;
         isMultiReading = false;
         tvTags.setText("Esperando tag único...");
-        logInfo("[SINGLE] Iniciando Lectura SENCILLA → tagInventoryAsyncFastStartReading()");
+        logInfo("[SINGLE] Iniciando Lectura SENCILLA → tagInventoryRawStartReading()");
         logInfo("[SINGLE] Se detendrá automáticamente al recibir el primer tag.");
 
         // Usar startSingleRead() del impl para modo sencilla correcto
@@ -335,7 +335,7 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
                 new AlertDialog.Builder(this)
                         .setTitle("Lectura Sencilla iMin ✓")
                         .setMessage("EPC : " + epc + "\nRSSI: " + rssi + " dBm\n\n" +
-                                    "(tagInventoryAsyncFastStartReading)")
+                                    "(Lectura Sencilla - tagInventoryRawStartReading)")
                         .setPositiveButton("OK", null)
                         .show();
             } else if (isMultiReading) {
