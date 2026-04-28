@@ -50,6 +50,13 @@ public class RegistroTomaFisicaAdapter extends RecyclerView.Adapter<RegistroToma
             intent.putExtra("nombre", item.getNombre());
             holder.itemView.getContext().startActivity(intent);
         });
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), DetalleTomaFisicaActivity.class);
+            intent.putExtra("tomaFisicaId", item.getTomaFisicaId());
+            intent.putExtra("nombre", item.getNombre());
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override
