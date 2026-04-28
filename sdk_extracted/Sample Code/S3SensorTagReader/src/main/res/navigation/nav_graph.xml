@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/SensorTagFragment">
+
+    <fragment
+        android:id="@+id/SensorTagFragment"
+        android:name="com.uk.tsl.rfid.samples.s3sensortagreader.SensorTagFragment"
+        android:label="@string/sensor_tag_fragment_label"
+        tools:layout="@layout/fragment_sensor_tag">
+
+        <action
+            android:id="@+id/action_SensorTagFragment_to_ConfigureFragment"
+            app:destination="@id/ConfigureFragment" />
+        <action
+            android:id="@+id/action_SensorTagFragment_to_NotCompatibleFragment"
+            app:destination="@id/NotCompatibleFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/ConfigureFragment"
+        android:name="com.uk.tsl.rfid.samples.s3sensortagreader.ConfigureFragment"
+        android:label="@string/configure_fragment_label"
+        tools:layout="@layout/fragment_configure">
+
+        <action
+            android:id="@+id/action_ConfigureFragment_to_SensorTagFragment"
+            app:destination="@id/SensorTagFragment" />
+        <action
+            android:id="@+id/action_ConfigureFragment_to_NotCompatibleFragment"
+            app:destination="@id/NotCompatibleFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/NotCompatibleFragment"
+        android:name="com.uk.tsl.rfid.samples.s3sensortagreader.NotCompatibleFragment"
+        android:label="@string/not_compatible_fragment_label"
+        tools:layout="@layout/fragment_not_compatible">
+
+        <action
+            android:id="@+id/action_NotCompatibleFragment_to_SensorTagFragment"
+            app:destination="@id/SensorTagFragment" />
+    </fragment>
+</navigation>

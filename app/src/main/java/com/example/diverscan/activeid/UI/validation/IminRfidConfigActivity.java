@@ -46,6 +46,9 @@ import java.util.Map;
 public class IminRfidConfigActivity extends AppCompatActivity implements IReaderListener {
 
     private static final String TAG = "IminRfidConfig";
+    // SDK: IminRfidSdk v1.0.3 | com.imin.peripherservice required
+    // Lectura Sencilla → IminReaderImpl.startSingleRead() → tagInventoryAsyncFastStartReading()
+    // Lectura Múltiple → IminReaderImpl.startInventory()  → tagInventoryRawStartReading()
 
     // UI
     private TextView tvServiceStatus, tvStatus, tvDeviceInfo, tvTags, tvLog, tvPowerLabel;
@@ -104,9 +107,13 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         btnSetPower.setOnClickListener(v -> applyPower());
         btnDiagnostic.setOnClickListener(v -> showDiagnostic());
 
-        logInfo("iMin Config UI lista. Modelo: " + Build.MODEL);
-        logInfo("SDK: IminRfidSdk v1.0.3 | Requiere com.imin.peripherservice");
-        logWarn("Este dispositivo DEBE ser un iMin con módulo RFID interno (I24P01 / Lark 1).");
+        logInfo("╔══════════════════════════════════════════╗");
+        logInfo("║  SIGNUS iMin RFID Config — v1.0.3 SDK   ║");
+        logInfo("╚══════════════════════════════════════════╝");
+        logInfo("Modelo: " + Build.MODEL + " | Android SDK: " + Build.VERSION.SDK_INT);
+        logInfo("SDK iMin RFID: v1.0.3 | Requiere: com.imin.peripherservice");
+        logInfo("Modos: SENCILLA=tagInventoryAsyncFastStartReading | MÚLTIPLE=tagInventoryRawStartReading");
+        logWarn("Dispositivo DEBE ser iMin I24P01/Lark 1 con módulo RFID interno.");
 
         // Auto-check service on start
         handler.postDelayed(this::checkIminService, 500);
@@ -179,28 +186,58 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
     // ─── Read Tests ───────────────────────────────────────────────────────────
 
     private void startSingleRead() {
-        if (iminDevice == null || !iminDevice.isConnected()) { toast("iMin desconectado"); return; }
-        isSingleReading = true; isMultiReading = false;
-        tvTags.setText("Esperando tag...");
-        iminDevice.startInventory();
-        logInfo("Esperando lectura sencilla iMin... (tagInventoryRawStartReading)");
+        if (iminDevice == null || !iminDevice.isConnected()) {
+            toast("iMin desconectado — conecte primero");
+            logWarn("[SINGLE] Lectura sencilla abortada: dispositivo no conectado.");
+            return;
+        }
+        isSingleReading = true;
+        isMultiReading = false;
+        tvTags.setText("Esperando tag único...");
+        logInfo("[SINGLE] Iniciando Lectura SENCILLA → tagInventoryAsyncFastStartReading()");
+        logInfo("[SINGLE] Se detendrá automáticamente al recibir el primer tag.");
+
+        // Usar startSingleRead() del impl para modo sencilla correcto
+        boolean started;
+        if (iminDevice instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) {
+            started = ((com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) iminDevice).startSingleRead();
+            logInfo("[SINGLE] startSingleRead() (AsyncFast mode) → " + (started ? "OK ✓" : "FALLÓ ✗"));
+        } else {
+            // Fallback para otros dispositivos
+            started = iminDevice.startInventory();
+            logInfo("[SINGLE] startInventory() (fallback) → " + (started ? "OK ✓" : "FALLÓ ✗"));
+        }
+        if (!started) {
+            isSingleReading = false;
+            toast("Error iniciando lectura sencilla");
+        }
     }
 
     private void toggleMultiRead() {
-        if (iminDevice == null || !iminDevice.isConnected()) { toast("iMin desconectado"); return; }
+        if (iminDevice == null || !iminDevice.isConnected()) {
+            toast("iMin desconectado — conecte primero");
+            logWarn("[MULTI] Lectura múltiple abortada: dispositivo no conectado.");
+            return;
+        }
         if (isMultiReading) {
+            // ── Detener lectura múltiple ──────────────────────────────────
+            logInfo("[MULTI] Deteniendo lectura múltiple → tagInventoryRawStopReading()");
             iminDevice.stopInventory();
             isMultiReading = false;
+            logInfo("[MULTI] Lectura múltiple DETENIDA. Tags únicos acumulados: " + multiReadTags.size());
             showMultiSummary();
             btnMulti.setText("Lectura Múltiple");
-            logInfo("Lectura múltiple detenida. tags únicos=" + multiReadTags.size());
         } else {
-            isMultiReading = true; isSingleReading = false;
+            // ── Iniciar lectura múltiple ──────────────────────────────────
+            isMultiReading = true;
+            isSingleReading = false;
             multiReadTags.clear();
-            iminDevice.startInventory();
+            logInfo("[MULTI] Iniciando Lectura MÚLTIPLE → tagInventoryRawStartReading()");
+            logInfo("[MULTI] Inventario continuo activo. Presione \"Detener\" para finalizar.");
+            boolean started = iminDevice.startInventory();
+            logInfo("[MULTI] startInventory() → " + (started ? "OK ✓" : "FALLÓ ✗"));
             btnMulti.setText("Detener (0)");
-            tvTags.setText("Escaneando...");
-            logInfo("Lectura múltiple iMin iniciada... (tagInventoryRawStartReading)");
+            tvTags.setText("Escaneando... (0 tags)");
         }
     }
 
@@ -257,40 +294,60 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
 
     @Override
     public void onConnected(String readerName) {
-        logInfo("iMin Conectado: " + readerName);
+        logInfo("[SDK] ✅ iMin CONECTADO: " + readerName);
+        logInfo("[SDK] RFIDHelper listo — puede iniciar lecturas");
+        if (iminDevice instanceof com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) {
+            logInfo(((com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) iminDevice).getDiagnosticInfo());
+        }
         runOnUiThread(this::updateConnectionUI);
     }
 
     @Override
     public void onDisconnected() {
-        logWarn("iMin Desconectado.");
+        logWarn("[SDK] iMin DESCONECTADO.");
         runOnUiThread(this::updateConnectionUI);
     }
 
     @Override
     public void onConnectionError(String message) {
-        logError("Error iMin: " + message);
+        logError("[SDK] ERROR iMin: " + message);
         runOnUiThread(this::updateConnectionUI);
     }
 
     @Override
     public void onTagRead(List<ReaderTag> tags) {
-        if (tags == null || tags.isEmpty()) return;
-        String epc = tags.get(0).getEpc();
-        logInfo("Tag iMin: " + epc + " (RSSI=" + tags.get(0).getRssi() + ")");
+        if (tags == null || tags.isEmpty()) {
+            Log.w(TAG, "[onTagRead] Lista de tags vacía — ignorado");
+            return;
+        }
+        ReaderTag first = tags.get(0);
+        String epc = first.getEpc();
+        short rssi = first.getRssi();
+        String mode = isSingleReading ? "SENCILLA" : (isMultiReading ? "MÚLTIPLE" : "IDLE");
+        logInfo("[TAG] ══ Modo=" + mode + " | EPC=" + epc + " | RSSI=" + rssi + " | Total en callback=" + tags.size());
+
         runOnUiThread(() -> {
             tvTags.setText(epc);
             if (isSingleReading) {
-                iminDevice.stopInventory();
+                // El IminReaderImpl ya hace auto-stop, pero lo marcamos aquí también
                 isSingleReading = false;
+                logInfo("[SINGLE] Tag recibido → showing dialog");
                 new AlertDialog.Builder(this)
-                        .setTitle("Lectura Sencilla iMin")
-                        .setMessage("EPC: " + epc + "\nRSSI: " + tags.get(0).getRssi())
-                        .setPositiveButton("OK", null).show();
+                        .setTitle("Lectura Sencilla iMin ✓")
+                        .setMessage("EPC : " + epc + "\nRSSI: " + rssi + " dBm\n\n" +
+                                    "(tagInventoryAsyncFastStartReading)")
+                        .setPositiveButton("OK", null)
+                        .show();
             } else if (isMultiReading) {
-                for (ReaderTag t : tags)
-                    multiReadTags.put(t.getEpc(), multiReadTags.getOrDefault(t.getEpc(), 0) + 1);
-                btnMulti.setText("Detener (" + multiReadTags.size() + ")");
+                // Acumular todos los tags del callback
+                for (ReaderTag t : tags) {
+                    multiReadTags.put(t.getEpc(),
+                            multiReadTags.getOrDefault(t.getEpc(), 0) + 1);
+                }
+                int unique = multiReadTags.size();
+                btnMulti.setText("Detener (" + unique + ")");
+                tvTags.setText(epc + "\n(" + unique + " únicos)");
+                logInfo("[MULTI] Tags acumulados: " + unique + " únicos | Último EPC: " + epc);
             }
         });
     }

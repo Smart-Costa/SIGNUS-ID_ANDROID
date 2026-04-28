@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">HF LF Support</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="instruction_text">Connect an HF/LF Reader (e.g. 2173)</string>
+    <string name="instruction2_text">Pull the Reader trigger to scan. As tags are scanned, the identifier and type of the tag will be displayed below.</string>
+
+    <string name="read_button_title">Read Tag</string>
+    <string name="instruction3_text">Enter Offset and number of Blocks. Tap \'Read Tag\'.</string>
+
+
+    <string name="button1_text">RF Version</string>
+    <string name="button2_text">ISO14443A Search</string>
+    <string name="clear_button_title">Clear Results</string>
+
+
+    <string name="connect_reader_menu_item_text">Connect Reader</string>
+    <string name="change_reader_menu_item_text">Change Reader</string>
+    <string name="disconnect_reader_menu_item_text">Disconnect Reader</string>
+
+</resources>

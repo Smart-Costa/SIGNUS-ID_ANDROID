@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">LicenceKey</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Strings used for fragments for navigation -->
+    <string name="licencekey_fragment_label">Reader:</string>
+
+    <string name="banner_title_authorised">Authorised</string>
+    <string name="banner_title_not_authorised">Not Authorised</string>
+
+    <string name="secret_placeholder_text">Enter secret here</string>
+    <string name="authorisation_title">Licence Key Installer</string>
+    <string name="authorisation_type_description">Install or remove a Digital Signature Licence Key. This asymmetric key, elliptic curve-based, signature is generated from the reader\'s Serial Number and Bluetooth Address and is unique to each Reader.</string>
+
+    <string name="authorise_button_text">Authorise</string>
+    <string name="de_authorise_button_text">De-authorise</string>
+
+    <string name="authorise_description">Write the licence key file to the reader</string>
+    <string name="de_authorise_description">Remove ANY licence key file from the reader</string>
+
+    <string name="clear_button_text">Clear</string>
+
+
+    <string name="connect_reader_menu_item_text">Connect Reader</string>
+    <string name="change_reader_menu_item_text">Change Reader</string>
+    <string name="disconnect_reader_menu_item_text">Disconnect Reader</string>
+
+    <string name="reset_reader_menu_item_text">Reset Reader</string>
+</resources>
