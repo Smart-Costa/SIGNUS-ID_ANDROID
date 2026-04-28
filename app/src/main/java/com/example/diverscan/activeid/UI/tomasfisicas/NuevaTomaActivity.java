@@ -328,6 +328,10 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
                 
                 if (currentStatus) {
                     isRfidReady = true;
+                    if (btnIniciar != null) {
+                        btnIniciar.setEnabled(true);
+                        btnIniciar.setAlpha(1.0f);
+                    }
                     showRfidToast("Lector Listo");
                     // Stop polling once connected
                     return;
@@ -611,6 +615,12 @@ public class NuevaTomaActivity extends AppCompatActivity implements ResponseHand
         txtIniciar = findViewById(R.id.txtIniciar);
         iconIniciar = findViewById(R.id.iconIniciar);
         btnBack = findViewById(R.id.btnBack);
+        
+        // El botón Iniciar debe empezar deshabilitado hasta que el lector conecte
+        if (btnIniciar != null) {
+            btnIniciar.setEnabled(false);
+            btnIniciar.setAlpha(0.5f); // Visual indication of disabled state
+        }
 
         spinnerActivos = findViewById(R.id.spinnerActivos);
         spinnerUbicacionA = findViewById(R.id.spinnerUbicacionA);

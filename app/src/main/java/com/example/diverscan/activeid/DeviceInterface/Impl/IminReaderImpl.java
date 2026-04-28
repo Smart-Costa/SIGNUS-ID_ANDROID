@@ -74,6 +74,7 @@ public class IminReaderImpl implements IReaderDevice {
 
     // ── Estado ────────────────────────────────────────────────────────────────
     private volatile boolean isConnected = false;
+    private volatile boolean isConnecting = false;
     private int currentPower = 30; // dBm por defecto
     /** true → lectura sencilla (auto-stop al primer tag)
      *  false → lectura múltiple continua */
@@ -144,10 +145,6 @@ public class IminReaderImpl implements IReaderDevice {
                 rfidManager.connect(context);
                 Log.d(TAG, "[INIT] rfidManager.connect() invocado — bind asíncrono en curso");
 
-                // 5. Auto-connect tras 500ms (tiempo para que el servicio se bindee)
-                Log.d(TAG, "[INIT] Programando connect() en 500ms...");
-                uiHandler.postDelayed(this::connect, 500);
-
             } catch (Throwable e) {
                 Log.e(TAG, "[INIT] Excepción crítica inicializando SDK iMin", e);
                 notifyError("Excepción SDK iMin: " + e.getMessage());
@@ -161,7 +158,7 @@ public class IminReaderImpl implements IReaderDevice {
 
     @Override
     public boolean connect() {
-        Log.d(TAG, "[CONNECT] Intentando obtener RFIDHelper...");
+        Log.d(TAG, "[CONNECT] Intentando conectar u obtener RFIDHelper...");
 
         if (!isServiceInstalled("com.imin.peripherservice")) {
             String msg = "com.imin.peripherservice no instalado — RFID no disponible.";
@@ -170,57 +167,76 @@ public class IminReaderImpl implements IReaderDevice {
             return false;
         }
 
+        if (isConnected || isConnecting) {
+            Log.d(TAG, "[CONNECT] Ya conectado o en proceso de conexión. Ignorando.");
+            return true;
+        }
+        isConnecting = true;
+
         executor.execute(() -> {
             try {
                 if (rfidManager == null) {
-                    Log.w(TAG, "[CONNECT] rfidManager era null, re-inicializando...");
+                    Log.w(TAG, "[CONNECT] rfidManager era null, inicializando...");
                     rfidManager = RFIDManager.getInstance();
                     if (rfidManager == null) {
-                        Log.e(TAG, "[CONNECT] RFIDManager.getInstance() retornó null en re-init.");
+                        Log.e(TAG, "[CONNECT] RFIDManager.getInstance() retornó null.");
                         notifyError("RFIDManager null en connect().");
+                        isConnecting = false;
                         return;
                     }
                     rfidManager.connect(context);
-                    Log.d(TAG, "[CONNECT] rfidManager.connect() re-invocado.");
                 }
 
-                // getHelper() retorna null si el bind aún no completó
-                rfidHelper = rfidManager.getHelper();
-                Log.d(TAG, "[CONNECT] rfidManager.getHelper() → " +
-                        (rfidHelper != null ? "OK ✓" : "NULL (servicio no vinculado aún)"));
-
-                if (rfidHelper != null) {
-                    // Modelo de escaneo
-                    try {
-                        int scanModel = rfidHelper.getScanModel();
-                        Log.i(TAG, "[CONNECT] getScanModel() → " + scanModel +
-                                " (0=normal, ver docs SDK para códigos)");
-                    } catch (Exception e) {
-                        Log.w(TAG, "[CONNECT] getScanModel() fallo: " + e.getMessage());
-                        handleBinderError(e);
+                // Polling: esperar hasta que el bind de iMin complete de forma asíncrona.
+                int retries = 10; // Hasta 5 segundos (10 * 500ms)
+                while (retries > 0) {
+                    rfidHelper = rfidManager.getHelper();
+                    if (rfidHelper != null) {
+                        try {
+                            // Validar que el proxy interno no sea nulo invocando un método
+                            rfidHelper.getScanModel();
+                            break; // ¡Está listo!
+                        } catch (Exception e) {
+                            Log.w(TAG, "[CONNECT] Proxy aún no listo (esperando bind)... Intentos: " + (retries-1));
+                        }
+                    } else {
+                        Log.w(TAG, "[CONNECT] rfidHelper es null... Intentos: " + (retries-1));
                     }
+                    try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+                    retries--;
+                }
 
-                    // Registrar callbacks
-                    registerReaderCall();
+                if (rfidHelper == null) {
+                    Log.e(TAG, "[CONNECT] No se pudo obtener rfidHelper tras varios intentos.");
+                    notifyError("Timeout al conectar con servicio RFID iMin.");
+                    isConnecting = false;
+                    return;
+                }
 
-                    isConnected = true;
-                    Log.i(TAG, "[CONNECT] Estado: CONECTADO ✓ (RFIDHelper listo)");
-                    Log.i(TAG, "[CONNECT] Dispositivo: " + getDeviceName());
+                // Última validación
+                try {
+                    int scanModel = rfidHelper.getScanModel();
+                    Log.i(TAG, "[CONNECT] getScanModel() → " + scanModel + " (0=normal, ver docs SDK)");
+                } catch (Exception e) {
+                    Log.w(TAG, "[CONNECT] getScanModel() final falló: " + e.getMessage());
+                }
 
-                    if (listener != null) {
-                        uiHandler.post(() -> listener.onConnected(getDeviceName()));
-                    }
+                // Registrar callbacks
+                registerReaderCall();
 
-                } else {
-                    String msg = "RFIDHelper es null — el servicio puede estar iniciándose. " +
-                                 "Intente de nuevo en un momento.";
-                    Log.e(TAG, "[CONNECT] " + msg);
-                    notifyError(msg);
+                isConnected = true;
+                isConnecting = false;
+                Log.i(TAG, "[CONNECT] Estado: CONECTADO ✓ (RFIDHelper listo)");
+                Log.i(TAG, "[CONNECT] Dispositivo: " + getDeviceName());
+
+                if (listener != null) {
+                    uiHandler.post(() -> listener.onConnected(getDeviceName()));
                 }
 
             } catch (Exception e) {
                 Log.e(TAG, "[CONNECT] Excepción durante conexión", e);
                 notifyError("Error al conectar: " + e.getMessage());
+                isConnecting = false;
             }
         });
         return true;
