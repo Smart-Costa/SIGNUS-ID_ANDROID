@@ -233,6 +233,15 @@ public class IminReaderImpl implements IReaderDevice {
                     uiHandler.post(() -> listener.onConnected(getDeviceName()));
                 }
 
+                // Configurar hardware a modo RFID-only
+                try {
+                    String configTrigger = "{\"triggerFunction\":1}";
+                    rfidHelper.extendOperation((byte) -105, configTrigger); // CMD.SET_TRIGGER_FUNCTION
+                    Log.i(TAG, "[INIT] Trigger configurado a RFID-only (1)");
+                } catch (Exception e) {
+                    Log.w(TAG, "[INIT] Error configurando trigger: " + e.getMessage());
+                }
+
             } catch (Exception e) {
                 Log.e(TAG, "[CONNECT] Excepción durante conexión", e);
                 notifyError("Error al conectar: " + e.getMessage());
@@ -261,6 +270,7 @@ public class IminReaderImpl implements IReaderDevice {
                 Log.d(TAG, "[INVENTORY] Limpiando buffer interno de tags (CMD.CLEAR_TAG)...");
                 try {
                     rfidHelper.extendOperation(CMD.CLEAR_TAG, "");
+                    Thread.sleep(50); // Dar tiempo al hardware para procesar el comando
                 } catch (Exception e) {
                     Log.w(TAG, "[INVENTORY] Error limpiando tags: " + e.getMessage());
                 }
@@ -292,6 +302,7 @@ public class IminReaderImpl implements IReaderDevice {
                 Log.d(TAG, "[SINGLE] Limpiando buffer interno de tags (CMD.CLEAR_TAG)...");
                 try {
                     rfidHelper.extendOperation(CMD.CLEAR_TAG, "");
+                    Thread.sleep(50); // Dar tiempo al hardware para procesar el comando
                 } catch (Exception e) {
                     Log.w(TAG, "[SINGLE] Error limpiando tags: " + e.getMessage());
                 }
