@@ -258,6 +258,12 @@ public class IminReaderImpl implements IReaderDevice {
         executor.execute(() -> {
             try {
                 Log.i(TAG, "[INVENTORY] ══ Modo MÚLTIPLE iniciando...");
+                Log.d(TAG, "[INVENTORY] Limpiando buffer interno de tags (CMD.CLEAR_TAG)...");
+                try {
+                    rfidHelper.extendOperation(CMD.CLEAR_TAG, "");
+                } catch (Exception e) {
+                    Log.w(TAG, "[INVENTORY] Error limpiando tags: " + e.getMessage());
+                }
                 Log.d(TAG, "[INVENTORY] Llamando rfidHelper.tagInventoryRawStartReading()");
                 rfidHelper.tagInventoryRawStartReading();
                 Log.i(TAG, "[INVENTORY] tagInventoryRawStartReading() → OK ✓");
@@ -283,6 +289,12 @@ public class IminReaderImpl implements IReaderDevice {
         executor.execute(() -> {
             try {
                 Log.i(TAG, "[SINGLE] ══ Modo SENCILLA iniciando...");
+                Log.d(TAG, "[SINGLE] Limpiando buffer interno de tags (CMD.CLEAR_TAG)...");
+                try {
+                    rfidHelper.extendOperation(CMD.CLEAR_TAG, "");
+                } catch (Exception e) {
+                    Log.w(TAG, "[SINGLE] Error limpiando tags: " + e.getMessage());
+                }
                 Log.d(TAG, "[SINGLE] Llamando rfidHelper.tagInventoryRawStartReading()");
                 rfidHelper.tagInventoryRawStartReading();
                 Log.i(TAG, "[SINGLE] tagInventoryRawStartReading() → OK ✓");
