@@ -22,6 +22,12 @@ import com.example.diverscan.activeid.DeviceInterface.IReaderListener;
 import com.example.diverscan.activeid.DeviceInterface.ReaderFactory;
 import com.example.diverscan.activeid.DeviceInterface.ReaderTag;
 import com.example.diverscan.activeid.R;
+import com.imin.rfid.RFIDManager;
+import com.imin.rfid.RFIDHelper;
+import com.imin.rfid.ReaderCall;
+import com.imin.rfid.constant.CMD;
+import com.imin.rfid.constant.ParamCts;
+import com.imin.rfid.entity.DataParameter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,6 +59,7 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
     // UI
     private TextView tvServiceStatus, tvStatus, tvDeviceInfo, tvTags, tvLog, tvPowerLabel;
     private Button btnCheckService, btnConnect, btnDisconnect, btnSingle, btnMulti, btnSetPower, btnDiagnostic;
+    private Button btnDirectConnect, btnDirectClear, btnDirectInventory, btnDirectStop;
     private SeekBar sbPower;
 
     // RFID
@@ -86,6 +93,12 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         btnDiagnostic   = findViewById(R.id.btn_imin_diagnostic);
         sbPower         = findViewById(R.id.sb_imin_power);
 
+        // Direct SDK Buttons
+        btnDirectConnect   = findViewById(R.id.btn_direct_connect);
+        btnDirectClear     = findViewById(R.id.btn_direct_clear);
+        btnDirectInventory = findViewById(R.id.btn_direct_inventory);
+        btnDirectStop      = findViewById(R.id.btn_direct_stop);
+
         tvLog.setMovementMethod(new ScrollingMovementMethod());
 
         // iMin power: 5–33 dBm
@@ -106,6 +119,12 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         btnMulti.setOnClickListener(v -> toggleMultiRead());
         btnSetPower.setOnClickListener(v -> applyPower());
         btnDiagnostic.setOnClickListener(v -> showDiagnostic());
+
+        // Direct SDK Listeners
+        btnDirectConnect.setOnClickListener(v -> directConnect());
+        btnDirectClear.setOnClickListener(v -> directClear());
+        btnDirectInventory.setOnClickListener(v -> directInventory());
+        btnDirectStop.setOnClickListener(v -> directStop());
 
         logInfo("╔══════════════════════════════════════════╗");
         logInfo("║  SIGNUS iMin RFID Config — v1.0.3 SDK   ║");
@@ -240,6 +259,105 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
             tvTags.setText("Escaneando... (0 tags)");
         }
     }
+
+    // ─── Direct SDK Tests (Sin Abstracción) ──────────────────────────────────
+    
+    private void directConnect() {
+        logInfo("[DIRECT] Llamando RFIDManager.getInstance().connect(this)...");
+        try {
+            RFIDManager.getInstance().setPrintLog(true);
+            RFIDManager.getInstance().connect(this);
+            logInfo("[DIRECT] rfidManager.connect() invocado.");
+            
+            // Esperar un momento y registrar callback
+            handler.postDelayed(() -> {
+                RFIDHelper helper = RFIDManager.getInstance().getHelper();
+                if (helper != null) {
+                    logInfo("[DIRECT] RFIDHelper obtenido ✓");
+                    helper.registerReaderCall(directReaderCall);
+                    logInfo("[DIRECT] ReaderCall registrado en el helper ✓");
+                    
+                    // Intentar configurar trigger
+                    try {
+                        helper.extendOperation((byte) -105, "{\"triggerFunction\":1}");
+                        logInfo("[DIRECT] Trigger configurado a RFID-only (1)");
+                    } catch (Exception e) {
+                        logError("[DIRECT] Error configurando trigger: " + e.getMessage());
+                    }
+                } else {
+                    logError("[DIRECT] RFIDHelper sigue siendo NULL tras 1.5s.");
+                }
+            }, 1500);
+        } catch (Exception e) {
+            logError("[DIRECT] Excepción en connect: " + e.getMessage());
+        }
+    }
+
+    private void directClear() {
+        logInfo("[DIRECT] Llamando helper.extendOperation(CMD.CLEAR_TAG)...");
+        try {
+            RFIDHelper helper = RFIDManager.getInstance().getHelper();
+            if (helper != null) {
+                helper.extendOperation((byte) -108, ""); // 0x94 = -108
+                logInfo("[DIRECT] CLEAR_TAG enviado.");
+            } else {
+                logError("[DIRECT] Helper es NULL");
+            }
+        } catch (Exception e) {
+            logError("[DIRECT] Error en clear: " + e.getMessage());
+        }
+    }
+
+    private void directInventory() {
+        logInfo("[DIRECT] Llamando helper.tagInventoryRawStartReading()...");
+        try {
+            RFIDHelper helper = RFIDManager.getInstance().getHelper();
+            if (helper != null) {
+                helper.tagInventoryRawStartReading();
+                logInfo("[DIRECT] Inventario iniciado.");
+            } else {
+                logError("[DIRECT] Helper es NULL");
+            }
+        } catch (Exception e) {
+            logError("[DIRECT] Error en inventory: " + e.getMessage());
+        }
+    }
+
+    private void directStop() {
+        logInfo("[DIRECT] Llamando helper.tagInventoryRawStopReading()...");
+        try {
+            RFIDHelper helper = RFIDManager.getInstance().getHelper();
+            if (helper != null) {
+                helper.tagInventoryRawStopReading();
+                logInfo("[DIRECT] Inventario detenido.");
+            } else {
+                logError("[DIRECT] Helper es NULL");
+            }
+        } catch (Exception e) {
+            logError("[DIRECT] Error en stop: " + e.getMessage());
+        }
+    }
+
+    private final ReaderCall directReaderCall = new ReaderCall() {
+        @Override
+        public void onSuccess(byte cmd, DataParameter data) {
+            logInfo("[DIRECT-CB] onSuccess: CMD=0x" + String.format("%02X", cmd));
+        }
+
+        @Override
+        public void onTag(byte cmd, byte state, DataParameter data) {
+            if (data == null) return;
+            String epc = data.getString(ParamCts.TAG_EPC);
+            String rssi = data.getString(ParamCts.TAG_RSSI);
+            logInfo("[DIRECT-TAG] EPC=" + epc + " | RSSI=" + rssi);
+            runOnUiThread(() -> tvTags.setText(epc));
+        }
+
+        @Override
+        public void onFiled(byte cmd, byte error, String msg) {
+            logError("[DIRECT-CB] onFailed: CMD=0x" + String.format("%02X", cmd) + " | Error=" + error + " | Msg=" + msg);
+        }
+    };
 
     // ─── Power ───────────────────────────────────────────────────────────────
 

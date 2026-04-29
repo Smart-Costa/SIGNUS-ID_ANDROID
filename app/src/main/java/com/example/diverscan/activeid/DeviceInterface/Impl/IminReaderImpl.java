@@ -194,13 +194,14 @@ public class IminReaderImpl implements IReaderDevice {
                     if (rfidHelper != null) {
                         try {
                             // Validar que el proxy interno no sea nulo invocando un método
-                            rfidHelper.getScanModel();
+                            int scanModel = rfidHelper.getScanModel();
+                            Log.i(TAG, "[CONNECT] rfidHelper obtenido con éxito! scanModel=" + scanModel);
                             break; // ¡Está listo!
                         } catch (Exception e) {
-                            Log.w(TAG, "[CONNECT] Proxy aún no listo (esperando bind)... Intentos: " + (retries-1));
+                            Log.w(TAG, "[CONNECT] Proxy aún no listo (esperando bind)... " + e.getMessage() + " | Intentos restantes: " + (retries-1));
                         }
                     } else {
-                        Log.w(TAG, "[CONNECT] rfidHelper es null... Intentos: " + (retries-1));
+                        Log.w(TAG, "[CONNECT] rfidHelper es null (el servicio iMin aún no ha bindeado)... Intentos restantes: " + (retries-1));
                     }
                     try { Thread.sleep(500); } catch (InterruptedException ignored) {}
                     retries--;
@@ -276,9 +277,9 @@ public class IminReaderImpl implements IReaderDevice {
                 }
                 Log.d(TAG, "[INVENTORY] Llamando rfidHelper.tagInventoryRawStartReading()");
                 rfidHelper.tagInventoryRawStartReading();
-                Log.i(TAG, "[INVENTORY] tagInventoryRawStartReading() → OK ✓");
+                Log.i(TAG, "[INVENTORY] tagInventoryRawStartReading() invocado correctamente ✓");
             } catch (Exception e) {
-                Log.e(TAG, "[INVENTORY] Error en tagInventoryRawStartReading(): " + e.getMessage(), e);
+                Log.e(TAG, "[INVENTORY] ERROR CRÍTICO en tagInventoryRawStartReading(): " + e.getMessage(), e);
                 handleBinderError(e);
             }
         });
@@ -370,12 +371,12 @@ public class IminReaderImpl implements IReaderDevice {
              */
             @Override
             public void onSuccess(byte cmd, DataParameter dataParameter) {
-                Log.d(TAG, "[onSuccess] CMD=0x" + String.format("%02X", cmd) +
+                Log.i(TAG, "[onSuccess] CMD=0x" + String.format("%02X", cmd) +
                         " (" + getCmdName(cmd) + ")");
                 if (dataParameter != null) {
                     String extra = dataParameter.toString();
                     if (extra != null && !extra.isEmpty()) {
-                        Log.v(TAG, "[onSuccess] DataParameter: " + extra);
+                        Log.i(TAG, "[onSuccess] DataParameter: " + extra);
                     }
                 }
             }
@@ -389,13 +390,16 @@ public class IminReaderImpl implements IReaderDevice {
              */
             @Override
             public void onTag(byte cmd, byte state, DataParameter dataParameter) {
-                Log.v(TAG, "[onTag] CMD=0x" + String.format("%02X", cmd) +
-                        " state=" + (state & 0xFF));
+                Log.i(TAG, "[onTag] Recibido: CMD=0x" + String.format("%02X", cmd) +
+                        " (" + getCmdName(cmd) + ") | state=" + (state & 0xFF));
 
                 if (dataParameter == null) {
                     Log.w(TAG, "[onTag] DataParameter es null — tag ignorado.");
                     return;
                 }
+
+                // Log de todos los campos para ver qué está mandando el hardware
+                Log.i(TAG, "[onTag] Campos recibidos: " + dataParameter.toString());
 
                 // ── Extraer campos del tag via ParamCts ──
                 String epc       = dataParameter.getString(ParamCts.TAG_EPC);
@@ -454,7 +458,7 @@ public class IminReaderImpl implements IReaderDevice {
              */
             @Override
             public void onFiled(byte cmd, byte errorCode, String msg) {
-                Log.w(TAG, "[onFiled] CMD=0x" + String.format("%02X", cmd) +
+                Log.i(TAG, "[onFailed/Filed] CMD=0x" + String.format("%02X", cmd) +
                         " (" + getCmdName(cmd) + ")" +
                         " | ErrorCode=0x" + String.format("%02X", errorCode) +
                         " | Msg: " + msg);
@@ -685,29 +689,29 @@ public class IminReaderImpl implements IReaderDevice {
      */
     private String getCmdName(byte cmd) {
         switch (cmd & 0xFF) {
-            case 0x00: return "INVENTORY";
-            case 0x01: return "REAL_TIME_INVENTORY";
-            case 0x02: return "FAST_SWITCH_ANT_INVENTORY";
-            case 0x03: return "WRITE_TAG";
-            case 0x04: return "READ_TAG";
-            case 0x05: return "LOCK_TAG";
-            case 0x06: return "KILL_TAG";
-            case 0x07: return "SET_ACCESS_EPC_MATCH";
-            case 0x08: return "GET_ACCESS_EPC_MATCH";
-            case 0x09: return "CUSTOMIZED_SESSION_TARGET_INVENTORY";
-            case 0x0A: return "SET_IMPINJ_FAST_TID";
-            case 0x0B: return "SET_AND_SAVE_IMPINJ_FAST_TID";
-            case 0x0C: return "GET_IMPINJ_FAST_TID";
-            case 0x19: return "SET_READ_WRITE_POWER";
-            case 0x26: return "SET_TRIGGER_FUNCTION";
-            case 0x27: return "SCANNER_START_DECODE";
-            case 0x28: return "SCANNER_STOP_DECODE";
-            case 0x2C: return "GET_INVENTORY_BUFFER";
-            case 0x2D: return "GET_AND_RESET_INVENTORY_BUFFER";
-            case 0x2E: return "GET_INVENTORY_BUFFER_TAG_COUNT";
-            case 0x2F: return "RESET_INVENTORY_BUFFER";
-            case 0x30: return "CLEAR_TAG";
-            case 0x31: return "CLEAR_TAG_FILTER";
+            case 0x80: return "INVENTORY";
+            case 0x81: return "READ_TAG";
+            case 0x82: return "WRITE_TAG";
+            case 0x83: return "LOCK_TAG";
+            case 0x84: return "KILL_TAG";
+            case 0x85: return "SET_ACCESS_EPC_MATCH";
+            case 0x86: return "GET_ACCESS_EPC_MATCH";
+            case 0x89: return "REAL_TIME_INVENTORY";
+            case 0x8A: return "FAST_SWITCH_ANT_INVENTORY";
+            case 0x8B: return "CUSTOMIZED_SESSION_TARGET_INVENTORY";
+            case 0x8C: return "SET_IMPINJ_FAST_TID";
+            case 0x8D: return "SET_AND_SAVE_IMPINJ_FAST_TID";
+            case 0x8E: return "GET_IMPINJ_FAST_TID";
+            case 0x90: return "GET_INVENTORY_BUFFER";
+            case 0x91: return "GET_AND_RESET_INVENTORY_BUFFER";
+            case 0x92: return "GET_INVENTORY_BUFFER_TAG_COUNT";
+            case 0x93: return "RESET_INVENTORY_BUFFER";
+            case 0x94: return "CLEAR_TAG";
+            case 0x95: return "CLEAR_TAG_FILTER";
+            case 0x96: return "SET_READ_WRITE_POWER";
+            case 0x97: return "SET_TRIGGER_FUNCTION";
+            case 0xF6: return "SCANNER_START_DECODE";
+            case 0xF7: return "SCANNER_STOP_DECODE";
             default:   return "UNKNOWN_CMD";
         }
     }

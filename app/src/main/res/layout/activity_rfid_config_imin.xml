@@ -208,6 +208,76 @@
             android:textColor="#FFFFFF"
             android:layout_marginBottom="8dp"/>
 
+        <!-- PRUEBAS DIRECTAS SECTION -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#CCCCCC"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PRUEBAS DIRECTAS (SIN ABSTRACCIÓN):"
+            android:textStyle="bold"
+            android:textColor="#C62828"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/btn_direct_connect"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="SDK Connect"
+                android:textSize="12sp"
+                android:backgroundTint="#FF9800"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_direct_clear"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="SDK Clear"
+                android:textSize="12sp"
+                android:backgroundTint="#FF9800"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <Button
+                android:id="@+id/btn_direct_inventory"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="SDK Start"
+                android:textSize="12sp"
+                android:backgroundTint="#FF9800"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_direct_stop"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="SDK Stop"
+                android:textSize="12sp"
+                android:backgroundTint="#FF9800"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
         <!-- Tags Read -->
         <TextView
             android:layout_width="match_parent"
