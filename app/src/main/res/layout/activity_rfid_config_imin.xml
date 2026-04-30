@@ -268,6 +268,16 @@
                 android:layout_marginEnd="4dp"/>
 
             <Button
+                android:id="@+id/btn_direct_single"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="SDK Single"
+                android:textSize="12sp"
+                android:backgroundTint="#FF9800"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
                 android:id="@+id/btn_direct_stop"
                 android:layout_width="0dp"
                 android:layout_weight="1"

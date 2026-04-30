@@ -236,13 +236,15 @@ public class IminReaderImpl implements IReaderDevice {
 
                 // Configurar hardware a modo RFID-only
                 try {
-                    // Intentar con la estructura 'mode' que es m├ís compatible en algunas versiones
-                    String configTrigger = "{\"mode\":1}";
+                    // Intentar con la estructura 'value' (tercer candidato para iMin Lark 1)
+                    String configTrigger = "{\"value\":1}";
                     rfidHelper.extendOperation(CMD.SET_TRIGGER_FUNCTION, configTrigger);
-                    Log.i(TAG, "[INIT] Trigger configurado a RFID-only (mode=1)");
-                    Thread.sleep(100);
+                    Log.i(TAG, "[INIT] Trigger configurado a RFID-only (value=1)");
+                    Thread.sleep(150);
                 } catch (Exception e) {
                     Log.w(TAG, "[INIT] Error configurando trigger: " + e.getMessage());
+                } finally {
+                    isConnecting = false;
                 }
 
             } catch (Exception e) {

@@ -58,8 +58,8 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
 
     // UI
     private TextView tvServiceStatus, tvStatus, tvDeviceInfo, tvTags, tvLog, tvPowerLabel;
-    private Button btnCheckService, btnConnect, btnDisconnect, btnSingle, btnMulti, btnSetPower, btnDiagnostic;
-    private Button btnDirectConnect, btnDirectClear, btnDirectInventory, btnDirectStop;
+    private Button btnConnect, btnDisconnect, btnStartInventory, btnStopInventory, btnSingleRead, btnSetPower, btnDiagnostic, btnCheckService;
+    private Button btnDirectConnect, btnDirectClear, btnDirectInventory, btnDirectSingle, btnDirectStop;
     private SeekBar sbPower;
 
     // RFID
@@ -87,8 +87,8 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         btnCheckService = findViewById(R.id.btn_imin_check_service);
         btnConnect      = findViewById(R.id.btn_imin_connect);
         btnDisconnect   = findViewById(R.id.btn_imin_disconnect);
-        btnSingle       = findViewById(R.id.btn_imin_single);
-        btnMulti        = findViewById(R.id.btn_imin_multi);
+        btnSingleRead   = findViewById(R.id.btn_imin_single);
+        btnStartInventory = findViewById(R.id.btn_imin_multi);
         btnSetPower     = findViewById(R.id.btn_imin_set_power);
         btnDiagnostic   = findViewById(R.id.btn_imin_diagnostic);
         sbPower         = findViewById(R.id.sb_imin_power);
@@ -97,7 +97,10 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         btnDirectConnect   = findViewById(R.id.btn_direct_connect);
         btnDirectClear     = findViewById(R.id.btn_direct_clear);
         btnDirectInventory = findViewById(R.id.btn_direct_inventory);
+        btnDirectSingle    = findViewById(R.id.btn_direct_single);
         btnDirectStop      = findViewById(R.id.btn_direct_stop);
+        
+        btnStopInventory   = findViewById(R.id.btn_imin_disconnect); // Se usa para desconectar en realidad
 
         tvLog.setMovementMethod(new ScrollingMovementMethod());
 
@@ -123,7 +126,34 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         // Direct SDK Listeners
         btnDirectConnect.setOnClickListener(v -> directConnect());
         btnDirectClear.setOnClickListener(v -> directClear());
-        btnDirectInventory.setOnClickListener(v -> directInventory());
+        btnSingleRead.setOnClickListener(v -> {
+            if (iminDevice != null) {
+                logInfo("Iniciando Lectura SENCILLA...");
+                boolean started = ((com.example.diverscan.activeid.DeviceInterface.Impl.IminReaderImpl) iminDevice).startSingleRead();
+                if (started) {
+                    logInfo("Comando SingleRead enviado ✓");
+                } else {
+                    logError("Fallo al iniciar SingleRead");
+                }
+            }
+        });
+        
+        btnDirectSingle.setOnClickListener(v -> {
+            try {
+                RFIDHelper helper = RFIDManager.getInstance().getHelper();
+                if (helper != null) {
+                    logInfo("[DIRECT] Limpiando buffer...");
+                    helper.extendOperation(CMD.CLEAR_TAG, "");
+                    Thread.sleep(50);
+                    logInfo("[DIRECT] Iniciando SingleRead (AsyncFast)...");
+                    helper.tagInventoryAsyncFastStartReading();
+                    logSuccess("[DIRECT] SingleRead iniciado ✓");
+                }
+            } catch (Exception e) {
+                logError("[DIRECT] Error: " + e.getMessage());
+            }
+        });
+        btnStopInventory.setOnClickListener(v -> directStop());
         btnDirectStop.setOnClickListener(v -> directStop());
 
         logInfo("╔══════════════════════════════════════════╗");
@@ -463,7 +493,7 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
                             multiReadTags.getOrDefault(t.getEpc(), 0) + 1);
                 }
                 int unique = multiReadTags.size();
-                btnMulti.setText("Detener (" + unique + ")");
+                btnStartInventory.setText("Detener (" + unique + ")");
                 tvTags.setText(epc + "\n(" + unique + " únicos)");
                 logInfo("[MULTI] Tags acumulados: " + unique + " únicos | Último EPC: " + epc);
             }
