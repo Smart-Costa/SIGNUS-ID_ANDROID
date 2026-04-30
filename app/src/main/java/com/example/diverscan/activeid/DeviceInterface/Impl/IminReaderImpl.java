@@ -236,9 +236,11 @@ public class IminReaderImpl implements IReaderDevice {
 
                 // Configurar hardware a modo RFID-only
                 try {
-                    String configTrigger = "{\"triggerFunction\":1}";
-                    rfidHelper.extendOperation((byte) -105, configTrigger); // CMD.SET_TRIGGER_FUNCTION
-                    Log.i(TAG, "[INIT] Trigger configurado a RFID-only (1)");
+                    // Intentar con la estructura 'mode' que es m├ís compatible en algunas versiones
+                    String configTrigger = "{\"mode\":1}";
+                    rfidHelper.extendOperation(CMD.SET_TRIGGER_FUNCTION, configTrigger);
+                    Log.i(TAG, "[INIT] Trigger configurado a RFID-only (mode=1)");
+                    Thread.sleep(100);
                 } catch (Exception e) {
                     Log.w(TAG, "[INIT] Error configurando trigger: " + e.getMessage());
                 }
@@ -307,9 +309,9 @@ public class IminReaderImpl implements IReaderDevice {
                 } catch (Exception e) {
                     Log.w(TAG, "[SINGLE] Error limpiando tags: " + e.getMessage());
                 }
-                Log.d(TAG, "[SINGLE] Llamando rfidHelper.tagInventoryRawStartReading()");
-                rfidHelper.tagInventoryRawStartReading();
-                Log.i(TAG, "[SINGLE] tagInventoryRawStartReading() → OK ✓");
+                Log.d(TAG, "[SINGLE] Llamando rfidHelper.tagInventoryAsyncFastStartReading()");
+                rfidHelper.tagInventoryAsyncFastStartReading();
+                Log.i(TAG, "[SINGLE] tagInventoryAsyncFastStartReading() ÔåÆ OK Ô£ô");
                 
                 // Timeout de 3 segundos para detener la lectura si no se encuentra ningún tag
                 uiHandler.postDelayed(() -> {

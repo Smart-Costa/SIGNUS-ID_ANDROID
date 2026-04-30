@@ -279,8 +279,8 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
                     
                     // Intentar configurar trigger
                     try {
-                        helper.extendOperation((byte) -105, "{\"triggerFunction\":1}");
-                        logInfo("[DIRECT] Trigger configurado a RFID-only (1)");
+                        helper.extendOperation(CMD.SET_TRIGGER_FUNCTION, "{\"mode\":1}");
+                        logInfo("[DIRECT] Trigger configurado a RFID-only (mode=1)");
                     } catch (Exception e) {
                         logError("[DIRECT] Error configurando trigger: " + e.getMessage());
                     }
@@ -298,7 +298,7 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         try {
             RFIDHelper helper = RFIDManager.getInstance().getHelper();
             if (helper != null) {
-                helper.extendOperation((byte) -108, ""); // 0x94 = -108
+                helper.extendOperation(CMD.CLEAR_TAG, "");
                 logInfo("[DIRECT] CLEAR_TAG enviado.");
             } else {
                 logError("[DIRECT] Helper es NULL");
