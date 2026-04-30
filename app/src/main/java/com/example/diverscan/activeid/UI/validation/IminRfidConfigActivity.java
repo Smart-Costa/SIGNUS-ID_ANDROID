@@ -118,8 +118,8 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         btnCheckService.setOnClickListener(v -> checkIminService());
         btnConnect.setOnClickListener(v -> connectImin());
         btnDisconnect.setOnClickListener(v -> disconnectImin());
-        btnSingle.setOnClickListener(v -> startSingleRead());
-        btnMulti.setOnClickListener(v -> toggleMultiRead());
+        btnSingleRead.setOnClickListener(v -> startSingleRead());
+        btnStartInventory.setOnClickListener(v -> toggleMultiRead());
         btnSetPower.setOnClickListener(v -> applyPower());
         btnDiagnostic.setOnClickListener(v -> showDiagnostic());
 
@@ -147,7 +147,7 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
                     Thread.sleep(50);
                     logInfo("[DIRECT] Iniciando SingleRead (AsyncFast)...");
                     helper.tagInventoryAsyncFastStartReading();
-                    logSuccess("[DIRECT] SingleRead iniciado ✓");
+                    logInfo("[DIRECT] SingleRead iniciado ✓");
                 }
             } catch (Exception e) {
                 logError("[DIRECT] Error: " + e.getMessage());
@@ -236,7 +236,7 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
 
     private void startSingleRead() {
         if (iminDevice == null || !iminDevice.isConnected()) {
-            toast("iMin desconectado — conecte primero");
+            logWarn("iMin desconectado — conecte primero");
             logWarn("[SINGLE] Lectura sencilla abortada: dispositivo no conectado.");
             return;
         }
@@ -258,13 +258,13 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
         }
         if (!started) {
             isSingleReading = false;
-            toast("Error iniciando lectura sencilla");
+            logWarn("Error iniciando lectura sencilla");
         }
     }
 
     private void toggleMultiRead() {
         if (iminDevice == null || !iminDevice.isConnected()) {
-            toast("iMin desconectado — conecte primero");
+            logWarn("iMin desconectado — conecte primero");
             logWarn("[MULTI] Lectura múltiple abortada: dispositivo no conectado.");
             return;
         }
@@ -275,7 +275,7 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
             isMultiReading = false;
             logInfo("[MULTI] Lectura múltiple DETENIDA. Tags únicos acumulados: " + multiReadTags.size());
             showMultiSummary();
-            btnMulti.setText("Lectura Múltiple");
+            btnStartInventory.setText("Lectura Múltiple");
         } else {
             // ── Iniciar lectura múltiple ──────────────────────────────────
             isMultiReading = true;
@@ -285,7 +285,7 @@ public class IminRfidConfigActivity extends AppCompatActivity implements IReader
             logInfo("[MULTI] Inventario continuo activo. Presione \"Detener\" para finalizar.");
             boolean started = iminDevice.startInventory();
             logInfo("[MULTI] startInventory() → " + (started ? "OK ✓" : "FALLÓ ✗"));
-            btnMulti.setText("Detener (0)");
+            btnStartInventory.setText("Detener (0)");
             tvTags.setText("Escaneando... (0 tags)");
         }
     }
