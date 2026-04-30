@@ -236,13 +236,16 @@ public class IminReaderImpl implements IReaderDevice {
 
                 // Configurar hardware a modo RFID-only
                 try {
-                    // Intentar con la estructura 'value' (tercer candidato para iMin Lark 1)
+                    // Candidato 1: JSON con 'value'
                     String configTrigger = "{\"value\":1}";
                     rfidHelper.extendOperation(CMD.SET_TRIGGER_FUNCTION, configTrigger);
-                    Log.i(TAG, "[INIT] Trigger configurado a RFID-only (value=1)");
-                    Thread.sleep(150);
+                    Log.i(TAG, "[INIT] Intentado Trigger value=1 (JSON)");
+                    
+                    // Pequeña pausa y verificamos si hubo error en el callback (esto es asíncrono pero ayuda)
+                    Thread.sleep(100);
                 } catch (Exception e) {
                     Log.w(TAG, "[INIT] Error configurando trigger: " + e.getMessage());
+                    handleBinderError(e);
                 } finally {
                     isConnecting = false;
                 }
@@ -303,17 +306,25 @@ public class IminReaderImpl implements IReaderDevice {
         
         executor.execute(() -> {
             try {
+                if (rfidHelper == null) return;
+                
                 Log.i(TAG, "[SINGLE] ══ Modo SENCILLA iniciando...");
                 Log.d(TAG, "[SINGLE] Limpiando buffer interno de tags (CMD.CLEAR_TAG)...");
                 try {
                     rfidHelper.extendOperation(CMD.CLEAR_TAG, "");
-                    Thread.sleep(50); // Dar tiempo al hardware para procesar el comando
+                    Thread.sleep(50);
                 } catch (Exception e) {
                     Log.w(TAG, "[SINGLE] Error limpiando tags: " + e.getMessage());
                 }
+
                 Log.d(TAG, "[SINGLE] Llamando rfidHelper.tagInventoryAsyncFastStartReading()");
-                rfidHelper.tagInventoryAsyncFastStartReading();
-                Log.i(TAG, "[SINGLE] tagInventoryAsyncFastStartReading() ÔåÆ OK Ô£ô");
+                try {
+                    rfidHelper.tagInventoryAsyncFastStartReading();
+                    Log.i(TAG, "[SINGLE] tagInventoryAsyncFastStartReading() invocado ✓");
+                } catch (Exception e) {
+                    Log.e(TAG, "[SINGLE] Error en tagInventoryAsyncFast: " + e.getMessage());
+                    handleBinderError(e);
+                }
                 
                 // Timeout de 3 segundos para detener la lectura si no se encuentra ningún tag
                 uiHandler.postDelayed(() -> {
@@ -377,6 +388,9 @@ public class IminReaderImpl implements IReaderDevice {
             public void onSuccess(byte cmd, DataParameter dataParameter) {
                 Log.i(TAG, "[onSuccess] CMD=0x" + String.format("%02X", cmd) +
                         " (" + getCmdName(cmd) + ")");
+                
+                // Fallback para SET_TRIGGER_FUNCTION (0x97) si el éxito no es total o queremos asegurar
+                // (En iMin a veces onSuccess con status extraño significa error parcial)
                 if (dataParameter != null) {
                     String extra = dataParameter.toString();
                     if (extra != null && !extra.isEmpty()) {
@@ -462,10 +476,25 @@ public class IminReaderImpl implements IReaderDevice {
              */
             @Override
             public void onFiled(byte cmd, byte errorCode, String msg) {
-                Log.i(TAG, "[onFailed/Filed] CMD=0x" + String.format("%02X", cmd) +
+                Log.e(TAG, "[onFailed/Filed] CMD=0x" + String.format("%02X", cmd) +
                         " (" + getCmdName(cmd) + ")" +
                         " | ErrorCode=0x" + String.format("%02X", errorCode) +
                         " | Msg: " + msg);
+
+                // Fallback para SET_TRIGGER_FUNCTION (0x97) si falla por parámetros (0xFE o similar)
+                if ((cmd & 0xFF) == 0x97) {
+                    Log.i(TAG, "[RETRY] SET_TRIGGER_FUNCTION falló. Reintentando con valor crudo '1' (no-JSON)...");
+                    executor.execute(() -> {
+                        try {
+                            if (rfidHelper != null) {
+                                rfidHelper.extendOperation(CMD.SET_TRIGGER_FUNCTION, "1");
+                                Log.i(TAG, "[RETRY] Comando crudo '1' enviado.");
+                            }
+                        } catch (Exception ex) {
+                            Log.e(TAG, "[RETRY] Error en reintento: " + ex.getMessage());
+                        }
+                    });
+                }
             }
         });
 
