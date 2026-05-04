@@ -2,46 +2,50 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="#F5F5F5">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:gravity="center_horizontal">
+        android:padding="16dp">
 
-        <!-- Header -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Configuración RFID — iMin"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="#2E7D32"
-            android:layout_marginBottom="4dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="SDK iMin RFID v1.0.3  |  Modelo: I24P01 / Lark 1"
-            android:textSize="12sp"
-            android:textColor="#888888"
-            android:layout_marginBottom="20dp"/>
-
-        <!-- Service Health -->
-        <TextView
+        <!-- ═══════════════ HEADER ═══════════════ -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Estado del Servicio iMin:"
-            android:textSize="15sp"
-            android:textStyle="bold"/>
+            android:orientation="vertical"
+            android:background="#1B5E20"
+            android:padding="16dp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📡 RFID iMin Lark 1"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SDK v1.0.3  |  I24P01  |  UHF RFID"
+                android:textSize="12sp"
+                android:textColor="#A5D6A7"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <!-- ═══════════════ ESTADO DEL SERVICIO ═══════════════ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:background="#FFFFFF"
+            android:padding="12dp"
             android:layout_marginBottom="8dp">
 
             <TextView
@@ -50,9 +54,8 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="com.imin.peripherservice: ?"
-                android:textSize="13sp"
-                android:background="#F9FBE7"
-                android:padding="8dp"/>
+                android:textSize="12sp"
+                android:textColor="#444444"/>
 
             <Button
                 android:id="@+id/btn_imin_check_service"
@@ -61,36 +64,203 @@
                 android:text="Verificar"
                 android:backgroundTint="#558B2F"
                 android:textColor="#FFFFFF"
+                android:textSize="12sp"
                 android:layout_marginStart="8dp"/>
         </LinearLayout>
 
-        <!-- Connection State -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Estado de Conexión:"
-            android:textSize="16sp"/>
-
-        <TextView
-            android:id="@+id/tv_imin_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="DESCONECTADO"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FF0000"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView
-            android:id="@+id/tv_imin_device_info"
+        <!-- ═══════════════ ESTADO DE CONEXIÓN ═══════════════ -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dispositivo: --"
-            android:textSize="14sp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#FFFFFF"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_imin_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="● DESCONECTADO"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#D32F2F"/>
+
+                <TextView
+                    android:id="@+id/tv_imin_device_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dispositivo: --"
+                    android:textSize="12sp"
+                    android:textColor="#666666"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_imin_diagnostic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔍 Info"
+                android:backgroundTint="#455A64"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             SECCIÓN PRINCIPAL — PRUEBA DIRECTA SDK (SIN PATRÓN)
+             ═══════════════════════════════════════════════════════════ -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PRUEBA DIRECTA — SDK iMin"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="#E65100"
+            android:padding="10dp"
             android:gravity="center"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Llama directamente a RFIDManager sin patrón de abstracción"
+            android:textSize="11sp"
+            android:textColor="#BF360C"
+            android:gravity="center"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- FILA 1: CONECTAR / DESCONECTAR -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/btn_direct_connect"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="56dp"
+                android:text="🔗 CONECTAR"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:backgroundTint="#2E7D32"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_direct_disconnect"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="56dp"
+                android:text="❌ DESCONECTAR"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:backgroundTint="#B71C1C"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <!-- FILA 2: LECTURA SENCILLA -->
+        <Button
+            android:id="@+id/btn_direct_single"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="📖 LECTURA SENCILLA (1 Tag, auto-stop)"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:backgroundTint="#1565C0"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- FILA 3: START / STOP MÚLTIPLE -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btn_direct_start"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="56dp"
+                android:text="▶ START\n(Múltiple)"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:backgroundTint="#F57F17"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btn_direct_stop"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="56dp"
+                android:text="⏹ STOP\n(Múltiple)"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:backgroundTint="#37474F"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <!-- ═══════════════ TAGS LEÍDOS ═══════════════ -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tags Leídos:"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tv_imin_tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="64dp"
+            android:background="#E8F5E9"
+            android:padding="12dp"
+            android:text="Esperando lectura..."
+            android:textColor="#1B5E20"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- ═══════════════ SEPARADOR ═══════════════ -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#CCCCCC"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Connect/Disconnect -->
+        <!-- ═══════════════════════════════════════════════════════════
+             SECCIÓN SECUNDARIA — CON PATRÓN (ReaderFactory/IReaderDevice)
+             ═══════════════════════════════════════════════════════════ -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PRUEBA CON PATRÓN (ReaderFactory)"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="#4A148C"
+            android:padding="10dp"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Connect/Disconnect via abstracción -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -104,7 +274,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Conectar"
-                android:backgroundTint="#2E7D32"
+                android:backgroundTint="#6A1B9A"
                 android:textColor="#FFFFFF"
                 android:layout_marginEnd="4dp"/>
 
@@ -114,12 +284,12 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Desconectar"
-                android:backgroundTint="#B71C1C"
+                android:backgroundTint="#880E4F"
                 android:textColor="#FFFFFF"
                 android:layout_marginStart="4dp"/>
         </LinearLayout>
 
-        <!-- Inventory Controls -->
+        <!-- Inventory Controls via abstracción -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -133,6 +303,8 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Lectura Sencilla"
+                android:backgroundTint="#6A1B9A"
+                android:textColor="#FFFFFF"
                 android:layout_marginEnd="4dp"/>
 
             <Button
@@ -141,22 +313,34 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="Lectura Múltiple"
+                android:backgroundTint="#6A1B9A"
+                android:textColor="#FFFFFF"
                 android:layout_marginStart="4dp"/>
         </LinearLayout>
 
-        <!-- IMIN-specific: antenna power in dBm -->
+        <Button
+            android:id="@+id/btn_imin_stop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Stop Múltiple"
+            android:backgroundTint="#4A148C"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Potencia Antena -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Potencia Antena iMin (dBm):"
-            android:textStyle="bold"/>
+            android:text="Potencia Antena (5–33 dBm):"
+            android:textStyle="bold"
+            android:textSize="13sp"/>
 
         <SeekBar
             android:id="@+id/sb_imin_power"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="33"
-            android:progress="30"
+            android:max="28"
+            android:progress="25"
             android:layout_marginBottom="4dp"/>
 
         <LinearLayout
@@ -164,7 +348,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_horizontal"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="8dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -194,129 +378,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Aplicar Potencia"
-            android:backgroundTint="#1B5E20"
+            android:backgroundTint="#4A148C"
             android:textColor="#FFFFFF"
-            android:layout_marginBottom="12dp"/>
-
-        <!-- IMIN Diagnostic -->
-        <Button
-            android:id="@+id/btn_imin_diagnostic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="🔍 Diagnóstico iMin"
-            android:backgroundTint="#2E7D32"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- PRUEBAS DIRECTAS SECTION -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="#CCCCCC"
-            android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"/>
 
-        <TextView
+        <!-- ═══════════════ LOG ═══════════════ -->
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="PRUEBAS DIRECTAS (SIN ABSTRACCIÓN):"
-            android:textStyle="bold"
-            android:textColor="#C62828"
+            android:layout_height="1dp"
+            android:background="#CCCCCC"
             android:layout_marginBottom="8dp"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
-
-            <Button
-                android:id="@+id/btn_direct_connect"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="SDK Connect"
-                android:textSize="12sp"
-                android:backgroundTint="#FF9800"
-                android:layout_marginEnd="4dp"/>
-
-            <Button
-                android:id="@+id/btn_direct_clear"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="SDK Clear"
-                android:textSize="12sp"
-                android:backgroundTint="#FF9800"
-                android:layout_marginStart="4dp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
-
-            <Button
-                android:id="@+id/btn_direct_inventory"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="SDK Start"
-                android:textSize="12sp"
-                android:backgroundTint="#FF9800"
-                android:layout_marginEnd="4dp"/>
-
-            <Button
-                android:id="@+id/btn_direct_single"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="SDK Single"
-                android:textSize="12sp"
-                android:backgroundTint="#FF9800"
-                android:layout_marginEnd="4dp"/>
-
-            <Button
-                android:id="@+id/btn_direct_stop"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="SDK Stop"
-                android:textSize="12sp"
-                android:backgroundTint="#FF9800"
-                android:layout_marginStart="4dp"/>
-        </LinearLayout>
-
-        <!-- Tags Read -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tags Leídos:"
+            android:text="Log de eventos:"
             android:textStyle="bold"
-            android:layout_marginTop="4dp"/>
+            android:textSize="13sp"
+            android:layout_marginBottom="4dp"/>
 
-        <TextView
-            android:id="@+id/tv_imin_tags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:background="#E8F5E9"
-            android:padding="8dp"
-            android:text="Esperando lectura..."
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Log -->
         <TextView
             android:id="@+id/tv_imin_log"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:text="Logs iMin..."
-            android:background="#EEEEEE"
-            android:padding="8dp"
-            android:textSize="12sp"
-            android:scrollbars="vertical"/>
+            android:layout_height="280dp"
+            android:text="--- Inicio de sesión ---"
+            android:background="#263238"
+            android:padding="10dp"
+            android:textSize="11sp"
+            android:textColor="#A5D6A7"
+            android:fontFamily="monospace"
+            android:scrollbars="vertical"
+            android:layout_marginBottom="16dp"/>
 
     </LinearLayout>
 </ScrollView>
