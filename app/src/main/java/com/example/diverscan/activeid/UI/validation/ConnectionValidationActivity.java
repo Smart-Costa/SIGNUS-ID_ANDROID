@@ -152,7 +152,8 @@ public class ConnectionValidationActivity extends AppCompatActivity
         logInfo("Sesión iniciada: modelo=" + Build.MODEL + " sdk=" + Build.VERSION.SDK_INT);
 
         btnReconnect.setOnClickListener(v -> {
-            logInfo("Reiniciando conexión...");
+            logInfo("=== INICIANDO VALIDACIÓN DE CONEXIÓN ===");
+            logInfo("Estado previo - Inicializado: " + rfidHandler.isInitialized() + " | Conectado: " + rfidHandler.isConnected());
 
             // Set transport based on selection
             int checkedId = rgTransport.getCheckedRadioButtonId();
@@ -160,22 +161,44 @@ public class ConnectionValidationActivity extends AppCompatActivity
 
             if (checkedId == R.id.rb_usb) {
                 connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.USB;
+                logInfo("Modo seleccionado en interfaz: USB (eConnex/OTG)");
                 inspectUsbState(true);
             } else if (checkedId == R.id.rb_serial) {
                 connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.SERIAL;
+                logInfo("Modo seleccionado en interfaz: SERIAL");
+            } else if (checkedId == R.id.rb_bluetooth) {
+                connType = com.example.diverscan.activeid.DeviceInterface.ConnectionType.BLUETOOTH;
+                logInfo("Modo seleccionado en interfaz: BLUETOOTH");
+            } else {
+                logWarn("RadioGroup transport no coincide con ninguna opción conocida. ID: " + checkedId);
             }
 
             com.example.diverscan.activeid.DeviceInterface.ReaderType type = com.example.diverscan.activeid.DeviceInterface.ReaderType.ZEBRA;
 
-            logInfo("Reconectando como: " + type + " via " + connType);
-            rfidHandler.setReaderType(type, connType);
+            logInfo("Invocando setReaderType(" + type + ", " + connType + ")...");
+            try {
+                rfidHandler.setReaderType(type, connType);
+                logInfo("setReaderType invocado correctamente");
+            } catch (Exception e) {
+                logError("Fallo crítico en setReaderType: " + e.getMessage());
+            }
+            
             updateUI();
+            
+            logInfo("Estado posterior - Inicializado: " + rfidHandler.isInitialized() + " | Conectado: " + rfidHandler.isConnected());
             try {
                 List<String> devices = rfidHandler.getFoundDevices();
-                logInfo("Dispositivos detectados tras reconexión: " + (devices == null ? 0 : devices.size()));
+                int size = (devices == null ? 0 : devices.size());
+                logInfo("Lectores Zebra detectados por el SDK tras reconexión: " + size);
+                if (devices != null && size > 0) {
+                    for (int i = 0; i < size; i++) {
+                        logInfo("Lector [" + i + "]: " + devices.get(i));
+                    }
+                }
             } catch (Exception e) {
-                logError("Error obteniendo dispositivos tras reconexión: " + e.getMessage());
+                logError("Error obteniendo lista de lectores tras reconexión: " + e.getMessage());
             }
+            logInfo("=== FIN DE VALIDACIÓN DE CONEXIÓN ===");
         });
 
         btnTestSingle.setOnClickListener(v -> startSingleRead());
@@ -601,6 +624,7 @@ public class ConnectionValidationActivity extends AppCompatActivity
     }
 
     private void checkAndRequestPermissions() {
+        logInfo("Validando manifiesto y permisos en tiempo de ejecución...");
         String[] permissions;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // Android 12+ (API 31+):
@@ -623,17 +647,19 @@ public class ConnectionValidationActivity extends AppCompatActivity
 
         List<String> listPermissionsNeeded = new ArrayList<>();
         for (String p : permissions) {
-            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
+            boolean isGranted = ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_GRANTED;
+            logInfo("Permiso: " + p.substring(p.lastIndexOf('.') + 1) + " -> " + (isGranted ? "CONCEDIDO (OK)" : "REQUERIDO (FALTA)"));
+            if (!isGranted) {
                 listPermissionsNeeded.add(p);
             }
         }
 
         if (!listPermissionsNeeded.isEmpty()) {
-            logWarn("Solicitando permisos: " + listPermissionsNeeded);
+            logWarn("Hay permisos ausentes en tiempo de ejecución. Solicitando al sistema: " + listPermissionsNeeded);
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]),
                     PERMISSION_REQUEST_CODE);
         } else {
-            logInfo("Permisos ya concedidos para conexión RFID.");
+            logInfo("Todos los permisos de sistema declarados están concedidos (OK).");
         }
     }
 
