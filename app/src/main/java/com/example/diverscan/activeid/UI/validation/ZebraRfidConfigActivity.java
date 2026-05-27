@@ -46,7 +46,7 @@ import java.util.Map;
 /**
  * Zebra-specific RFID configuration screen.
  * Uses Zebra RFID SDK API3 v2.0.5.226.
- * Tests: USB & Serial transport, USB device inspection, DataWedge toggle,
+ * Tests: USB, Serial & Bluetooth transport, USB device inspection, DataWedge toggle,
  *        single tag read, multi tag read, antenna power index.
  */
 public class ZebraRfidConfigActivity extends AppCompatActivity implements ResponseHandlerInterface {
@@ -110,8 +110,13 @@ public class ZebraRfidConfigActivity extends AppCompatActivity implements Respon
 
         // Restore last known Zebra connection type
         String lastConn = SharedPreferencesGetSet.leer_local("zebra_connection_type_last_ok", this);
-        if ("USB".equalsIgnoreCase(lastConn)) rgTransport.check(R.id.rb_zebra_usb);
-        else rgTransport.check(R.id.rb_zebra_serial);
+        if ("USB".equalsIgnoreCase(lastConn)) {
+            rgTransport.check(R.id.rb_zebra_usb);
+        } else if ("BLUETOOTH".equalsIgnoreCase(lastConn)) {
+            rgTransport.check(R.id.rb_zebra_bluetooth);
+        } else {
+            rgTransport.check(R.id.rb_zebra_serial);
+        }
 
         rfidHandler = TagWriter.getInstance();
         if (!rfidHandler.isInitialized()) rfidHandler.onCreate(this);
@@ -146,7 +151,7 @@ public class ZebraRfidConfigActivity extends AppCompatActivity implements Respon
         requestPermissionsIfNeeded();
         updateUI();
         logInfo("Zebra Config UI lista. Modelo dispositivo: " + Build.MODEL);
-        logWarn("SDK API3 v2.0.5.226 | Protocolo sugerido: SERIAL para dispositivos TC-Series, USB para RFD-Series.");
+        logWarn("SDK API3 v2.0.5.226 | Protocolo: SERIAL (TC-Series), USB (RFD-Series), BLUETOOTH (Sleds externos).");
     }
 
     @Override
@@ -160,7 +165,6 @@ public class ZebraRfidConfigActivity extends AppCompatActivity implements Respon
     @Override
     protected void onPause() {
         super.onPause();
-        // Keep reader active
     }
 
     @Override
@@ -175,9 +179,18 @@ public class ZebraRfidConfigActivity extends AppCompatActivity implements Respon
 
     private void reconnect() {
         int id = rgTransport.getCheckedRadioButtonId();
-        ConnectionType ct = id == R.id.rb_zebra_usb ? ConnectionType.USB : ConnectionType.SERIAL;
+        ConnectionType ct;
+        if (id == R.id.rb_zebra_usb) {
+            ct = ConnectionType.USB;
+            inspectUsb(true);
+        } else if (id == R.id.rb_zebra_bluetooth) {
+            ct = ConnectionType.BLUETOOTH;
+            logInfo("Buscando lectores Zebra via Bluetooth...");
+        } else {
+            ct = ConnectionType.SERIAL;
+        }
+
         logInfo("Reconectando Zebra via " + ct + "...");
-        if (ct == ConnectionType.USB) inspectUsb(true);
         rfidHandler.setReaderType(ReaderType.ZEBRA, ct);
         handler.postDelayed(this::updateUI, 2000);
     }
@@ -336,14 +349,19 @@ public class ZebraRfidConfigActivity extends AppCompatActivity implements Respon
     // ─── Permissions ──────────────────────────────────────────────────────────
 
     private void requestPermissionsIfNeeded() {
-        String[] perms = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-                ? new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}
-                : new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
         List<String> needed = new ArrayList<>();
-        for (String p : perms) {
-            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED)
-                needed.add(p);
+        
+        // Bluetooth Permissions
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED)
+                needed.add(Manifest.permission.BLUETOOTH_SCAN);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED)
+                needed.add(Manifest.permission.BLUETOOTH_CONNECT);
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                needed.add(Manifest.permission.ACCESS_FINE_LOCATION);
         }
+        
         if (!needed.isEmpty()) ActivityCompat.requestPermissions(this, needed.toArray(new String[0]), PERMISSION_REQUEST_CODE);
     }
 

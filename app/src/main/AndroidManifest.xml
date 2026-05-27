@@ -12,19 +12,17 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <!-- 📡 Permisos Bluetooth completos (Legacy API ≤ 30 + Modern API 31+) -->
-    <uses-permission android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
-        android:maxSdkVersion="30" />
+    <!-- 📡 Permisos Bluetooth completos 
+         IMPORTANTE: Se eliminan los maxSdkVersion="30" porque en dispositivos Zebra con Android 13, 
+         ciertos broadcasts (ACL_CONNECTED) siguen requiriendo la declaración base. -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
 
     <!-- 🔌 USB Host — acceso a lectores RFID USB/Serial (eConnex, OTG) -->
-    <!-- NOTA: USB_PERMISSION NO es un permiso del sistema, se gestiona con
-         UsbManager.requestPermission() en tiempo de ejecución, NO aquí. -->
     <uses-feature android:name="android.hardware.usb.host" android:required="true" />
     <uses-feature android:name="android.hardware.usb.accessory" android:required="false" />
 
@@ -41,12 +39,17 @@
 
     <!-- 📷 Cámara — requerida y declarada como permiso en runtime -->
     <uses-permission android:name="android.permission.CAMERA" />
-
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- 📷 Cámara requerida para funcionalidades principales -->
     <uses-feature android:name="android.hardware.camera" android:required="true" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <!-- 🔍 Visibilidad de paquetes para Android 11+ (API 30+) 
+         Necesario para que la app pueda "ver" y conectarse al servicio RFID de Zebra. -->
+    <queries>
+        <package android:name="com.zebra.rfid.api3" />
+    </queries>
 
     <!-- 🧱 Configuración de la aplicación -->
     <application
@@ -62,6 +65,9 @@
         android:enableOnBackInvokedCallback="true"
         android:windowSoftInputMode="stateHidden"
         android:requestLegacyExternalStorage="false">
+
+        <!-- 🏷️ Librería EMDK de Zebra necesaria para acceso a hardware en algunos modelos -->
+        <uses-library android:name="com.symbol.emdk" android:required="false" />
 
         <!-- 🌀 Splash Screen -->
         <activity
@@ -156,11 +162,6 @@
             android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"
             android:exported="false"/>
-        <!--<activity android:name=".UI.activo.RegistroActivoActivity"
-            android:label="@string/crear"
-            android:parentActivityName=".UI.main.MainActivity"
-            android:screenOrientation="portrait"
-            android:exported="false"/>-->
         <activity android:name=".Locate_Assets.AsignarUbicacion"
             android:label="@string/Ubicaciones"
             android:parentActivityName=".UI.main.MainActivity"
@@ -231,19 +232,6 @@
             android:parentActivityName=".UI.main.MainActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
-
-        <!--<activity android:name=".CreateAsset.SelectLocationActivity"
-            android:parentActivityName=".UI.main.MainActivity"
-            android:label="@string/UbicacionNuevoActivo"
-            android:exported="false" />
-        <activity android:name=".CreateAsset.RegisterAssetPrimaryActivity"
-            android:parentActivityName=".UI.activo.RegistroActivoActivity"
-            android:label="@string/DatosNuevoActivoObligatorios"
-            android:exported="false" />
-        <activity android:name=".CreateAsset.RegisterAssetSecondaryActivity"
-            android:parentActivityName=".CreateAsset.RegisterAssetPrimaryActivity"
-            android:label="@string/DatosNuevoActivoSecundarios"
-            android:exported="false" />-->
 
         <!-- 🏷️ Gestión de Tags -->
         <activity android:name=".Tags.ClasificacionTags"

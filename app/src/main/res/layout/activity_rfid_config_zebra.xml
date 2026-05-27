@@ -76,16 +76,22 @@
                 android:id="@+id/rb_zebra_usb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="USB (SERVICE_USB)"
-                android:layout_marginHorizontal="8dp"/>
+                android:text="USB"
+                android:layout_marginHorizontal="4dp"/>
 
             <RadioButton
                 android:id="@+id/rb_zebra_serial"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Serial (eConnex)"
-                android:checked="true"
-                android:layout_marginStart="8dp"/>
+                android:text="Serial"
+                android:layout_marginHorizontal="4dp"/>
+
+            <RadioButton
+                android:id="@+id/rb_zebra_bluetooth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BT"
+                android:layout_marginHorizontal="4dp"/>
         </RadioGroup>
 
         <!-- Reconnect -->
