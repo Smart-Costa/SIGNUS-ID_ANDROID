@@ -569,6 +569,7 @@ public class ZebraReaderImpl implements IReaderDevice, Readers.RFIDReaderEventHa
                 Log.d(TAG, "eventReadNotify() tagsBatch=" + myTags.length);
                 List<ReaderTag> convertedTags = new ArrayList<>();
                 for (TagData tag : myTags) {
+                    Log.d(TAG, "[RAW-TAG] EPC=" + tag.getTagID() + " RSSI=" + tag.getPeakRSSI());
                     convertedTags.add(new ReaderTag(tag.getTagID(), tag.getPeakRSSI()));
                 }
                 if (listener != null) {

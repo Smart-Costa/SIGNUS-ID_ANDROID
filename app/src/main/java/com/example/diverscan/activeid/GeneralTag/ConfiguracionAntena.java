@@ -83,6 +83,7 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
             txtLogView.setMovementMethod(new android.text.method.ScrollingMovementMethod());
         }
 
+        validarYLoguearPermisos();
         eventos();
         try{
             Power = SharedPreferencesGetSet.leer_local("potenciaAntena", this);
@@ -324,6 +325,7 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
     @Override
     protected void onResume() {
         super.onResume();
+        validarYLoguearPermisos();
         initializeRfidSetupIfPermitted();
         if (!PermissionUtils.checkPermissions(this)) {
             return;
@@ -383,11 +385,12 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
     private void conectarLector() {
         if (!PermissionUtils.checkPermissions(this)) {
             txtCnfActual.setText("Estado: permisos pendientes");
+            logInfo("Intento de conexión fallido: permisos pendientes");
             Toast.makeText(_context, "Permisos pendientes para conexión RFID", Toast.LENGTH_SHORT).show();
             PermissionUtils.requestPermissions(this);
             return;
         }
-        Log.d(TAG, "Conectando lector...");
+        logInfo("Conectando lector...");
         if (rfidHandler != null) {
              String result = rfidHandler.onResume();
              Toast.makeText(_context, result, Toast.LENGTH_SHORT).show();
@@ -399,9 +402,11 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
         if (!PermissionUtils.checkPermissions(this)) {
             PermissionUtils.requestPermissions(this);
             txtCnfActual.setText("Estado: permisos pendientes");
+            logInfo("RFID Setup detenido: permisos pendientes. Solicitando...");
             return;
         }
         if (setupCompleted) return;
+        logInfo("Inicializando Setup RFID...");
         rfidHandler = TagWriter.getInstance();
         if (!rfidHandler.isInitialized()) {
             rfidHandler.onCreate(this);
@@ -413,6 +418,39 @@ public class ConfiguracionAntena extends AppCompatActivity implements ResponseHa
         conectarLector();
         setupCompleted = true;
     }
+
+    private void logInfo(String message) {
+        Log.d(TAG, message);
+        if (txtLogView != null) {
+            runOnUiThread(() -> {
+                txtLogView.append(message + "\n");
+                int scrollAmount = txtLogView.getLayout() != null 
+                    ? txtLogView.getLayout().getLineTop(txtLogView.getLineCount()) - txtLogView.getHeight()
+                    : 0;
+                if (scrollAmount > 0) {
+                    txtLogView.scrollTo(0, scrollAmount);
+                }
+            });
+        }
+    }
+
+    private void validarYLoguearPermisos() {
+        logInfo("=== VALIDACIÓN DE PERMISOS AL INGRESAR A CONFIGURACIÓN ===");
+        logInfo("Dispositivo Android API SDK: " + android.os.Build.VERSION.SDK_INT);
+        String[] permissions = PermissionUtils.getRequiredPermissions();
+        boolean allGranted = true;
+        for (String permission : permissions) {
+            int status = androidx.core.content.ContextCompat.checkSelfPermission(this, permission);
+            boolean isGranted = (status == android.content.pm.PackageManager.PERMISSION_GRANTED);
+            logInfo("Permiso: " + permission + " -> " + (isGranted ? "CONCEDIDO" : "DENEGADO"));
+            if (!isGranted) {
+                allGranted = false;
+            }
+        }
+        logInfo("Resultado final de permisos: " + (allGranted ? "APROBADO" : "PENDIENTE"));
+        logInfo("=========================================================");
+    }
+
     public void controles(){
          mConfigurarAntena = findViewById(R.id.FConfigurarAntena);
          txtPotencia = findViewById(R.id.txtPotencia);

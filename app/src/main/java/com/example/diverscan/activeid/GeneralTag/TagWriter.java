@@ -299,6 +299,12 @@ public class TagWriter implements IReaderListener {
 
     @Override
     public void onTagRead(List<ReaderTag> tags) {
+        Log.d(TAG, "onTagRead() received tags count=" + (tags != null ? tags.size() : 0));
+        if (tags != null) {
+            for (ReaderTag tag : tags) {
+                Log.d(TAG, "[TAG-WRITER-TAG] EPC=" + tag.getEpc() + " RSSI=" + tag.getRssi());
+            }
+        }
         ResponseHandlerInterface handler = (responseHandlerRef != null) ? responseHandlerRef.get() : null;
         if (handler != null && tags != null && !tags.isEmpty()) {
             ReaderTag[] legacyTags = tags.toArray(new ReaderTag[0]);
@@ -393,7 +399,13 @@ public class TagWriter implements IReaderListener {
     }
 
     public synchronized void stopInventory() {
-        if (device != null) device.stopInventory();
+        if (device != null) {
+            new Thread(() -> {
+                Log.d(TAG, "[RFID-STOP-BG] stopInventory() en background thread...");
+                device.stopInventory();
+                Log.d(TAG, "[RFID-STOP-BG] stopInventory() terminado");
+            }, "RFID-Stop-Thread").start();
+        }
     }
 
     public void setAntennaPower(int power) {
